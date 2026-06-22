@@ -381,6 +381,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="arena">Arena</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
+    <div class="nav-item" data-view="sandbox">Sandbox</div>
   </nav>
   
   <main>
@@ -551,6 +552,43 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
           <li><strong>CHAIN</strong> — Agentic workflows and multi-step pipelines</li>
           <li><strong>CENTAUUR</strong> — Human-AI synthesis and competitive frontier execution</li>
         </ul>
+      </div>
+    </section>
+    <section class="view" id="view-sandbox">
+      <h1 class="section-title">Prompt Builder Sandbox</h1>
+      <p class="section-sub">Construct a structured System Prompt using the 4 elements. Calculate token cost and copy to clipboard.</p>
+      
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// 1. Define Elements</div>
+          <div style="display:grid;gap:1rem">
+            <div>
+              <label style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;">Role (Who is the AI?)</label>
+              <input type="text" id="sb-role" placeholder="e.g., Senior Staff Engineer at FAANG" style="width:100%;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.6rem;margin-top:0.3rem;border-radius:2px;font-family:var(--mono);font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;">Task (What is it doing?)</label>
+              <input type="text" id="sb-task" placeholder="e.g., Review my Python code for edge cases" style="width:100%;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.6rem;margin-top:0.3rem;border-radius:2px;font-family:var(--mono);font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;">Constraints (What NOT to do?)</label>
+              <input type="text" id="sb-constraints" placeholder="e.g., Do not rewrite the code. No fluff." style="width:100%;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.6rem;margin-top:0.3rem;border-radius:2px;font-family:var(--mono);font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;">Output (Exact format)</label>
+              <input type="text" id="sb-output" placeholder="e.g., Bullet points of categories, then ask a guiding question." style="width:100%;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.6rem;margin-top:0.3rem;border-radius:2px;font-family:var(--mono);font-size:0.85rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-label">// 2. Generated Prompt</div>
+          <div id="sb-preview" style="background:var(--void);border:1px solid var(--border);padding:1rem;border-radius:4px;height:200px;overflow-y:auto;font-size:0.85rem;color:var(--text);line-height:1.6;white-space:pre-wrap;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;">
+            <div style="font-size:0.7rem;color:var(--text-dim)">Tokens: <span id="sb-tokens" style="color:var(--cyan)">0</span> (~4 chars = 1 token)</div>
+            <button class="btn" id="sb-copy">Copy to Clipboard</button>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -2059,7 +2097,58 @@ function init(){
   bootSequence();
 }
 
-init();
+// ============== SANDBOX ==============
+function renderSandbox() {
+  const role = document.getElementById('sb-role').value;
+  const task = document.getElementById('sb-task').value;
+  const constraints = document.getElementById('sb-constraints').value;
+  const output = document.getElementById('sb-output').value;
+  
+  let prompt = "";
+  if(role) prompt += "ROLE:\nYou are a " + role + ".\n\n";
+  if(task) prompt += "TASK:\n" + task + ".\n\n";
+  if(constraints) prompt += "CONSTRAINTS:\n" + constraints + ".\n\n";
+  if(output) prompt += "OUTPUT:\n" + output + ".";
+  
+  if(!prompt) prompt = "Start typing to generate your structured System Prompt...";
+  
+  document.getElementById('sb-preview').textContent = prompt;
+  
+  // Mock token calc (1 token ~= 4 chars)
+  const tokens = Math.ceil(prompt.length / 4);
+  document.getElementById('sb-tokens').textContent = tokens;
+}
+
+['sb-role', 'sb-task', 'sb-constraints', 'sb-output'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', renderSandbox);
+});
+
+document.getElementById('sb-copy').onclick = () => {
+  const text = document.getElementById('sb-preview').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('Prompt copied to clipboard', 'success');
+  }, () => {
+    toast('Failed to copy', 'error');
+  });
+};
+
+// Update showView to handle sandbox
+const originalShowView = showView;
+showView = function(name) {
+  originalShowView(name);
+  if(name === 'sandbox') renderSandbox();
+};
+
+function init(){
+  S = loadState();
+  // ... other code ...
+  
+  // ADD THIS LINE:
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  
+  bootSequence();
+}
 
 })();
 </script>
