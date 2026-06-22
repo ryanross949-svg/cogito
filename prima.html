@@ -1121,7 +1121,21 @@ function renderDashboard(){
   
   const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
   const dueCards = getDueCards();
-  const nextProjectPhase = PROJECT_PHASES.find(p => !S.project[p.id].solved && S.modules[p.moduleId].unlocked);
+    let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) {
+        const prevPhaseId = PROJECT_PHASES[i-1].id;
+        if (!S.project[prevPhaseId].solved) canUnlock = false;
+      }
+      if (canUnlock) {
+        nextProjectPhase = p;
+        break;
+      }
+    }
+  }
   
   if(dueCards.length > 0){
     missionTitle.textContent = 'Clear Drill Queue';
@@ -1397,13 +1411,22 @@ function renderProject(){
   html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'OPERATIONAL' : 'IN DEVELOPMENT') + '</span></div>';
   html += '</div>';
   
-  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to the project scenario. Phases unlock sequentially as you complete the corresponding training modules. Make the principled choice to proceed.</p>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to the project scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
   
   html += '<div class="phase-list">';
   PROJECT_PHASES.forEach((p, i) => {
     const m = MODULES.find(x => x.id === p.moduleId);
     const solved = S.project[p.id].solved;
-    const unlocked = S.modules[p.moduleId].unlocked;
+    
+    // FIX: A phase is only unlocked if its module is unlocked AND the previous phase is solved
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) {
+      const prevPhaseId = PROJECT_PHASES[i-1].id;
+      if (!S.project[prevPhaseId].solved) {
+        unlocked = false;
+      }
+    }
+    
     const active = !solved && unlocked;
     
     html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="PRIMA.showProjectPhase(\''+p.id+'\')"' : '') + '>';
