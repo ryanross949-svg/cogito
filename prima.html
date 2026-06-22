@@ -16,11 +16,42 @@
   --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
   --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
 }
+[data-theme="matrix"] {
+  --void:#000000; --void-2:#0A0A0A; --panel:rgba(0,20,0,0.8); --panel-solid:#050505;
+  --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366;
+  --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00;
+  --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5);
+}
+[data-theme="cyberpunk"] {
+  --void:#1A0A1A; --void-2:#2A0A2A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A;
+  --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C;
+  --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060;
+  --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6);
+}
+[data-theme="light"] {
+  --void:#FDF6E3; --void-2:#F5F0E0; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF;
+  --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F;
+  --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1;
+  --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3);
+}
+[data-theme="nord"] {
+  --void:#2E3440; --void-2:#3B4252; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440;
+  --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A;
+  --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A;
+  --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3);
+}
+.theme-dropdown { position: relative; display: inline-block; }
+.theme-btn { font-size: 0.6rem; color: var(--text-dim); background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.5rem; border-radius: 2px; cursor: pointer; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
+.theme-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.theme-menu { position: absolute; right: 0; top: 120%; background: var(--panel-solid); border: 1px solid var(--border-bright); border-radius: 4px; display: none; flex-direction: column; z-index: 100; min-width: 120px; }
+.theme-menu.active { display: flex; }
+.theme-option { padding: 0.5rem 1rem; font-size: 0.7rem; color: var(--text-dim); cursor: pointer; border: none; background: none; text-align: left; font-family: var(--mono); text-transform: uppercase; }
+.theme-option:hover { background: var(--panel); color: var(--cyan); }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
 body{
   background: radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%), var(--void);
-  min-height:100vh; position:relative; font-size:14px; line-height:1.6;
+  min-height:100vh; position:relative; font-size:14px; line-height:1.6; transition: background 0.3s, color 0.3s;
 }
 #particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
@@ -324,6 +355,16 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <a href="index.html" class="hub-link">← COGITO</a>
     </div>
     <div class="stats-strip">
+      <div class="theme-dropdown">
+        <button class="theme-btn" id="themeBtn">Theme</button>
+        <div class="theme-menu" id="themeMenu">
+          <button class="theme-option" onclick="PRIMA.setTheme('quantum')">Quantum</button>
+          <button class="theme-option" onclick="PRIMA.setTheme('matrix')">Matrix</button>
+          <button class="theme-option" onclick="PRIMA.setTheme('cyberpunk')">Cyberpunk</button>
+          <button class="theme-option" onclick="PRIMA.setTheme('light')">Light</button>
+          <button class="theme-option" onclick="PRIMA.setTheme('nord')">Nord</button>
+        </div>
+      </div>
       <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
       <div class="stat-pill">XP <b id="topXp">0</b></div>
       <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
@@ -1997,11 +2038,34 @@ function bootSequence(){
 window.PRIMA = {
   show: showView, showModuleDetail, showLesson, markLessonRead,
   showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
-  showProjectPhase, answerPhase
+  showProjectPhase, answerPhase, setTheme
 };
+
+// ============== THEME SWITCHER ==============
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme); // Use global key so all apps share theme
+  document.getElementById('themeMenu').classList.remove('active');
+  // Re-init particles to match new theme colors if needed, but CSS variables handle most of it
+}
+
+document.getElementById('themeBtn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('themeMenu').classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.theme-dropdown')) {
+    document.getElementById('themeMenu').classList.remove('active');
+  }
+});
 
 // ============== INIT ==============
 function init(){
+    // Load Global Theme
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  
   S = loadState();
   checkDailyReset();
   updateStreak();
