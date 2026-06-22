@@ -13,17 +13,12 @@
     --border: rgba(157,78,221,0.2); --border-bright: rgba(157,78,221,0.5);
     --display: 'Segoe UI', Helvetica, sans-serif; --mono: 'JetBrains Mono', monospace;
   }
-  /* THEMES */
   [data-theme="matrix"] { --void:#000000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
   [data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
   [data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
   [data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%), radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%), var(--void);
-    color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem; transition: background 0.3s, color 0.3s;
-  }
+  body { background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%), radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%), var(--void); color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem; transition: background 0.3s, color 0.3s; }
   header { text-align: center; margin-bottom: 2rem; }
   h1 { font-family: var(--display); font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
   .sub { color: var(--text-dim); font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; }
@@ -34,7 +29,6 @@
   .theme-menu.active { display: flex; }
   .theme-option { padding: 0.5rem 1rem; font-size: 0.7rem; color: var(--text-dim); cursor: pointer; border: none; background: none; text-align: center; font-family: var(--mono); text-transform: uppercase; }
   .theme-option:hover { background: var(--panel); color: var(--cyan); }
-  
   .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; }
   @media(max-width: 800px) { .hub-grid { grid-template-columns: 1fr; } }
   .panel { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; position: relative; backdrop-filter: blur(8px); border-radius: 4px; }
@@ -47,7 +41,6 @@
   .profile-card { text-align: center; }
   .profile-title { font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: var(--magenta); letter-spacing: 0.1em; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,45,156,0.4); }
   .profile-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
-  
   .radar-wrap { display: flex; align-items: center; justify-content: center; padding: 1rem 0; }
   .radar-svg { width: 100%; max-width: 300px; height: auto; }
   .radar-axis { stroke: var(--border); stroke-width: 1; }
@@ -55,23 +48,15 @@
   .radar-poly { fill: rgba(0,217,255,0.15); stroke: var(--cyan); stroke-width: 2; filter: drop-shadow(0 0 8px var(--cyan)); transition: all 0.8s ease; }
   .radar-label { font-family: var(--display); font-size: 10px; fill: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
   .radar-label.active { fill: var(--cyan); }
-
-  /* Heatmap */
   .heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10px, 1fr)); gap: 2px; margin-top: 0.5rem; }
   .heat-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.05); border-radius: 1px; }
-  .heat-active-1 { background: rgba(0,217,255,0.2); }
-  .heat-active-2 { background: rgba(0,217,255,0.4); }
-  .heat-active-3 { background: rgba(0,217,255,0.6); }
   .heat-active-4 { background: var(--cyan); box-shadow: 0 0 4px var(--cyan); }
-
-  /* Achievements */
   .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
   .ach-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem 0.5rem; text-align: center; border-radius: 4px; opacity: 0.4; transition: all 0.3s; }
   .ach-card.unlocked { opacity: 1; border-color: var(--green); background: rgba(0,255,163,0.05); box-shadow: 0 0 10px rgba(0,255,163,0.1); }
   .ach-icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
   .ach-name { font-size: 0.7rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
   .ach-desc { font-size: 0.6rem; color: var(--text-dim); line-height: 1.2; }
-
   .domain-section { max-width: 1000px; margin: 0 auto 3rem; }
   .domain-title { font-family: var(--display); font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
@@ -84,8 +69,6 @@
   .app-tag { font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; display: flex; justify-content: space-between; }
   .maturity-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
   .maturity-fill { height: 100%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); transition: width 0.8s; }
-
-  /* Feedback Widget */
   #feedback-fab { position:fixed; bottom:2rem; right:2rem; z-index:90; background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
   #feedback-fab:hover { border-color:var(--cyan); color:var(--cyan); }
   #feedback-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
@@ -99,7 +82,6 @@
   .fb-yn.selected { background: var(--cyan); color: var(--void); border-color: var(--cyan); }
   .fb-text { display:none; width:100%; margin-top:0.5rem; background:var(--void); border:1px solid var(--border); color:var(--text); padding:0.75rem; border-radius:4px; font-family:var(--mono); font-size:0.8rem; resize:vertical; }
   .submit-btn { width:100%; margin-top:1.5rem; background:var(--cyan); color:var(--void); border:none; padding:0.75rem; font-family:var(--mono); font-weight:700; text-transform:uppercase; cursor:pointer; border-radius:4px; letter-spacing:0.1em; }
-  
   @media(max-width: 600px) { h1 { font-size: 2.2rem; } body { padding: 1rem; } }
 </style>
 </head>
@@ -135,9 +117,7 @@
   <div class="hub-grid">
     <div class="panel">
       <div class="panel-label">// Global Mastery Matrix</div>
-      <div class="radar-wrap">
-        <svg class="radar-svg" viewBox="-130 -130 260 260" id="hubRadarSvg"></svg>
-      </div>
+      <div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="hubRadarSvg"></svg></div>
     </div>
     <div class="panel">
       <div class="panel-label">// Discipline Breakdown</div>
@@ -168,12 +148,7 @@
     <div class="domain-title">🧠 AI & Technology</div>
     <div class="grid" id="ai-grid"></div>
   </div>
-  <div class="domain-section">
-    <div class="domain-title">📐 Mathematics & Physics</div>
-    <div class="grid" id="math-grid">
-  </div>
 
-  <!-- Feedback Widget -->
   <button id="feedback-fab">Feedback</button>
   <div id="feedback-modal">
     <div class="modal-content">
@@ -201,8 +176,8 @@
 const APPS = [
   { id: 'prima', name: 'PRIMA', domain: 'engineering', axisName: 'Engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
   { id: 'nash', name: 'NASH', domain: 'strategy', axisName: 'Strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v7', href: 'nash.html' },
-  { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' }
-  { id: 'fermi', name: 'FERMI', domain: domain: 'math', axisName: 'Physics/Math', desc: 'Order-of-magnitude estimation, physics limits, and Fermi problems.', tag: '10 Axes · 120 Cards', storageKey: 'fermi-v1', href: 'fermi.html' }
+  { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' },
+  { id: 'fermi', name: 'FERMI', domain: 'engineering', axisName: 'Physics/Math', desc: 'Order-of-magnitude estimation, physics limits, and Fermi problems.', tag: '10 Axes · 120 Cards', storageKey: 'fermi-v1', href: 'fermi.html' }
 ];
 
 // Replace with your actual GitHub repo details
@@ -337,10 +312,7 @@ function renderHeatmap() {
     const dStr = d.toISOString().split('T')[0];
     const cell = document.createElement('div');
     cell.className = 'heat-cell';
-    if(activity.includes(dStr)) {
-      // Simulating intensity based on random/mock XP gained that day. For now, just mark as active.
-      cell.classList.add('heat-active-4'); 
-    }
+    if(activity.includes(dStr)) { cell.classList.add('heat-active-4'); }
     cell.title = dStr;
     grid.appendChild(cell);
   }
@@ -355,7 +327,7 @@ const ACHIEVEMENTS = [
   { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 5 globally', icon: '🧬', check: () => getLevel(totalXP) >= 5 },
   { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 10 globally', icon: '🧠', check: () => getLevel(totalXP) >= 10 },
   { id: 'mastery_100', name: 'Master', desc: '100 cards matured', icon: '💎', check: () => totalMature >= 100 },
-  { id: 'renaissance', name: 'Renaissance', desc: 'Start all 3 courses', icon: '🎨', check: () => appData.every(a => a.xp > 0) },
+  { id: 'renaissance', name: 'Renaissance', desc: 'Start all 4 courses', icon: '🎨', check: () => appData.every(a => a.xp > 0) },
   { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 20 globally', icon: '🚀', check: () => getLevel(totalXP) >= 20 }
 ];
 
