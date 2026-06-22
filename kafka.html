@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // KAFKA v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">KAFKA</div><div class="boot-sub">Cogito // Information Theory Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">KAFKA</div><div class="brand-tag">SIGNAL TO NOISE</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="KAFKA.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="KAFKA.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="KAFKA.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="KAFKA.setTheme('light')">Light</button><button class="theme-option" onclick="KAFKA.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Black Chamber</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="KAFKA.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of information theory. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: BLACK CHAMBER</h1><p class="section-sub">A cumulative scenario. Extract signal from noise in a high-stakes intelligence operation.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About KAFKA</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>KAFKA is a cognitive training simulator designed to install the information-theoretic thinking patterns used by cryptographers, signal processors, and data scientists. It trains you to extract truth from noise, quantify uncertainty, and communicate with minimum entropy.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Black Chamber require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>SIGNAL</strong> — Signal vs. Noise, Signal-to-Noise Ratio (SNR)</li>
+          <li><strong>ENTROPY</strong> — Shannon Entropy, information content in bits</li>
+          <li><strong>COMPRESS</strong> — Lossless vs Lossy, Huffman coding</li>
+          <li><strong>REDUNDANT</strong> — Error correction, parity bits, Hamming codes</li>
+          <li><strong>CHANNEL</strong> — Bandwidth, latency, Shannon-Hartley theorem</li>
+          <li><strong>CRYPTO</strong> — Symmetric, Asymmetric, Hashing, RSA</li>
+          <li><strong>NOISE</strong> — White, pink, stochastic processes</li>
+          <li><strong>FILTER</strong> — Kalman filters, moving averages, extraction</li>
+          <li><strong>CODE</strong> — ASCII, Unicode, Base64, line codes</li>
+          <li><strong>TRUTH</strong> — Bayesian inference, epistemology, truth extraction</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'SIGNAL', title:'Signal vs. Noise', summary:'Isolating meaningful data in a chaotic environment.', lesson:{ title:'The Architecture of Extraction', body: 'The fundamental problem of perception and data science is the same: separating the signal (the underlying truth you want to capture) from the noise (the random, irrelevant fluctuations that obscure it).\n\n## Signal-to-Noise Ratio (SNR)\n\nSNR is the ratio of the power of a signal to the power of background noise. If the signal is a whisper and the noise is a rock concert, SNR is near zero; you cannot extract the truth. If the signal is a fire alarm and the noise is a quiet room, SNR is high.\n\nIn data science, "noise" is the variance in your dataset that is due to randomness or measurement error. "Signal" is the actual underlying pattern. A good model captures the signal and ignores the noise. Overfitting is when your model learns the noise.\n\n## The Method\n\n1. **Identify the signal:** What is the fundamental truth you are trying to measure?\n2. **Identify the noise:** What are the sources of random interference?\n3. **Calculate SNR:** Is the signal strong enough to be reliably extracted? If not, you need a better sensor or more data (averaging).\n4. **Filter:** Apply mathematical or logical filters to attenuate the noise and amplify the signal.', takeaways:['Signal is truth; Noise is interference.','SNR (Signal-to-Noise Ratio) determines extractability.','Overfitting is treating noise as signal.','To improve SNR: increase signal strength, decrease noise, or average multiple samples.','A good filter attenuates noise without distorting the signal.'] } },
+  { id:'m2', codename:'ENTROPY', title:'Shannon Entropy', summary:'Quantifying uncertainty and information content.', lesson:{ title:'The Architecture of Uncertainty', body: 'Claude Shannon invented Information Theory in 1948. His core insight: "Information" is the resolution of uncertainty. If I tell you something you already know, it carries zero information. If I tell you the outcome of a fair coin flip, it carries 1 bit of information.\n\n## Shannon Entropy (H)\n\nEntropy is the average amount of information contained in each message. It is measured in bits.\n\nFor a fair coin (50/50), H = 1 bit.\nFor a biased coin (90/10), H < 1 bit. The outcome is more predictable, so less information is gained when it occurs.\nFor a double-headed coin (100/0), H = 0 bits. There is no uncertainty.\n\n## Why It Matters\n\nEntropy quantifies the theoretical limit of compression. A file with 1,000 characters of "AAAAAAA" has 0 bits of entropy. It can be compressed to almost nothing. A file with 1,000 random characters has high entropy. It cannot be compressed.\n\n## The Method\n\n1. **Identify the probabilities** of each possible state.\n2. **Calculate Entropy:** H = -Σ p(x) * log2(p(x)).\n3. **Interpret:** High H = high uncertainty = high information content = harder to compress.', takeaways:['Information is the resolution of uncertainty.','Entropy (H) measures average information content in bits.','High entropy = high unpredictability = hard to compress.','Low entropy = high predictability = easy to compress.','Shannon entropy defines the theoretical limit of lossless compression.'] } },
+  { id:'m3', codename:'COMPRESS', title:'Data Compression', summary:'Lossless vs Lossy, Huffman coding.', lesson:{ title:'The Architecture of Efficiency', body: 'Compression is the art of representing information using fewer bits. It relies on finding and eliminating redundancy.\n\n## Lossless vs. Lossy\n\nLossless compression (ZIP, PNG, FLAC) allows the original data to be perfectly reconstructed. It exploits statistical redundancy (e.g., repeating patterns). The theoretical limit is defined by Shannon entropy.\n\nLossy compression (JPEG, MP3, GIF) permanently eliminates some information. It exploits human perception limits. A JPEG throws away high-frequency color changes that the eye barely notices. You cannot reconstruct the original exactly, but the file is much smaller.\n\n## Huffman Coding\n\nA lossless algorithm that assigns shorter codes to frequent symbols and longer codes to rare symbols. If "E" is the most common letter in English, it gets a 2-bit code. "Z" gets a 10-bit code. This minimizes the average length of a message.\n\n## The Method\n\n1. **Identify redundancy:** Are there patterns, repetitions, or biased distributions?\n2. **Choose lossless or lossy:** Can the receiver tolerate imperfect data?\n3. **Apply coding:** Use algorithms (Huffman, LZW, DCT) to map the data to a smaller space.', takeaways:['Compression eliminates redundancy.','Lossless allows perfect reconstruction; Lossy does not.','Huffman coding: short codes for frequent symbols, long for rare.','Shannon entropy sets the limit for lossless compression.','Lossy compression exploits perceptual limits (what the eye/ear ignores).'] } },
+  { id:'m4', codename:'REDUNDANT', title:'Error Correction', summary:'Parity bits, Hamming codes, and self-healing data.', lesson:{ title:'The Architecture of Resilience', body: 'In a noisy channel, bits flip. 1s become 0s. Error correction is the math of adding strategic redundancy so that the receiver can detect and fix errors without asking for a retransmission.\n\n## Parity Bits\n\nThe simplest error detection. Add 1 bit to a byte. If the byte has an odd number of 1s, the parity bit is 1. If even, 0. If one bit flips during transmission, the parity fails. This detects errors but cannot fix them.\n\n## Hamming Codes\n\nRichard Hamming invented a code where multiple parity bits are calculated at specific positions. If an error occurs, the combination of failed parity bits points exactly to the binary index of the flipped bit. The receiver flips it back. This is Forward Error Correction (FEC).\n\n## The Trade-off\n\nError correction adds redundancy (overhead). A Hamming(7,4) code takes 4 bits of data and adds 3 parity bits, sending 7 bits total. You trade bandwidth for resilience. This is why deep space communication (Voyager) uses heavy error correction—the signal is incredibly weak.\n\n## The Method\n\n1. **Assess the channel noise:** How often do bits flip?\n2. **Add redundancy:** Parity for detection, Hamming/ECC for correction.\n3. **Trade bandwidth for resilience:** Accept overhead to ensure delivery.', takeaways:['Error correction adds strategic redundancy to survive noise.','Parity bits detect errors; Hamming codes correct them.','Forward Error Correction (FEC) fixes errors without retransmission.','Trade bandwidth (overhead) for resilience (accuracy).','Deep space and wireless rely heavily on error correction.'] } },
+  { id:'m5', codename:'CHANNEL', title:'Channel Capacity', summary:'Bandwidth, latency, Shannon-Hartley theorem.', lesson:{ title:'The Architecture of the Pipe', body: 'A channel is the medium through which information flows (fiber optic, radio, air). Every channel has a physical limit on how fast data can move through it reliably.\n\n## Shannon-Hartley Theorem\n\nC = B * log2(1 + S/N)\n\nC = Channel Capacity (bits per second)\nB = Bandwidth (Hertz)\nS/N = Signal-to-Noise Ratio\n\nThis equation dictates the absolute maximum speed at which data can be transmitted with zero errors. If you try to push 10 Gbps through a channel with a capacity of 1 Gbps, you will get massive errors. No amount of engineering can beat this.\n\n## Bandwidth vs. Latency\n\nBandwidth is the width of the pipe (how much data fits per second). Latency is the length of the pipe (how long it takes for the first bit to arrive). You can have a massive bandwidth (download a movie in 1 second) but high latency (it takes 10 minutes for the first byte to arrive from Mars).\n\n## The Method\n\n1. **Calculate Capacity:** Use Shannon-Hartley to find the physical ceiling.\n2. **Compare to requirements:** Are you trying to push 10 Gbps through a 1 Gbps pipe?\n3. **Optimize variables:** Increase bandwidth (more Hz), increase signal power, or decrease noise.', takeaways:['Shannon-Hartley defines the maximum error-free data rate.','C = B * log2(1 + S/N). Capacity, Bandwidth, SNR.','Bandwidth = pipe width; Latency = pipe length.','Pushing data faster than capacity causes errors.','To increase capacity: increase bandwidth, signal, or decrease noise.'] } },
+  { id:'m6', codename:'CRYPTO', title:'Cryptography', summary:'Symmetric, asymmetric, hashing, RSA.', lesson:{ title:'The Architecture of Secrecy', body: 'Cryptography is the application of mathematical hardness to secure information. It relies on functions that are easy to compute in one direction, but computationally infeasible to reverse without a key.\n\n## Symmetric vs. Asymmetric\n\nSymmetric (AES): The same key encrypts and decrypts. Fast. Used for bulk data. The problem is key distribution—how do you share the key securely?\n\nAsymmetric (RSA): Two keys (Public and Private). You encrypt with the public key; only the private key can decrypt. Solves key distribution. Slow. Used to exchange symmetric keys.\n\n## Hashing\n\nA one-way function. Input any data, get a fixed-size hash. You cannot reverse the hash to get the data. Used for passwords (store the hash, not the password) and integrity (if one bit changes, the hash changes completely).\n\n## RSA and Factorization\n\nRSA relies on the fact that multiplying two large primes is easy, but factoring the product back into the original primes is exponentially hard. The "key" is the mathematical asymmetry.\n\n## The Method\n\n1. **Confidentiality:** Encrypt with recipient\'s public key.\n2. **Integrity:** Hash the message.\n3. **Authentication:** Sign the hash with your private key.', takeaways:['Cryptography relies on mathematical asymmetry (easy one way, hard the other).','Symmetric is fast (bulk data); Asymmetric solves key distribution.','Hashing is one-way. Used for integrity and passwords.','RSA relies on the hardness of prime factorization.','Security = Computational Hardness + Key Management.'] } },
+  { id:'m7', codename:'NOISE', title:'Types of Noise', summary:'White, pink, stochastic processes.', lesson:{ title:'The Architecture of Interference', body: 'Not all noise is the same. Understanding the statistical properties of noise allows you to filter it effectively.\n\n## White Noise\n\nRandom, uncorrelated fluctuations. Equal power across all frequencies. Like the static on an old TV. Because it is uncorrelated, averaging multiple samples reduces white noise by sqrt(N). 100 samples reduce noise by 10x.\n\n## Pink Noise (1/f)\n\nPower decreases with frequency. Common in nature (heartbeat intervals, stock markets). Harder to filter because the low-frequency components are strong.\n\n## Stochastic Processes\n\nRandom variables evolving over time. A "random walk" (Brownian motion) is a stochastic process where the next step depends only on the current position. Stock prices are often modeled as random walks.\n\n## The Method\n\n1. **Identify the noise spectrum:** Is it white (flat) or pink (1/f)?\n2. **Apply the correct filter:** Averaging works for white noise. Low-pass filters work for high-frequency noise.\n3. **Do not confuse noise with trend:** A random walk can look like a trend, but it is just noise.', takeaways:['White noise: flat power spectrum, uncorrelated. Averaging reduces it.','Pink noise (1/f): power decreases with frequency. Common in biology/markets.','Stochastic process: random variables evolving over time.','Averaging reduces white noise by sqrt(N).','Do not mistake a random walk (noise) for a predictable trend.'] } },
+  { id:'m8', codename:'FILTER', title:'Filtering', summary:'Kalman filters, moving averages, signal extraction.', lesson:{ title:'The Architecture of Smoothing', body: 'Filtering is the mathematical process of estimating the true state of a system from noisy measurements.\n\n## Moving Average\n\nThe simplest filter. Take the average of the last N measurements. Smooths out rapid fluctuations (noise) to reveal the underlying trend (signal). However, it introduces lag—the filtered value always lags behind the true value.\n\n## Kalman Filter\n\nThe optimal recursive estimator. It predicts the next state of a system, takes a noisy measurement, and then combines the prediction and the measurement, weighted by their respective uncertainties.\n\nIf you are very uncertain about your prediction, you trust the sensor more. If the sensor is very noisy, you trust the prediction more. The Kalman filter continuously updates its uncertainty.\n\nUsed in GPS, autonomous vehicles, and radar tracking. It allows a car to track its position even when GPS signals bounce off buildings (noise).\n\n## The Method\n\n1. **Predict:** Estimate the next state based on the current state.\n2. **Measure:** Take a noisy reading.\n3. **Update (Filter):** Blend prediction and measurement based on confidence.', takeaways:['Filtering estimates the true state from noisy measurements.','Moving Average smooths noise but introduces lag.','Kalman Filter is optimal: blends prediction and measurement weighted by uncertainty.','Trust the source (sensor vs model) that has lower variance.','Used in GPS, radar, and autonomous vehicles.'] } },
+  { id:'m9', codename:'CODE', title:'Coding Theory', summary:'ASCII, Unicode, Base64, line codes.', lesson:{ title:'The Architecture of Representation', body: 'Information must be encoded into a physical representation (voltage, light, radio waves) to be transmitted or stored. Coding theory is the study of how to map symbols to bits efficiently.\n\n## ASCII and Unicode\n\nASCII maps English letters to 7 bits (128 characters). Unicode (UTF-8) maps every character in every language to variable-length bits. It is backwards compatible with ASCII but supports emojis and Kanji.\n\n## Base64\n\nA scheme to encode binary data (images, files) into ASCII text. It does this by mapping 3 bytes of binary into 4 ASCII characters. This allows you to send images through email or JSON, which only support text. It expands data size by 33%, trading space for compatibility.\n\n## Line Codes (Manchester, NRZ)\n\nPhysical layer encoding. How to represent 1s and 0s on a wire. NRZ (Non-Return-to-Zero) just holds the voltage high for 1, low for 0. Problem: a long string of 0s looks like "no signal" (DC drift). Manchester encoding forces a voltage transition in the middle of every bit, ensuring the receiver can always sync the clock.\n\n## The Method\n\n1. **Map symbols to bits:** Use standard codes (UTF-8) for text.\n2. **Map bits to physical states:** Use line codes that allow clock recovery.\n3. **Ensure compatibility:** Use wrappers (Base64) if the channel only supports text.', takeaways:['Coding maps abstract information to physical representations.','UTF-8 encodes all human languages; ASCII is a subset.','Base64 trades 33% size overhead for text-channel compatibility.','Line codes (Manchester) embed clock sync data into the bitstream.','Encoding is the bridge between math and physics.'] } },
+  { id:'m10', codename:'TRUTH', title:'Truth Extraction', summary:'Bayesian inference and epistemology.', lesson:{ title:'The Architecture of Belief', body: 'Information theory ultimately underpins epistemology—how we know what we know. Bayesian inference is the mathematical framework for updating beliefs based on noisy evidence.\n\n## Bayes\' Theorem\n\nP(H|E) = P(E|H) * P(H) / P(E)\n\nThe probability of a Hypothesis given the Evidence is proportional to the probability of the Evidence given the Hypothesis, times the prior probability of the Hypothesis.\n\nYou start with a prior belief. You observe evidence. You update your belief. The new belief becomes the prior for the next piece of evidence.\n\n## Signal Extraction as Epistemology\n\nIf you are trying to determine if a coin is rigged (Hypothesis), you flip it 10 times (Evidence). If it lands heads 10 times, your belief that it is rigged increases. But if you had a strong prior that the coin was fair, you might still believe it is fair and attribute the 10 heads to noise (rare event).\n\nBayesian inference is the optimal way to separate signal (the rigging) from noise (random chance) over time.\n\n## The Method\n\n1. **State your priors:** What do you believe before seeing data?\n2. **Gather evidence:** Take noisy measurements.\n3. **Update:** Use Bayes to adjust your belief proportional to the strength of the evidence.\n4. **Repeat:** New evidence refines the signal.', takeaways:['Bayesian inference is the mathematical framework for learning from noisy evidence.','P(H|E) updates a prior belief based on new data.','It optimally separates signal (truth) from noise (random chance).','You cannot evaluate evidence without knowing the prior (base rate).','Truth extraction is an iterative process of belief updating.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the fundamental problem of perception and data science?',back:'Separating the signal (underlying truth) from the noise (random, irrelevant fluctuations).'},
+  {id:'c2',moduleId:'m1',core:true,category:'concept',front:'What does SNR stand for?',back:'Signal-to-Noise Ratio. The ratio of signal power to noise power.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'In data science, what is "noise"?',back:'Variance in the dataset due to randomness or measurement error.'},
+  {id:'c4',moduleId:'m1',core:false,category:'concept',front:'What is overfitting?',back:'When a machine learning model learns the noise in the training data as if it were signal.'},
+  {id:'c5',moduleId:'m1',core:false,category:'application',front:'How do you improve SNR?',back:'Increase signal strength, decrease noise, or average multiple samples (averaging reduces uncorrelated noise).'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'If SNR is near zero, what happens?',back:'The truth (signal) cannot be reliably extracted from the interference.'},
+  {id:'c7',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "A good filter attenuates noise without..."',back:'"...distorting the signal."'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'What is the difference between signal and noise?',back:'Signal is the underlying truth you want to capture. Noise is the random interference obscuring it.'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'Why does averaging multiple samples reduce white noise?',back:'Because white noise is uncorrelated (random). Positive and negative fluctuations cancel out when averaged.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is a "sensor" in the context of signal extraction?',back:'Any mechanism (biological, mechanical, or algorithmic) used to measure the signal.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'If a stock price jumps randomly every day, is that signal or noise?',back:'Mostly noise (a random walk). The underlying signal might be the long-term trend or earnings growth.'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Signal is truth; Noise is..."',back:'"...interference."'}, 
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is Shannon Entropy?',back:'The measure of uncertainty or information content in a message, measured in bits.'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'What does "Information is the resolution of uncertainty" mean?',back:'If you are told something you already know, it carries 0 bits of information. Information is proportional to surprise.'},
+  {id:'c15',moduleId:'m2',core:false,category:'application',front:'Entropy of a fair coin (50/50)?',back:'1 bit.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'Entropy of a double-headed coin (100/0)?',back:'0 bits. There is no uncertainty.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'What does high entropy imply about compression?',back:'High entropy = high unpredictability = hard to compress. (e.g., random text cannot be compressed).'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'Entropy of a biased coin (90/10)?',back:'Less than 1 bit. The outcome is more predictable, so less information is gained.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'Who invented Information Theory?',back:'Claude Shannon in 1948.'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'String "AAAAAAA" has how many bits of entropy?',back:'0 bits. It is perfectly predictable.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Entropy defines the theoretical limit of..."',back:'"...lossless compression."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'What is the formula for Shannon Entropy?',back:'H = -Σ p(x) * log2(p(x)).'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'A file with 1000 random characters vs 1000 "A"s. Which has higher entropy?',back:'The random characters. They cannot be compressed.'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'Does a predictable system have high or low entropy?',back:'Low entropy. There is little uncertainty.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is the goal of data compression?',back:'To represent information using fewer bits by eliminating redundancy.'},
+  {id:'c26',moduleId:'m3',core:true,category:'concept',front:'Lossless vs Lossy compression?',back:'Lossless allows perfect reconstruction. Lossy permanently discards some data (e.g., JPEG, MP3).'},
+  {id:'c27',moduleId:'m3',core:false,category:'application',front:'How does Huffman Coding work?',back:'It assigns shorter bit-codes to frequent symbols and longer codes to rare symbols.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'Why does Lossy compression work for images/audio?',back:'It exploits human perceptual limits. It discards frequencies the eye/ear barely notices.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'What is statistical redundancy?',back:'Repeating patterns or biased distributions (e.g., "E" is more common than "Z").'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'Can you compress a file with 0 entropy?',back:'Only to the limit of its size. If it is already 0 entropy, it has no redundancy to remove.'},
+  {id:'c31',moduleId:'m3',core:false,category:'application',front:'Give an example of Lossless compression.',back:'ZIP, PNG, FLAC.'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'What is the theoretical limit of lossless compression?',back:'The Shannon entropy of the source.'},
+  {id:'c33',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Compression eliminates..."',back:'"...redundancy."'},
+  {id:'c34',moduleId:'m3',core:false,category:'application',front:'Why can\'t you compress a random file?',back:'Random data has maximum entropy (no redundancy). Attempting to compress it usually makes it larger.'},
+  {id:'c35',moduleId:'m3',core:false,category:'concept',front:'What does LZW stand for?',back:'Lempel-Ziv-Welch. A common dictionary-based lossless compression algorithm.'},
+  {id:'c36',moduleId:'m3',core:false,category:'application',front:'Why is text highly compressible?',back:'Human language has low entropy (high predictability). "Q" is almost always followed by "U".'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is the purpose of error correction?',back:'To detect and fix errors (flipped bits) in a noisy channel without retransmission.'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'What is a parity bit?',back:'A simple bit added to a byte to make the total number of 1s even or odd. It detects errors but cannot correct them.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'What is Forward Error Correction (FEC)?',back:'Sending enough redundant data that the receiver can fix errors without asking the sender to retransmit.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'How does a Hamming Code work?',back:'It calculates multiple parity bits at specific positions. The combination of failed parity bits points exactly to the index of the flipped bit.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is the trade-off of error correction?',back:'It adds redundancy (overhead). You trade bandwidth for resilience.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'Why does deep space communication use heavy error correction?',back:'The signal is incredibly weak (high noise). Without heavy ECC, the data would be unintelligible.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is the difference between detection and correction?',back:'Detection (parity) tells you an error occurred. Correction (Hamming) tells you which bit flipped so you can fix it.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'Hamming(7,4) code: 4 bits data, 3 bits parity. What is the overhead?',back:'75% overhead (3 parity bits for 4 data bits).'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Trade bandwidth for..."',back:'"...resilience."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'Why can\'t you just detect errors and ask for a retransmission (ARQ)?',back:'In deep space or broadcast, retransmission takes too long (latency) or is impossible (one-way channel).'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'What happens if 2 bits flip in a simple parity system?',back:'The parity might still look correct (even number of flips cancels out). The error is missed.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What is "strategic redundancy"?',back:'Adding redundancy in a mathematical way (like Hamming) rather than just copying data.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is the Shannon-Hartley Theorem?',back:'C = B * log2(1 + S/N). It defines the maximum error-free data rate (Capacity) of a channel.'},
+  {id:'c50',moduleId:'m5',core:true,category:'concept',front:'Difference between Bandwidth and Latency?',back:'Bandwidth is the width of the pipe (data per second). Latency is the length of the pipe (time for first bit to arrive).'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'How do you increase Channel Capacity (C)?',back:'Increase Bandwidth (B), increase Signal power (S), or decrease Noise (N).'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'What happens if you push 10 Gbps through a 1 Gbps channel?',back:'You will get massive errors. You cannot beat the Shannon-Hartley limit.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'What is a "channel" in information theory?',back:'The medium through which information flows (fiber, radio, air).'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'What does "log2(1 + S/N)" represent?',back:'The spectral efficiency: how many bits per Hz of bandwidth you can reliably send.'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'You have high bandwidth but high latency (e.g., Satellite). What is the issue?',back:'You can download a movie in 1 second, but it takes 500ms for the first byte to arrive.'},
+  {id:'c56',moduleId:'m5',core:false,category:'application',front:'You have low bandwidth but low latency (e.g., old dial-up). What is the issue?',back:'The first byte arrives instantly, but a movie takes days to download.'},
+  {id:'c57',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Pushing data faster than capacity causes..."',back:'"...errors."'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'Why do 5G networks use higher frequencies (mmWave)?',back:'Higher frequency = more Bandwidth (B). More B = higher Capacity (C).'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'If S/N is very low, what happens to Capacity?',back:'It drops drastically. log2(1 + 0.1) is very small.'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'Is there a physical limit to how fast data can move?',back:'Yes, the speed of light limits latency. The medium limits bandwidth.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the core principle of cryptography?',back:'Mathematical asymmetry: functions that are easy to compute in one direction, but computationally infeasible to reverse without a key.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'Symmetric vs Asymmetric encryption?',back:'Symmetric uses the same key to encrypt/decrypt (fast). Asymmetric uses Public/Private keys (solves key distribution).'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'What is a hash function?',back:'A one-way function. Input any data, get a fixed-size hash. You cannot reverse it. Used for integrity and passwords.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'What mathematical problem does RSA rely on?',back:'The hardness of prime factorization. Multiplying two large primes is easy; factoring the product is exponentially hard.'},
+  {id:'c65',moduleId:'m6',core:false,category:'application',front:'How do you ensure Confidentiality?',back:'Encrypt the data with the recipient\'s Public Key. Only their Private Key can decrypt it.'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'How do you ensure Authentication?',back:'Sign the hash of the message with your Private Key. Anyone with your Public Key can verify you sent it.'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'Why is Asymmetric encryption slow?',back:'It requires massive numbers and complex math (modular exponentiation).'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'How do you secure bulk data (e.g., a hard drive)?',back:'Use Symmetric encryption (AES). It is fast. Asymmetric is only used to exchange the AES key.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Security = Computational Hardness +..."',back:'"...Key Management."'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What is a "Digital Signature"?',back:'A hash of the data encrypted with a sender\'s private key. Proves the sender\'s identity and that the data wasn\'t tampered with.'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'Why shouldn\'t you store passwords in plaintext?',back:'If the database is hacked, all passwords are exposed. Store hashes instead. To verify, hash the input and compare.'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'What is a "Collision" in hashing?',back:'When two different inputs produce the same hash. A good hash function makes this computationally infeasible.'},
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is White Noise?',back:'Random, uncorrelated fluctuations with equal power across all frequencies. (Like TV static).'},
+  {id:'c74',moduleId:'m7',core:true,category:'concept',front:'How does averaging reduce white noise?',back:'Because white noise is uncorrelated, positive and negative fluctuations cancel out. Averaging N samples reduces noise by sqrt(N).'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is Pink Noise (1/f)?',back:'Noise where power decreases with frequency. Common in nature (heartbeats, stock markets).'},
+  {id:'c76',moduleId:'m7',core:false,category:'concept',front:'What is a Stochastic Process?',back:'Random variables evolving over time. (e.g., a random walk or Brownian motion).'},
+  {id:'c77',moduleId:'m7',core:false,category:'application',front:'If you average 100 samples, how much does white noise decrease?',back:'By a factor of 10 (sqrt(100)).'},
+  {id:'c78',moduleId:'m7',core:false,category:'concept',front:'Why is Pink Noise harder to filter than White Noise?',back:'Because the low-frequency components are strong, they don\'t average out easily.'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'Is a stock price a random walk?',back:'Often modeled as one. The next price depends only on the current price plus a random shock.'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'What does "uncorrelated" mean?',back:'The value at time T has no relationship to the value at time T-1.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Do not mistake a random walk for..."',back:'"...a predictable trend."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is Brownian Motion?',back:'The random movement of particles in a fluid, a classic example of a stochastic process.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'You see a pattern in stock prices. Is it signal or noise?',back:'Likely noise (a random walk can produce apparent patterns). Be extremely skeptical.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'What is a Low-Pass Filter?',back:'A filter that allows low frequencies to pass but blocks high frequencies (smoothing).'}, 
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is the goal of filtering?',back:'To estimate the true state of a system from noisy measurements.'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'What is a Moving Average?',back:'A simple filter that averages the last N measurements. Smooths noise but introduces lag.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'What is a Kalman Filter?',back:'An optimal recursive estimator. It blends a prediction and a noisy measurement, weighted by their respective uncertainties.'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'When does a Kalman Filter trust the model over the sensor?',back:'When the sensor noise is very high (high variance).'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'When does a Kalman Filter trust the sensor over the model?',back:'When the model\'s prediction uncertainty is high (e.g., the system is unpredictable).'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'What is the main drawback of a Moving Average?',back:'Lag. The filtered value always lags behind the true value.'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'What is "variance"?',back:'A measure of how spread out the noise is. High variance = very noisy.'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'Where are Kalman Filters used?',back:'GPS tracking, autonomous vehicles, radar, aerospace guidance.'},
+  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Trust the source that has..."',back:'"...lower variance."'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'What is a recursive estimator?',back:'An algorithm that updates its estimate each time step using only the current measurement and the previous estimate.'},
+  {id:'c95',moduleId:'m8',core:false,category:'application',front:'Why doesn\'t a GPS use a Moving Average?',back:'Too much lag. A car needs instant position updates; a moving average would make it look like it is in the past.'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'What is "smoothing"?',back:'The process of removing high-frequency noise to reveal the underlying trend.'}, 
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is Coding Theory?',back:'The study of how to map symbols to bits efficiently for transmission or storage.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What is UTF-8?',back:'A variable-length character encoding (part of Unicode) that supports all languages. It is backwards compatible with ASCII.'},
+  {id:'c99',moduleId:'m9',core:false,category:'application',front:'What is Base64?',back:'A scheme to encode binary data (images) into ASCII text. Expands size by 33% for text-channel compatibility.'},
+  {id:'c100',moduleId:'m9',core:false,category:'concept',front:'What is Manchester Encoding?',back:'A line code that forces a voltage transition in the middle of every bit, allowing clock recovery.'},
+  {id:'c101',moduleId:'m9',core:false,category:'application',front:'Why use Base64 in emails?',back:'Email protocols (SMTP) were designed for text. Base64 lets you attach binary files (images, PDFs) by converting them to text.'},
+  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'What is the problem with NRZ (Non-Return-to-Zero) encoding?',back:'A long string of 0s or 1s looks like "no signal" (DC drift). The receiver loses clock sync.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'What is ASCII?',back:'A 7-bit character encoding standard for English letters, numbers, and symbols (128 characters).'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'Why does Manchester encoding require more bandwidth?',back:'Because it uses two voltage transitions per bit, doubling the frequency requirement.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Encoding is the bridge between..."',back:'"...math and physics."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is a "Line Code"?',back:'The physical pattern of voltage or light used to represent 1s and 0s on a wire or fiber.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Why is UTF-8 called "variable-length"?',back:'Common characters (A) use 1 byte; rare characters (emojis) use up to 4 bytes.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'What is clock recovery?',back:'The receiver\'s ability to synchronize its internal clock with the sender\'s bitstream.'}, 
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is Bayesian Inference?',back:'The mathematical framework for updating beliefs based on noisy evidence.'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'Formula for Bayes\' Theorem?',back:'P(H|E) = P(E|H) * P(H) / P(E). Probability of Hypothesis given Evidence.'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'What is a "Prior" in Bayes\' Theorem?',back:'P(H). Your belief in the hypothesis before seeing the new evidence.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'You flip a coin 10 times, get 10 heads. Is it rigged?',back:'Bayesian update: It depends on your prior. If you were 99% sure it was fair, 10 heads might just be noise. If you were unsure, it is likely rigged.'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'How does Bayes\' Theorem relate to Signal vs Noise?',back:'It is the optimal way to separate signal (the rigging) from noise (random chance) over time.'},
+  {id:'c114',moduleId:'m10',core:false,category:'concept',front:'What is the "Posterior"?',back:'P(H|E). Your updated belief after seeing the evidence.'},
+  {id:'c115',moduleId:'m10',core:false,category:'application',front:'Why is truth extraction iterative?',back:'Because the posterior of today becomes the prior of tomorrow. Each new piece of evidence refines the signal.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'What happens if you ignore the Prior (base rate)?',back:'You will over-react to rare events (e.g., assuming a 99% accurate test for a 1% disease means you are definitely sick).'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Truth extraction is an iterative process of..."',back:'"...belief updating."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is Epistemology?',back:'The study of how we know what we know. Bayesian inference is its mathematical formalization.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'If evidence contradicts a very strong prior, what should you do?',back:'Update your belief slightly, but probably still trust the prior unless the evidence is overwhelming.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What does P(E|H) represent?',back:'The likelihood: the probability of seeing the evidence IF the hypothesis were true.'}
+];
+
+const ARENA = [
+  // MODULE 1: SIGNAL
+  { id:'p1', moduleId:'m1', title:'Q1: SNR', difficulty:1, reward:50, timeLimit:45, body:'You are trying to listen to a podcast on a noisy train. The train noise is the...', options:['Signal','Noise','Filter','Bandwidth'], correct:1, explanation:'Noise is the random, irrelevant interference. The podcast audio is the signal.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Overfitting', difficulty:2, reward:100, timeLimit:60, body:'Your AI model memorizes the exact pixel values of training images, including sensor dust. What is this?', options:['Signal extraction','Overfitting. The model is learning noise as if it were signal.','Lossless compression','Entropy'], correct:1, explanation:'Overfitting is treating noise (random dust) as signal (the actual object). The model will fail on new data.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Averaging', difficulty:3, reward:200, timeLimit:90, body:'Your sensor is very noisy. How do you extract the true signal?', options:['Turn up the volume','Take multiple samples and average them. Uncorrelated noise cancels out.','Buy a cheaper sensor','Increase bandwidth'], correct:1, explanation:'Averaging N samples reduces uncorrelated white noise by sqrt(N). 100 samples reduce noise by 10x.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Stock Price', difficulty:4, reward:500, timeLimit:120, body:'A stock price jumps 5% randomly every day with no news. Is this signal or noise?', options:['Signal: The market knows something.','Noise: A random walk. The underlying signal is the long-term trend.','Signal: Day traders are predicting it.','Both'], correct:1, explanation:'Short-term price fluctuations without news are noise (stochastic process). The signal is the company\'s actual earnings/value growth.' },
+
+  // MODULE 2: ENTROPY
+  { id:'p5', moduleId:'m2', title:'Q1: Fair Coin', difficulty:1, reward:50, timeLimit:45, body:'What is the Shannon Entropy of a fair coin flip (50/50)?', options:['0 bits','1 bit','2 bits','0.5 bits'], correct:1, explanation:'1 bit. There are 2 equally likely outcomes. log2(2) = 1.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Double-Headed', difficulty:2, reward:100, timeLimit:60, body:'What is the entropy of a double-headed coin (100% heads)?', options:['1 bit','0 bits. There is no uncertainty.','Infinite bits','0.5 bits'], correct:1, explanation:'0 bits. You already know the outcome. Telling you the result conveys no new information.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Compressibility', difficulty:3, reward:200, timeLimit:90, body:'File A is 1000 random characters. File B is 1000 "A"s. Which has higher entropy?', options:['File A','File B','They are the same','Cannot be determined'], correct:0, explanation:'File A has high entropy (unpredictable) and cannot be compressed. File B has 0 entropy and can be compressed to almost nothing.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Information', difficulty:4, reward:500, timeLimit:120, body:'Why does a biased coin (90% heads) have less than 1 bit of entropy?', options:['Because it is rigged.','Because the outcome is more predictable, so learning the result conveys less surprise/information.','Because it lands on heads more often','Because it has 2 outcomes'], correct:1, explanation:'Information is the resolution of uncertainty. If you are 90% sure it will be heads, seeing "heads" resolves very little uncertainty. The entropy is ~0.47 bits.' },
+
+  // MODULE 3: COMPRESS
+  { id:'p9', moduleId:'m3', title:'Q1: Lossless', difficulty:1, reward:50, timeLimit:45, body:'Which is an example of Lossless compression?', options:['JPEG','MP3','ZIP','GIF'], correct:2, explanation:'ZIP is lossless. You can extract the original file perfectly. JPEG/MP3/GIF are lossy.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Huffman', difficulty:2, reward:100, timeLimit:60, body:'How does Huffman Coding work?', options:['It deletes rare letters','It assigns shorter codes to frequent symbols and longer codes to rare symbols.','It lowers the volume','It adds parity bits'], correct:1, explanation:'By giving "E" a 2-bit code and "Z" a 10-bit code, the average message length is minimized.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Lossy Images', difficulty:3, reward:200, timeLimit:90, body:'Why can a JPEG compress an image 10x with barely visible quality loss?', options:['It deletes dark pixels','It exploits human perceptual limits, discarding high-frequency color changes the eye ignores.','It uses Huffman coding','It reduces resolution'], correct:1, explanation:'Lossy compression exploits biology. The eye is sensitive to brightness (luma) but ignores fine color details (chroma). JPEG discards the chroma.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Random File', difficulty:4, reward:500, timeLimit:120, body:'You try to ZIP a file of 1GB random numbers. What happens?', options:['It compresses to 100MB','It compresses to 1MB','It stays roughly 1GB. Random data has maximum entropy and no redundancy to remove.','It expands slightly'], correct:2, explanation:'Compression works by finding redundancy. Random data has none. ZIP will fail to compress it and the file might even grow slightly due to headers.' },
+
+  // MODULE 4: REDUNDANT
+  { id:'p13', moduleId:'m4', title:'Q1: Parity', difficulty:1, reward:50, timeLimit:45, body:'What does a parity bit do?', options:['Corrects errors','Detects (but does not correct) errors','Compresses data','Encrypts data'], correct:1, explanation:'Parity tells you if a bit flipped, but not which one. You must request a retransmission.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Hamming', difficulty:2, reward:100, timeLimit:60, body:'How does a Hamming Code correct an error?', options:['By sending the data twice','The combination of failed parity bits points exactly to the binary index of the flipped bit.','It cannot correct errors','It uses a hash'], correct:1, explanation:'Hamming codes calculate multiple parity bits. If parity 1 and 2 fail, the error is at index 3 (binary 011).' },
+  { id:'p15', moduleId:'m4', title:'Q3: Deep Space', difficulty:3, reward:200, timeLimit:90, body:'Why does Voyager use heavy Forward Error Correction (FEC)?', options:['Because the signal is very weak (high noise)','Because latency is 20 hours, retransmission is impossible','Because it uses solar power','Because it is old'], correct:0, explanation:'While latency is an issue, the primary reason is SNR. The signal from billions of miles away is incredibly weak. Without FEC, the data would be pure noise.' },
+  { id:'p16', moduleId:'m4', title:'Q4: Trade-off', difficulty:4, reward:500, timeLimit:120, body:'Hamming(7,4) takes 4 bits of data, adds 3 parity bits, sends 7. What is the overhead?', options:['30%','75% (3 parity bits for 4 data bits)','100%','10%'], correct:1, explanation:'Overhead = (Total - Data) / Data. (7-4)/4 = 0.75. You are sending 75% extra data to achieve error correction.' },
+
+  // MODULE 5: CHANNEL
+  { id:'p17', moduleId:'m5', title:'Q1: Formula', difficulty:1, reward:50, timeLimit:45, body:'Shannon-Hartley Theorem formula?', options:['C = B * log2(1 + S/N)','F = ma','E = mc^2','V = IR'], correct:0, explanation:'C = B * log2(1 + S/N). Capacity = Bandwidth * log2(1 + Signal/Noise).' },
+  { id:'p18', moduleId:'m5', title:'Q2: Bandwidth vs Latency', difficulty:2, reward:100, timeLimit:60, body:'You can download a 4K movie in 1 second, but it takes 10 minutes for the first byte to arrive from Mars. This is an example of...', options:['High Bandwidth, High Latency','Low Bandwidth, Low Latency','High SNR','Low Entropy'], correct:0, explanation:'The pipe is wide (high bandwidth), but very long (high latency).' },
+  { id:'p19', moduleId:'m5', title:'Q3: 10 Gbps limit', difficulty:3, reward:200, timeLimit:90, body:'You push 10 Gbps through a fiber line with a physical capacity of 1 Gbps. What happens?', options:['It works, just slower','Massive errors. You cannot beat the Shannon-Hartley limit.','It compresses the data','It queues up'], correct:1, explanation:'The Shannon limit is a physical ceiling. Pushing data faster than C causes massive errors. No engineering can beat it.' },
+  { id:'p20', moduleId:'m5', title:'Q4: 5G mmWave', difficulty:4, reward:500, timeLimit:120, body:'Why do 5G networks use higher frequencies (mmWave) despite poor range?', options:['Better penetration','Higher frequency = more Bandwidth (B). More B = higher Capacity (C).','Lower noise','Lower latency'], correct:1, explanation:'Higher frequencies allocate more spectrum (Bandwidth). C = B * log2(1+S/N). Doubling B doubles C. The trade-off is shorter range.' },
+
+  // MODULE 6: CRYPTO
+  { id:'p21', moduleId:'m6', title:'Q1: Asymmetry', difficulty:1, reward:50, timeLimit:45, body:'What is the core principle of cryptography?', options:['Long passwords','Mathematical asymmetry: easy one way, hard to reverse.','Hiding data in images','Using lasers'], correct:1, explanation:'Crypto relies on functions like multiplication (easy) vs factorization (hard), or hashing (easy) vs reversal (impossible).' },
+  { id:'p22', moduleId:'m6', title:'Q2: Symmetric', difficulty:2, reward:100, timeLimit:60, body:'Why use Symmetric (AES) encryption for bulk data instead of Asymmetric (RSA)?', options:['AES is unbreakable','RSA is too slow. AES is fast. Use RSA just to share the AES key.','AES uses smaller keys','RSA requires internet'], correct:1, explanation:'RSA requires massive numbers and complex math. AES is hardware-accelerated and fast. Hybrid systems use RSA to exchange AES keys securely.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Hashing', difficulty:3, reward:200, timeLimit:90, body:'You store user passwords in a database. What should you store?', options:['Plaintext passwords','Encrypted passwords','Hashed passwords (with salt)','A text file'], correct:2, explanation:'Never store plaintext. If hacked, hashes are useless to attackers (especially with salt). To verify, hash the input and compare.' },
+  { id:'p24', moduleId:'m6', title:'Q4: RSA', difficulty:4, reward:500, timeLimit:120, body:'What mathematical problem guarantees the security of RSA?', options:['The traveling salesman problem','Prime factorization of large numbers.','Solving pi','The halting problem'], correct:1, explanation:'Multiplying two large primes is easy. Factoring the product back into the original primes is computationally infeasible for classical computers.' },
+
+  // MODULE 7: NOISE
+  { id:'p25', moduleId:'m7', title:'Q1: White Noise', difficulty:1, reward:50, timeLimit:45, body:'What is White Noise?', options:['Noise that is visible','Random, uncorrelated fluctuations with equal power across frequencies.','Noise from white machines','Predictable noise'], correct:1, explanation:'Like TV static. Equal power at all frequencies. Because it is uncorrelated, averaging reduces it.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Averaging', difficulty:2, reward:100, timeLimit:60, body:'You average 100 samples of a noisy signal. How much does the white noise decrease?', options:['100x','10x (sqrt(100))','1x','0.1x'], correct:1, explanation:'Averaging N samples reduces uncorrelated white noise by sqrt(N). sqrt(100) = 10.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Pink Noise', difficulty:3, reward:200, timeLimit:90, body:'Why is Pink Noise (1/f) harder to filter than White Noise?', options:['It is louder','Because the low-frequency components are strong, they don\'t average out easily.','It is higher frequency','It is correlated'], correct:1, explanation:'Pink noise has more power at low frequencies. Averaging doesn\'t cancel low frequencies well. It requires different filtering.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Random Walk', difficulty:4, reward:500, timeLimit:120, body:'A stock price fluctuates randomly daily. You see a "head and shoulders" pattern. What is it?', options:['A strong sell signal','Likely noise. A random walk can produce apparent patterns.','A signal from the market','A reason to buy'], correct:1, explanation:'Do not mistake a random walk (noise) for a predictable trend. The "head and shoulders" is likely a pattern emerging from randomness, not signal.' },
+
+  // MODULE 8: FILTER
+  { id:'p29', moduleId:'m8', title:'Q1: Moving Average', difficulty:1, reward:50, timeLimit:45, body:'What is the main drawback of a simple Moving Average filter?', options:['It is too fast','It introduces lag. The filtered value always lags behind the true value.','It amplifies noise','It requires encryption'], correct:1, explanation:'Averaging the last N points smooths noise, but it takes N points for a change to fully register. It lags.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Kalman Trust', difficulty:2, reward:100, timeLimit:60, body:'When does a Kalman Filter trust the sensor over the model?', options:['When the sensor is cheap','When the sensor noise variance is low (high confidence).','When the model is old','Never'], correct:1, explanation:'The Kalman Filter weights prediction and measurement inversely proportional to their variance. Low sensor variance = high trust.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Kalman Use', difficulty:3, reward:200, timeLimit:90, body:'Why does an autonomous car use a Kalman Filter for GPS?', options:['GPS is slow','GPS signals bounce off buildings (noise). The filter blends GPS with inertial predictions to estimate true position.','GPS is encrypted','To save battery'], correct:1, explanation:'In a city, GPS jumps around due to reflections. The Kalman Filter smooths this by trusting the car\'s motion model when GPS variance is high.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Optimal', difficulty:4, reward:500, timeLimit:120, body:'Why is the Kalman Filter called "optimal"?', options:['It is the fastest','It minimizes the mean squared error of the estimate, given linear Gaussian noise.','It never makes mistakes','It uses AI'], correct:1, explanation:'Mathematically, under linear assumptions with Gaussian noise, the Kalman Filter produces the lowest possible variance estimate. It is the theoretical best.' },
+
+  // MODULE 9: CODE
+  { id:'p33', moduleId:'m9', title:'Q1: Base64', difficulty:1, reward:50, timeLimit:45, body:'What is Base64 used for?', options:['Encrypting data','Encoding binary data into ASCII text for text-only channels.','Compressing data','Hashing'], correct:1, explanation:'It maps 3 bytes of binary to 4 ASCII characters. It allows sending images through email/JSON.' },
+  { id:'p34', moduleId:'m9', title:'Q2: UTF-8', difficulty:2, reward:100, timeLimit:60, body:'Why is UTF-8 called "variable-length"?', options:['It changes over time','Common characters (A) use 1 byte; rare characters (emojis) use up to 4 bytes.','It uses 8 bits always','It is random'], correct:1, explanation:'It is backwards compatible with ASCII (1 byte) but can expand to 4 bytes for Unicode characters like emojis.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Manchester', difficulty:3, reward:200, timeLimit:90, body:'Why does Manchester encoding force a voltage transition in the middle of every bit?', options:['To save power','To allow clock recovery. The receiver syncs its clock to the transitions.','To encrypt the data','To reduce noise'], correct:1, explanation:'In NRZ, a long string of 0s has no transitions, so the receiver loses sync. Manchester guarantees a transition per bit.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Base64 Overhead', difficulty:4, reward:500, timeLimit:120, body:'What is the size overhead of Base64 encoding?', options:['10%','33% (3 bytes binary -> 4 bytes ASCII)','100%','0%'], correct:1, explanation:'3 bytes (24 bits) are split into 4 groups of 6 bits. Each 6-bit group becomes 1 ASCII char (8 bits). 4*8 = 32 bits. 32/24 = 1.33. 33% overhead.' },
+
+  // MODULE 10: TRUTH
+  { id:'p37', moduleId:'m10', title:'Q1: Bayes', difficulty:1, reward:50, timeLimit:45, body:'Formula for Bayes\' Theorem?', options:['P(H|E) = P(E|H) * P(H) / P(E)','P(A) = P(B)','P = IV','H = -Σ p log p'], correct:0, explanation:'P(H|E) = P(E|H) * P(H) / P(E). The posterior is proportional to the likelihood times the prior.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Prior', difficulty:2, reward:100, timeLimit:60, body:'In Bayes\' Theorem, what is the "Prior" P(H)?', options:['The probability of the evidence','Your belief in the hypothesis before seeing the new evidence.','The final answer','The noise'], correct:1, explanation:'The prior is your base rate. Before seeing new evidence, how likely was the hypothesis?' },
+  { id:'p39', moduleId:'m10', title:'Q3: 10 Heads', difficulty:3, reward:200, timeLimit:90, body:'You flip a coin 10 times, get 10 heads. Is it rigged?', options:['Yes, definitely.','It depends on your prior. If you were 99% sure it was fair, 10 heads might just be a rare noise event. If unsure, it is likely signal (rigged).','No, impossible.','Ask a friend'], correct:1, explanation:'Bayesian inference requires a prior. A strong prior that the coin is fair means 10 heads is probably just noise. A weak prior means it is likely rigged.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Iterative', difficulty:4, reward:500, timeLimit:120, body:'Why is truth extraction iterative?', options:['Because you forget things','Because the posterior of today becomes the prior of tomorrow.','Because data changes','Because of noise'], correct:1, explanation:'Each new piece of evidence updates your belief. That updated belief (posterior) becomes the starting point (prior) for the next piece of evidence.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Intercept', scenario:'You intercept an enemy radio transmission. It is buried in static. How do you extract the message?', options:['Turn up the volume','Calculate the SNR. If low, average multiple intercepts to reduce uncorrelated noise.','Guess the words','Buy a better antenna'], correct:1, explanation:'Averaging multiple samples reduces white noise by sqrt(N). This increases SNR, making the signal (message) extractable.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Codebook', scenario:'The enemy is sending messages. Some messages are highly predictable ("All clear"), others are random. Which carries more information?', options:['The predictable ones','The random ones (higher entropy = more information).','They are the same','The encrypted ones'], correct:1, explanation:'Shannon Entropy. A predictable message resolves little uncertainty (low info). A random message resolves high uncertainty (high info). The random ones are the valuable intelligence.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Image', scenario:'You capture a low-resolution satellite image of a military base. You need to compress it to send it over a slow link. What do you use?', options:['Lossless ZIP','Lossy JPEG. Discard high-frequency details the eye ignores to save bandwidth.','Base64','RSA'], correct:1, explanation:'Lossy compression (JPEG) exploits perceptual limits. You trade perfect fidelity for a massive reduction in file size, which is necessary for a slow channel.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Jamming', scenario:'The enemy is jamming your signal. Bits are flipping in transit. How do you ensure the message gets through?', options:['Send it louder','Forward Error Correction (Hamming Codes). Add redundancy so the receiver can fix flipped bits without retransmission.','Send it faster','Send it twice'], correct:1, explanation:'In a jammed (high noise) channel, retransmission might also fail. FEC (Hamming) allows the receiver to correct errors mathematically.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Burst', scenario:'You have 10 seconds to send 1 GB of data before the enemy triangulates your position. The channel capacity is 100 Mbps. What happens?', options:['It sends perfectly','It fails. 1 GB = 8000 Mb. 8000 Mb / 100 Mbps = 80 seconds. You exceed the Shannon limit.','It compresses','It works if you try hard'], correct:1, explanation:'You cannot beat the Shannon-Hartley limit. 1 GB requires 80 seconds at 100 Mbps. You will fail.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Mole', scenario:'You need to securely send a list of agent names to HQ. How do you ensure only HQ can read it?', options:['Encrypt with your Private Key','Encrypt with HQ\'s Public Key. Only their Private Key can decrypt it.','Hash it','Base64 it'], correct:1, explanation:'Asymmetric encryption. Encrypt with the recipient\'s Public Key. Even if intercepted, it is useless without HQ\'s Private Key.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Market', scenario:'You are tracking enemy funding via stock market anomalies. The daily price jumps randomly. Is this signal or noise?', options:['Signal: The enemy is trading','Noise: A random walk. The signal is the long-term trend.','Signal: Day traders know','Both'], correct:1, explanation:'Short-term stock fluctuations are stochastic (noise). The signal is the underlying trend over months/years. Do not react to daily noise.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Radar', scenario:'Your radar tracks an incoming missile, but the radar bounces off rain (noise). How do you track the true position?', options:['Move the radar','Use a Kalman Filter. Blend the noisy radar measurement with a physics prediction of the missile\'s path.','Ignore the radar','Turn up the gain'], correct:1, explanation:'The Kalman Filter optimally blends the prediction (model) and the measurement (radar), weighting them by their variance. It filters the rain noise.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Embed', scenario:'You need to hide a secret map inside a standard JPEG image sent over email. What encoding do you use to fit binary data into the image text?', options:['UTF-8','Base64. It encodes binary map data into ASCII text that can be embedded.','Huffman','Manchester'], correct:1, explanation:'Base64 converts binary data into text. You can embed this text into the metadata of a JPEG, hiding the map in plain sight.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Conclusion', scenario:'You have 3 sources saying the enemy will attack, and 1 source saying they won\'t. How do you decide?', options:['Trust the majority','Use Bayesian Inference. Update your prior belief with each piece of evidence, weighted by the source\'s reliability.','Trust the loudest source','Flip a coin'], correct:1, explanation:'Bayesian inference. Start with a prior (e.g., attack is unlikely). Update it with the evidence (3 sources). The posterior gives the true probability of attack, separating signal from noise.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The SNR Check', body:'Identify a "signal" you are trying to focus on today (e.g., a conversation). What is the "noise"? How can you improve the SNR?' },
+  { id:'rw2', title:'The Entropy Calc', body:'Estimate the entropy of your password. Is it high or low? (log2(charset^length))' },
+  { id:'rw3', title:'The Compression', body:'Look at a large file on your computer. Could it be losslessly compressed? What redundancy does it have?' },
+  { id:'rw4', title:'The Parity', body:'Next time you enter a credit card number, note the last digit. That\'s a Luhn algorithm (parity check) for error detection.' },
+  { id:'rw5', title:'The Channel Limit', body:'Check your internet speed (Mbps). That is your channel capacity. You cannot download faster than that.' },
+  { id:'rw6', title:'The Hash', body:'Hash a document using an online tool. Change one letter and hash it again. Notice how the hash changes completely.' },
+  { id:'rw7', title:'The White Noise', body:'Listen to white noise (e.g., fan, static). Recognize it as uncorrelated random fluctuations.' },
+  { id:'rw8', title:'The Kalman', body:'When your GPS jumps while driving under a bridge, recognize the noise. Your phone uses a Kalman filter to smooth it.' },
+  { id:'rw9', title:'The Base64', body:'Find an image embedded in an email. It was likely Base64 encoded to travel through the text-based SMTP protocol.' },
+  { id:'rw10', title:'The Prior', body:'Before reading a news headline, state your prior belief. After reading, update it. Did the evidence shift your belief?' },
+  { id:'rw11', title:'The Signal', body:'In a noisy room, focus on one voice. You are applying a biological filter to isolate signal from noise.' },
+  { id:'rw12', title:'The Uncertainty', body:'Estimate the entropy of a dice roll vs a coin flip. Which has more uncertainty?' },
+  { id:'rw13', title:'The Lossy', body:'Look at a JPEG. It is compressed. The "artifacts" around edges are the discarded high-frequency data.' },
+  { id:'rw14', title:'The Redundancy', body:'Why do we say "Alpha, Bravo, Charlie" on the radio? It adds redundancy to survive noisy channels.' },
+  { id:'rw15', title:'The Bandwidth', body:'Why is 5G faster than 4G? It uses higher frequencies (more Bandwidth).' },
+  { id:'rw16', title:'The Crypto', body:'Send an encrypted message (e.g., via Signal). You are using mathematical asymmetry to ensure confidentiality.' },
+  { id:'rw17', title:'The Pink Noise', body:'Listen to pink noise (e.g., rain). It has more low-frequency power than white noise (TV static).' },
+  { id:'rw18', title:'The Moving Average', body:'Track a metric (weight, stocks) over 7 days. Average it. Notice how the noise is smoothed, but the trend lags.' },
+  { id:'rw19', title:'The UTF-8', body:'Type an emoji. It is a Unicode character, encoded in UTF-8, taking up 4 bytes.' },
+  { id:'rw20', title:'The Bayes', body:'See a "99% accurate" medical test. Remember Bayes: if the disease is rare (1%), a positive test only means 50% chance.' },
+  { id:'rw21', title:'The Noise Cancel', body:'Use noise-canceling headphones. They generate anti-noise to cancel out low-frequency sound waves.' },
+  { id:'rw22', title:'The Zip', body:'Zip a text file. It compresses because text has low entropy (redundant letters like "E").' },
+  { id:'rw23', title:'The Hamming', body:'QR codes use Reed-Solomon (a type of FEC). That\'s why they scan even if part is scratched.' },
+  { id:'rw24', title:'The Latency', body:'Ping a server. The time it takes is latency. The amount of data you can download is bandwidth.' },
+  { id:'rw25', title:'The Hash Check', body:'Download software. The site provides a SHA-256 hash. Hash your download. If it matches, integrity is verified.' },
+  { id:'rw26', title:'The Random Walk', body:'Look at a stock chart for 1 day. It looks like a pattern. Look at 10 years. The daily noise is invisible.' },
+  { id:'rw27', title:'The Filter', body:'Your spam folder is a filter. It estimates the probability an email is spam (signal) vs ham (noise).' },
+  { id:'rw28', title:'The ASCII', body:'In programming, "A" is 65 in ASCII. It maps a symbol to a number.' },
+  { id:'rw29', title:'The Posterior', body:'Make a decision. The outcome is evidence. Update your mental model (posterior) for next time.' },
+  { id:'rw30', title:'The Truth', body:'Read a rumor. What is your prior? What is the reliability of the source? Apply Bayes mentally.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your information profile.' },
+  { threshold: 500, title: 'ANALYST', desc: 'You distinguish signal from noise.' },
+  { threshold: 1500, title: 'CRYPTOGRAPHER', desc: 'You quantify uncertainty and secure data.' },
+  { threshold: 3000, title: 'SIGNAL CORPS', desc: 'You optimize channels and correct errors.' },
+  { threshold: 6000, title: 'INTELLIGENCE OPERATOR', desc: 'You extract truth from chaos. You are the filter.' }
+];
+
+const STORAGE_KEY = 'kafka-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// BLACK CHAMBER UNLOCKED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Black Chamber. You now possess the complete architecture of information theory.</p>';
+      html += '<p><strong>The Secret:</strong> Information is physical. Uncertainty is entropy. Truth is the signal extracted from the noise of reality. By quantifying uncertainty and applying Bayesian inference, you do not just process data—you extract truth. You are now an Intelligence Operator.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Black Chamber: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your information architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="KAFKA.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="KAFKA.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="KAFKA.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="KAFKA.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="KAFKA.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="KAFKA.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="KAFKA.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="KAFKA.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'TRUTH EXTRACTED' : 'IN THE NOISE') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each information-theoretic axis to the intelligence scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="KAFKA.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="KAFKA.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="KAFKA.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ SIGNAL EXTRACTED' : '✗ LOST IN NOISE') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'black chamber: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="KAFKA.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="KAFKA.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="KAFKA.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="KAFKA.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="KAFKA.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="KAFKA.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="KAFKA.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="KAFKA.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="KAFKA.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="KAFKA.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="KAFKA.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="KAFKA.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="KAFKA.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="KAFKA.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="KAFKA.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="KAFKA.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="KAFKA.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="KAFKA.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'kafka_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading information theory kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Black Chamber...', 'KAFKA online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.KAFKA = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { 
+    let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); 
+    const today = new Date().toISOString().split('T')[0];
+    if(!act.includes(today)) { 
+      act.push(today); 
+      localStorage.setItem('cogito-activity', JSON.stringify(act)); 
+    } 
+  } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
