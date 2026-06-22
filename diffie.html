@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // DIFFIE v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'\25B8';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'\25C6';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'\25B8';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">DIFFIE</div><div class="boot-sub">Cogito // Cryptography & Trust Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">DIFFIE</div><div class="brand-tag">ZERO-TRUST ARCHITECTURE</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="DIFFIE.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="DIFFIE.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="DIFFIE.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="DIFFIE.setTheme('light')">Light</button><button class="theme-option" onclick="DIFFIE.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Zero-Trust</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="DIFFIE.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of cryptography and trust. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: ZERO-TRUST</h1><p class="section-sub">A cumulative scenario. Build a secure, Byzantine-fault-tolerant voting network.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About DIFFIE</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>DIFFIE is a cognitive training simulator designed to install the adversarial thinking patterns used by cryptographers and security architects. It trains you to verify truth without revealing data, and to build systems that survive in a room full of eavesdroppers and malicious actors.</p>
+        <h2>// Core Pedagogy</h2>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Zero-Trust require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>AXIOM</strong> — Perfect secrecy, One-Time Pads, and Kerckhoffs's principle</li>
+          <li><strong>HASH</strong> — Cryptographic hashes, integrity, and Merkle trees</li>
+          <li><strong>EXCHANGE</strong> — Diffie-Hellman, discrete log, and key agreement</li>
+          <li><strong>ASYMM</strong> — Public key cryptography, RSA, and trapdoor functions</li>
+          <li><strong>SIGN</strong> — Digital signatures, non-repudiation, and authentication</li>
+          <li><strong>ZERO</strong> — Zero-Knowledge Proofs (ZKPs)</li>
+          <li><strong>ENTROPY</strong> — Random number generation and seed security</li>
+          <li><strong>TRUST</strong> — PKI, Certificate Authorities, and Web of Trust</li>
+          <li><strong>BYZANTINE</strong> — Byzantine fault tolerance and consensus</li>
+          <li><strong>QUANTUM</strong> — Post-quantum cryptography (Shor's algorithm, lattices)</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'AXIOM', title:'Perfect Secrecy', summary:'One-Time Pads, Shannon entropy, and Kerckhoffs principle.', lesson:{ title:'The Architecture of Secrecy', body: 'In 1949, Claude Shannon defined "Perfect Secrecy." A cryptosystem is perfectly secure if the ciphertext gives an attacker zero information about the plaintext, even with infinite computing power.\n\n## The One-Time Pad (OTP)\n\nThe only algorithm that achieves perfect secrecy is the One-Time Pad. You take a plaintext bit and XOR it with a truly random key bit. The result is random. An attacker seeing a \'1\' cannot tell if the plaintext was \'0\' and the key was \'1\', or vice versa.\n\n## The Catch\n\nThe key must be: 1. Truly random. 2. As long as the message. 3. Never reused. If you reuse a key, XORing two ciphertexts cancels out the key, leaving the XOR of the two plaintexts, which is easily broken.\n\n## Kerckhoffs\'s Principle\n\nA cryptosystem should remain secure even if everything about the system, except the key, is public knowledge. "Security by obscurity" (hiding the algorithm) is considered weak. Public algorithms (like AES) are scrutinized by the global community; if they survive, they are trusted.\n\n## The Method\n\n1. Assume the attacker knows your algorithm. 2. Security relies entirely on the secrecy of the key. 3. If you need perfect secrecy, use OTP, but manage the key perfectly.', takeaways:['Perfect secrecy means ciphertext reveals zero info about plaintext.','One-Time Pad (OTP) is the only perfectly secure algorithm, using XOR.','OTP keys must be random, as long as the message, and never reused.','Kerckhoffs\'s Principle: Security relies on the key, not the algorithm\'s secrecy.','Security by obscurity is weak; public scrutiny is strong.'] } },
+  { id:'m2', codename:'HASH', title:'Cryptographic Hashing', summary:'Integrity, pre-image resistance, and Merkle trees.', lesson:{ title:'The Architecture of Integrity', body: 'A cryptographic hash function takes any input (a file, a message) and produces a fixed-size string of bytes. It is a one-way function: you cannot reverse it.\n\n## The Three Properties\n\n1. **Pre-image resistance:** Given a hash `h`, it is infeasible to find the input `x`.\n2. **Second pre-image resistance:** Given an input `x1`, it is infeasible to find a different `x2` with the same hash.\n3. **Collision resistance:** It is infeasible to find any two inputs `x1` and `x2` that hash to the same value.\n\n## The Avalanche Effect\n\nA tiny change in the input drastically changes the output. "hello" and "Hello" will have completely different SHA-256 hashes. This makes tampering obvious.\n\n## Merkle Trees\n\nA Merkle tree hashes pairs of data together, then hashes the resulting hashes, until one "root hash" remains. If any single piece of data at the bottom changes, the root hash changes. Bitcoin uses this to summarize all transactions in a block in one 32-byte hash.\n\n## The Method\n\n1. Use hashes to verify integrity (did this file change?). 2. Use them to index data (hash tables). 3. Never use them for passwords without a "salt" (use bcrypt/argon2 instead).', takeaways:['Hash functions are one-way: you cannot reverse them.','Three properties: pre-image, second pre-image, collision resistance.','The avalanche effect: tiny input change = massive output change.','Merkle trees summarize massive datasets into a single root hash.','Do NOT use plain hashes for passwords; use slow hashes (bcrypt).'] } },
+  { id:'m3', codename:'EXCHANGE', title:'The Key Exchange', summary:'Diffie-Hellman, discrete log, and MITM attacks.', lesson:{ title:'The Architecture of Agreement', body: 'How do two people who have never met agree on a shared secret over a public channel filled with eavesdroppers? This was the breakthrough of Diffie-Hellman in 1976.\n\n## The Discrete Log Problem\n\nIt is easy to compute `g^x mod p` (exponentiation). It is extremely hard to reverse it (find `x` given `g`, `p`, and the result). This asymmetry is the foundation of DH.\n\n## The Magic\n\nAlice and Bob agree on public numbers `g` and `p`. Alice picks secret `a`, sends `A = g^a mod p`. Bob picks secret `b`, sends `B = g^b mod p`. \nAlice computes `B^a mod p`. Bob computes `A^b mod p`. \nMath magic: both equal `g^(ab) mod p`. They now share a secret, but an eavesdropper only saw `A`, `B`, `g`, and `p`, which are useless without knowing `a` or `b`.\n\n## The Man-in-the-Middle (MITM)\n\nDH does not authenticate the parties. Mallory can intercept Alice\'s public key, send her own to Bob, and intercept Bob\'s public key, sending her own to Alice. Mallory now shares a secret with Alice and a different secret with Bob, decrypting and re-encrypting all traffic.\n\n## The Method\n\n1. Use DH to establish a shared secret over an insecure channel. 2. You MUST authenticate the exchange (via digital signatures or pre-shared keys) to prevent MITM.', takeaways:['Diffie-Hellman allows two parties to agree on a secret over a public channel.','It relies on the Discrete Logarithm Problem (easy forward, hard reverse).','It solves key distribution but NOT authentication.','Man-in-the-Middle (MITM) attacks defeat DH without authentication.','Always combine DH with signatures (e.g., DHE-RSA) to prove identity.'] } },
+  { id:'m4', codename:'ASYMM', title:'Public Key Cryptography', summary:'RSA, trapdoor functions, and key pairs.', lesson:{ title:'The Architecture of Asymmetry', body: 'Symmetric encryption uses one key for both locking and unlocking. The problem: how do you share the key? Asymmetric encryption (Public Key Crypto) solves this by using two keys: a Public Key (to lock) and a Private Key (to unlock).\n\n## The Trapdoor Function\n\nA mathematical function that is easy to compute in one direction but hard to reverse, unless you have a specific piece of "trapdoor" information.\n\n## RSA\n\nBased on the difficulty of factoring large primes. \n1. Multiply two huge prime numbers `p` and `q` to get `n`. \n2. It is easy to calculate `n = p * q`. \n3. It is computationally infeasible to find `p` and `q` given only `n`.\nThe public key uses `n`. The private key requires knowing `p` and `q`.\n\n## The Use Case\n\nAnyone can encrypt a message with your public key. Only you (with the private key) can decrypt it. This solves the key distribution problem. However, it is slow. In practice, we use RSA to encrypt a symmetric key, then use the fast symmetric key (AES) to encrypt the actual data.\n\n## The Method\n\n1. Use asymmetric crypto for key exchange and signatures. 2. Use symmetric crypto (AES) for bulk data encryption. 3. Security relies on the hardness of the math problem (factoring, discrete log).', takeaways:['Asymmetric crypto uses a Public Key (lock) and Private Key (unlock).','It is based on trapdoor functions: easy forward, hard reverse.','RSA relies on the difficulty of factoring large prime numbers.','Asymmetric is slow; use it to exchange a symmetric key for data.','Never share your private key. Freely share your public key.'] } },
+  { id:'m5', codename:'SIGN', title:'Digital Signatures', summary:'Authentication, non-repudiation, and integrity.', lesson:{ title:'The Architecture of Proof', body: 'Encryption keeps data secret. Signatures prove WHO sent it and that it wasn\'t changed. \n\n## How It Works\n\n1. Alice hashes her message to get a digest.\n2. Alice encrypts the digest with her PRIVATE key. This is the "signature."\n3. Bob receives the message and the signature.\n4. Bob decrypts the signature using Alice\'s PUBLIC key. \n5. Bob hashes the message himself. If his hash matches the decrypted signature, he knows: \n a) The message wasn\'t altered (Integrity). \n b) It came from Alice (Authentication). \n c) Alice cannot deny sending it (Non-repudiation).\n\n## RSA vs ECDSA\n\nRSA uses factoring. ECDSA (Elliptic Curve Digital Signature Algorithm) uses elliptic curve math. ECDSA provides the same security with much smaller keys (256-bit ECDSA ≈ 3072-bit RSA). This saves bandwidth and compute, which is why Bitcoin and Ethereum use ECDSA.\n\n## The Method\n\n1. Sign hashes, not raw data (efficiency). 2. Use the private key to sign, public key to verify. 3. Signatures provide non-repudiation, which encryption alone cannot.', takeaways:['Digital signatures provide Authentication, Integrity, and Non-repudiation.','Sign by encrypting a hash with the PRIVATE key. Verify by decrypting with PUBLIC key.','Non-repudiation: the sender cannot deny sending the message.','ECDSA (elliptic curves) is more efficient than RSA for the same security level.','Always sign hashes for efficiency, not the raw message.'] } },
+  { id:'m6', codename:'ZERO', title:'Zero-Knowledge Proofs', summary:'Proving knowledge without revealing the knowledge.', lesson:{ title:'The Architecture of Nothing', body: 'A Zero-Knowledge Proof (ZKP) allows you to prove to a verifier that you know a secret, without revealing the secret itself.\n\n## The Ali Baba Cave\n\nImagine a circular cave with a magic door in the middle. To go from the left entrance to the right exit, you must say a password. Alice wants to prove to Bob she knows the password, but won\'t tell him.\n1. Alice enters the cave from a random side (Left or Right).\n2. Bob stands outside and shouts which side he wants her to exit from.\n3. If Alice knows the password, she can always exit the requested side (using the door if needed).\n4. If she doesn\'t know it, she has a 50% chance of failing.\n5. Repeat 20 times. The chance of a faker succeeding 20 times is 1 in a million.\n\n## The Three Properties\n\n1. **Completeness:** If the statement is true, an honest verifier will be convinced.\n2. **Soundness:** If the statement is false, a cheating prover cannot convince the verifier (except with tiny probability).\n3. **Zero-Knowledge:** The verifier learns NOTHING else but the fact that the statement is true.\n\n## Use Cases\n\nZK-Rollups in Ethereum (scaling), private transactions (Zcash), proving you are over 18 without revealing your birthdate.\n\n## The Method\n\n1. Use ZKPs when you need to prove a fact without revealing the underlying data. 2. They are computationally heavy but cryptographically sound.', takeaways:['A ZKP proves you know a secret without revealing the secret.','Properties: Completeness, Soundness, Zero-Knowledge.','The Ali Baba Cave is the classic analogy.','Use cases: privacy coins (Zcash), blockchain scaling (ZK-Rollups), identity proofs.','They trade computation for privacy/efficiency.'] } },
+  { id:'m7', codename:'ENTROPY', title:'Randomness & Entropy', summary:'CSPRNGs, seeds, and the failure of /dev/random.', lesson:{ title:'The Architecture of Chaos', body: 'Cryptography is useless if your randomness is predictable. If your "random" key is actually based on the current time, an attacker can guess it.\n\n## TRNG vs PRNG vs CSPRNG\n\n- **TRNG (True Random Number Generator):** Hardware based. Measures physical noise (thermal noise, photon arrival). Truly unpredictable but slow.\n- **PRNG (Pseudo-Random):** Software algorithm (e.g., Mersenne Twister). Fast, but deterministic. If you know the "seed", you know the sequence. Not for crypto.\n- **CSPRNG (Cryptographically Secure PRNG):** Software, but designed so that knowing the output gives zero info about future outputs. Used for keys.\n\n## The Seed\n\nA CSPRNG is only as good as its seed. If the seed has 32 bits of entropy, an attacker can brute-force it in seconds. A Bitcoin private key needs 256 bits of entropy. \n\n## The Debian Bug\n\nIn 2008, a Debian maintainer commented out two lines of code in OpenSSL because Valgrind flagged it as an error. This reduced the entropy of all OpenSSL keys generated on Debian/Ubuntu for two years to just 15 bits. Every key was brute-forceable in minutes. \n\n## The Method\n\n1. Never write your own RNG. 2. Always use the OS CSPRNG (/dev/urandom on Linux, CryptGenRandom on Windows). 3. Ensure your seed has at least 128-256 bits of true entropy.', takeaways:['PRNGs (Mersenne Twister) are for simulations, not crypto.','CSPRNGs (Cryptographically Secure) are required for keys.','A crypto system is only as strong as its seed entropy.','The Debian OpenSSL bug proved that bad RNG destroys all security.','Use OS-level entropy sources (/dev/urandom), never custom RNGs.'] } },
+  { id:'m8', codename:'TRUST', title:'Trust Models', summary:'PKI, Certificate Authorities, and Web of Trust.', lesson:{ title:'The Architecture of Trust', body: 'Asymmetric crypto solves key exchange, but how do you know a public key actually belongs to "Alice" and not "Mallory"? This is the Trust Problem.\n\n## Public Key Infrastructure (PKI)\n\nA hierarchical model. A Root Certificate Authority (CA) signs the public keys of Intermediate CAs, who sign the keys of websites (like google.com). Your browser trusts the Root CA. If the chain is unbroken, you trust the site. \n\n## The Web of Trust\n\nA decentralized model used by PGP. Instead of a central authority, users sign each other\'s keys. If Bob trusts Alice, and Alice signs Charlie\'s key, Bob can trust Charlie. Trust is transitive.\n\n## Trust on First Use (TOFU)\n\nUsed by SSH. The first time you connect to a server, you accept its public key without proof. If the key changes later, you are warned. It assumes the first connection wasn\'t intercepted.\n\n## The Method\n\n1. PKI is the standard for the web (HTTPS). 2. Web of Trust is for decentralized comms. 3. TOFU is for interactive shells. 4. If the trust root is compromised (e.g., DigiNotar), the whole system fails.', takeaways:['Trust models solve "whose key is this?"','PKI: Hierarchical. Root CAs sign Intermediate CAs who sign sites.','Web of Trust: Decentralized. Users sign each other (PGP).','TOFU: Trust the first key seen; warn if it changes (SSH).','If the Root of Trust is compromised, the entire system fails.'] } },
+  { id:'m9', codename:'BYZANTINE', title:'Byzantine Fault Tolerance', summary:'Consensus, Sybil attacks, and 2f+1.', lesson:{ title:'The Architecture of Consensus', body: 'The Byzantine Generals Problem: Several generals are besieging a city. They must agree to attack or retreat together. If they don\'t coordinate, they lose. But some generals might be traitors sending false messages. How do loyal generals reach consensus?\n\n## Byzantine Fault Tolerance (BFT)\n\nA system is BFT if it can reach consensus despite malicious (Byzantine) nodes. The mathematical proof: to survive `f` malicious nodes, you need at least `3f + 1` total nodes. \n- To tolerate 1 traitor, you need 4 generals. \n- To tolerate 33% traitors, you need 67% honest nodes.\n\n## Practical BFT (PBFT)\n\nUsed in permissioned blockchains (Hyperledger). Nodes take turns being a leader. Messages are signed. Requires heavy communication (O(n^2)). Fast and final, but doesn\'t scale to thousands of nodes.\n\n## Nakamoto Consensus (Bitcoin)\n\nBitcoin solves BFT in an open (permissionless) network using Proof of Work (PoW). It trades finality for probabilistic finality and Sybil resistance. You can\'t create fake nodes because nodes must burn energy, not just spin up software. \n\n## Sybil Attacks\n\nCreating many fake identities to outvote honest nodes. PoW prevents this in Bitcoin. In PoS (Proof of Stake), you must lock up capital to vote.\n\n## The Method\n\n1. Identify the threat model (crash faults vs Byzantine faults). 2. Ensure honest majority (2/3 for BFT, 51% for PoW). 3. Prevent Sybil attacks via cost (energy or capital).', takeaways:['Byzantine Fault Tolerance (BFT) handles malicious nodes, not just crashes.','To survive f malicious nodes, you need 3f + 1 total nodes.','PBFT is fast but requires O(n^2) communication (permissioned).','Nakamoto Consensus (PoW) solves BFT in open networks via energy cost.','Sybil attacks (fake identities) are prevented by making identities expensive (PoW/PoS).'] } },
+  { id:'m10', codename:'QUANTUM', title:'Post-Quantum Crypto', summary:'Shor\'s algorithm, Grover\'s algorithm, and lattice crypto.', lesson:{ title:'The Architecture of the Quantum Threat', body: 'Quantum computers exploit superposition and entanglement. They break the math assumptions of modern cryptography.\n\n## Shor\'s Algorithm\n\nA quantum algorithm that can factor large numbers and solve discrete logs in polynomial time. If a quantum computer with enough qubits is built, **RSA and ECC are dead.** A key that would take a supercomputer a billion years to break, a quantum computer breaks in hours.\n\n## Grover\'s Algorithm\n\nA quantum search algorithm. It effectively halves the key size of symmetric encryption. AES-256 becomes as hard to break as AES-128. Symmetric crypto survives, but key sizes must double.\n\n## Post-Quantum Cryptography (PQC)\n\nNew algorithms believed to be resistant to quantum computers. NIST is standardizing them.\n- **Lattice-based (e.g., Kyber/Dilithium):** Based on the hardness of finding the closest point in a high-dimensional lattice. \n- **Hash-based (e.g., SPHINCS+):** Digital signatures based only on hash functions (very secure, but large signatures).\n- **Code-based (e.g., McEliece):** Based on error-correcting codes.\n\n## The Method\n\n1. Symmetric keys need to double (AES-256 is quantum-safe). 2. RSA/ECC must be replaced by PQC (Kyber/Dilithium). 3. "Harvest Now, Decrypt Later": attackers are storing encrypted data today to decrypt tomorrow when quantum computers arrive.', takeaways:['Shor\'s Algorithm breaks RSA and ECC (factoring and discrete log).','Grover\'s Algorithm halves symmetric key strength (AES-256 becomes AES-128).','Symmetric crypto survives quantum if keys are doubled.','Post-Quantum Crypto (PQC) uses new math (lattices, hashes, codes).','"Harvest Now, Decrypt Later" is a threat today for long-lived secrets.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is Perfect Secrecy?',back:'A system where the ciphertext gives an attacker zero information about the plaintext, even with infinite computing power.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'What is the only algorithm that achieves Perfect Secrecy?',back:'The One-Time Pad (OTP). It XORs plaintext with a truly random key of equal length.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Three rules of a One-Time Pad key?',back:'1. Truly random. 2. As long as the message. 3. Never reused.'},
+  {id:'c4',moduleId:'m1',core:false,category:'concept',front:'State Kerckhoffs\'s Principle.',back:'A cryptosystem should remain secure even if everything about the system, except the key, is public knowledge.'},
+  {id:'c5',moduleId:'m1',core:false,category:'application',front:'Why is "Security by Obscurity" weak?',back:'Hiding the algorithm relies on a small group keeping a secret. Public algorithms survive global scrutiny.'},
+  {id:'c6',moduleId:'m1',core:false,category:'concept',front:'What happens if you reuse a One-Time Pad key?',back:'XORing two ciphertexts cancels the key, leaving the XOR of the two plaintexts, which is easily broken.'},
+  {id:'c7',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Security relies on the key, not..."',back:'"...the algorithm\'s secrecy." (Kerckhoffs)'},
+  {id:'c8',moduleId:'m1',core:false,category:'application',front:'If an attacker has infinite compute, can they break OTP?',back:'No. OTP is information-theoretically secure. The key space is larger than the message space.'},
+  {id:'c9',moduleId:'m1',core:false,category:'concept',front:'What is the XOR operation in crypto?',back:'Exclusive OR. If inputs are the same, output is 0. If different, output is 1. It is self-inverse (A XOR B XOR B = A).'},
+  {id:'c10',moduleId:'m1',core:false,category:'application',front:'Why isn\'t OTP used everywhere?',back:'Key distribution. Exchanging a key as long as the message is as hard as exchanging the message itself.'},
+  {id:'c11',moduleId:'m1',core:false,category:'concept',front:'What is the difference between symmetric and asymmetric crypto?',back:'Symmetric uses 1 key (fast). Asymmetric uses 2 keys (public/private, slow).'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete: "Security by obscurity is weak; ___ is strong."',back:'"Public scrutiny."'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is a cryptographic hash function?',back:'A one-way mathematical function that takes any input and produces a fixed-size string. Cannot be reversed.'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'What is the Avalanche Effect?',back:'A tiny change in the input (e.g., 1 bit) drastically changes the output hash (50% of bits flip).'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'Three properties of a secure hash?',back:'1. Pre-image resistance (hard to find x from h(x)). 2. Second pre-image (hard to find x2 given x1). 3. Collision (hard to find any x1, x2 with same hash).'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'What is a Merkle Tree?',back:'A tree of hashes. Pairs of data are hashed, then the hashes are hashed together, up to a single "root hash".'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'Why use a Merkle Tree in blockchain?',back:'It summarizes all transactions in a block into one 32-byte hash. Proving a transaction exists requires only log(N) hashes.'},
+  {id:'c18',moduleId:'m2',core:false,category:'concept',front:'Should you use SHA-256 to store passwords?',back:'No. SHA-256 is too fast. Use slow hashes designed for passwords: bcrypt, scrypt, or Argon2.'},
+  {id:'c19',moduleId:'m2',core:false,category:'application',front:'What is a "salt" in hashing?',back:'A random value added to a password before hashing. It prevents rainbow table attacks and ensures identical passwords have different hashes.'},
+  {id:'c20',moduleId:'m2',core:false,category:'concept',front:'Pre-image resistance vs Collision resistance?',back:'Pre-image: given hash `h`, find `x`. Collision: find ANY two `x1, x2` with same hash. Collision is easier to break.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete: "Hashes verify ___."',back:'"Integrity." (Did the data change?)'},
+  {id:'c22',moduleId:'m2',core:false,category:'application',front:'Given hash "5f4dcc3b...", can you find the input?',back:'Infeasible. You would have to brute-force the input space (Pre-image resistance).'},
+  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'What is a Hash Collision?',back:'When two different inputs produce the exact same hash output.'},
+  {id:'c24',moduleId:'m2',core:false,category:'application',front:'How does Git use hashes?',back:'Git stores files and directories as SHA-1 hashes. If any file changes, the commit hash changes.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What problem does Diffie-Hellman solve?',back:'How two parties can agree on a shared secret over an insecure, public channel.'},
+  {id:'c26',moduleId:'m3',core:true,category:'concept',front:'What math problem is Diffie-Hellman based on?',back:'The Discrete Logarithm Problem (easy to compute g^x mod p, hard to find x given the result).'},
+  {id:'c27',moduleId:'m3',core:false,category:'application',front:'Explain the DH key exchange simply.',back:'Alice sends g^a, Bob sends g^b. Both compute g^(ab). Eavesdropper sees g^a and g^b but cannot compute g^(ab).'},
+  {id:'c28',moduleId:'m3',core:false,category:'concept',front:'What is the fatal flaw of plain Diffie-Hellman?',back:'It does not authenticate the parties. It is vulnerable to Man-in-the-Middle (MITM) attacks.'},
+  {id:'c29',moduleId:'m3',core:false,category:'application',front:'How do you prevent a MITM attack on DH?',back:'Use authenticated key exchange, like DHE-RSA, where the DH parameters are digitally signed.'},
+  {id:'c30',moduleId:'m3',core:false,category:'concept',front:'Why use ephemeral keys (DHE)?',back:'Ephemeral keys are generated fresh per session. This provides Forward Secrecy: compromising a long-term key later doesn\'t decrypt past sessions.'},
+  {id:'c31',moduleId:'m3',core:false,category:'quote',front:'Complete: "Diffie-Hellman solves key distribution but not ___."',back:'"Authentication."'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'What is Forward Secrecy?',back:'A property where compromising the server\'s long-term private key does not compromise past session keys.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'In MITM, what does Mallory do?',back:'Intercepts Alice\'s public key, sends her own to Bob. Re-encrypts all traffic. Both think they share a secret with each other, but actually share it with Mallory.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'Symmetric vs Asymmetric key exchange?',back:'Symmetric requires pre-sharing a key (hard). Asymmetric (DH) allows agreement without pre-sharing.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'What does `g^ab mod p` represent?',back:'The shared secret computed by both Alice and Bob in Diffie-Hellman.'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'Is Diffie-Hellman vulnerable to quantum computers?',back:'Yes. Shor\'s algorithm breaks the discrete log problem, breaking DH.'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is a Trapdoor Function?',back:'A function easy to compute in one direction, but hard to reverse unless you have specific "trapdoor" information (the private key).'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'What math problem is RSA based on?',back:'The difficulty of factoring the product of two large prime numbers.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'Public Key vs Private Key?',back:'Public key encrypts/verifies (shared widely). Private key decrypts/signs (kept secret).'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'Why do we use RSA to encrypt a symmetric key, not the whole message?',back:'RSA is extremely slow. We use RSA to securely exchange an AES key, then use fast AES for the data.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What happens if you lose your RSA private key?',back:'You cannot decrypt any messages sent to you, and you cannot sign new messages.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'If `n = p * q` (huge primes), what is easy and what is hard?',back:'Easy: multiplying p and q to get n. Hard: given n, finding p and q.'},
+  {id:'c43',moduleId:'m4',core:false,category:'quote',front:'Complete: "Never share your private key. Freely share your ___."',back:'"Public key."'},
+  {id:'c44',moduleId:'m4',core:false,category:'concept',front:'What is a key pair?',back:'The mathematically linked set of a public key and a private key in asymmetric crypto.'},
+  {id:'c45',moduleId:'m4',core:false,category:'application',front:'How does Alice send a secret to Bob using RSA?',back:'Alice encrypts the message using Bob\'s Public Key. Only Bob\'s Private Key can decrypt it.'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'Is RSA symmetric or asymmetric?',back:'Asymmetric. It uses two different keys.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'Key sizes: 2048-bit RSA vs 256-bit AES. Which is stronger?',back:'256-bit AES. RSA requires huge keys because factoring algorithms are better than brute-force.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'Why is ECC (Elliptic Curve) preferred over RSA today?',back:'ECC provides the same security with much smaller keys (256-bit ECC = 3072-bit RSA). Faster and less bandwidth.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What are the 3 properties of Digital Signatures?',back:'1. Authentication (proves sender). 2. Integrity (proves not altered). 3. Non-repudiation (sender cannot deny).'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'How do you create a digital signature?',back:'Hash the message, then encrypt the hash with your PRIVATE key.'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'How do you verify a digital signature?',back:'Decrypt the signature with the sender\'s PUBLIC key. Hash the message. If they match, it\'s valid.'},
+  {id:'c52',moduleId:'m5',core:false,category:'concept',front:'What is Non-repudiation?',back:'The sender cannot later deny having sent the message, because only they possess the private key used to sign it.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'Why sign hashes instead of raw messages?',back:'Efficiency. Hashing a 1GB file to 32 bytes and signing the 32 bytes is vastly faster than signing 1GB.'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'RSA Sign vs RSA Encrypt?',back:'Encrypt: use public key. Decrypt: use private key. Sign: use private key. Verify: use public key.'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'ECDSA vs RSA signatures?',back:'ECDSA (Elliptic Curve) is much smaller and faster than RSA for the same security level. Used in Bitcoin.'},
+  {id:'c56',moduleId:'m5',core:false,category:'quote',front:'Complete: "Sign with the private key, verify with the ___."',back:'"Public key."'},
+  {id:'c57',moduleId:'m5',core:false,category:'concept',front:'Does encryption provide non-repudiation?',back:'No. Encryption provides secrecy. Only signatures provide non-repudiation.'},
+  {id:'c58',moduleId:'m5',core:false,category:'application',front:'If a hacker alters a signed message, what happens to the signature?',back:'The hash of the altered message will not match the decrypted signature. Verification fails.'},
+  {id:'c59',moduleId:'m5',core:false,category:'concept',front:'What is a Certificate Authority (CA)?',back:'A trusted third party that signs public keys, binding them to identities.'},
+  {id:'c60',moduleId:'m5',core:false,category:'application',front:'Why does Bitcoin use ECDSA instead of RSA?',back:'ECDSA keys and signatures are tiny (256-bit), saving massive space on the blockchain.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is a Zero-Knowledge Proof (ZKP)?',back:'Proving to a verifier that you know a secret, without revealing the secret itself.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'Three properties of a ZKP?',back:'1. Completeness (true statements verified). 2. Soundness (false statements rejected). 3. Zero-Knowledge (verifier learns nothing else).'},
+  {id:'c63',moduleId:'m6',core:false,category:'application',front:'Explain the Ali Baba Cave analogy.',back:'Alice enters a cave loop. Bob shouts which exit to use. If she knows the password, she can always exit correctly. Repeat 20x to prove it without revealing the password.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'Use case: How to prove you are over 18 with a ZKP?',back:'The verifier provides a mathematical challenge that can only be solved if your age > 18, without revealing your exact birthdate.'},
+  {id:'c65',moduleId:'m6',core:false,category:'application',front:'What is a ZK-Rollup in blockchain?',back:'Processing thousands of transactions off-chain, and submitting a single ZKP to the main chain proving they are all valid.'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'Completeness vs Soundness?',back:'Completeness: honest prover convinces honest verifier. Soundness: cheating prover cannot convince honest verifier.'},
+  {id:'c67',moduleId:'m6',core:false,category:'quote',front:'Complete: "A ZKP proves a fact without revealing the ___."',back:'"Underlying data."'},
+  {id:'c68',moduleId:'m6',core:false,category:'concept',front:'Why are ZKPs computationally heavy?',back:'They require complex polynomial commitments and elliptic curve math to ensure soundness.'},
+  {id:'c69',moduleId:'m6',core:false,category:'application',front:'How does Zcash achieve privacy?',back:'Using zk-SNARKs to prove a transaction is valid (inputs = outputs) without revealing sender, receiver, or amount.'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What does "zk-SNARK" stand for?',back:'Zero-Knowledge Succinct Non-interactive ARgument of Knowledge.'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'Can a ZKP prove you solved a Sudoku without showing the solution?',back:'Yes. This is a classic interactive proof puzzle demonstrating ZK properties.'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'Interactive vs Non-interactive ZKPs?',back:'Interactive requires back-and-forth challenges. Non-interactive (SNARKs) can be verified instantly by anyone.'},
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'PRNG vs CSPRNG?',back:'PRNG (Pseudo-Random) is fast but predictable (Mersenne Twister). CSPRNG (Cryptographically Secure) is unpredictable even if outputs are known.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'Where should you get random numbers for crypto keys?',back:'The OS CSPRNG (e.g., /dev/urandom on Linux). Never write your own.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is "Entropy" in crypto?',back:'The measure of unpredictability. A 256-bit key requires 256 bits of true entropy to be secure.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'What was the Debian OpenSSL bug?',back:'A maintainer removed 2 lines of code, reducing entropy to 15 bits. All keys generated for 2 years were trivially brute-forced.'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'TRNG (True Random Number Generator)?',back:'Hardware that measures physical noise (thermal, photon). Truly unpredictable but slow.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'Why is `Math.random()` in JS bad for crypto?',back:'It is a PRNG based on a timestamp seed. Completely predictable. Use `crypto.getRandomValues()`.'},
+  {id:'c79',moduleId:'m7',core:false,category:'quote',front:'Complete: "A crypto system is only as strong as its ___."',back:'"Seed entropy."'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'What is a "Seed" in a PRNG?',back:'The initial value. If you know the seed, you can predict the entire sequence of "random" numbers.'},
+  {id:'c81',moduleId:'m7',core:false,category:'application',front:'How much entropy is needed for a Bitcoin private key?',back:'256 bits. Less than that, and brute force becomes feasible.'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'Is /dev/urandom secure for key generation?',back:'Yes. It gathers environmental noise and uses a CSPRNG algorithm. It is the standard.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'If a key has 40 bits of entropy, how long to crack?',back:'Seconds. 2^40 is ~1 trillion, trivial for a modern CPU.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'Why are hardware wallets (TRNG) used for crypto?',back:'They ensure private keys are generated in isolation with true hardware entropy, isolated from the internet.'},
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What problem does Public Key Infrastructure (PKI) solve?',back:'Proving that a public key actually belongs to the entity claiming to own it.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'How does PKI work?',back:'A Root Certificate Authority (CA) signs the public keys of websites. Your browser trusts the Root CA, creating a chain of trust.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'What is the Web of Trust?',back:'A decentralized trust model (PGP). Users sign each other\'s keys. Trust is transitive.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What is TOFU (Trust On First Use)?',back:'Trusting the first public key you see for a server. If it changes, you are warned. Used by SSH.'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'What happens if a Root CA is compromised?',back:'The attacker can forge certificates for any website. The entire web trust model breaks (e.g., DigiNotar).'},
+  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'What is a Digital Certificate?',back:'A document containing a public key and identity info, signed by a CA.'},
+  {id:'c91',moduleId:'m8',core:false,category:'quote',front:'Complete: "In PKI, trust is ___ (Root -> Intermediate -> Site)."',back:'"Hierarchical."'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'How does HTTPS verify a site?',back:'Site sends certificate. Browser checks if signed by a trusted Root CA. If yes, encrypts traffic.'},
+  {id:'c93',moduleId:'m8',core:false,category:'concept',front:'Why is PGP (Web of Trust) hard for average users?',back:'It requires manual key verification and signing parties. PKI is automated via browsers.'},
+  {id:'c94',moduleId:'m8',core:false,category:'application',front:'What is a Man-in-the-Middle (MITM) attack on HTTPS?',back:'Attacker intercepts traffic and presents a fake certificate. If the browser trusts it (bad CA), the attack succeeds.'},
+  {id:'c95',moduleId:'m8',core:false,category:'concept',front:'Certificate Pinning?',back:'Hardcoding a specific public key into an app, refusing to trust any CA for that domain. Prevents MITM via rogue CAs.'},
+  {id:'c96',moduleId:'m8',core:false,category:'application',front:'SSH vs HTTPS trust model?',back:'SSH uses TOFU (warn on change). HTTPS uses PKI (chain to Root CA).'},
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is the Byzantine Generals Problem?',back:'How loyal generals can reach consensus when some generals might be traitors sending false messages.'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'To survive f malicious nodes, how many total nodes (N) are needed for BFT?',back:'N = 3f + 1. E.g., to survive 1 traitor, you need 4 nodes. To survive 33% traitors, need 67% honest.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'What is a Sybil Attack?',back:'Creating many fake identities to outvote honest nodes in a consensus network.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'How does Proof of Work (PoW) prevent Sybil attacks?',back:'Identities are tied to compute power (energy). You cannot fake 10,000 nodes without 10,000x the electricity.'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'PBFT (Practical Byzantine Fault Tolerance)?',back:'A consensus algorithm used in permissioned blockchains. Fast, final, but requires O(n^2) communication.'},
+  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'Nakamoto Consensus?',back:'Bitcoin\'s solution. Replaces finality with probabilistic finality and uses PoW for Sybil resistance.'},
+  {id:'c103',moduleId:'m9',core:false,category:'quote',front:'Complete: "To survive f malicious nodes, you need 3f + 1 total ___."',back:'"Nodes."'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'Crash Fault vs Byzantine Fault?',back:'Crash: node dies/goes offline. Byzantine: node actively lies/malicious. BFT handles both.'},
+  {id:'c105',moduleId:'m9',core:false,category:'concept',front:'Why can\'t PBFT scale to Bitcoin\'s size?',back:'O(n^2) message complexity. If 10,000 nodes talk to each other, it\'s 100 million messages. Too slow.'},
+  {id:'c106',moduleId:'m9',core:false,category:'application',front:'How does Proof of Stake (PoS) prevent Sybil attacks?',back:'Voting power is tied to locked capital (stake), not compute. Faking identities gives no power.'},
+  {id:'c107',moduleId:'m9',core:false,category:'concept',front:'What is "Finality" in blockchain?',back:'The guarantee that a block cannot be reverted. PBFT has instant finality. PoW has probabilistic finality.'},
+  {id:'c108',moduleId:'m9',core:false,category:'application',front:'51% Attack?',back:'When an attacker controls >50% of the network power (PoW). They can censor transactions and double-spend.'},
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What does Shor\'s Algorithm do?',back:'It factors large numbers and solves discrete logs in polynomial time on a quantum computer. Breaks RSA and ECC.'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'What does Grover\'s Algorithm do?',back:'It searches unsorted databases quadratically faster. Halves symmetric key strength (AES-256 becomes AES-128).'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'Is symmetric crypto (AES) safe from quantum computers?',back:'Yes, if keys are doubled. AES-256 is quantum-safe. AES-128 is not.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'What is Lattice-based cryptography?',back:'Post-quantum crypto based on the hardness of finding the closest point in a high-dimensional lattice (e.g., Kyber).'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'What is "Harvest Now, Decrypt Later"?',back:'Attackers are storing encrypted HTTPS traffic today, planning to decrypt it in 10 years when quantum computers arrive.'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'How do you migrate to Post-Quantum Crypto (PQC)?',back:'Replace RSA/ECC with PQC algorithms (Kyber/Dilithium). Double symmetric key sizes.'},
+  {id:'c115',moduleId:'m10',core:false,category:'quote',front:'Complete: "Shor\'s Algorithm breaks RSA and ___."',back:'"ECC." (Elliptic Curve Cryptography)'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'Why is RSA dead in the quantum era?',back:'Factoring is easy for a quantum computer running Shor\'s algorithm. A 2048-bit key falls in hours.'},
+  {id:'c117',moduleId:'m10',core:false,category:'application',front:'What is SPHINCS+?',back:'A post-quantum digital signature algorithm based entirely on hash functions (no new math assumptions, but large signatures).'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is NIST\'s role in PQC?',back:'Running a competition to standardize post-quantum algorithms (Kyber for encryption, Dilithium for signatures).'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'If a secret must stay secret for 50 years, what must you do?',back:'Use PQC today. "Harvest Now, Decrypt Later" is an active threat.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'Does a quantum computer break hashing (SHA-256)?',back:'No. Grover\'s only halves the security, so SHA-256 is still 128-bit secure. No need to switch hash algorithms.'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: Perfect Secrecy', difficulty:1, reward:50, timeLimit:60, body:'A system is perfectly secure if the ciphertext gives an attacker zero information about the plaintext, even with infinite computing power. What is the only algorithm that achieves this?', options:['AES-256','RSA','The One-Time Pad (OTP)','SHA-256'], correct:2, explanation:'The One-Time Pad (OTP) XORs plaintext with a truly random key of equal length. Because any plaintext is equally likely, the ciphertext is perfectly random.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Kerckhoffs', difficulty:1, reward:50, timeLimit:45, body:'Should the security of a cryptosystem rely on keeping the algorithm secret?', options:['Yes, if the algorithm leaks, the system is broken.','No. Security should rely only on the secrecy of the key. (Kerckhoffs\'s Principle).','Yes, but only for proprietary software.','No, but only if you use AES.'], correct:1, explanation:'Kerckhoffs\'s Principle states that the system must remain secure even if everything except the key is public. Security by obscurity is weak.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The OTP Catch', difficulty:2, reward:100, timeLimit:60, body:'You use a One-Time Pad key to encrypt two different messages. What happens?', options:['It\'s fine, OTP is perfectly secure.','The security drops by 50%.','The key cancels out. XORing the two ciphertexts yields the XOR of the plaintexts, which is easily broken.','The second message is unencryptable.'], correct:2, explanation:'Reusing an OTP key is fatal. C1 XOR C2 = (P1 XOR K) XOR (P2 XOR K) = P1 XOR P2. The key is gone, leaving the relationship between the two plaintexts.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Infinite Attacker', difficulty:3, reward:200, timeLimit:90, body:'An attacker has a quantum computer with infinite qubits and infinite time. They intercept your AES-256 ciphertext. Can they break it?', options:['Yes, brute force is just math.','No. AES-256 is computationally secure, not perfectly secure, but 2^256 brute force is physically impossible in this universe.','Yes, AES has a backdoor.','No, AES is perfectly secure.'], correct:1, explanation:'AES is computationally secure. It is not "perfect" like OTP, but 2^256 operations exceeds the energy of the sun. It is secure against infinite compute in practice.' },
+  { id:'p5', moduleId:'m2', title:'Q1: The Hash', difficulty:1, reward:50, timeLimit:45, body:'You hash the file "report.docx" and get "a3f...". You change one comma in the file and hash it again. What happens?', options:['The hash is identical.','The hash changes by exactly one character.','The hash changes completely (Avalanche Effect).','The hash is shorter.'], correct:2, explanation:'The Avalanche Effect dictates that a tiny change in the input causes a massive, unpredictable change in the output hash.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Passwords', difficulty:1, reward:50, timeLimit:45, body:'You are building a login system. Should you store passwords using SHA-256?', options:['Yes, SHA-256 is secure.','No. SHA-256 is too fast. Use bcrypt or Argon2, which are slow and resist brute force.','Yes, but add a salt.','No, use MD5.'], correct:1, explanation:'SHA-256 is designed for speed. Attackers can guess billions of SHA-256 hashes per second. bcrypt is deliberately slow, making brute force infeasible.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Merkle Tree', difficulty:2, reward:100, timeLimit:60, body:'Why does Bitcoin use a Merkle Tree to summarize transactions in a block?', options:['It makes the block smaller.','It allows a node to verify a specific transaction is in a block without downloading the whole block (SPV).','It encrypts the transactions.','It sorts the transactions by fee.'], correct:1, explanation:'A Merkle tree creates a single root hash. A light client can verify a transaction exists by checking a path (log N hashes) rather than downloading all transactions.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Collision', difficulty:3, reward:200, timeLimit:90, body:'What is a Hash Collision?', back:'When two different inputs produce the exact same hash output.', options:['When the hash is reversed.','When two different inputs produce the exact same hash output.','When the hash is too long.','When the hash is truncated.'], correct:1, explanation:'A collision breaks the system. If an attacker can create a malicious contract with the same hash as a safe one, they can swap them.' },
+  { id:'p9', moduleId:'m3', title:'Q1: The Magic', difficulty:1, reward:50, timeLimit:60, body:'What problem does Diffie-Hellman solve?', options:['Encrypting large files.','How two parties can agree on a shared secret over a public channel.','How to sign a document.','How to hash a file quickly.'], correct:1, explanation:'DH allows Alice and Bob to derive a shared secret by exchanging public numbers, without an eavesdropper figuring out the secret.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Flaw', difficulty:1, reward:50, timeLimit:45, body:'What is the fatal flaw of plain Diffie-Hellman?', options:['It is too slow.','It relies on factoring primes.','It does not authenticate the parties, allowing Man-in-the-Middle (MITM) attacks.','It is vulnerable to brute force.'], correct:2, explanation:'DH doesn\'t prove WHO you are talking to. Mallory can intercept and act as a middleman, decrypting everything.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Fix', difficulty:2, reward:100, timeLimit:60, body:'How do you prevent a MITM attack on Diffie-Hellman?', options:['Use a longer key.','Use authenticated key exchange (e.g., DHE-RSA) where parameters are digitally signed.','Change keys every minute.','Use a VPN.'], correct:1, explanation:'By signing the DH parameters with a private key (verified by a CA), you prove identity. Mallory cannot forge the signature.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Forward Secrecy', difficulty:3, reward:200, timeLimit:90, body:'What is Forward Secrecy?', back:'A property where compromising a long-term private key does not compromise past session keys.', options:['A property where keys rotate automatically.','A property where compromising a long-term private key does not compromise past session keys.','A property where the server is anonymous.','A property where hashes are salted.'], correct:1, explanation:'Ephemeral DH (DHE) generates a new key per session. If the server is hacked later, past recorded traffic remains encrypted.' },
+  { id:'p13', moduleId:'m4', title:'Q1: The Keys', difficulty:1, reward:50, timeLimit:45, body:'In asymmetric cryptography, which key encrypts the message?', options:['The Private Key.','The Public Key.','The Session Key.','The Hash.'], correct:1, explanation:'The Public Key locks the message. Only the corresponding Private Key can unlock it.' },
+  { id:'p14', moduleId:'m4', title:'Q2: RSA Math', difficulty:1, reward:50, timeLimit:45, body:'What math problem is RSA based on?', options:['The Discrete Logarithm.','The difficulty of factoring the product of two large primes.','Finding the shortest path in a graph.','Sorting an array.'], correct:1, explanation:'Multiplying two huge primes is easy. Given the product, finding the two primes is computationally infeasible.' },
+  { id:'p15', moduleId:'m4', title:'Q3: The Hybrid', difficulty:2, reward:100, timeLimit:60, body:'Why do we use RSA to encrypt a symmetric AES key, rather than encrypting the whole message with RSA?', options:['RSA is less secure.','RSA is extremely slow. We use it to exchange the fast AES key, then use AES for the bulk data.','AES keys are too small for RSA.','RSA cannot encrypt text.'], correct:1, explanation:'Hybrid encryption combines the key distribution power of RSA with the speed of AES.' },
+  { id:'p16', moduleId:'m4', title:'Q4: ECC', difficulty:3, reward:200, timeLimit:90, body:'Why is Elliptic Curve Cryptography (ECC) preferred over RSA in modern systems?', options:['ECC uses simpler math.','ECC provides the same security with much smaller keys (256-bit ECC = 3072-bit RSA), saving bandwidth and compute.','RSA is broken.','ECC is older and more tested.'], correct:1, explanation:'Smaller keys mean faster handshakes (HTTPS) and less storage. This is why Bitcoin and Ethereum use ECC.' },
+  { id:'p17', moduleId:'m5', title:'Q1: The Signature', difficulty:1, reward:50, timeLimit:45, body:'How do you create a digital signature?', options:['Hash the message, encrypt the hash with your PRIVATE key.','Hash the message, encrypt the hash with your PUBLIC key.','Encrypt the message with your private key.','Encrypt the message with your public key.'], correct:0, explanation:'Signing is the reverse of encryption. You use the private key to sign, and the public key to verify.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Non-repudiation', difficulty:1, reward:50, timeLimit:45, body:'What is Non-repudiation?', options:['The sender cannot deny having sent the message, because only they possess the private key used to sign it.','The message is encrypted.','The message is hashed.','The message is compressed.'], correct:0, explanation:'Because the signature could only have been created by the private key holder, they cannot later claim they didn\'t send it.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Verification', difficulty:2, reward:100, timeLimit:60, body:'How does Bob verify Alice\'s signature?', options:['He decrypts the signature with Alice\'s private key.','He hashes the message himself, and decrypts the signature with Alice\'s PUBLIC key. If they match, it\'s valid.','He encrypts the message with his public key.','He asks Alice for her private key.'], correct:1, explanation:'Decrypting the signature with the public key reveals the hash. If it matches the hash of the received message, integrity and authenticity are verified.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Why Hash?', difficulty:3, reward:200, timeLimit:90, body:'Why do we sign hashes (digests) instead of raw messages?', back:'Efficiency. Hashing a 1GB file to 32 bytes and signing the 32 bytes is vastly faster than signing 1GB.', options:['Security. Signing raw messages reveals the key.','Efficiency. Hashing a 1GB file to 32 bytes and signing the 32 bytes is vastly faster than signing 1GB.','Legal. Hashes are legally binding.','Standard. It\'s just convention.'], correct:1, explanation:'Signing algorithms are slow. Operating on a fixed 32-byte hash is always fast, regardless of file size.' },
+  { id:'p21', moduleId:'m6', title:'Q1: The ZKP', difficulty:1, reward:50, timeLimit:45, body:'What is a Zero-Knowledge Proof (ZKP)?', options:['A proof that reveals half the data.','Proving to a verifier that you know a secret, without revealing the secret itself.','A proof that requires a trusted third party.','A proof that uses zero bytes.'], correct:1, explanation:'ZKPs allow you to prove a statement is true (e.g., "I am over 18") without revealing the underlying data (your birthdate).' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Cave', difficulty:1, reward:50, timeLimit:45, body:'In the Ali Baba Cave analogy, how does Alice prove she knows the password?', options:['She tells Bob the password.','She exits the side Bob randomly requests, 20 times in a row. The chance of faking this is 1 in a million.','She signs a message.','She hashes the password.'], correct:1, explanation:'If she doesn\'t know the password, she has a 50% chance of failing each round. 20 rounds makes faking statistically impossible.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Properties', difficulty:2, reward:100, timeLimit:60, body:'Which is NOT a property of a ZKP?', options:['Completeness.','Soundness.','Zero-Knowledge.','Reversibility.'], correct:3, explanation:'The three properties are Completeness, Soundness, and Zero-Knowledge. Reversibility is not a crypto property.' },
+  { id:'p24', moduleId:'m6', title:'Q4: ZK-Rollups', difficulty:3, reward:200, timeLimit:90, body:'How do ZK-Rollups scale Ethereum?', options:['They delete old transactions.','They process thousands of transactions off-chain and submit a single ZKP to the main chain proving they are all valid.','They increase the block size.','They use shards.'], correct:1, explanation:'Instead of the main chain verifying 10,000 transactions, it verifies one small cryptographic proof. Massive scaling.' },
+  { id:'p25', moduleId:'m7', title:'Q1: The RNG', difficulty:1, reward:50, timeLimit:45, body:'Which random number generator should you use for cryptographic keys?', options:['Math.random() in JavaScript.','Mersenne Twister.','The OS CSPRNG (e.g., /dev/urandom).','The current timestamp.'], correct:2, explanation:'CSPRNGs (Cryptographically Secure PRNGs) gather entropy from the OS and are unpredictable. PRNGs are predictable.' },
+  { id:'p26', moduleId:'m7', title:'Q2: The Bug', difficulty:1, reward:50, timeLimit:45, body:'What was the Debian OpenSSL bug?', options:['A bug that leaked private keys.','A maintainer commented out code, reducing entropy to 15 bits. All keys were brute-forceable.','A bug that crashed the server.','A bug that allowed infinite loops.'], correct:1, explanation:'A real-world disaster. Two lines of code removed to satisfy a memory checker destroyed the entropy, making every key generated on Debian for 2 years trivially crackable.' },
+  { id:'p27', moduleId:'m7', title:'Q3: The Seed', difficulty:2, reward:100, timeLimit:60, body:'A Bitcoin private key needs 256 bits of entropy. You generate one using the current time in milliseconds. What happens?', options:['It\'s secure, time is random.','It\'s broken. The time is predictable. An attacker can brute-force the millisecond range in seconds.','It\'s secure if you use SHA-256.','It\'s secure if you don\'t tell anyone.'], correct:1, explanation:'Time is not entropy. It is a predictable function. Your "private" key will be stolen instantly.' },
+  { id:'p28', moduleId:'m7', title:'Q4: 40 bits', difficulty:3, reward:200, timeLimit:90, body:'If a key has 40 bits of entropy, how long does it take a modern computer to crack?', options:['Centuries.','Years.','Seconds.','Forever.'], correct:2, explanation:'2^40 is ~1 trillion. A modern CPU can do billions of operations per second. A GPU can crack it in fractions of a second.' },
+  { id:'p29', moduleId:'m8', title:'Q1: The Problem', difficulty:1, reward:50, timeLimit:45, body:'What problem does Public Key Infrastructure (PKI) solve?', options:['Encrypting traffic.','Proving that a public key actually belongs to the entity claiming to own it.','Signing documents.','Hashing files.'], correct:1, explanation:'Without PKI, an attacker can give you their public key, claiming to be "google.com", and intercept your traffic (MITM).' },
+  { id:'p30', moduleId:'m8', title:'Q2: The Chain', difficulty:1, reward:50, timeLimit:45, body:'How does PKI work?', options:['A Root CA signs the public keys of websites. Your browser trusts the Root CA.','Websites sign each other.','The government assigns keys.','Keys are hardcoded into hardware.'], correct:0, explanation:'A hierarchy. Root CA -> Intermediate CA -> Website. If the chain is unbroken and the Root is trusted, the site is trusted.' },
+  { id:'p31', moduleId:'m8', title:'Q3: TOFU', difficulty:2, reward:100, timeLimit:60, body:'What is TOFU (Trust On First Use)?', options:['Trusting the first public key you see for a server. If it changes, you are warned.','Eating tofu instead of meat.','A type of encryption algorithm.','A blockchain consensus.'], correct:0, explanation:'Used by SSH. The first connection assumes no MITM. If the key changes later, it alerts you to a potential attack.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Compromise', difficulty:3, reward:200, timeLimit:90, body:'What happens if a Root Certificate Authority (CA) is compromised?', back:'The attacker can forge certificates for any website. The entire web trust model breaks.', options:['Nothing, CAs are decentralized.','The attacker can forge certificates for any website. The entire web trust model breaks.','Only sites using that CA are affected, but the root is fine.','The browser updates automatically.'], correct:1, explanation:'DigiNotar was compromised in 2011. The attacker issued a wildcard certificate for *.google.com. Browsers had to revoke the Root CA entirely.' },
+  { id:'p33', moduleId:'m9', title:'Q1: The Problem', difficulty:1, reward:50, timeLimit:45, body:'What is the Byzantine Generals Problem?', options:['How to encrypt messages between generals.','How loyal generals can reach consensus when some might be traitors sending false messages.','How to distribute keys.','How to siege a city.'], correct:1, explanation:'A fundamental problem in distributed systems. How do you agree on a state when some nodes are actively malicious?' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Math', difficulty:1, reward:50, timeLimit:45, body:'To survive f malicious nodes, how many total nodes (N) are needed for Byzantine Fault Tolerance?', options:['N = 2f + 1','N = 3f + 1','N = f + 1','N = 10f'], correct:1, explanation:'You need 3f+1. To tolerate 1 traitor, you need 4 nodes. To tolerate 33% traitors, you need 67% honest nodes.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Sybil', difficulty:2, reward:100, timeLimit:60, body:'What is a Sybil Attack?', options:['An attack that crashes the server.','Creating many fake identities to outvote honest nodes in a consensus network.','Stealing private keys.','Replaying old messages.'], correct:1, explanation:'If voting is 1 node = 1 vote, an attacker spins up 10,000 nodes and controls the network.' },
+  { id:'p36', moduleId:'m9', title:'Q4: PoW', difficulty:3, reward:200, timeLimit:90, body:'How does Proof of Work (PoW) prevent Sybil attacks?', options:['It requires KYC verification.','Identities are tied to compute power (energy). You cannot fake 10,000 nodes without 10,000x the electricity.','It limits IP addresses.','It uses a central server to approve nodes.'], correct:1, explanation:'PoW makes voting expensive. One vote = one unit of energy. Faking identities gives no advantage without the energy to back them.' },
+  { id:'p37', moduleId:'m10', title:'Q1: Shor', difficulty:1, reward:50, timeLimit:45, body:'What does Shor\'s Algorithm do?', back:'It factors large numbers and solves discrete logs in polynomial time on a quantum computer. Breaks RSA and ECC.', options:['It breaks AES-256.','It factors large numbers and solves discrete logs in polynomial time on a quantum computer. Breaks RSA and ECC.','It hashes files faster.','It creates perfect randomness.'], correct:1, explanation:'A sufficiently powerful quantum computer running Shor\'s algorithm will render RSA and ECC obsolete.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Grover', difficulty:1, reward:50, timeLimit:45, body:'What does Grover\'s Algorithm do?', options:['It breaks RSA.','It searches unsorted databases quadratically faster. Halves symmetric key strength (AES-256 becomes AES-128).','It signs documents.','It creates quantum keys.'], correct:1, explanation:'Grover\'s algorithm means symmetric keys need to double in size to maintain security against quantum computers.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Harvest Now', difficulty:2, reward:100, timeLimit:60, body:'What is "Harvest Now, Decrypt Later"?', options:['A farming technique.','Attackers are storing encrypted HTTPS traffic today, planning to decrypt it in 10 years when quantum computers arrive.','A way to speed up hashing.','A blockchain consensus.'], correct:1, explanation:'If your data must remain secret for 10+ years, RSA is already dead. You must use Post-Quantum Crypto (PQC) today.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Solution', difficulty:3, reward:200, timeLimit:90, body:'What is Lattice-based cryptography?', options:['A 2D graphics rendering technique.','Post-quantum crypto based on the hardness of finding the closest point in a high-dimensional lattice.','A type of symmetric key.','A blockchain architecture.'], correct:1, explanation:'Lattices (e.g., Kyber) are believed to be resistant to both classical and quantum attacks. NIST is standardizing them.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Vault', scenario:'You are designing a state secrets vault. The data must remain secure for 100 years. What encryption do you use?', options:['RSA-4096. It\'s the industry standard.','AES-256. Symmetric crypto is quantum-resistant if keys are large enough.','One-Time Pad (OTP). It is perfectly secret, immune to all future compute.','SHA-256.'], correct:2, explanation:'For perfect secrecy over a century, only OTP survives. RSA will fall to quantum. AES-256 is strong but relies on key management. OTP relies on the physics of randomness.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Supply Chain', scenario:'You receive a firmware update for your hardware wallet. How do you verify it wasn\'t tampered with in transit?', options:['Check the file size.','Hash the file and compare it to the manufacturer\'s published hash. (Avalanche Effect).','Open it and look at the code.','Encrypt it with your private key.'], correct:1, explanation:'A single bit change alters the entire hash. If your hash matches the official one, the file is identical.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Channel', scenario:'Alice and Bob need to agree on a secret key over a public telephone line. Eve is listening. What do they use?', options:['RSA.','Diffie-Hellman (DH).','AES.','MD5.'], correct:1, explanation:'DH allows them to derive a shared secret by exchanging public numbers. Eve hears the numbers but cannot compute the secret.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Drop', scenario:'A whistleblower wants to send you a document. They want YOU to be the only one who can read it, even if they send it over an insecure channel. What do they need?', options:['Your Private Key.','Your Public Key.','A shared password.','A hash of the document.'], correct:1, explanation:'They encrypt the document with your Public Key. Only your Private Key can decrypt it.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Contract', scenario:'You sign a digital contract with your private key. Later, you claim you didn\'t sign it. What cryptographic property proves you did?', options:['Integrity.','Authentication.','Non-repudiation.','Confidentiality.'], correct:2, explanation:'Non-repudiation. Since only you possess the private key, the signature proves you signed it. You cannot repudiate it.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Proof', scenario:'You want to log into a server without sending your password. You want to prove you know it, without revealing it. What do you use?', options:['A hash of the password.','A salt.','A Zero-Knowledge Proof (ZKP).','RSA.'], correct:2, explanation:'A ZKP allows you to prove knowledge of the password without transmitting it. The server verifies the proof.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Key Gen', scenario:'You are generating a Bitcoin private key. You use `Math.random()` in JavaScript. What is the risk?', options:['It\'s too slow.','It is predictable. An attacker can recreate the sequence and steal your funds.','It produces numbers that are too large.','It is not quantum safe.'], correct:1, explanation:'`Math.random()` is a PRNG based on a timestamp. It is entirely predictable. You must use a CSPRNG.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Browser', scenario:'You visit `bank.com`. How does your browser know the public key it receives actually belongs to the bank and not an attacker?', options:['It checks the IP address.','It checks if the key is signed by a trusted Root Certificate Authority (PKI).','It asks the user.','It hashes the key.'], correct:1, explanation:'PKI. The bank\'s certificate is signed by a Root CA. Your browser trusts the Root CA, thus trusts the bank\'s key.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Network', scenario:'You are building a blockchain with 100 nodes. How many malicious nodes can your Byzantine Fault Tolerant (BFT) system survive?', options:['50','33','67','10'], correct:1, explanation:'BFT requires 3f+1 nodes to survive f malicious nodes. 100 = 3(33)+1. So it can survive 33 malicious nodes (1/3 of the network).' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Future', scenario:'You are designing a system to protect nuclear launch codes for 50 years. Quantum computers are coming. What do you use?', options:['RSA-4096. It\'s huge.','ECC-512.','Post-Quantum Cryptography (e.g., Lattice-based Kyber).','AES-128.'], correct:2, explanation:'RSA and ECC will be broken by Shor\'s algorithm. For long-term secrets, you must migrate to PQC today.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Obscurity Check', body:'Find an app or system that relies on "security by obscurity" (hiding how it works). Why is it weak?' },
+  { id:'rw2', title:'The Hash Verify', body:'Download a large file (like an OS image). Find the official SHA-256 hash. Hash the file yourself and verify they match.' },
+  { id:'rw3', title:'The MITM Hunt', body:'Look at the certificates in your browser. Find the Root CAs your browser trusts. What happens if one is compromised?' },
+  { id:'rw4', title:'The Password Store', body:'Check your password manager. Is it using AES-256? Are your passwords salted and hashed with bcrypt/Argon2?' },
+  { id:'rw5', title:'The ZKP Thought', body:'Think of a real-world scenario where you could use a ZKP (proving a fact without revealing data). Write it down.' },
+  { id:'rw6', title:'The Entropy Audit', body:'How do your crypto apps generate private keys? Do they use hardware RNG or software CSPRNG?' },
+  { id:'rw7', title:'The Forward Secrecy', body:'Check if your favorite websites support Forward Secrecy (ECDHE). Use your browser\'s dev tools to check the TLS handshake.' },
+  { id:'rw8', title:'The Sybil Cost', body:'Look at a blockchain (Bitcoin or Ethereum). How much does it cost to create 1,000 fake nodes? Why does this prevent Sybil attacks?' },
+  { id:'rw9', title:'The Quantum Threat', body:'Identify a secret you have today that must stay secret for 20+ years. Is it protected by RSA? It is vulnerable to "Harvest Now, Decrypt Later".' },
+  { id:'rw10', title:'The Signature', body:'Sign an email with PGP or verify a software signature. Experience the flow of public/private key verification.' },
+  { id:'rw11', title:'The Reuse Trap', body:'Why is reusing a One-Time Pad fatal? Write down the XOR math to prove it.' },
+  { id:'rw12', title:'The Avalanche', body:'Hash "hello" and "Hello" using SHA-256. Observe the massive difference.' },
+  { id:'rw13', title:'The DH Math', body:'Draw the Diffie-Hellman exchange on paper. Alice sends A, Bob sends B. Show how both compute the same secret.' },
+  { id:'rw14', title:'The Trapdoor', body:'Explain why multiplying two primes is easy, but factoring the product is hard. This is the trapdoor of RSA.' },
+  { id:'rw15', title:'The Non-repudiation', body:'Why can\'t encryption provide non-repudiation? Only signatures can. Why?' },
+  { id:'rw16', title:'The Ali Baba Cave', body:'Explain the ZKP Ali Baba cave to a friend. If they understand it, you understand it.' },
+  { id:'rw17', title:'The RNG', body:'Why is `Math.random()` bad for crypto? What is the difference between PRNG and CSPRNG?' },
+  { id:'rw18', title:'The Trust Root', body:'What is a Root CA? Why does your browser trust it? What happens if it goes rogue?' },
+  { id:'rw19', title:'The 3f+1 Rule', body:'If a network has 10 nodes, how many can be malicious before consensus fails? (Answer: 3).' },
+  { id:'rw20', title:'The PQC', body:'Look up NIST\'s Post-Quantum Crypto standards. What algorithms are replacing RSA?' },
+  { id:'rw21', title:'The Salt', body:'Why do we add a "salt" to passwords before hashing? What attack does it prevent?' },
+  { id:'rw22', title:'The Merkle', body:'How does Git use Merkle Trees? How does Bitcoin use them?' },
+  { id:'rw23', title:'The Ephemeral', body:'What is an ephemeral key? Why does it provide Forward Secrecy?' },
+  { id:'rw24', title:'The Hybrid', body:'Why do we use RSA to exchange an AES key, rather than RSA for the whole message?' },
+  { id:'rw25', title:'The ECDSA', body:'Why does Bitcoin use ECDSA instead of RSA? What is the key size advantage?' },
+  { id:'rw26', title:'The Harvest', body:'What is "Harvest Now, Decrypt Later"? Are your current HTTPS sessions vulnerable?' },
+  { id:'rw27', title:'The TOFU', body:'What is Trust On First Use? How does SSH use it?' },
+  { id:'rw28', title:'The 51%', body:'What is a 51% attack? Is it a Byzantine fault or a Sybil attack?' },
+  { id:'rw29', title:'The Grover', body:'If AES-128 is weakened to 64-bit by Grover\'s algorithm, what key size do you need for quantum safety?' },
+  { id:'rw30', title:'The Lattice', body:'What math problem is Lattice-based crypto based on? Why is it quantum resistant?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your security profile.' },
+  { threshold: 500, title: 'ANALYST', desc: 'You understand the difference between hashing and encryption.' },
+  { threshold: 1500, title: 'ENGINEER', desc: 'You can design systems using PKI, DH, and signatures.' },
+  { threshold: 3000, title: 'CRYPTOGRAPHER', desc: 'You navigate zero-knowledge proofs and BFT consensus.' },
+  { threshold: 6000, title: 'ARCHITECT', desc: 'You design zero-trust systems that survive quantum threats and Byzantine actors.' }
+];
+
+const STORAGE_KEY = 'diffie-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// ZERO-TRUST ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Zero-Trust. You now possess the complete cryptographic architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Cryptography is not about hiding things; it is about proving things. Proving integrity (hashes), proving identity (signatures), and proving truth without knowledge (ZKPs). By designing systems assuming the network is hostile and every actor might be a traitor, you build structures that survive reality. You are now a Security Architect.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Zero-Trust: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your cryptographic architecture to the scenario.';
+    missionBtn.textContent = 'Open Project ->';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="DIFFIE.show(\'modules\')"><- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="DIFFIE.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="DIFFIE.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="DIFFIE.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>'; }
+    html += '<button class="btn secondary mt-1" onclick="DIFFIE.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="DIFFIE.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="DIFFIE.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>Checked Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="DIFFIE.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'ZERO-TRUST' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cryptographic axis to the secure network scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="DIFFIE.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="DIFFIE.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="DIFFIE.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'zero-trust: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="DIFFIE.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="DIFFIE.show(\'dashboard\')">View Final Report -></button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="DIFFIE.show(\'modules\')">Continue Training -></button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="DIFFIE.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="DIFFIE.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="DIFFIE.show(\'arena\')">Arena -></button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="DIFFIE.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="DIFFIE.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="DIFFIE.rateDrill(1)">Again<span class="interval"><1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="DIFFIE.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="DIFFIE.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="DIFFIE.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="DIFFIE.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="DIFFIE.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="DIFFIE.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="DIFFIE.show(\'arena\')">Back to Arena -></button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="DIFFIE.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="DIFFIE.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'diffie_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading crypto/trust kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Zero-Trust...', 'DIFFIE online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.DIFFIE = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
