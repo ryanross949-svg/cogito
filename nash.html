@@ -2054,7 +2054,15 @@ function init(){
   bootSequence();
 }
 
-init();
+function init(){
+  S = loadState();
+  // ... other code ...
+  
+  // ADD THIS LINE:
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  
+  bootSequence();
+}
 
 })();
 </script>
