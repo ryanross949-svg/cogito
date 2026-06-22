@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NASH // Strategic Architecture v1.0</title>
+<title>Cogito // NASH v7.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -18,25 +19,12 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
 body{
-  background:
-    radial-gradient(ellipse at 20% 10%,rgba(0,255,163,0.08),transparent 50%),
-    radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),
-    var(--void);
+  background: radial-gradient(ellipse at 20% 10%,rgba(0,255,163,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%), var(--void);
   min-height:100vh; position:relative; font-size:14px; line-height:1.6;
 }
 #particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:
-    linear-gradient(rgba(0,255,163,0.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,255,163,0.03) 1px,transparent 1px);
-  background-size:60px 60px;pointer-events:none;z-index:1;
-}
-body::after{
-  content:'';position:fixed;inset:0;
-  background:linear-gradient(rgba(0,255,163,0.02) 50%,transparent 50%);
-  background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;
-}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,163,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,163,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,255,163,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
 
 #boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
 #boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
@@ -54,8 +42,11 @@ body::after{
 #app.active{display:flex;}
 
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
 .brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,255,163,0.4);}
 .brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
 .stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;}
 .stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
 .stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
@@ -282,6 +273,21 @@ body::after{
 .phase-row.solved .phase-status{color:var(--green);}
 .phase-row.active-phase .phase-status{color:var(--magenta);}
 
+/* ARENA DIFFICULTY BADGES */
+.arena-group-header{font-family:var(--display); font-size:1.1rem; color:var(--cyan); margin-top:2rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); letter-spacing:0.1em;}
+.arena-row{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); padding:1rem 1.5rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s;}
+.arena-row:hover{border-color:var(--border-bright); transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex; align-items:center; gap:1rem; flex:1;}
+.arena-num{font-family:var(--display); color:var(--cyan-dim); font-size:0.85rem; width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem; font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem; border-radius:2px; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15); color:var(--green); border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15); color:var(--amber); border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15); color:var(--magenta); border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15); color:var(--red); border:1px solid var(--red);}
+
 @media(max-width:700px){
   .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
   .stats-strip{flex-wrap:wrap;gap:0.85rem;}
@@ -303,16 +309,19 @@ body::after{
 
 <div id="boot">
   <div class="boot-logo">NASH</div>
-  <div class="boot-sub">Strategic Architecture v1.0 // Game Theory Protocol</div>
+  <div class="boot-sub">Cogito // Game Theory Protocol v7.0</div>
   <div class="boot-log" id="bootLog"></div>
   <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
 </div>
 
 <div id="app">
   <header class="topbar">
-    <div>
-      <div class="brand">NASH</div>
-      <div class="brand-tag">STRATEGIC ARCHITECTURE</div>
+    <div class="topbar-left">
+      <div>
+        <div class="brand">NASH</div>
+        <div class="brand-tag">STRATEGIC ARCHITECTURE</div>
+      </div>
+      <a href="index.html" class="hub-link">← COGITO</a>
     </div>
     <div class="stats-strip">
       <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
@@ -417,7 +426,7 @@ body::after{
     
     <section class="view" id="view-arena">
       <h1 class="section-title">Combat Arena</h1>
-      <p class="section-sub">Scenario-based problem solving. Apply principles under pressure.</p>
+      <p class="section-sub">100 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p>
       <div class="arena-container" id="arenaContainer"></div>
     </section>
     
@@ -444,6 +453,17 @@ body::after{
           <div class="big-stat-label">Longest Streak</div>
           <div class="big-stat-value" id="statLongStreak">0</div>
           <div class="big-stat-sub" id="statCurStreak">current: 0d</div>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Backup & Restore</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p>
+        <div class="flex gap-1" style="flex-wrap:wrap">
+          <button class="btn secondary" id="exportBtn">Export Save File</button>
+          <label class="btn secondary" style="cursor:pointer">
+            Import Save File
+            <input type="file" id="importBtn" accept=".json" style="display:none">
+          </label>
         </div>
       </div>
       <div class="panel mt-2">
@@ -503,431 +523,278 @@ body::after{
 
 // ============== DATA: MODULES ==============
 const MODULES = [
-  {
-    id:'m1', codename:'MATRIX', title:'The Normal Form',
-    summary:'Players, strategies, and payoff matrices.',
-    lesson:{
-      title:'The Architecture of Interaction',
-      body: 'Game theory is the study of mathematical models of strategic interaction among rational decision-makers. It is the physics of human and economic behavior.\n\n' +
-            '## The Primitives\n\n' +
-            'Every game consists of three elements:\n' +
-            '1. **Players**: The decision-makers involved.\n' +
-            '2. **Strategies**: The actions available to each player.\n' +
-            '3. **Payoffs**: The utility (or profit, or evolutionary fitness) each player receives for every combination of strategies chosen.\n\n' +
-            'We represent this in **Normal Form** (or Strategic Form) as a matrix. The rows represent Player 1\'s strategies; the columns represent Player 2\'s strategies. The intersections contain the payoffs.\n\n' +
-            '## The Prisoner\'s Dilemma\n\n' +
-            'The most famous game is the Prisoner\'s Dilemma. Two criminals are interrogated separately. They can Cooperate (C) with each other by staying silent, or Defect (D) by confessing.\n\n' +
-            '> If both Cooperate, they get 1 year each. If both Defect, they get 3 years each. If one Defects and the other Cooperates, the defector goes free (0) and the cooperator gets 5 years.\n\n' +
-            'In matrix form (using positive payoffs where higher is better):' +
-            '\n\n- (C, C) = (3, 3)' +
-            '\n- (D, D) = (1, 1)' +
-            '\n- (D, C) = (5, 0)' +
-            '\n- (C, D) = (0, 5)\n\n' +
-            '## Rationality Assumption\n\n' +
-            'Game theory assumes players are **rational** (they want to maximize their own payoff) and have **common knowledge of rationality** (I know you are rational, you know I know you are rational, ad infinitum). This assumption is the bedrock of all classical game theory, though behavioral economics later challenges it.',
-      takeaways:[
-        'A game requires Players, Strategies, and Payoffs.',
-        'Normal Form represents games as matrices.',
-        'The Prisoner\'s Dilemma demonstrates individual rationality can lead to collective ruin.',
-        'Game theory assumes rational payoff-maximizing players.',
-        'Common knowledge of rationality is required for deep strategic deduction.'
-      ]
-    }
-  },
-  {
-    id:'m2', codename:'DOMINANCE', title:'Strict Dominance',
-    summary:'Iterated elimination of dominated strategies.',
-    lesson:{
-      title:'The Path of Certainty',
-      body: 'How do we solve a game? The first and most powerful tool is the concept of **Dominance**.\n\n' +
-            '## Strictly Dominant Strategies\n\n' +
-            'A strategy A *strictly dominates* strategy B if A yields a higher payoff than B *regardless of what the other player does*. If you have a strictly dominant strategy, you should always play it. It is the only rational choice.\n\n' +
-            'In the Prisoner\'s Dilemma, look at Player 1\'s choice. If Player 2 Cooperates, Defecting gives 5 > 3. If Player 2 Defects, Defecting gives 1 > 0. Defecting strictly dominates Cooperating. Both players realize this, and both Defect. They get (1,1) instead of the socially optimal (3,3).\n\n' +
-            '## Iterated Elimination (IESDS)\n\n' +
-            'What if no strategy strictly dominates all others? We use Iterated Elimination of Strictly Dominated Strategies (IESDS).\n\n' +
-            '1. Look at Player 1\'s strategies. If one is strictly worse than another under all conditions, delete the row.\n' +
-            '2. Now look at Player 2\'s strategies, knowing Player 1 will never play the deleted row. Delete any strictly dominated columns.\n' +
-            '3. Repeat until no strategies can be eliminated.\n\n' +
-            'If this process leaves exactly one strategy for each player, the game is **dominance solvable**.\n\n' +
-            '## The Trap of Weak Dominance\n\n' +
-            'A strategy *weakly dominates* another if it is at least as good in all cases, and strictly better in at least one case. Be careful: eliminating weakly dominated strategies can cause you to miss equilibria or lose a viable option. Stick to strict dominance for elimination.',
-      takeaways:[
-        'Strategy A strictly dominates B if A > B always.',
-        'A strictly dominant strategy should always be played.',
-        'IESDS iteratively removes dominated strategies to solve games.',
-        'Prisoner\'s Dilemma: Defect strictly dominates Cooperate.',
-        'Avoid eliminating weakly dominated strategies; it can break solutions.'
-      ]
-    }
-  },
-  {
-    id:'m3', codename:'EQUILIBRIUM', title:'Nash Equilibrium',
-    summary:'Mutual best responses and the Nash Equilibrium.',
-    lesson:{
-      title:'The Unilateral Deviation Test',
-      body: 'John Nash proved that every finite game has at least one equilibrium. The **Nash Equilibrium (NE)** is the central concept of game theory.\n\n' +
-            '## The Definition\n\n' +
-            'A set of strategies is a Nash Equilibrium if no player can strictly improve their payoff by unilaterally changing their strategy, assuming the other players\' strategies remain fixed.\n\n' +
-            'It is a state of mutual best response. I am playing my best response to your strategy, and you are playing your best response to mine.\n\n' +
-            '## The Coordination Problem\n\n' +
-            'Consider the Stag Hunt. Two hunters can hunt a Stag (S) or a Hare (H). Catching a Stag requires both. Catching a Hare can be done alone.\n\n' +
-            '- (S, S) = (5, 5)' +
-            '\n- (H, H) = (2, 2)' +
-            '\n- (S, H) = (0, 2)' +
-            '\n- (H, S) = (2, 0)\n\n' +
-            'This game has TWO pure-strategy Nash Equilibria: (S, S) and (H, H). (S, S) is "payoff dominant" (better for both). (H, H) is "risk dominant" (safer, because you get 2 even if the other hunts Stag). Which one will they play? Game theory cannot answer this purely mathematically; it requires culture, communication, or history.\n\n' +
-            '## The Battle of the Sexes\n\n' +
-            'Two players want to coordinate, but have different preferences. (Opera, Opera) = (3, 2). (Football, Football) = (2, 3). Miscoordination yields (0,0). Again, two Nash Equilibria. The challenge is not finding the NE; it is selecting among them.',
-      takeaways:[
-        'Nash Equilibrium: no player can profitably deviate unilaterally.',
-        'NE represents mutual best responses.',
-        'Every finite game has at least one Nash Equilibrium.',
-        'Stag Hunt illustrates the tension between payoff dominance and risk dominance.',
-        'Multiple equilibria require coordination mechanisms (culture, communication).'
-      ]
-    }
-  },
-  {
-    id:'m4', codename:'MIXED', title:'Mixed Strategies',
-    summary:'Randomization and zero-sum games.',
-    lesson:{
-      title:'The Mathematics of Unpredictability',
-      body: 'What happens when no pure strategy Nash Equilibrium exists? Consider Matching Pennies. Player 1 wants to match; Player 2 wants to mismatch. If Player 1 plays Heads, Player 2 plays Tails. If Player 2 plays Tails, Player 1 plays Tails. There is no stable point.\n\n' +
-            '## Randomization\n\n' +
-            'The solution is to randomize. A **mixed strategy** is a probability distribution over pure strategies. Nash proved that every finite game has an equilibrium in mixed strategies.\n\n' +
-            'How do we find it? A player randomizes to make the *opponent indifferent* between their own strategies. If I play Heads 50% of the time and Tails 50% of the time, my opponent gets the same expected payoff whether they play Heads or Tails. They are indifferent, meaning they cannot exploit me.\n\n' +
-            '## Zero-Sum Games\n\n' +
-            'In a Zero-Sum game, one player\'s gain is exactly the other\'s loss (e.g., poker, options trading). The Minimax Theorem (von Neumann) states that the value of a zero-sum game is determined by both players minimizing the maximum loss the other can inflict.\n\n' +
-            '## The Indifference Principle\n\n' +
-            'To calculate a mixed strategy equilibrium for Player 1, set Player 2\'s expected payoffs equal to each other, and solve for Player 1\'s probabilities. You do not optimize your own payoff directly; you optimize the mixture that makes your opponent\'s exploitation impossible.',
-      takeaways:[
-        'When no pure strategy NE exists, players must randomize (Mixed Strategies).',
-        'Every finite game has at least one mixed strategy Nash Equilibrium.',
-        'You randomize to make your opponent indifferent.',
-        'Zero-sum games are solved via the Minimax Theorem.',
-        'Indifference Principle: set opponent\'s expected payoffs equal to solve for probabilities.'
-      ]
-    }
-  },
-  {
-    id:'m5', codename:'EXTENSIVE', title:'Extensive Form Games',
-    summary:'Game trees, backward induction, and credible threats.',
-    lesson:{
-      title:'The Sequence of Action',
-      body: 'The Normal Form (matrix) assumes simultaneous moves. But many games are sequential. For these, we use the **Extensive Form** (game tree).\n\n' +
-            '## The Game Tree\n\n' +
-            'The game starts at an initial decision node. Branches represent actions. Terminal nodes yield payoffs. We use information sets to denote what a player knows when making a decision (if they don\'t know which node they are at, the nodes are in the same information set).\n\n' +
-            '## Backward Induction\n\n' +
-            'To solve a perfect-information extensive form game, we use **Backward Induction**. Start at the end of the tree. At the last decision nodes, the player will choose the action with the highest payoff. Replace those branches with the resulting payoffs. Work backwards to the root.\n\n' +
-            '## The Centipede Game\n\n' +
-            'A classic example. Two players alternate taking a growing pot of money. At each turn, a player can "Take" (ending the game) or "Pass" (growing the pot). Backward induction says the first player should Take immediately. But experimentally, humans usually Pass a few times. This reveals a tension between strict backward induction and cooperative intuition.\n\n' +
-            '## Credible Threats and Subgame Perfection\n\n' +
-            'A threat is only meaningful if it is credible—i.e., if you would actually carry it out when the time comes. A **Subgame Perfect Equilibrium (SPE)** is a refinement of Nash Equilibrium that eliminates non-credible threats. It requires strategies to be a Nash Equilibrium in every subgame.',
-      takeaways:[
-        'Extensive Form uses game trees to model sequential moves.',
-        'Backward Induction solves perfect-information games by reasoning from the end.',
-        'Subgame Perfect Equilibrium (SPE) eliminates non-credible threats.',
-        'The Centipede Game shows tension between logic and cooperation.',
-        'A threat is only valid if executing it is rational at the time of execution.'
-      ]
-    }
-  },
-  {
-    id:'m6', codename:'REPEATED', title:'Repeated Games',
-    summary:'The Folk Theorem, trigger strategies, and cooperation.',
-    lesson:{
-      title:'The Shadow of the Future',
-      body: 'The Prisoner\'s Dilemma ends in defection. But what if you play it 100 times? Does the shadow of the future enable cooperation?\n\n' +
-            '## Finitely Repeated Games\n\n' +
-            'If a game is repeated a known, finite number of times, backward induction destroys cooperation. In the last round (Round 100), there is no future, so both players Defect (it is a one-shot PD). Knowing Round 100 is Defect, Round 99 has no future, so both Defect. The unraveling continues to Round 1. Finite repetition yields the same outcome as one-shot.\n\n' +
-            '## Infinitely Repeated Games\n\n' +
-            'If the game is infinite (or ends with a probability < 1 each round), cooperation becomes rational. We use a discount factor (δ) to value future payoffs less than present ones (due to impatience or risk of game ending).\n\n' +
-            '## Trigger Strategies\n\n' +
-            'A **Grim Trigger** strategy says: "I will Cooperate as long as you have always Cooperated. If you ever Defect, I will Defect forever." This is unforgiving.\n\n' +
-            'A **Tit-for-Tat** strategy says: "I will start by Cooperating, and then do whatever you did in the previous round." This is forgiving and famous for winning Axelrod\'s tournament.\n\n' +
-            '## The Folk Theorem\n\n' +
-            'The Folk Theorem states that in an infinitely repeated game, almost any feasible payoff can be sustained as an equilibrium if the discount factor is high enough (players care enough about the future). This is powerful but mathematically chaotic: it means outcomes are hard to predict.',
-      takeaways:[
-        'Finite repetition of a PD unravels via backward induction.',
-        'Infinite (or probabilistic) repetition allows cooperation.',
-        'Grim Trigger: any defection causes permanent defection.',
-        'Tit-for-Tat: cooperative, retaliatory, forgiving.',
-        'The Folk Theorem: almost any payoff is sustainable if players value the future enough.'
-      ]
-    }
-  },
-  {
-    id:'m7', codename:'BAYESIAN', title:'Bayesian Games',
-    summary:'Incomplete information and Bayesian updating.',
-    lesson:{
-      title:'The Architecture of the Unknown',
-      body: 'Classical game theory assumes payoffs are common knowledge. Reality is not so clean. What if you don\'t know the other player\'s payoff structure? (e.g., are they a strong competitor or a weak one?)\n\n' +
-            '## Harsanyi\'s Trick\n\n' +
-            'John Harsanyi introduced **Bayesian Games**. He modeled incomplete information by introducing "Types." Nature moves first, assigning a Type to each player based on a prior probability distribution. Player 1 might be "Strong" with 30% probability or "Weak" with 70% probability. Player 1 knows their own type; Player 2 only knows the prior.\n\n' +
-            '## Beliefs and Updating\n\n' +
-            'Players maintain **beliefs** about the other players\' types. When Player 2 observes Player 1 making a move, Player 2 updates their beliefs using Bayes\' Rule.\n\n' +
-            '> P(Type | Action) = [ P(Action | Type) * P(Type) ] / P(Action)\n\n' +
-            '## Bayesian Nash Equilibrium (BNE)\n\n' +
-            'A BNE is a set of strategies (one for each type of each player) and beliefs such that every type is playing a best response to their beliefs about the other players\' strategies. It is Nash Equilibrium extended to the fog of incomplete information.',
-      takeaways:[
-        'Bayesian Games model situations where types/payoffs are unknown.',
-        'Harsanyi introduced "Types" and Nature\'s initial move.',
-        'Players use Bayes\' Rule to update beliefs after observing actions.',
-        'Bayesian Nash Equilibrium (BNE) extends NE to incomplete information.',
-        'BNE requires strategies to be best responses to expected strategies of all types.'
-      ]
-    }
-  },
-  {
-    id:'m8', codename:'MECHANISM', title:'Mechanism Design',
-    summary:'Reverse game theory, auctions, and VCG.',
-    lesson:{
-      title:'Designing the Game',
-      body: 'Game theory tells you what happens *given* a set of rules. **Mechanism Design** (reverse game theory) asks: what rules should I design to achieve a desired outcome, assuming players will game the rules strategically?\n\n' +
-            '## Incentive Compatibility\n\n' +
-            'A mechanism is **Incentive Compatible** if truth-telling is a dominant strategy. You cannot do better than revealing your true value.\n\n' +
-            '## The VCG Mechanism\n\n' +
-            'The Vickrey-Clarke-Groves (VCG) mechanism is the holy grail of mechanism design. In a VCG auction, you bid your true value. The winner is the highest bidder, but they pay the *social harm* they cause to others (i.e., the second-highest bid). This is the Second-Price Sealed-Bid Auction.\n\n' +
-            '## Revenue Equivalence Theorem\n\n' +
-            'A stunning result: under certain conditions, all standard auction formats (English, Dutch, First-Price Sealed-Bid, Second-Price Sealed-Bid) yield the exact same expected revenue for the seller, assuming bidders are rational and values are independent. The choice of auction format doesn\'t change the seller\'s expected profit.',
-      takeaways:[
-        'Mechanism Design is reverse game theory: designing rules to achieve outcomes.',
-        'Incentive Compatibility means truth-telling is the dominant strategy.',
-        'Vickrey (Second-Price) Auctions are incentive-compatible.',
-        'VCG mechanism: winner pays the externality (social harm) they impose.',
-        'Revenue Equivalence Theorem: standard auction formats yield the same expected revenue.'
-      ]
-    }
-  },
-  {
-    id:'m9', codename:'SIGNALLING', title:'Signalling & Cheap Talk',
-    summary:'Separating vs. pooling equilibria.',
-    lesson:{
-      title:'The Cost of Credibility',
-      body: 'How do you communicate your type when anyone can lie? Michael Spence introduced **Signalling**. A signal is an action that is costly to fake.\n\n' +
-            '## The Spence Education Model\n\n' +
-            'Why do we get MBAs if they teach nothing useful? To signal productivity. Assume workers are either High productivity (fast learners) or Low productivity (slow learners). Getting an MBA is costly. The cost is higher for Low productivity workers (they struggle more). If the wage premium for an MBA is high enough, High workers get the MBA and Low workers do not. The signal separates them.\n\n' +
-            '## Separating vs. Pooling Equilibria\n\n' +
-            'In a **Separating Equilibrium**, different types send different signals. The employer perfectly infers the worker\'s type.\n\n' +
-            'In a **Pooling Equilibrium**, all types send the same signal. The employer learns nothing and pays the average wage.\n\n' +
-            '## Cheap Talk\n\n' +
-            'When signals cost nothing to send (e.g., a politician saying "I am honest"), it is called **Cheap Talk**. Without a cost differential, cheap talk cannot separate types. It is just noise. Credibility requires skin in the game.',
-      takeaways:[
-        'A Signal must be costly to fake to convey information.',
-        'Spence Model: education signals productivity because it is costlier for low types.',
-        'Separating Equilibrium: types reveal themselves via distinct actions.',
-        'Pooling Equilibrium: types blend, no information is revealed.',
-        'Cheap Talk (costless signals) cannot credibly separate types.'
-      ]
-    }
-  },
-  {
-    id:'m10', codename:'EVOLUTIONARY', title:'Evolutionary Game Theory',
-    summary:'Replicator dynamics and ESS.',
-    lesson:{
-      title:'The Biology of Strategy',
-      body: 'Game theory escaped economics and entered biology. John Maynard Smith created **Evolutionary Game Theory**. It drops the assumption of rationality entirely. Instead, strategies are genetically hardwired, and payoffs represent reproductive fitness.\n\n' +
-            '## Replicator Dynamics\n\n' +
-            'If a strategy yields a higher-than-average payoff, the proportion of the population using it grows. The **Replicator Dynamic** mathematically describes how strategy frequencies evolve over time based on their relative fitness.\n\n' +
-            '## Evolutionary Stable Strategy (ESS)\n\n' +
-            'A strategy is an ESS if, when adopted by an entire population, no mutant strategy can invade it.\n\n' +
-            'Test: Let strategy A be the incumbent. Let B be a mutant entering at frequency ε.\n' +
-            'A is an ESS if either:' +
-            '\n1. A plays better against A than B does against A.' +
-            '\n2. A and B play equally well against A, but A plays better against B than B does against B.\n\n' +
-            '## The Hawk-Dove Game\n\n' +
-            'Animals compete for resources. Hawks fight; Doves bluff. If Hawk meets Dove, Hawk wins. If Dove meets Dove, they split. If Hawk meets Hawk, they fight and incur severe cost. The ESS is often a mixed strategy, explaining why animals rarely fight to the death.',
-      takeaways:[
-        'Evolutionary Game Theory applies to biology, dropping rationality.',
-        'Payoffs represent reproductive fitness.',
-        'Replicator Dynamic: high-payoff strategies grow in frequency.',
-        'Evolutionary Stable Strategy (ESS) resists invasion by mutants.',
-        'Hawk-Dove game explains why mixed strategies (ritualized conflict) evolve.'
-      ]
-    }
-  }
+  { id:'m1', codename:'MATRIX', title:'The Normal Form', summary:'Players, strategies, and payoff matrices.', lesson:{ title:'The Architecture of Interaction', body: 'Game theory is the study of mathematical models of strategic interaction among rational decision-makers. It is the physics of human and economic behavior.\n\n## The Primitives\n\nEvery game consists of three elements:\n1. **Players**: The decision-makers involved.\n2. **Strategies**: The actions available to each player.\n3. **Payoffs**: The utility (or profit, or evolutionary fitness) each player receives for every combination of strategies chosen.\n\nWe represent this in **Normal Form** (or Strategic Form) as a matrix. The rows represent Player 1\'s strategies; the columns represent Player 2\'s strategies. The intersections contain the payoffs.\n\n## The Prisoner\'s Dilemma\n\nThe most famous game is the Prisoner\'s Dilemma. Two criminals are interrogated separately. They can Cooperate (C) with each other by staying silent, or Defect (D) by confessing.\n\n> If both Cooperate, they get 1 year each. If both Defect, they get 3 years each. If one Defects and the other Cooperates, the defector goes free (0) and the cooperator gets 5 years.\n\nIn matrix form (using positive payoffs where higher is better):\n- (C, C) = (3, 3)\n- (D, D) = (1, 1)\n- (D, C) = (5, 0)\n- (C, D) = (0, 5)\n\n## Rationality Assumption\n\nGame theory assumes players are **rational** (they want to maximize their own payoff) and have **common knowledge of rationality** (I know you are rational, you know I know you are rational, ad infinitum). This assumption is the bedrock of all classical game theory, though behavioral economics later challenges it.', takeaways:['A game requires Players, Strategies, and Payoffs.','Normal Form represents games as matrices.','The Prisoner\'s Dilemma demonstrates individual rationality can lead to collective ruin.','Game theory assumes rational payoff-maximizing players.','Common knowledge of rationality is required for deep strategic deduction.'] } },
+  { id:'m2', codename:'DOMINANCE', title:'Strict Dominance', summary:'Iterated elimination of dominated strategies.', lesson:{ title:'The Path of Certainty', body: 'How do we solve a game? The first and most powerful tool is the concept of **Dominance**.\n\n## Strictly Dominant Strategies\n\nA strategy A *strictly dominates* strategy B if A yields a higher payoff than B *regardless of what the other player does*. If you have a strictly dominant strategy, you should always play it. It is the only rational choice.\n\nIn the Prisoner\'s Dilemma, look at Player 1\'s choice. If Player 2 Cooperates, Defecting gives 5 > 3. If Player 2 Defects, Defecting gives 1 > 0. Defecting strictly dominates Cooperating. Both players realize this, and both Defect. They get (1,1) instead of the socially optimal (3,3).\n\n## Iterated Elimination (IESDS)\n\nWhat if no strategy strictly dominates all others? We use Iterated Elimination of Strictly Dominated Strategies (IESDS).\n\n1. Look at Player 1\'s strategies. If one is strictly worse than another under all conditions, delete the row.\n2. Now look at Player 2\'s strategies, knowing Player 1 will never play the deleted row. Delete any strictly dominated columns.\n3. Repeat until no strategies can be eliminated.\n\nIf this process leaves exactly one strategy for each player, the game is **dominance solvable**.\n\n## The Trap of Weak Dominance\n\nA strategy *weakly dominates* another if it is at least as good in all cases, and strictly better in at least one case. Be careful: eliminating weakly dominated strategies can cause you to miss equilibria or lose a viable option. Stick to strict dominance for elimination.', takeaways:['Strategy A strictly dominates B if A > B always.','A strictly dominant strategy should always be played.','IESDS iteratively removes dominated strategies to solve games.','Prisoner\'s Dilemma: Defect strictly dominates Cooperate.','Avoid eliminating weakly dominated strategies; it can break solutions.'] } },
+  { id:'m3', codename:'EQUILIBRIUM', title:'Nash Equilibrium', summary:'Mutual best responses and the Nash Equilibrium.', lesson:{ title:'The Unilateral Deviation Test', body: 'John Nash proved that every finite game has at least one equilibrium. The **Nash Equilibrium (NE)** is the central concept of game theory.\n\n## The Definition\n\nA set of strategies is a Nash Equilibrium if no player can strictly improve their payoff by unilaterally changing their strategy, assuming the other players\' strategies remain fixed.\n\nIt is a state of mutual best response. I am playing my best response to your strategy, and you are playing your best response to mine.\n\n## The Coordination Problem\n\nConsider the Stag Hunt. Two hunters can hunt a Stag (S) or a Hare (H). Catching a Stag requires both. Catching a Hare can be done alone.\n\n- (S, S) = (5, 5)\n- (H, H) = (2, 2)\n- (S, H) = (0, 2)\n- (H, S) = (2, 0)\n\nThis game has TWO pure-strategy Nash Equilibria: (S, S) and (H, H). (S, S) is "payoff dominant" (better for both). (H, H) is "risk dominant" (safer, because you get 2 even if the other hunts Stag). Which one will they play? Game theory cannot answer this purely mathematically; it requires culture, communication, or history.\n\n## The Battle of the Sexes\n\nTwo players want to coordinate, but have different preferences. (Opera, Opera) = (3, 2). (Football, Football) = (2, 3). Miscoordination yields (0,0). Again, two Nash Equilibria. The challenge is not finding the NE; it is selecting among them.', takeaways:['Nash Equilibrium: no player can profitably deviate unilaterally.','NE represents mutual best responses.','Every finite game has at least one Nash Equilibrium.','Stag Hunt illustrates the tension between payoff dominance and risk dominance.','Multiple equilibria require coordination mechanisms (culture, communication).'] } },
+  { id:'m4', codename:'MIXED', title:'Mixed Strategies', summary:'Randomization and zero-sum games.', lesson:{ title:'The Mathematics of Unpredictability', body: 'What happens when no pure strategy Nash Equilibrium exists? Consider Matching Pennies. Player 1 wants to match; Player 2 wants to mismatch. If Player 1 plays Heads, Player 2 plays Tails. If Player 2 plays Tails, Player 1 plays Tails. There is no stable point.\n\n## Randomization\n\nThe solution is to randomize. A **mixed strategy** is a probability distribution over pure strategies. Nash proved that every finite game has an equilibrium in mixed strategies.\n\nHow do we find it? A player randomizes to make the *opponent indifferent* between their own strategies. If I play Heads 50% of the time and Tails 50% of the time, my opponent gets the same expected payoff whether they play Heads or Tails. They are indifferent, meaning they cannot exploit me.\n\n## Zero-Sum Games\n\nIn a Zero-Sum game, one player\'s gain is exactly the other\'s loss (e.g., poker, options trading). The Minimax Theorem (von Neumann) states that the value of a zero-sum game is determined by both players minimizing the maximum loss the other can inflict.\n\n## The Indifference Principle\n\nTo calculate a mixed strategy equilibrium for Player 1, set Player 2\'s expected payoffs equal to each other, and solve for Player 1\'s probabilities. You do not optimize your own payoff directly; you optimize the mixture that makes your opponent\'s exploitation impossible.', takeaways:['When no pure strategy NE exists, players must randomize (Mixed Strategies).','Every finite game has at least one mixed strategy Nash Equilibrium.','You randomize to make your opponent indifferent.','Zero-sum games are solved via the Minimax Theorem.','Indifference Principle: set opponent\'s expected payoffs equal to solve for probabilities.'] } },
+  { id:'m5', codename:'EXTENSIVE', title:'Extensive Form Games', summary:'Game trees, backward induction, and credible threats.', lesson:{ title:'The Sequence of Action', body: 'The Normal Form (matrix) assumes simultaneous moves. But many games are sequential. For these, we use the **Extensive Form** (game tree).\n\n## The Game Tree\n\nThe game starts at an initial decision node. Branches represent actions. Terminal nodes yield payoffs. We use information sets to denote what a player knows when making a decision (if they don\'t know which node they are at, the nodes are in the same information set).\n\n## Backward Induction\n\nTo solve a perfect-information extensive form game, we use **Backward Induction**. Start at the end of the tree. At the last decision nodes, the player will choose the action with the highest payoff. Replace those branches with the resulting payoffs. Work backwards to the root.\n\n## The Centipede Game\n\nA classic example. Two players alternate taking a growing pot of money. At each turn, a player can "Take" (ending the game) or "Pass" (growing the pot). Backward induction says the first player should Take immediately. But experimentally, humans usually Pass a few times. This reveals a tension between strict backward induction and cooperative intuition.\n\n## Credible Threats and Subgame Perfection\n\nA threat is only meaningful if it is credible—i.e., if you would actually carry it out when the time comes. A **Subgame Perfect Equilibrium (SPE)** is a refinement of Nash Equilibrium that eliminates non-credible threats. It requires strategies to be a Nash Equilibrium in every subgame.', takeaways:['Extensive Form uses game trees to model sequential moves.','Backward Induction solves perfect-information games by reasoning from the end.','Subgame Perfect Equilibrium (SPE) eliminates non-credible threats.','The Centipede Game shows tension between logic and cooperation.','A threat is only valid if executing it is rational at the time of execution.'] } },
+  { id:'m6', codename:'REPEATED', title:'Repeated Games', summary:'The Folk Theorem, trigger strategies, and cooperation.', lesson:{ title:'The Shadow of the Future', body: 'The Prisoner\'s Dilemma ends in defection. But what if you play it 100 times? Does the shadow of the future enable cooperation?\n\n## Finitely Repeated Games\n\nIf a game is repeated a known, finite number of times, backward induction destroys cooperation. In the last round (Round 100), there is no future, so both players Defect (it is a one-shot PD). Knowing Round 100 is Defect, Round 99 has no future, so both Defect. The unraveling continues to Round 1. Finite repetition yields the same outcome as one-shot.\n\n## Infinitely Repeated Games\n\nIf the game is infinite (or ends with a probability < 1 each round), cooperation becomes rational. We use a discount factor (δ) to value future payoffs less than present ones (due to impatience or risk of game ending).\n\n## Trigger Strategies\n\nA **Grim Trigger** strategy says: "I will Cooperate as long as you have always Cooperated. If you ever Defect, I will Defect forever." This is unforgiving.\n\nA **Tit-for-Tat** strategy says: "I will start by Cooperating, and then do whatever you did in the previous round." This is forgiving and famous for winning Axelrod\'s tournament.\n\n## The Folk Theorem\n\nThe Folk Theorem states that in an infinitely repeated game, almost any feasible payoff can be sustained as an equilibrium if the discount factor is high enough (players care enough about the future). This is powerful but mathematically chaotic: it means outcomes are hard to predict.', takeaways:['Finite repetition of a PD unravels via backward induction.','Infinite (or probabilistic) repetition allows cooperation.','Grim Trigger: any defection causes permanent defection.','Tit-for-Tat: cooperative, retaliatory, forgiving.','The Folk Theorem: almost any payoff is sustainable if players value the future enough.'] } },
+  { id:'m7', codename:'BAYESIAN', title:'Bayesian Games', summary:'Incomplete information and Bayesian updating.', lesson:{ title:'The Architecture of the Unknown', body: 'Classical game theory assumes payoffs are common knowledge. Reality is not so clean. What if you don\'t know the other player\'s payoff structure? (e.g., are they a strong competitor or a weak one?)\n\n## Harsanyi\'s Trick\n\nJohn Harsanyi introduced **Bayesian Games**. He modeled incomplete information by introducing "Types." Nature moves first, assigning a Type to each player based on a prior probability distribution. Player 1 might be "Strong" with 30% probability or "Weak" with 70% probability. Player 1 knows their own type; Player 2 only knows the prior.\n\n## Beliefs and Updating\n\nPlayers maintain **beliefs** about the other players\' types. When Player 2 observes Player 1 making a move, Player 2 updates their beliefs using Bayes\' Rule.\n\n> P(Type | Action) = [ P(Action | Type) * P(Type) ] / P(Action)\n\n## Bayesian Nash Equilibrium (BNE)\n\nA BNE is a set of strategies (one for each type of each player) and beliefs such that every type is playing a best response to their beliefs about the other players\' strategies. It is Nash Equilibrium extended to the fog of incomplete information.', takeaways:['Bayesian Games model situations where types/payoffs are unknown.','Harsanyi introduced "Types" and Nature\'s initial move.','Players use Bayes\' Rule to update beliefs after observing actions.','Bayesian Nash Equilibrium (BNE) extends NE to incomplete information.','BNE requires strategies to be best responses to expected strategies of all types.'] } },
+  { id:'m8', codename:'MECHANISM', title:'Mechanism Design', summary:'Reverse game theory, auctions, and VCG.', lesson:{ title:'Designing the Game', body: 'Game theory tells you what happens *given* a set of rules. **Mechanism Design** (reverse game theory) asks: what rules should I design to achieve a desired outcome, assuming players will game the rules strategically?\n\n## Incentive Compatibility\n\nA mechanism is **Incentive Compatible** if truth-telling is a dominant strategy. You cannot do better than revealing your true value.\n\n## The VCG Mechanism\n\nThe Vickrey-Clarke-Groves (VCG) mechanism is the holy grail of mechanism design. In a VCG auction, you bid your true value. The winner is the highest bidder, but they pay the *social harm* they cause to others (i.e., the second-highest bid). This is the Second-Price Sealed-Bid Auction.\n\n## Revenue Equivalence Theorem\n\nA stunning result: under certain conditions, all standard auction formats (English, Dutch, First-Price Sealed-Bid, Second-Price Sealed-Bid) yield the exact same expected revenue for the seller, assuming bidders are rational and values are independent. The choice of auction format doesn\'t change the seller\'s expected profit.', takeaways:['Mechanism Design is reverse game theory: designing rules to achieve outcomes.','Incentive Compatibility means truth-telling is the dominant strategy.','Vickrey (Second-Price) Auctions are incentive-compatible.','VCG mechanism: winner pays the externality (social harm) they impose.','Revenue Equivalence Theorem: standard auction formats yield the same expected revenue.'] } },
+  { id:'m9', codename:'SIGNALLING', title:'Signalling & Cheap Talk', summary:'Separating vs. pooling equilibria.', lesson:{ title:'The Cost of Credibility', body: 'How do you communicate your type when anyone can lie? Michael Spence introduced **Signalling**. A signal is an action that is costly to fake.\n\n## The Spence Education Model\n\nWhy do we get MBAs if they teach nothing useful? To signal productivity. Assume workers are either High productivity (fast learners) or Low productivity (slow learners). Getting an MBA is costly. The cost is higher for Low productivity workers (they struggle more). If the wage premium for an MBA is high enough, High workers get the MBA and Low workers do not. The signal separates them.\n\n## Separating vs. Pooling Equilibria\n\nIn a **Separating Equilibrium**, different types send different signals. The employer perfectly infers the worker\'s type.\n\nIn a **Pooling Equilibrium**, all types send the same signal. The employer learns nothing and pays the average wage.\n\n## Cheap Talk\n\nWhen signals cost nothing to send (e.g., a politician saying "I am honest"), it is called **Cheap Talk**. Without a cost differential, cheap talk cannot separate types. It is just noise. Credibility requires skin in the game.', takeaways:['A Signal must be costly to fake to convey information.','Spence Model: education signals productivity because it is costlier for low types.','Separating Equilibrium: types reveal themselves via distinct actions.','Pooling Equilibrium: types blend, no information is revealed.','Cheap Talk (costless signals) cannot credibly separate types.'] } },
+  { id:'m10', codename:'EVOLUTIONARY', title:'Evolutionary Game Theory', summary:'Replicator dynamics and ESS.', lesson:{ title:'The Biology of Strategy', body: 'Game theory escaped economics and entered biology. John Maynard Smith created **Evolutionary Game Theory**. It drops the assumption of rationality entirely. Instead, strategies are genetically hardwired, and payoffs represent reproductive fitness.\n\n## Replicator Dynamics\n\nIf a strategy yields a higher-than-average payoff, the proportion of the population using it grows. The **Replicator Dynamic** mathematically describes how strategy frequencies evolve over time based on their relative fitness.\n\n## Evolutionary Stable Strategy (ESS)\n\nA strategy is an ESS if, when adopted by an entire population, no mutant strategy can invade it.\n\nTest: Let strategy A be the incumbent. Let B be a mutant entering at frequency ε.\nA is an ESS if either:\n1. A plays better against A than B does against A.\n2. A and B play equally well against A, but A plays better against B than B does against B.\n\n## The Hawk-Dove Game\n\nAnimals compete for resources. Hawks fight; Doves bluff. If Hawk meets Dove, Hawk wins. If Dove meets Dove, they split. If Hawk meets Hawk, they fight and incur severe cost. The ESS is often a mixed strategy, explaining why animals rarely fight to the death.', takeaways:['Evolutionary Game Theory applies to biology, dropping rationality.','Payoffs represent reproductive fitness.','Replicator Dynamic: high-payoff strategies grow in frequency.','Evolutionary Stable Strategy (ESS) resists invasion by mutants.','Hawk-Dove game explains why mixed strategies (ritualized conflict) evolve.'] } }
 ];
 
-// ============== DATA: FLASHCARDS ==============
+// ============== DATA: FLASHCARDS (120 Total) ==============
 const CARDS = [
-  // M1
+  // M1 (12)
   {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What are the three primitives of any game in normal form?',back:'1. Players. 2. Strategies (actions available). 3. Payoffs (utility for every combination of strategies).'},
   {id:'c2',moduleId:'m1',core:true,category:'application',front:'In the Prisoner\'s Dilemma, what are the payoffs for (Defect, Cooperate)?',back:'The Defector gets the highest payoff (Temptation = 5), and the Cooperator gets the lowest (Sucker = 0).'},
   {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What does "Common Knowledge of Rationality" mean?',back:'I know you are rational, you know I know, I know you know I know, ad infinitum. It is required for deep strategic deduction.'},
-  // M2
-  {id:'c4',moduleId:'m2',core:true,category:'concept',front:'Definition of a Strictly Dominant Strategy?',back:'A strategy that yields a strictly higher payoff than any other strategy, regardless of what the opponent plays.'},
-  {id:'c5',moduleId:'m2',core:true,category:'application',front:'What is IESDS?',back:'Iterated Elimination of Strictly Dominated Strategies. You iteratively remove strategies that are strictly dominated until only one profile remains (if solvable).'},
-  {id:'c6',moduleId:'m2',core:false,category:'concept',front:'Why avoid eliminating WEAKLY dominated strategies?',back:'Because it can eliminate viable equilibria and the order of elimination matters. Strict elimination is mathematically safe; weak is not.'},
-  // M3
-  {id:'c7',moduleId:'m3',core:true,category:'concept',front:'Definition of a Nash Equilibrium?',back:'A set of strategies where no player can strictly improve their payoff by unilaterally deviating. It is a state of mutual best response.'},
-  {id:'c8',moduleId:'m3',core:true,category:'application',front:'In the Stag Hunt, which equilibrium is risk dominant?',back:'The Hare/Hare equilibrium is risk dominant (guarantees a payoff without relying on the other player). Stag/Stag is payoff dominant.'},
-  {id:'c9',moduleId:'m3',core:false,category:'concept',front:'Does game theory tell us how to select between multiple Nash Equilibria?',back:'No. Pure game theory identifies them, but selection requires culture, communication, or focal points (Schelling).'},
-  // M4
-  {id:'c10',moduleId:'m4',core:true,category:'concept',front:'Why use a Mixed Strategy?',back:'To prevent the opponent from exploiting you. You randomize to make the opponent indifferent between their strategies.'},
-  {id:'c11',moduleId:'m4',core:true,category:'application',front:'How do you solve for a player\'s mixed strategy probabilities?',back:'Set the opponent\'s expected payoffs for their pure strategies equal to each other, then solve for the probability. (The Indifference Principle).'},
-  {id:'c12',moduleId:'m4',core:false,category:'concept',front:'What is the Minimax Theorem (von Neumann)?',back:'In zero-sum games, the value of the game is determined by both players minimizing the maximum loss the other can inflict. Optimal play yields the Nash Equilibrium.'},
-  // M5
-  {id:'c13',moduleId:'m5',core:true,category:'concept',front:'How do you solve a perfect-information Extensive Form game?',back:'Backward Induction. Start at the terminal decision nodes, assume players choose their best action, and work backwards to the root.'},
-  {id:'c14',moduleId:'m5',core:true,category:'application',front:'What is a Subgame Perfect Equilibrium (SPE)?',back:'A refinement of Nash Equilibrium that requires strategies to be a Nash Equilibrium in every subgame. It eliminates non-credible threats.'},
-  {id:'c15',moduleId:'m5',core:false,category:'concept',front:'What is a non-credible threat?',back:'A threat to take an action that would not be rational to execute if the decision node were actually reached.'},
-  // M6
-  {id:'c16',moduleId:'m6',core:true,category:'concept',front:'Why does cooperation fail in a finitely repeated Prisoner\'s Dilemma?',back:'Because of backward induction. The last round has no future, so players defect. This unravels all the way back to the first round.'},
-  {id:'c17',moduleId:'m6',core:true,category:'application',front:'What is a Grim Trigger strategy?',back:'"I will cooperate as long as you have always cooperated. If you ever defect, I will defect forever." It is unforgiving.'},
-  {id:'c18',moduleId:'m6',core:false,category:'quote',front:'Summarize the Folk Theorem.',back:'In an infinitely repeated game, almost any feasible payoff can be sustained as an equilibrium if the discount factor is high enough (players value the future enough).'},
-  // M7
-  {id:'c19',moduleId:'m7',core:true,category:'concept',front:'How did Harsanyi model incomplete information?',back:'By introducing "Types." Nature moves first, assigning types based on a probability distribution. You know your type, but only the prior of others.'},
-  {id:'c20',moduleId:'m7',core:true,category:'application',front:'What is the formula for Bayesian updating?',back:'P(Type | Action) = [ P(Action | Type) * P(Type) ] / P(Action). It updates beliefs based on observed actions.'},
-  {id:'c21',moduleId:'m7',core:false,category:'concept',front:'What is a Bayesian Nash Equilibrium (BNE)?',back:'A set of strategies and beliefs where every type of every player is playing a best response to their beliefs about the other players\' strategies.'},
-  // M8
-  {id:'c22',moduleId:'m8',core:true,category:'concept',front:'What is Mechanism Design?',back:'Reverse game theory. Designing the rules of a game to achieve a desired outcome, assuming players will behave strategically.'},
-  {id:'c23',moduleId:'m8',core:true,category:'application',front:'What is the VCG (Vickrey-Clarke-Groves) mechanism?',back:'An auction where the winner pays the social harm (externality) they impose on others. It makes truth-telling a dominant strategy (Incentive Compatible).'},
-  {id:'c24',moduleId:'m8',core:false,category:'quote',front:'Summarize the Revenue Equivalence Theorem.',back:'Under certain conditions, all standard auction formats (English, Dutch, First-Price, Second-Price) yield the exact same expected revenue for the seller.'},
-  // M9
-  {id:'c25',moduleId:'m9',core:true,category:'concept',front:'What makes a signal credible?',back:'It must be differentially costly. It must cost more for a dishonest type to send than an honest type, making it impossible to fake profitably.'},
-  {id:'c26',moduleId:'m9',core:true,category:'application',front:'Difference between Separating and Pooling Equilibria?',back:'Separating: different types send different signals (information is revealed). Pooling: all types send the same signal (no information is revealed).'},
-  {id:'c27',moduleId:'m9',core:false,category:'concept',front:'Why is "Cheap Talk" (costless signals) ineffective?',back:'Without a cost differential, any type can send any signal. Therefore, signals cannot separate types, and rational players ignore them.'},
-  // M10
-  {id:'c28',moduleId:'m10',core:true,category:'concept',front:'What is an Evolutionary Stable Strategy (ESS)?',back:'A strategy that, when adopted by a whole population, cannot be invaded by a small group of mutants playing a different strategy.'},
-  {id:'c29',moduleId:'m10',core:true,category:'application',front:'What does the Replicator Dynamic describe?',back:'How the frequency of strategies in a population changes over time. Strategies with above-average payoff grow in frequency.'},
-  {id:'c30',moduleId:'m10',core:false,category:'quote',front:'How does the Hawk-Dove game explain animal behavior?',back:'It shows that fighting to the death (Hawk vs Hawk) is usually not an ESS. The stable state is often a mixed strategy of ritualized conflict (Dove).'}
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'If a game has perfect information, what does that imply?',back:'Every player knows the full history of previous moves when making a decision. There are no hidden simultaneous moves.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What is a "Constant-Sum" game?',back:'A game where the sum of payoffs for all players is a constant, regardless of the strategies chosen. (e.g., dividing a fixed pie).'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'How is utility defined in classical game theory?',back:'A numerical representation of a player\'s preferences over outcomes, assuming they prefer higher payoffs. It is not necessarily money.'},
+  {id:'c7',moduleId:'m1',core:false,category:'concept',front:'What is the difference between a pure strategy and a mixed strategy?',back:'A pure strategy is a single specific action. A mixed strategy is a probability distribution over multiple pure strategies (e.g., 80% Heads, 20% Tails).'},
+  {id:'c8',moduleId:'m1',core:false,category:'application',front:'In a matrix, what does the intersection of Row 1 and Column 2 represent?',back:'The payoffs for Player 1 choosing Strategy 1 and Player 2 choosing Strategy 2. Typically formatted as (P1 Payoff, P2 Payoff).'},
+  {id:'c9',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Game theory is the physics of ___ behavior."',back:'"...human and economic." (or "strategic").'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is a "Dominant Strategy"?',back:'A strategy that yields a strictly higher payoff than any other strategy, regardless of what the opponent plays.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'Why is the Prisoner\'s Dilemma a "dilemma"?',back:'Individual rationality leads to a collectively worse outcome. Both players defect, getting (1,1), instead of cooperating to get (3,3).'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'What does "Simultaneous Move" mean in game theory?',back:'Players choose strategies without knowing the specific choices of the other players in that round. (Can be modeled even if actions are physically sequential).'},
+  // M2 (12)
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'Definition of a Strictly Dominant Strategy?',back:'A strategy that yields a strictly higher payoff than any other strategy, regardless of what the opponent plays.'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'What is IESDS?',back:'Iterated Elimination of Strictly Dominated Strategies. You iteratively remove strategies that are strictly dominated until only one profile remains (if solvable).'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'Why avoid eliminating WEAKLY dominated strategies?',back:'Because it can eliminate viable equilibria and the order of elimination matters. Strict elimination is mathematically safe; weak is not.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'If Row A weakly dominates Row B, what does that mean?',back:'Row A is at least as good as Row B in all scenarios, and strictly better in at least one scenario.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'What is a "Dominance Solvable" game?',back:'A game where applying Iterated Elimination of Strictly Dominated Strategies (IESDS) results in exactly one strategy profile remaining.'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'In the Prisoner\'s Dilemma, which strategy is strictly dominant?',back:'Defect. If the other cooperates, defecting yields 5 > 3. If the other defects, defecting yields 1 > 0.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'Can a game have multiple strictly dominant strategies for one player?',back:'No. Strict dominance is a transitive relation. You can only have one strictly dominant strategy (though others might tie, making them weakly dominant).'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'How do you apply IESDS to a matrix?',back:'Look at Player 1\'s rows. If Row A\'s payoffs are all > Row B\'s, cross out Row B. Then look at Player 2\'s remaining columns and repeat.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "If you have a strictly dominant strategy, you should ___."',back:'"...always play it."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'What is the relationship between Strict Dominance and Nash Equilibrium?',back:'If a player has a strictly dominant strategy, they will play it in every Nash Equilibrium. IESDS will never eliminate a strategy used in a Nash Equilibrium.'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'If a game is not dominance solvable, what is the next tool to solve it?',back:'Best Response analysis to find Nash Equilibria.'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'Why is IESDS considered "safe"?',back:'Because it relies on the assumption of Common Knowledge of Rationality. A rational player will never play a strictly dominated strategy, and everyone knows this.'},
+  // M3 (12)
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'Definition of a Nash Equilibrium?',back:'A set of strategies where no player can strictly improve their payoff by unilaterally deviating. It is a state of mutual best response.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'In the Stag Hunt, which equilibrium is risk dominant?',back:'The Hare/Hare equilibrium is risk dominant (guarantees a payoff without relying on the other player). Stag/Stag is payoff dominant.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'Does game theory tell us how to select between multiple Nash Equilibria?',back:'No. Pure game theory identifies them, but selection requires culture, communication, or focal points (Schelling).'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'What is a "Best Response"?',back:'The strategy that yields the highest payoff for a player, given the specific strategies chosen by all other players.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'What is a "Pure Strategy Nash Equilibrium"?',back:'A Nash Equilibrium where players choose a single specific action with 100% probability (no randomization).'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'In Battle of the Sexes (Opera vs Football), how many Pure NE exist?',back:'Two. (Opera, Opera) and (Football, Football).'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'What is "Payoff Dominance"?',back:'An equilibrium is payoff dominant if it yields strictly higher payoffs for all players compared to other equilibria (e.g., Stag/Stag in Stag Hunt).'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'How do you find Nash Equilibria in a matrix?',back:'Underline Player 1\'s best response to each of Player 2\'s strategies. Underline Player 2\'s best response to each of Player 1\'s strategies. Cells with both underlined are NE.'},
+  {id:'c33',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "A Nash Equilibrium is a state of mutual ___."',back:'"...best response."'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'What is a "Focal Point" (Schelling point)?',back:'A solution that players choose by default without communication because it seems natural, special, or relevant to them (e.g., meeting at the train station).'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'In the Prisoner\'s Dilemma, what is the Nash Equilibrium?',back:'(Defect, Defect). Given the other defects, defecting yields 1 > 0. Given the other cooperates, defecting yields 5 > 3.'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'Did John Nash invent the concept of equilibrium?',back:'No, Cournot used it for duopoly in 1838. Nash proved mathematically that every finite game has at least one equilibrium (1950).'},
+  // M4 (12)
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'Why use a Mixed Strategy?',back:'To prevent the opponent from exploiting you. You randomize to make the opponent indifferent between their strategies.'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'How do you solve for a player\'s mixed strategy probabilities?',back:'Set the opponent\'s expected payoffs for their pure strategies equal to each other, then solve for the probability. (The Indifference Principle).'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'What is the Minimax Theorem (von Neumann)?',back:'In zero-sum games, the value of the game is determined by both players minimizing the maximum loss the other can inflict. Optimal play yields the Nash Equilibrium.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'In Matching Pennies, what is the mixed strategy NE?',back:'Both players play Heads 50% and Tails 50%. This makes the opponent\'s expected payoff 0 regardless of what they do.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is the "Support" of a mixed strategy?',back:'The set of pure strategies that are played with strictly positive probability in the mixed strategy.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'If Player 1 mixes 70% A and 30% B, what must be true of Player 2\'s payoffs?',back:'Player 2\'s expected payoff for playing any strategy in their support must be exactly equal. (Indifference Principle).'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'Does a mixed strategy mean the player is "guessing"?',back:'No. It means they are intentionally randomizing according to a strict mathematical probability to avoid being exploited.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'In Rock-Paper-Scissors, what is the mixed strategy NE?',back:'Both players play Rock, Paper, and Scissors exactly 33.3% of the time each.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "You randomize to make your opponent ___."',back:'"...indifferent."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'What is "Expected Utility" in a mixed strategy?',back:'The sum of the utilities of each outcome, weighted by the probability of that outcome occurring given the mixed strategies.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'If a game has no pure strategy NE, does it have a mixed NE?',back:'Yes. Nash\'s theorem proves every finite game has at least one NE, so if none are pure, at least one must be mixed.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'Why is a mixed strategy useful in sports (e.g., penalty kicks)?',back:'If you always kick left, the goalie will always dive left. Randomizing prevents exploitation.'},
+  // M5 (12)
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'How do you solve a perfect-information Extensive Form game?',back:'Backward Induction. Start at the terminal decision nodes, assume players choose their best action, and work backwards to the root.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'What is a Subgame Perfect Equilibrium (SPE)?',back:'A refinement of Nash Equilibrium that requires strategies to be a Nash Equilibrium in every subgame. It eliminates non-credible threats.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is a non-credible threat?',back:'A threat to take an action that would not be rational to execute if the decision node were actually reached.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'In the Centipede Game, what does backward induction predict?',back:'Player 1 will "Take" on the very first move, ending the game immediately, even though both could be richer by passing.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'What is an "Information Set" in a game tree?',back:'A set of decision nodes that a player cannot distinguish between at the time they must make their choice. Used to model simultaneous moves or imperfect information.'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'How do you convert an Extensive Form game to Normal Form?',back:'List all possible complete strategies for each player (e.g., "If node A, do X; if node B, do Y") and map them to a payoff matrix.'},
+  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'What is "Zermelo\'s Theorem"?',back:'Every finite, two-player, perfect-information, zero-sum game (like Chess) has a determinable outcome (win for P1, win for P2, or draw) if both play perfectly.'},
+  {id:'c56',moduleId:'m5',core:false,category:'application',front:'In the Entry Deterrence game, why is the incumbent\'s threat to fight not credible?',back:'Because if the entrant actually enters, fighting yields a lower payoff for the incumbent than accommodating. Backward induction reveals this.'},
+  {id:'c57',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "A threat is only credible if executing it is ___."',back:'"...rational at the time of execution."'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'What is the difference between NE and SPE?',back:'NE allows for non-credible threats if they happen to be off the equilibrium path. SPE requires rational play at every possible node, even off-path ones.'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'Why do humans often play "Pass" in the Centipede game despite backward induction?',back:'Social heuristics, trust, or cognitive limits prevent humans from executing infinite recursive logic. They cooperate until near the end.'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'What is "Forward Induction"?',back:'Inferring a player\'s intent from their past actions. E.g., "They made an irrational move earlier, which signals they intend to fight."'},
+  // M6 (12)
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'Why does cooperation fail in a finitely repeated Prisoner\'s Dilemma?',back:'Because of backward induction. The last round has no future, so players defect. This unravels all the way back to the first round.'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'What is a Grim Trigger strategy?',back:'"I will cooperate as long as you have always cooperated. If you ever defect, I will defect forever." It is unforgiving.'},
+  {id:'c63',moduleId:'m6',core:false,category:'quote',front:'Summarize the Folk Theorem.',back:'In an infinitely repeated game, almost any feasible payoff can be sustained as an equilibrium if the discount factor is high enough (players value the future enough).'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'What is Tit-for-Tat?',back:'Start by cooperating. Then, in every subsequent round, do whatever the opponent did in the previous round.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'What is the "Discount Factor" (δ)?',back:'A value between 0 and 1 representing how much a player values future payoffs compared to present ones. High δ = patient.'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'Why did Tit-for-Tat win Axelrod\'s tournament?',back:'It is nice (never defects first), retaliatory (punishes defection immediately), forgiving (returns to cooperation), and clear (easy for opponents to model).'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'What is the condition for Grim Trigger to sustain cooperation?',back:'The future punishment must be severe enough and discounted lightly enough that the one-time gain from defecting is less than the future loss of cooperation.'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'If δ = 0.9, how much is a payoff of 10 next round worth today?',back:'10 * 0.9 = 9.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "The shadow of the ___ enables cooperation."',back:'"...future."'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What is an "Infinitely Repeated Game"?',back:'A game with no predetermined end, or a game that ends with a constant probability < 1 each round. (Stochastic end).'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'What is a "Grim Trigger" vs a "Carrot and Stick" strategy?',back:'Grim Trigger punishes forever. Carrot and Stick punishes for a finite number of rounds, then returns to cooperation.'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'Why is the Folk Theorem both powerful and frustrating?',back:'Powerful because it proves cooperation is possible. Frustrating because it proves almost ANYTHING is an equilibrium, making prediction impossible.'},
+  // M7 (12)
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'How did Harsanyi model incomplete information?',back:'By introducing "Types." Nature moves first, assigning types based on a probability distribution. You know your type, but only the prior of others.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'What is the formula for Bayesian updating?',back:'P(Type | Action) = [ P(Action | Type) * P(Type) ] / P(Action). It updates beliefs based on observed actions.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is a Bayesian Nash Equilibrium (BNE)?',back:'A set of strategies and beliefs where every type of every player is playing a best response to their beliefs about the other players\' strategies.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'In a First-Price Sealed Bid Auction, how should a player bid if values are private?',back:'They should bid strictly less than their true value (shading their bid) to maximize expected profit, accounting for the probability of winning.'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'What is a "Prior" in Bayesian games?',back:'The initial probability distribution over types before any actions are observed. (e.g., 30% chance Strong, 70% chance Weak).'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'What is the "Winner\'s Curse" in common value auctions?',back:'The winning bidder is the one who most overestimated the true value. Rational bidders shade bids downward to account for this.'},
+  {id:'c79',moduleId:'m7',core:false,category:'concept',front:'What is "Adverse Selection"?',back:'A market failure where only "bad" types participate because "good" types cannot signal their quality (e.g., the Market for Lemons).'},
+  {id:'c80',moduleId:'m7',core:false,category:'application',front:'How does a Cournot Duopoly model incomplete information?',back:'Firms don\'t know the rival\'s exact marginal cost. They form beliefs about the rival\'s cost type and choose quantities to maximize expected profit.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Players use Bayes\' Rule to ___ their beliefs."',back:'"...update."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is a "Pooling Equilibrium" in Bayesian games?',back:'When different types of players take the exact same action, revealing no information. Beliefs remain at the prior.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'In a war of attrition, how do Bayesian dynamics apply?',back:'Players don\'t know the opponent\'s valuation of the prize or cost of time. They update beliefs based on how long the opponent stays.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'Why is BNE harder to calculate than NE?',back:'Because you must calculate the expected payoff across all possible types of the opponent, weighted by the prior/update probabilities.'},
+  // M8 (12)
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is Mechanism Design?',back:'Reverse game theory. Designing the rules of a game to achieve a desired outcome, assuming players will behave strategically.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What is the VCG (Vickrey-Clarke-Groves) mechanism?',back:'An auction where the winner pays the social harm (externality) they impose on others. It makes truth-telling a dominant strategy (Incentive Compatible).'},
+  {id:'c87',moduleId:'m8',core:false,category:'quote',front:'Summarize the Revenue Equivalence Theorem.',back:'Under certain conditions, all standard auction formats (English, Dutch, First-Price, Second-Price) yield the exact same expected revenue for the seller.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What is "Incentive Compatibility"?',back:'A property of a mechanism where truth-telling is the dominant strategy. Players maximize their payoff by revealing their true valuation.'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'In a Second-Price Sealed Bid (Vickrey) auction, what is your dominant strategy?',back:'Bid your true valuation. If you win, you pay the second-highest bid, which is less than or equal to your value.'},
+  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'What is "Individual Rationality"?',back:'A mechanism must guarantee players an expected payoff at least as good as their outside option (not participating), otherwise they won\'t play.'},
+  {id:'c91',moduleId:'m8',core:false,category:'application',front:'How does an English Ascending Auction work?',back:'Bidders openly bid increasing amounts until no one bids higher. The winner pays the final bid. (Equivalent to Vickrey for private values).'},
+  {id:'c92',moduleId:'m8',core:false,category:'concept',front:'What is "Allocative Efficiency"?',back:'A property where the mechanism allocates the good to the player who values it most highly. (VCG achieves this).'},
+  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Mechanism Design is ___ game theory."',back:'"...reverse."'},
+  {id:'c94',moduleId:'m8',core:false,category:'application',front:'Why does a First-Price Sealed Bid Auction NOT have truth-telling as a dominant strategy?',back:'If you bid your true value and win, you pay your true value, yielding zero profit. You must bid lower (shade) to profit.'},
+  {id:'c95',moduleId:'m8',core:false,category:'concept',front:'What is the "Revelation Principle"?',back:'Any equilibrium of a complex mechanism can be replicated by a direct, incentive-compatible mechanism where players simply report their types.'},
+  {id:'c96',moduleId:'m8',core:false,category:'application',front:'How do tech companies use mechanism design for ad auctions?',back:'They use Generalized Second-Price (GSP) auctions. Advertisers bid per click, but the winner pays the second-highest bid price per click.'},
+  // M9 (12)
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What makes a signal credible?',back:'It must be differentially costly. It must cost more for a dishonest type to send than an honest type, making it impossible to fake profitably.'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'Difference between Separating and Poolling Equilibria?',back:'Separating: different types send different signals (information is revealed). Pooling: all types send the same signal (no information is revealed).'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'Why is "Cheap Talk" (costless signals) ineffective?',back:'Without a cost differential, any type can send any signal. Therefore, signals cannot separate types, and rational players ignore them.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'In the Spence Education Model, why do High types get MBAs?',back:'The MBA yields a higher wage premium. The cost is low enough for High types to make a profit, but high enough for Low types to make a loss.'},
+  {id:'c101',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Credibility requires ___ in the game."',back:'"...skin in the game." (or "cost").'},
+  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'What is "Screening"?',back:'When the uninformed player moves first to force the informed player to reveal their type. (e.g., Insurance deductibles).'},
+  {id:'c103',moduleId:'m9',core:false,category:'application',front:'How does a warranty act as a signal?',back:'A long warranty is costly for a low-quality product (it will break often) but cheap for a high-quality product. It separates the types.'},
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'What is a "Single Crossing Property"?',back:'The condition that the marginal cost of signaling is strictly lower for the high type than the low type, allowing a separating equilibrium to exist.'},
+  {id:'c105',moduleId:'m9',core:false,category:'application',front:'In a job interview, why is "I am hardworking" cheap talk?',back:'Because anyone can say it. It costs nothing. A better signal is "I worked 80 hours a week for 3 years on this project."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is a "Pooling Equilibrium" in Signalling?',back:'When the signal cost is too high for even the High type to send, or too low to deter the Low type. Both types send the same signal (or don\'t).'},
+  {id:'c107',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "A Signal must be ___ to fake to convey information."',back:'"...costly."'},
+  {id:'c108',moduleId:'m9',core:false,category:'application',front:'Why do luxury brands burn unsold inventory?',back:'To signal exclusivity. If they sold it at a discount, it would destroy the brand\'s high-type signal, pooling them with mass-market brands.'},
+  // M10 (12)
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is an Evolutionary Stable Strategy (ESS)?',back:'A strategy that, when adopted by a whole population, cannot be invaded by a small group of mutants playing a different strategy.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What does the Replicator Dynamic describe?',back:'How the frequency of strategies in a population changes over time. Strategies with above-average payoff grow in frequency.'},
+  {id:'c111',moduleId:'m10',core:false,category:'quote',front:'How does the Hawk-Dove game explain animal behavior?',back:'It shows that fighting to the death (Hawk vs Hawk) is usually not an ESS. The stable state is often a mixed strategy of ritualized conflict (Dove).'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'What is the "Fitness" of a strategy?',back:'The expected payoff of that strategy when played against a randomly drawn member of the population.'},
+  {id:'c113',moduleId:'m10',core:false,category:'application',front:'In the Hawk-Dove game, if V (value) > C (cost of injury), what happens?',back:'Hawk is an ESS. The resource is worth the fight, so the population evolves to be entirely aggressive.'},
+  {id:'c114',moduleId:'m10',core:false,category:'concept',front:'What is a "Mutant" in evolutionary game theory?',back:'A small fraction of the population that adopts a new strategy. The ESS test asks if this mutant can grow or dies out.'},
+  {id:'c115',moduleId:'m10',core:false,category:'application',front:'How is Evolutionary Game Theory different from Classical Game Theory?',back:'It drops the assumption of rationality. Strategies are genetically hardwired, and players don\'t "choose." Success is determined by reproduction.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'What is the "First Theorem of Evolutionary Game Theory"?',back:'Every ESS is a Nash Equilibrium, but not every Nash Equilibrium is an ESS.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Strategies with above-average payoff ___ in frequency."',back:'"...grow."'},
+  {id:'c118',moduleId:'m10',core:false,category:'application',front:'Why do animals often engage in "ritualized displays" instead of fatal combat?',back:'A mixed ESS. If everyone fought to the death, the surviving mutants who avoided conflict would reproduce. A stable equilibrium balances aggression and bluffing.'},
+  {id:'c119',moduleId:'m10',core:false,category:'concept',front:'What is "Asymmetric Evolutionary Game Theory"?',back:'Games where players have roles (e.g., Owner vs. Intruder). The ESS can be conditional on the role (e.g., Bourgeois strategy: play Hawk if Owner, Dove if Intruder).'},
+  {id:'c120',moduleId:'m10',core:false,category:'application',front:'Can a strictly dominated strategy ever become prevalent in a population?',back:'No. Because it yields strictly lower payoffs, its fitness will always be below average, and the Replicator Dynamic will drive it to extinction.'}
 ];
 
-// ============== DATA: ARENA PROBLEMS ==============
+// ============== DATA: ARENA PROBLEMS (100 Total - 10 Per Module) ==============
 const ARENA = [
-  { id:'p1',moduleId:'m1', title:'The Duopoly', timeLimit:60, body:'You run Firm A. Firm B is your only competitor. You can set prices High or Low. If both go High, both make $5M. If both go Low, both make $1M. If one goes Low and the other High, the Low firm makes $7M and the High firm makes $0. Construct the normal form and identify the trap.', options:['Set High prices and hope Firm B cooperates.','Recognize this as a Prisoner\'s Dilemma. Low strictly dominates High. Both will go Low, making $1M each.','Collude with Firm B to set High prices. It is the socially optimal outcome.','Set High prices to signal goodwill.'], correct:1, explanation:'Setting Low prices strictly dominates High. If B goes High, you get $7M > $5M. If B goes Low, you get $1M > $0M. Rationality traps you both at $1M.' },
-  { id:'p2',moduleId:'m2', title:'The Product Launch', timeLimit:45, body:'Your team is deciding on features for a new phone. You can add Feature X (costs $10) or not. Feature X provides $5 of value to the user. Your competitor is facing the exact same decision. What is the strategic move?', options:['Add Feature X because it adds value to the user.','Do not add Feature X. It is strictly dominated. The cost ($10) exceeds the value ($5), but if your competitor adds it, you are forced to match it, burning money for no market share gain.','Add Feature X only if you think your competitor will.','Do not add Feature X. Let the competitor add it and steal their market share.'], correct:1, explanation:'If neither adds X, you split the market. If both add X, you split the market but incurred $10 cost for $5 value (net loss of $5). Adding X is a strictly dominated strategy if the value doesn\'t exceed the cost and doesn\'t win market share.' },
-  { id:'p3',moduleId:'m3', title:'The Tech Standard', timeLimit:60, body:'Two tech giants must choose a charging standard: USB-C or Lightning. Both prefer to use the same standard. Giant A prefers USB-C (payoff 5). Giant B prefers Lightning (payoff 5). Miscoordination yields 0 for both. How many pure-strategy Nash Equilibria exist?', options:['Zero. They will never agree.','One. (USB-C, USB-C) because it is better for consumers.','Two. (USB-C, USB-C) and (Lightning, Lightning). The challenge is coordinating on which one.','One. (USB-C, Lightning) as a compromise.'], correct:2, explanation:'This is the Battle of the Sexes. If both choose USB-C, neither wants to switch alone (0 < 5 or 2). If both choose Lightning, same. There are two Nash Equilibria. Game theory doesn\'t tell us which one; history or power does.' },
-  { id:'p4',moduleId:'m4', title:'The Penalty Kick', timeLimit:45, body:'You are a soccer goalie. The striker is equally good shooting left or right. If you dive the right way, you save it 50% of the time. If you dive the wrong way, you never save it. The striker has a tendency to shoot left 70% of the time. What is your optimal mixed strategy?', options:['Dive left 100% of the time to exploit their tendency.','Dive right 30% of the time and left 70% of the time.','Randomize to make the striker indifferent. Calculate the exact mix so the striker\'s expected success is equal whether they shoot left or right.','Dive right 50% of the time and left 50% of the time.'], correct:2, explanation:'If you just follow their 70% tendency, they will adapt. To play optimally, you must randomize so the striker cannot exploit your pattern. You set your probabilities to make them indifferent to shooting left or right (Minimax).' },
-  { id:'p5',moduleId:'m5', title:'The Entry Deterrence', timeLimit:90, body:'You are a monopolist. A startup is considering entering your market. If they enter, you can either Fight (price war, you both lose $10M) or Accommodate (you share the market, you make $20M, they make $20M). You threaten the startup: "If you enter, I will fight." Is your threat credible?', options:['Yes. You are the monopolist. You set the rules.','Yes. Fighting shows strength for future competitors.','No. If they actually enter, fighting gives you -$10M while accommodating gives you $20M. Backward induction reveals the threat is non-credible. The startup will enter.','No. The startup doesn\'t care about your threats.'], correct:2, explanation:'This is the Chain Store Paradox. By backward induction, if the startup enters, fighting is strictly worse for you. The startup knows you are rational and will ignore the threat. It is not Subgame Perfect.' },
-  { id:'p6',moduleId:'m6', title:'The Cartel', timeLimit:60, body:'You and a rival are in a cartel, agreeing to keep prices high. You interact every quarter indefinitely. If one cheats, they make $100M and the other makes $0. If both hold, both make $50M. If both cheat, both make $10M. What sustains cooperation?', options:['Goodwill and corporate ethics.','A legally binding contract.','The shadow of the future. If the discount factor is high enough, the threat of future punishment (Grim Trigger) makes cooperation rational.','The government auditing prices.'], correct:2, explanation:'In a repeated game, the Folk Theorem applies. If the future is valued highly enough (high discount factor), the long-term loss of $40M per period from a price war outweighs the one-time gain of $50M from cheating. Cooperation is sustained by trigger strategies.' },
-  { id:'p7',moduleId:'m7', title:'The Acquisition', timeLimit:90, body:'You are buying a startup. The startup is either a "Unicorn" (worth $100M) or a "Dud" (worth $0). You believe there is a 50% chance it is a Unicorn. The founder asks for $40M. If the founder knows their true type, what happens?', options:['Both types will ask for $40M, and you will buy it for an expected value of $50M.','Only the Dud will accept $40M. The Unicorn knows it is worth $100M and will walk away. You face adverse selection (the Lemon\'s Problem).','You will buy it because $40M < $50M expected value.','The Unicorn will lower its price to $30M to beat the Dud.'], correct:1, explanation:'This is adverse selection (Akerlof\'s Market for Lemons). The Dud will accept $40M (since 40 > 0). The Unicorn will reject it (since 40 < 100). Only the Dud sells. The signal (accepting the offer) perfectly separates the types, and you lose money.' },
-  { id:'p8',moduleId:'m8', title:'The Spectrum Auction', timeLimit:90, body:'You are bidding for a 5G license. Your true valuation is $50M. The government is using a Second-Price Sealed-Bid (Vickrey) auction. The highest bidder wins and pays the second-highest bid. What is your optimal bid?', options:['Bid $40M to get a deal.','Bid $50M. In a Vickrey auction, truth-telling is the dominant strategy. You maximize profit regardless of others.','Bid $60M to guarantee you win, since you only pay the second price.','Bid $10M and hope everyone else bids low.'], correct:1, explanation:'In a VCG/Vickrey auction, bidding your true value is strictly dominant. If you bid lower, you risk losing a profitable license. If you bid higher, you risk the "winner\'s curse" (paying more than it is worth if the second bid is >$50M). Truth-telling is incentive compatible.' },
-  { id:'p9',moduleId:'m9', title:'The MBA Hire', timeLimit:60, body:'You are hiring a CEO. Candidates are either "Geniuses" (worth $10M/yr) or "Average" (worth $2M/yr). Getting an MBA costs a Genius $100K in effort, but costs an Average person $5M in effort (they struggle immensely). You offer $5M/yr to anyone with an MBA. Is this a credible separating equilibrium?', options:['Yes. Only Geniuses will get the MBA because the cost ($100K) is less than the wage ($5M). Average candidates won\'t ($5M cost > $5M wage).','No. Both will get MBAs because the wage is $5M.','Yes. Both will get MBAs, creating a pooling equilibrium.','No. MBAs are useless. You should hire randomly.'], correct:0, explanation:'This is the Spence Signalling model. The cost differential makes the signal credible. The Genius gets the MBA (Net: 5M - 100K = 4.9M). The Average candidate does not (Net: 5M - 5M = 0). The MBA perfectly separates the types, justifying the $5M wage.' },
-  { id:'p10',moduleId:'m10', title:'The Retail War', timeLimit:60, body:'Two retail chains operate in a city. They can either engage in cutthroat pricing (Hawk) or premium pricing (Dove). If both play Hawk, they bleed cash and both fail (Payoff 0). If both play Dove, they both thrive (Payoff 3). What is the evolutionary stable state over time?', options:['All Hawks. Survival of the fittest.','All Doves. Cooperation is always best.','A mixed strategy. Some stores will be Hawks, some Doves, stabilizing when the expected payoff of both strategies is equal.','Hawks will mutate into Doves instantly.'], correct:2, explanation:'If everyone is a Dove, a Hawk mutant thrives (gets 5 vs 3). If everyone is a Hawk, they all fail (0), so a Dove mutant might survive better by avoiding direct conflict. The Replicator Dynamic pushes the population to a mixed Evolutionary Stable Strategy (ESS) where the frequencies balance out.' }
+  // MODULE 1: MATRIX
+  { id:'p1', moduleId:'m1', title:'Q1: The Primitives', difficulty:1, reward:50, timeLimit:60, body:'You are mapping a negotiation between two companies. Which of the following is NOT one of the three primitives of a normal form game?', options:['Players (the decision makers).','Strategies (actions available to each player).','Payoffs (utility for every combination of strategies).','History (the sequence of past interactions).'], correct:3, explanation:'The normal form (matrix) assumes simultaneous moves and does not require history. The three primitives are Players, Strategies, and Payoffs.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Rationality', difficulty:1, reward:50, timeLimit:45, body:'Classical game theory assumes players are rational. What does this mean?', options:['Players try to maximize their own payoff.','Players always act ethically and fairly.','Players try to maximize the total social welfare.','Players act randomly to avoid being exploited.'], correct:0, explanation:'Rationality in game theory is strictly self-interested payoff maximization. It does not consider ethics or social welfare unless those are baked into the payoffs.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Common Knowledge', difficulty:1, reward:50, timeLimit:45, body:'What does "Common Knowledge of Rationality" imply?', options:['I know you are rational.','You know I am rational.','I know you know I know you are rational, ad infinitum.','The rules of the game are written down.'], correct:2, explanation:'It is an infinite recursion of knowing. This assumption allows players to execute deep strategic deduction, like Iterated Elimination of Dominated Strategies.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Matrix', difficulty:2, reward:100, timeLimit:60, body:'In a payoff matrix, the intersection of Row 1 (Player 1) and Column 2 (Player 2) shows the payoff (5, 2). What does this mean?', options:['Player 1 gets 2 and Player 2 gets 5.','Player 1 gets 5 and Player 2 gets 2.','The total payoff is 5, split 2 to 1.','Player 1 played 5 strategies and Player 2 played 2.'], correct:1, explanation:'The standard convention is (Player 1 Payoff, Player 2 Payoff). So 5 goes to the row player, 2 goes to the column player.' },
+  { id:'p5', moduleId:'m1', title:'Q5: Prisoner\'s Dilemma Payoffs', difficulty:2, reward:100, timeLimit:60, body:'In the Prisoner\'s Dilemma, what are the payoffs for (Defect, Cooperate)?', options:['The Defector gets the highest payoff (Temptation) and the Cooperator gets the lowest (Sucker).','Both get the Reward for mutual cooperation.','Both get the Punishment for mutual defection.','The Defector gets 0 and the Cooperator gets 5.'], correct:0, explanation:'Temptation > Reward > Punishment > Sucker. This payoff structure is what makes defection strictly dominant, causing the dilemma.' },
+  { id:'p6', moduleId:'m1', title:'Q6: Simultaneous vs Sequential', difficulty:2, reward:100, timeLimit:60, body:'A game is modeled as "Simultaneous Move." This means:', options:['Players must move at the exact same split-second in time.','Players choose actions without knowing the specific choices of the other players in that round.','The game has no time element; it is a static matrix.','Players cannot communicate, even after the game.'], correct:1, explanation:'Simultaneous move is about information, not physical timing. You can model a sequential game as simultaneous if the second player doesn\'t know the first player\'s move.' },
+  { id:'p7', moduleId:'m1', title:'Q7: Constant Sum', difficulty:3, reward:200, timeLimit:90, body:'A game is "Constant Sum" with a value of 100. What does this mean?', options:['One player always gets 100 and the other gets 0.','The sum of payoffs for both players is always exactly 100, regardless of strategies.','The game lasts 100 rounds.','The maximum any player can score is 100.'], correct:1, explanation:'If Player 1 gets 40, Player 2 gets 60. Dividing a fixed pie is constant-sum. It is strategically equivalent to a Zero-Sum game (just shift by a constant).' },
+  { id:'p8', moduleId:'m1', title:'Q8: Utility', difficulty:3, reward:200, timeLimit:90, body:'Why does game theory use "Utility" instead of money?', options:['Money is too hard to calculate.','Money does not always map linearly to happiness (e.g., risk aversion).','Utility is a real, measurable physical quantity.','Money is unethical to use in models.'], correct:1, explanation:'A rational player might prefer a guaranteed $50 over a 50% chance at $100. Utility captures risk preferences, making expected value calculations mathematically valid.' },
+  { id:'p9', moduleId:'m1', title:'Q9: Pure vs Mixed', difficulty:3, reward:200, timeLimit:90, body:'What is the difference between a pure strategy and a mixed strategy?', options:['Pure is rational; mixed is irrational.','Pure is a single specific action; mixed is a probability distribution over multiple actions.','Pure is simultaneous; mixed is sequential.','Pure is zero-sum; mixed is non-zero-sum.'], correct:1, explanation:'Playing "Heads" is pure. Playing "Heads 80% of the time, Tails 20% of the time" is mixed. Nash proved every game has an equilibrium, possibly mixed.' },
+  { id:'p10', moduleId:'m1', title:'Q10: The Dilemma', difficulty:4, reward:500, timeLimit:120, body:'Why is the Prisoner\'s Dilemma a "dilemma"?', options:['Because the players cannot communicate.','Because individual rationality leads to a collectively worse outcome.','Because the payoffs are unknown.','Because there is no Nash Equilibrium.'], correct:1, explanation:'Both players rationally choose Defect, resulting in (1,1). If they had irrationally cooperated, they could have achieved (3,3). Rationality causes ruin.' },
+  // MODULE 2: DOMINANCE
+  { id:'p11', moduleId:'m2', title:'Q1: Strict Dominance', difficulty:1, reward:50, timeLimit:45, body:'Strategy A strictly dominates Strategy B. This means:', options:['A yields a higher payoff than B, regardless of what the opponent does.','A yields a higher payoff than B, but only if the opponent plays a specific strategy.','A and B yield the same payoff.','A is cheaper to implement than B.'], correct:0, explanation:'Strict dominance means A is always strictly better than B, under all possible states of the world. A rational player will never play B.' },
+  { id:'p12', moduleId:'m2', title:'Q2: The Rule', difficulty:1, reward:50, timeLimit:45, body:'If you have a strictly dominant strategy, what should you do?', options:['Mix it with other strategies to confuse the opponent.','Always play it.','Only play it if the opponent is rational.','Discard it, as it is too obvious.'], correct:1, explanation:'It is the only rational choice. It maximizes your payoff against every possible opponent move.' },
+  { id:'p13', moduleId:'m2', title:'Q3: IESDS', difficulty:1, reward:50, timeLimit:45, body:'What does IESDS stand for?', options:['Infinite Equilibrium Strategy Deduction System.','Iterated Elimination of Strictly Dominated Strategies.','International Economic Strategy Development System.','Iterated Evaluation of Strategic Dominance Sets.'], correct:1, explanation:'IESDS is the process of iteratively removing strictly dominated strategies to solve a game.' },
+  { id:'p14', moduleId:'m2', title:'Q4: Weak Dominance', difficulty:2, reward:100, timeLimit:60, body:'Strategy A weakly dominates Strategy B. What does this mean?', options:['A is always strictly better than B.','A is at least as good as B in all cases, and strictly better in at least one case.','A and B are identical in all cases.','A is better than B only if the opponent plays randomly.'], correct:1, explanation:'Weak dominance allows for ties. Eliminating weakly dominated strategies is risky because it can eliminate Nash Equilibria.' },
+  { id:'p15', moduleId:'m2', title:'Q5: Why Strict is Safe', difficulty:2, reward:100, timeLimit:60, body:'Why is eliminating strictly dominated strategies considered mathematically safe?', options:['Because it simplifies the matrix.','Because a rational player would never play it, and everyone knows this (Common Knowledge).','Because it increases the payoffs for the remaining strategies.','Because it is required by the Nash Equilibrium definition.'], correct:1, explanation:'If a strategy is strictly dominated, a rational player will never play it. Because we assume Common Knowledge of Rationality, we can safely delete it and analyze the reduced game.' },
+  { id:'p16', moduleId:'m2', title:'Q6: Elimination Order', difficulty:2, reward:100, timeLimit:60, body:'Does the order of elimination matter when using IESDS?', options:['Yes, you must eliminate Player 1\'s strategies first.','Yes, you must eliminate Player 2\'s strategies first.','No, the final result is always the same regardless of order.','It only matters if there are more than 2 players.'], correct:2, explanation:'For strictly dominated strategies, the order of elimination does not matter. The process is path-independent. (Note: this is NOT true for weakly dominated strategies).' },
+  { id:'p17', moduleId:'m2', title:'Q7: Dominance Solvable', difficulty:3, reward:200, timeLimit:90, body:'A game is "Dominance Solvable." What does this mean?', options:['The game has no Nash Equilibrium.','Applying IESDS results in exactly one strategy profile remaining.','One player has a strictly dominant strategy.','The game can be solved by backwards induction.'], correct:1, explanation:'If iteratively eliminating strictly dominated strategies reduces the matrix to a single cell, that cell is the unique Nash Equilibrium of the game.' },
+  { id:'p18', moduleId:'m2', title:'Q8: Weak Dominance Trap', difficulty:3, reward:200, timeLimit:90, body:'Why should you avoid eliminating weakly dominated strategies?', options:['It is mathematically too complex.','It can eliminate viable Nash Equilibria and the result depends on the order of elimination.','It makes the game harder to solve.','Weak dominance is never actually true.'], correct:1, explanation:'Unlike strict dominance, weak dominance elimination is path-dependent. Eliminating Row A first might lead to a different equilibrium than eliminating Column B first.' },
+  { id:'p19', moduleId:'m2', title:'Q9: Multiple Dominant', difficulty:3, reward:200, timeLimit:90, body:'Can a player have multiple strictly dominant strategies?', options:['Yes, if they are all equal.','No, strict dominance is a transitive relation, so you can only have one.','Yes, if the opponent has no dominant strategy.','No, players can only have one strategy total.'], correct:1, explanation:'If A dominates B and A dominates C, A is the unique strictly dominant strategy. You cannot have two distinct strictly dominant strategies.' },
+  { id:'p20', moduleId:'m2', title:'Q10: NE and Dominance', difficulty:4, reward:500, timeLimit:120, body:'What is the relationship between Strict Dominance and Nash Equilibrium?', options:['If a player has a strictly dominant strategy, they will play it in every Nash Equilibrium.','A strictly dominant strategy prevents a Nash Equilibrium from existing.','Nash Equilibrium requires weak dominance, not strict dominance.','Strict dominance and Nash Equilibrium are mutually exclusive.'], correct:0, explanation:'IESDS will never eliminate a strategy that is part of a Nash Equilibrium. Therefore, if a strictly dominant strategy exists, it must be played in any NE.' },
+  // MODULE 3: EQUILIBRIUM
+  { id:'p21', moduleId:'m3', title:'Q1: The Definition', difficulty:1, reward:50, timeLimit:45, body:'What is the definition of a Nash Equilibrium?', options:['A state where total payoffs are maximized.','A state where no player can strictly improve their payoff by unilaterally changing their strategy.','A state where all players get equal payoffs.','A state where no one can be exploited.'], correct:1, explanation:'It is a state of mutual best response. Given what the others are doing, no one wants to deviate.' },
+  { id:'p22', moduleId:'m3', title:'Q2: Best Response', difficulty:1, reward:50, timeLimit:45, body:'What is a "Best Response"?', options:['The strategy that maximizes a player\'s payoff, given the strategies of all other players.','The most ethical strategy.','The strategy that punishes the opponent for deviating.','The strategy chosen most frequently in experiments.'], correct:0, explanation:'A Nash Equilibrium is simply a profile where every player\'s chosen strategy is a Best Response to the others.' },
+  { id:'p23', moduleId:'m3', title:'Q3: Unilateral Deviation', difficulty:1, reward:50, timeLimit:45, body:'The Nash Equilibrium test assumes players deviate "unilaterally." What does this mean?', options:['Only one player can deviate at a time, while the others keep their strategies fixed.','Players form coalitions to deviate together.','Players deviate randomly.','Players announce their deviations in advance.'], correct:0, explanation:'NE is a stable point against individual deviations. It does not require stability against group deviations (that is Coalition Proof Equilibrium).' },
+  { id:'p24', moduleId:'m3', title:'Q4: Finding NE in a Matrix', difficulty:2, reward:100, timeLimit:60, body:'How do you find Pure Strategy Nash Equilibria in a payoff matrix?', options:['Look for the cell with the highest total payoff.','Underline P1\'s best response to each of P2\'s strategies, and vice versa. Cells with both underlined are NE.','Eliminate all strictly dominated strategies; the remaining cell is the NE.','Find the cell where payoffs are equal.'], correct:1, explanation:'By underlining best responses, you find the cells where both players are simultaneously playing their best response to the other. Those are the NE.' },
+  { id:'p25', moduleId:'m3', title:'Q5: Stag Hunt', difficulty:2, reward:100, timeLimit:60, body:'In the Stag Hunt, which equilibrium is "Risk Dominant"?', options:['Stag/Stag (both hunt the stag).','Hare/Hare (both hunt the hare).','There is no risk dominant equilibrium.','The mixed strategy equilibrium.'], correct:1, explanation:'Hare/Hare is risk dominant because hunting the hare guarantees a payoff without relying on the other player\'s cooperation. Stag/Stag is payoff dominant.' },
+  { id:'p26', moduleId:'m3', title:'Q6: Battle of the Sexes', difficulty:2, reward:100, timeLimit:60, body:'In Battle of the Sexes (Opera vs Football), how many Pure Strategy NE exist?', options:['Zero','One','Two','Four'], correct:2, explanation:'(Opera, Opera) and (Football, Football) are both NE. The challenge is selecting which one to play without communication.' },
+  { id:'p27', moduleId:'m3', title:'Q7: Focal Points', difficulty:3, reward:200, timeLimit:90, body:'What is a "Focal Point" (Schelling point)?', options:['A strategy that is mathematically proven to be optimal.','A solution that players choose by default without communication because it seems natural or special.','The center of a payoff matrix.','The strategy with the highest payoff.'], correct:1, explanation:'When multiple NE exist, players use cultural or psychological cues to select one. E.g., "Meet me in New York" -> Grand Central Station is a focal point.' },
+  { id:'p28', moduleId:'m3', title:'Q8: Multiple Equilibria', difficulty:3, reward:200, timeLimit:90, body:'Does game theory tell us how to select between multiple Nash Equilibria?', options:['Yes, always pick the one with the highest total payoff.','Yes, always pick the risk dominant one.','No, pure game theory identifies them, but selection requires culture, communication, or focal points.','No, multiple equilibria mean the game is unsolvable.'], correct:2, explanation:'Game theory is descriptive, not prescriptive for selection. Real-world coordination requires external mechanisms.' },
+  { id:'p29', moduleId:'m3', title:'Q9: Payoff Dominance', difficulty:3, reward:200, timeLimit:90, body:'An equilibrium is "Payoff Dominant." What does this mean?', options:['It is the safest equilibrium.','It yields strictly higher payoffs for all players compared to other equilibria.','It is the only mathematically stable equilibrium.','It is the equilibrium most likely to be played in experiments.'], correct:1, explanation:'Stag/Stag in the Stag Hunt is payoff dominant. It is Pareto optimal. However, it might not be the one actually played due to risk.' },
+  { id:'p30', moduleId:'m3', title:'Q10: The Centaur', difficulty:4, reward:500, timeLimit:120, body:'John Nash proved what about finite games?', options:['Every finite game has exactly one Nash Equilibrium.','Every finite game has at least one Nash Equilibrium (possibly mixed).','Every finite game is dominance solvable.','Every finite game has a Focal Point.'], correct:1, explanation:'Nash\'s theorem (1950) proves existence. If no pure strategy NE exists, a mixed strategy NE must exist.' },
+  // MODULE 4: MIXED
+  { id:'p31', moduleId:'m4', title:'Q1: When to Mix', difficulty:1, reward:50, timeLimit:45, body:'When should a player use a Mixed Strategy?', options:['When they want to maximize their payoff.','When they want to prevent the opponent from exploiting them by making them indifferent.','When they are unsure of their own preferences.','When the game is cooperative.'], correct:1, explanation:'You randomize to make the opponent indifferent. If they are indifferent, they cannot exploit a pattern in your play.' },
+  { id:'p32', moduleId:'m4', title:'Q2: Indifference Principle', difficulty:1, reward:50, timeLimit:45, body:'What is the Indifference Principle?', options:['Players are indifferent between all strategies.','To solve for P1\'s mix, set P2\'s expected payoffs for their pure strategies equal to each other.','Players don\'t care about payoffs.','Mixed strategies yield zero expected payoff.'], correct:1, explanation:'You do not optimize your own payoff directly. You optimize the mixture that makes your opponent\'s exploitation impossible.' },
+  { id:'p33', moduleId:'m4', title:'Q3: Zero-Sum', difficulty:1, reward:50, timeLimit:45, body:'In a Zero-Sum game, what is the relationship between Player 1 and Player 2 payoffs?', options:['They sum to a constant (e.g., 0).','They are independent.','Player 1\'s payoff is always higher.','Player 2\'s payoff is always higher.'], correct:0, explanation:'P1\'s gain is exactly P2\'s loss. (e.g., Poker, options trading, matching pennies).' },
+  { id:'p34', moduleId:'m4', title:'Q4: Minimax', difficulty:2, reward:100, timeLimit:60, body:'What does the Minimax Theorem state?', options:['Minimize your maximum loss to find the Nash Equilibrium in zero-sum games.','Always play the strategy that minimizes your opponent\'s payoff.','Mixed strategies are irrational in zero-sum games.','Zero-sum games have no equilibrium.'], correct:0, explanation:'Von Neumann proved that the value of a zero-sum game is determined by players minimizing the maximum loss the other can inflict. This yields the mixed NE.' },
+  { id:'p35', moduleId:'m4', title:'Q5: Matching Pennies', difficulty:2, reward:100, timeLimit:60, body:'In Matching Pennies, what is the mixed strategy NE?', options:['P1 plays Heads 100%, P2 plays Tails 100%.','Both players play Heads 50% and Tails 50%.','P1 plays Heads 80%, P2 plays Heads 20%.','There is no NE in Matching Pennies.'], correct:1, explanation:'By playing 50/50, both players make the opponent\'s expected payoff 0 regardless of what they do. No one can be exploited.' },
+  { id:'p36', moduleId:'m4', title:'Q6: Expected Utility', difficulty:2, reward:100, timeLimit:60, body:'How is Expected Utility calculated in a mixed strategy?', options:['Sum of utilities weighted by probabilities.','Average of the best and worst outcomes.','Maximum possible utility.','Minimum possible utility.'], correct:0, explanation:'If you get 10 with 80% chance and 0 with 20% chance, your expected utility is (0.8 * 10) + (0.2 * 0) = 8.' },
+  { id:'p37', moduleId:'m4', title:'Q7: Support', difficulty:3, reward:200, timeLimit:90, body:'What is the "Support" of a mixed strategy?', options:['The psychological motivation behind the strategy.','The set of pure strategies played with strictly positive probability.','The maximum payoff achievable.','The Nash Equilibrium itself.'], correct:1, explanation:'If you play A 70%, B 30%, and C 0%, the support is {A, B}. Strategies with 0% probability are not in the support.' },
+  { id:'p38', moduleId:'m4', title:'Q8: Opponent Exploitation', difficulty:3, reward:200, timeLimit:90, body:'Why is a mixed strategy useful in penalty kicks (soccer)?', options:['It makes the game more exciting for fans.','If you always kick left, the goalie will always dive left. Randomizing prevents exploitation.','It increases the power of the kick.','It confuses the referee.'], correct:1, explanation:'If you are predictable, the opponent can optimize against you. Mixing ensures your opponent cannot gain an edge by guessing your pattern.' },
+  { id:'p39', moduleId:'m4', title:'Q9: Solving for P1', difficulty:3, reward:200, timeLimit:90, body:'If P1 is mixing 70% A and 30% B, what must be true of P2\'s payoffs?', options:['P2 must also mix 70/30.','P2\'s expected payoff for playing any strategy in their support must be exactly equal.','P2 gets 0 payoff.','P2\'s payoffs are irrelevant.'], correct:1, explanation:'If P2\'s payoffs were not equal, P2 would play the higher payoff strategy 100% of the time. P1\'s mix forces P2 to be indifferent.' },
+  { id:'p40', moduleId:'m4', title:'Q10: The Value', difficulty:4, reward:500, timeLimit:120, body:'In a Zero-Sum game, the "Value of the Game" is:', options:['The total money wagered.','The expected payoff of Player 1 when both play the minimax mixed strategy equilibrium.','The maximum possible payoff.','The Nash Equilibrium itself.'], correct:1, explanation:'Von Neumann proved this value exists. It is the floor for P1 (maximin) and the ceiling for P2 (minimax). At equilibrium, P1 secures exactly this value.' },
+  // MODULE 5: EXTENSIVE
+  { id:'p41', moduleId:'m5', title:'Q1: Game Trees', difficulty:1, reward:50, timeLimit:45, body:'Which form is used to model sequential games?', options:['Normal Form (Matrix).','Extensive Form (Game Tree).','Bayesian Form.','Evolutionary Form.'], correct:1, explanation:'Extensive form uses nodes (decision points) and branches (actions) to map out the sequence of moves.' },
+  { id:'p42', moduleId:'m5', title:'Q2: Backward Induction', difficulty:1, reward:50, timeLimit:45, body:'How do you solve a perfect-information Extensive Form game?', options:['Forward Induction.','Backward Induction (start at the end and work backwards).','Iterated Elimination.','Mixed Strategies.'], correct:1, explanation:'Look at the last decision nodes. Assume players choose the highest payoff. Replace those branches with the resulting payoffs and work back to the root.' },
+  { id:'p43', moduleId:'m5', title:'Q3: Credible Threats', difficulty:1, reward:50, timeLimit:45, body:'What is a "Non-Credible Threat"?', options:['A threat to take an action that would not be rational to execute if the node were reached.','A threat made by an irrational player.','A threat to defect in a repeated game.','A threat that is not legally binding.'], correct:0, explanation:'E.g., "If you enter my market, I will start a price war and lose money forever." If entry occurs, executing the threat is irrational. It is non-credible.' },
+  { id:'p44', moduleId:'m5', title:'Q4: SPE', difficulty:2, reward:100, timeLimit:60, body:'What is a Subgame Perfect Equilibrium (SPE)?', options:['An equilibrium that maximizes total payoff.','A refinement of NE that eliminates non-credible threats.','An equilibrium in a mixed strategy.','An equilibrium that requires communication.'], correct:1, explanation:'SPE requires strategies to be a Nash Equilibrium in every subgame. It enforces rationality at every node, even those off the equilibrium path.' },
+  { id:'p45', moduleId:'m5', title:'Q5: Centipede Game', difficulty:2, reward:100, timeLimit:60, body:'What does backward induction predict for the Centipede Game?', options:['Players cooperate until the end.','Player 1 will "Take" on the very first move.','Players randomize.','Player 2 will "Take" on the first move.'], correct:1, explanation:'By looking at the last node, Player 2 would Take. Knowing this, Player 1 takes at the second-to-last node. This unravels to the start.' },
+  { id:'p46', moduleId:'m5', title:'Q6: Information Sets', difficulty:2, reward:100, timeLimit:60, body:'What does an "Information Set" represent in a game tree?', options:['A set of optimal strategies.','A set of decision nodes that a player cannot distinguish between when making a choice.','The payoffs for a specific action.','The history of the game.'], correct:1, explanation:'If a player doesn\'t know exactly which node they are at (e.g., simultaneous moves modeled sequentially), those nodes are linked in an information set.' },
+  { id:'p47', moduleId:'m5', title:'Q7: Zermelo\'s Theorem', difficulty:3, reward:200, timeLimit:90, body:'What does Zermelo\'s Theorem state about Chess?', options:['Chess has no Nash Equilibrium.','If both players play perfectly, the outcome is predetermined (win, lose, or draw).','Chess is a zero-sum game.','Chess is too complex to model with game theory.'], correct:1, explanation:'Every finite, two-player, perfect-information, zero-sum game has a determinable outcome. Chess can be solved by backward induction (in theory).' },
+  { id:'p48', moduleId:'m5', title:'Q8: Entry Deterrence', difficulty:3, reward:200, timeLimit:90, body:'In the Entry Deterrence game, why is the incumbent\'s threat to fight not credible?', options:['Because the entrant is too strong.','Because if the entrant enters, fighting yields a lower payoff for the incumbent than accommodating.','Because the incumbent cannot legally fight.','Because the incumbent is irrational.'], correct:1, explanation:'Backward induction reveals that once entry occurs, accommodating is the best response. The threat is non-credible. The entrant will enter.' },
+  { id:'p49', moduleId:'m5', title:'Q9: NE vs SPE', difficulty:3, reward:200, timeLimit:90, body:'What is the difference between NE and SPE in extensive form games?', options:['NE allows for non-credible threats; SPE eliminates them.','SPE allows for non-credible threats; NE eliminates them.','They are identical.','NE is only for matrices; SPE is only for trees.'], correct:0, explanation:'NE only looks at the equilibrium path. SPE requires rational play at every possible node, even off-path ones. All SPE are NE, but not all NE are SPE.' },
+  { id:'p50', moduleId:'m5', title:'Q10: Human Behavior', difficulty:4, reward:500, timeLimit:120, body:'Why do humans often play "Pass" in the Centipede game despite backward induction?', options:['They are irrational.','Social heuristics, trust, and cognitive limits prevent infinite recursive logic.','They don\'t understand the payoffs.','They are trying to trick the opponent.'], correct:1, explanation:'Humans are not perfectly rational calculating machines. We use heuristics like "fairness" and "trust" which often yield higher payoffs in finite iterations.' },
+  // MODULE 6: REPEATED
+  { id:'p51', moduleId:'m6', title:'Q1: Finite Repetition', difficulty:1, reward:50, timeLimit:45, body:'What happens in a finitely repeated Prisoner\'s Dilemma?', options:['Cooperation emerges.','Backward induction causes cooperation to unravel; both defect every round.','Players randomize.','The game has no equilibrium.'], correct:1, explanation:'In the last round, there is no future, so both defect. Knowing this, the second-to-last round has no future, so both defect. This unravels to Round 1.' },
+  { id:'p52', moduleId:'m6', title:'Q2: Infinite Repetition', difficulty:1, reward:50, timeLimit:45, body:'What is required for cooperation to be rational in a repeated Prisoner\'s Dilemma?', options:['A legally binding contract.','The game must be infinite (or end with a probability < 1), and players must value the future.','The players must be friends.','The payoffs must change.'], correct:1, explanation:'The "shadow of the future" enables cooperation. If future punishment is possible, defection is deterred.' },
+  { id:'p53', moduleId:'m6', title:'Q3: Grim Trigger', difficulty:1, reward:50, timeLimit:45, body:'What is a "Grim Trigger" strategy?', options:['Cooperate forever. Defect forever.','Cooperate until the opponent defects, then defect forever.','Defect until the opponent cooperates, then cooperate forever.','Randomize in every round.'], correct:1, explanation:'It is unforgiving. One defection triggers permanent retaliation. It is a strong deterrent but offers no path to redemption.' },
+  { id:'p54', moduleId:'m6', title:'Q4: Tit-for-Tat', difficulty:2, reward:100, timeLimit:60, body:'What is the "Tit-for-Tat" strategy?', options:['Start by defecting, then copy the opponent\'s previous move.','Start by cooperating, then copy the opponent\'s previous move.','Always do the opposite of the opponent\'s previous move.','Cooperate 90% of the time, defect 10%.'], correct:1, explanation:'Tit-for-Tat: Nice (never defects first), Retaliatory (punishes defection), Forgiving (returns to cooperation), Clear (easy to model).' },
+  { id:'p55', moduleId:'m6', title:'Q5: Discount Factor', difficulty:2, reward:100, timeLimit:60, body:'What is the "Discount Factor" (δ)?', options:['The probability of the game ending.','A value between 0 and 1 representing how much a player values future payoffs vs present ones.','The inflation rate.','The total number of rounds.'], correct:1, explanation:'High δ (e.g., 0.9) = patient. Low δ (e.g., 0.1) = impatient. Cooperation requires δ to be high enough that future punishment outweighs current temptation.' },
+  { id:'p56', moduleId:'m6', title:'Q6: Axelrod\'s Tournament', difficulty:2, reward:100, timeLimit:60, body:'Why did Tit-for-Tat win Axelrod\'s tournament?', options:['It was the most aggressive strategy.','It was nice, retaliatory, forgiving, and clear.','It exploited weak opponents.','It was the only strategy that didn\'t defect.'], correct:1, explanation:'It provoked cooperation from nice strategies, punished aggressive strategies, and restored peace quickly, maximizing long-term payoff.' },
+  { id:'p57', moduleId:'m6', title:'Q7: Folk Theorem', difficulty:3, reward:200, timeLimit:90, body:'What does the Folk Theorem state?', options:['In finite games, cooperation is impossible.','In infinitely repeated games, almost any feasible payoff can be sustained as an equilibrium if δ is high enough.','Players always converge to the payoff dominant equilibrium.','Grim Trigger is the only stable strategy.'], correct:1, explanation:'It proves cooperation is possible, but also proves almost ANYTHING is an equilibrium, making prediction mathematically chaotic.' },
+  { id:'p58', moduleId:'m6', title:'Q8: Condition for Cooperation', difficulty:3, reward:200, timeLimit:90, body:'What condition must hold for Grim Trigger to sustain cooperation?', options:['δ must be greater than T-R / T-P (Temptation-Reward / Temptation-Punishment).','δ must be 0.','δ must be exactly 0.5.','The game must be finite.'], correct:0, explanation:'The future loss of cooperation (weighted by δ) must exceed the one-time gain from defecting. If δ is high enough, cooperation is stable.' },
+  { id:'p59', moduleId:'m6', title:'Q9: Carrot and Stick', difficulty:3, reward:200, timeLimit:90, body:'How does a "Carrot and Stick" strategy differ from Grim Trigger?', options:['It never punishes.','It punishes for a finite number of rounds, then returns to cooperation.','It only uses rewards (carrots).','It punishes randomly.'], correct:1, explanation:'Grim Trigger punishes forever. Carrot and Stick (e.g., Tit-for-Tat) punishes briefly, allowing the relationship to recover. This is more robust against errors.' },
+  { id:'p60', moduleId:'m6', title:'Q10: Shadow of the Future', difficulty:4, reward:500, timeLimit:120, body:'Why does the "shadow of the future" enable cooperation?', options:['Because players are afraid of ghosts.','Because it makes future punishment credible and calculable, deterring current defection.','Because it increases the total payoff.','Because it allows players to communicate.'], correct:1, explanation:'If the future matters (high δ), the threat of future retaliation outweighs the immediate temptation to defect. This is the bedrock of all repeated game theory.' },
+  // MODULE 7: BAYESIAN
+  { id:'p61', moduleId:'m7', title:'Q1: Harsanyi\'s Trick', difficulty:1, reward:50, timeLimit:45, body:'How did John Harsanyi model incomplete information?', options:['By dropping the rationality assumption.','By introducing "Types" and Nature\'s initial move assigning types.','By using fuzzy logic.','By making payoffs random in every round.'], correct:1, explanation:'Nature moves first, assigning types (e.g., Strong/Weak) based on a prior probability distribution. You know your type; others only know the prior.' },
+  { id:'p62', moduleId:'m7', title:'Q2: Priors', difficulty:1, reward:50, timeLimit:45, body:'What is a "Prior" in Bayesian games?', options:['The first move a player makes.','The initial probability distribution over types before any actions are observed.','The payoff matrix.','The dominant strategy.'], correct:1, explanation:'E.g., 30% chance the opponent is Strong, 70% chance they are Weak. This is common knowledge.' },
+  { id:'p63', moduleId:'m7', title:'Q3: Bayes\' Rule', difficulty:1, reward:50, timeLimit:45, body:'When do players use Bayes\' Rule?', options:['To calculate expected utility.','To update their beliefs about types after observing actions.','To find the Nash Equilibrium.','To eliminate dominated strategies.'], correct:1, explanation:'If a Strong type is more likely to fight than a Weak type, observing a fight updates your belief that the opponent is Strong.' },
+  { id:'p64', moduleId:'m7', title:'Q4: BNE', difficulty:2, reward:100, timeLimit:60, body:'What is a Bayesian Nash Equilibrium (BNE)?', options:['A state where no player can improve by deviating, given their beliefs about types.','A state where all types play the same strategy.','An equilibrium that only exists in infinite games.','An equilibrium where players always tell the truth.'], correct:0, explanation:'Every type of every player is playing a best response to their expected strategies of all other types, given the prior and updating rules.' },
+  { id:'p65', moduleId:'m7', title:'Q5: Adverse Selection', difficulty:2, reward:100, timeLimit:60, body:'What is "Adverse Selection"?', options:['A market failure where only "bad" types participate because "good" types cannot signal their quality.','A strategy where players randomly select actions.','A type of Nash Equilibrium.','A mechanism design failure.'], correct:0, explanation:'E.g., the Market for Lemons. Used cars on the market are likely lemons because owners of good cars won\'t sell at the average price.' },
+  { id:'p66', moduleId:'m7', title:'Q6: Winner\'s Curse', difficulty:2, reward:100, timeLimit:60, body:'What is the "Winner\'s Curse" in common value auctions?', options:['The winner is cursed by having to pay.','The winning bidder is the one who most overestimated the true value.','The winner always loses money.','The auctioneer curses the winner.'], correct:1, explanation:'If the true value is the same for everyone but unknown, the highest bid is likely the most optimistic (overestimated) valuation. Rational bidders shade bids down.' },
+  { id:'p67', moduleId:'m7', title:'Q7: Pooling Equilibrium', difficulty:3, reward:200, timeLimit:90, body:'What is a "Pooling Equilibrium" in Bayesian games?', options:['Different types send different signals, revealing information.','All types send the same signal, revealing no information. Beliefs remain at the prior.','Players pool their resources together.','The game has no equilibrium.'], correct:1, explanation:'If both Strong and Weak types fight, fighting reveals nothing. You still believe they are Strong with 30% probability.' },
+  { id:'p68', moduleId:'m7', title:'Q8: Separating Equilibrium', difficulty:3, reward:200, timeLimit:90, body:'What is a "Separating Equilibrium"?', options:['All types blend together.','Different types send different signals, allowing the observer to perfectly infer the type.','Players separate into coalitions.','The game separates into subgames.'], correct:1, explanation:'If only Strong types fight, and Weak types fold, then fighting perfectly signals Strength. Beliefs are updated to 100%.' },
+  { id:'p69', moduleId:'m7', title:'Q9: First-Price Auction', difficulty:3, reward:200, timeLimit:90, body:'In a First-Price Sealed Bid Auction with private values, how should you bid?', options:['Bid your true value.','Bid strictly less than your true value (shade your bid).','Bid 0.','Bid the maximum possible value.'], correct:1, explanation:'If you bid your true value and win, you pay your true value, netting zero profit. You must shade down to maximize expected profit, balancing probability of winning vs profit margin.' },
+  { id:'p70', moduleId:'m7', title:'Q10: War of Attrition', difficulty:4, reward:500, timeLimit:120, body:'How do Bayesian dynamics apply to a War of Attrition?', options:['Players know the opponent\'s exact cost of time.','Players don\'t know the opponent\'s valuation of the prize or cost of time. They update beliefs based on how long the opponent stays.','Players use mixed strategies.','It is a perfect information game.'], correct:1, explanation:'You don\'t know if the opponent is crazy or just bluffing. Every second they stay, you update your belief that they will stay forever. This often leads to long, wasteful stands.' },
+  // MODULE 8: MECHANISM
+  { id:'p71', moduleId:'m8', title:'Q1: Reverse Game Theory', difficulty:1, reward:50, timeLimit:45, body:'What is Mechanism Design?', options:['Designing the rules of a game to achieve a desired outcome, assuming players behave strategically.','Reverse engineering a competitor\'s product.','Designing UI/UX for games.','Proving that Nash Equilibria exist.'], correct:0, explanation:'You know the desired outcome (e.g., allocative efficiency), and you design the rules (the mechanism) so that rational players achieve it.' },
+  { id:'p72', moduleId:'m8', title:'Q2: Incentive Compatibility', difficulty:1, reward:50, timeLimit:45, body:'What does it mean for a mechanism to be "Incentive Compatible"?', options:['It incentivizes players to work harder.','Truth-telling is the dominant strategy. Players maximize payoff by revealing their true valuation.','It is compatible with environmental incentives.','It maximizes the mechanism designer\'s revenue.'], correct:1, explanation:'You cannot do better than telling the truth. This is the holy grail of mechanism design because it makes prediction trivial.' },
+  { id:'p73', moduleId:'m8', title:'Q3: VCG', difficulty:1, reward:50, timeLimit:45, body:'What is the VCG mechanism?', options:['A lottery system.','An auction where the winner pays the social harm (externality) they impose on others.','A voting system.','A matching algorithm.'], correct:1, explanation:'Vickrey-Clarke-Groves. The winner pays the second-highest bid. It is incentive compatible and allocatively efficient.' },
+  { id:'p74', moduleId:'m8', title:'Q4: Vickrey Auction', difficulty:2, reward:100, timeLimit:60, body:'In a Second-Price Sealed Bid (Vickrey) auction, what is your dominant strategy?', options:['Bid half your true value.','Bid your true valuation.','Bid slightly above the second-highest bid.','Bid 0.'], correct:1, explanation:'If you bid your true value V, and the second highest bid is S: if V > S, you win and pay S (profit V-S). If you bid lower, you risk losing positive profit. If you bid higher, you risk overpaying.' },
+  { id:'p75', moduleId:'m8', title:'Q5: Revenue Equivalence', difficulty:2, reward:100, timeLimit:60, body:'What does the Revenue Equivalence Theorem state?', options:['All auctions yield the same revenue regardless of bidders.','Under certain conditions, all standard auction formats yield the exact same expected revenue for the seller.','Vickrey auctions always yield more than First-Price.','English auctions always yield more than Dutch.'], correct:1, explanation:'If bidders are risk-neutral and values are independent and identically distributed, English, Dutch, First-Price, and Second-Price auctions all yield the same expected revenue.' },
+  { id:'p76', moduleId:'m8', title:'Q6: Allocative Efficiency', difficulty:2, reward:100, timeLimit:60, body:'What is "Allocative Efficiency"?', options:['The auctioneer maximizes revenue.','The good is allocated to the player who values it most highly.','The good is split equally among all players.','The mechanism runs quickly.'], correct:1, explanation:'VCG achieves this. The player with the highest valuation wins, maximizing total social welfare.' },
+  { id:'p77', moduleId:'m8', title:'Q7: Individual Rationality', difficulty:3, reward:200, timeLimit:90, body:'What is the "Individual Rationality" constraint?', options:['Players must be rational.','A mechanism must guarantee players an expected payoff at least as good as their outside option (not participating).','Players must act individually, not in coalitions.','The mechanism must be fair.'], correct:1, explanation:'If expected payoff from participating is negative, players won\'t play. The mechanism must guarantee non-negative expected utility (in expectation).' },
+  { id:'p78', moduleId:'m8', title:'Q8: First-Price Truth', difficulty:3, reward:200, timeLimit:90, body:'Why does a First-Price Sealed Bid Auction NOT have truth-telling as a dominant strategy?', options:['Because the winner pays their bid, so bidding true value yields zero profit if won.','Because bidders don\'t know their true values.','Because it is not incentive compatible.','Because the auctioneer manipulates the bids.'], correct:0, explanation:'To profit, you must bid strictly less than your true value. The trade-off is: lower bid = higher margin but lower probability of winning.' },
+  { id:'p79', moduleId:'m8', title:'Q9: Revelation Principle', difficulty:3, reward:200, timeLimit:90, body:'What is the "Revelation Principle"?', options:['Players reveal their strategies after the game.','Any equilibrium of a complex mechanism can be replicated by a direct, incentive-compatible mechanism where players simply report their types.','Mechanism designers must reveal the rules.','Truth-telling is always optimal.'], correct:1, explanation:'It simplifies mechanism design. Instead of designing complex games, just design a direct mechanism where asking for types yields the same outcome.' },
+  { id:'p80', moduleId:'m8', title:'Q10: GSP', difficulty:4, reward:500, timeLimit:120, body:'How do tech companies (like Google) use mechanism design for ad auctions?', options:['They use First-Price auctions.','They use Generalized Second-Price (GSP) auctions. Advertisers bid per click, but the winner pays the second-highest bid price per click.','They use a lottery system.','They negotiate prices directly.'], correct:1, explanation:'GSP is not strictly incentive compatible like VCG, but it is intuitive and widely used. It mimics the English ascending auction properties.' },
+  // MODULE 9: SIGNALLING
+  { id:'p81', moduleId:'m9', title:'Q1: Credibility', difficulty:1, reward:50, timeLimit:45, body:'What makes a signal credible?', options:['It is loud and clear.','It must be differentially costly. It must cost more for a dishonest type to send than an honest type.','It must be legally binding.','It must be sent by a third party.'], correct:1, explanation:'If anyone can send the signal for free, it carries no information. It must be costly to fake.' },
+  { id:'p82', moduleId:'m9', title:'Q2: Spence Model', difficulty:1, reward:50, timeLimit:45, body:'In the Spence Education Model, why do High types get MBAs?', options:['To learn useful business skills.','The MBA yields a higher wage premium. The cost is low enough for High types to make a profit, but high enough for Low types to make a loss.','To network with other High types.','Because it is required by law.'], correct:1, explanation:'Education acts as a signal of productivity. The differential cost separates the types, allowing employers to pay High types more.' },
+  { id:'p83', moduleId:'m9', title:'Q3: Separating', difficulty:1, reward:50, timeLimit:45, body:'What is a "Separating Equilibrium"?', options:['Different types send different signals. The observer perfectly infers the type.','All types send the same signal.','Players separate into different rooms.','The signal is too weak to observe.'], correct:0, explanation:'High types signal, Low types don\'t. The signal separates them, revealing all information.' },
+  { id:'p84', moduleId:'m9', title:'Q4: Pooling', difficulty:2, reward:100, timeLimit:60, body:'What is a "Pooling Equilibrium"?', options:['Different types send different signals.','All types send the same signal. The observer learns nothing and pays the average wage.','Players pool their money together.','The signal is ignored.'], correct:1, explanation:'If the signal cost is too high for even High types, or too low to deter Low types, both types do the same thing. No information is revealed.' },
+  { id:'p85', moduleId:'m9', title:'Q5: Cheap Talk', difficulty:2, reward:100, timeLimit:60, body:'Why is "Cheap Talk" ineffective?', options:['It is too quiet to hear.','Without a cost differential, any type can send any signal. Rational players ignore it.','It is illegal.','It is too expensive.'], correct:1, explanation:'A politician saying "I am honest" is cheap talk. It costs nothing, so dishonest politicians say it too. It cannot separate types.' },
+  { id:'p86', moduleId:'m9', title:'Q6: Screening', difficulty:2, reward:100, timeLimit:60, body:'What is "Screening"?', options:['When the uninformed player moves first to force the informed player to reveal their type.','When the informed player signals.','A type of movie.','A filtering mechanism for data.'], correct:0, explanation:'E.g., An insurance company (uninformed) offers different deductibles. The customer (informed) chooses one, thereby screening themselves into a risk pool.' },
+  { id:'p87', moduleId:'m9', title:'Q7: Warranties', difficulty:3, reward:200, timeLimit:90, body:'How does a warranty act as a signal?', options:['It is a legal requirement.','A long warranty is costly for a low-quality product (it will break often) but cheap for a high-quality product. It separates the types.','It increases the price.','It reduces consumer risk.'], correct:1, explanation:'Only a firm confident in its high quality can afford to offer a long warranty. It is a costly signal that deters low-quality mimicry.' },
+  { id:'p88', moduleId:'m9', title:'Q8: Single Crossing', difficulty:3, reward:200, timeLimit:90, body:'What is the "Single Crossing Property"?', options:['When two players cross paths in a game.','The condition that the marginal cost of signaling is strictly lower for the high type than the low type.','When a signal crosses the equilibrium path.','When players switch strategies simultaneously.'], correct:1, explanation:'This property ensures that a separating equilibrium can exist. If costs are identical, signaling cannot separate types.' },
+  { id:'p89', moduleId:'m9', title:'Q9: Burning Money', difficulty:3, reward:200, timeLimit:90, body:'Why might a company "burn money" (e.g., sponsor a stadium)?', options:['Tax write-off.','To signal financial strength. If a weak company tried this, they would go bankrupt, so only strong companies can afford the signal.','To impress customers with the brand name.','To deter entry.'], correct:1, explanation:'Burning money is a costly signal. It proves the company has so much capital that they can afford to waste some. It builds trust in financial markets.' },
+  { id:'p90', moduleId:'m9', title:'Q10: Luxury Burns', difficulty:4, reward:500, timeLimit:120, body:'Why do luxury brands burn unsold inventory instead of discounting it?', options:['It is cheaper than storing it.','To signal exclusivity. Discounting would destroy the brand\'s high-type signal, pooling them with mass-market brands.','To avoid paying taxes on sales.','Because it is illegal to sell last season\'s clothes.'], correct:1, explanation:'Burning inventory is a costly signal of commitment to exclusivity. It ensures only high types (wealthy) can afford the brand, preserving the high price premium.' },
+  // MODULE 10: EVOLUTIONARY
+  { id:'p91', moduleId:'m10', title:'Q1: Rationality', difficulty:1, reward:50, timeLimit:45, body:'How does Evolutionary Game Theory differ from Classical Game Theory?', options:['It assumes players are rational.','It drops the assumption of rationality. Strategies are genetically hardwired, and players don\'t "choose."','It is only used in biology.','It uses mixed strategies exclusively.'], correct:1, explanation:'Animals don\'t calculate Nash Equilibria. Successful strategies reproduce; unsuccessful ones die out. Payoffs represent fitness.' },
+  { id:'p92', moduleId:'m10', title:'Q2: ESS', difficulty:1, reward:50, timeLimit:45, body:'What is an Evolutionary Stable Strategy (ESS)?', options:['A strategy that maximizes total population fitness.','A strategy that, when adopted by a whole population, cannot be invaded by a small group of mutants.','A strategy that is a Nash Equilibrium.','A strategy that mutates rapidly.'], correct:1, explanation:'If everyone plays A, and a few mutants play B, the mutants must die out (achieve lower fitness) for A to be an ESS.' },
+  { id:'p93', moduleId:'m10', title:'Q3: Replicator Dynamic', difficulty:1, reward:50, timeLimit:45, body:'What does the Replicator Dynamic describe?', options:['How genes mutate.','How the frequency of strategies in a population changes over time based on their relative fitness.','How players learn to play Nash Equilibrium.','The rate of population growth.'], correct:1, explanation:'If a strategy yields above-average payoff, its frequency in the population grows. If below-average, it shrinks.' },
+  { id:'p94', moduleId:'m10', title:'Q4: Hawk-Dove', difficulty:2, reward:100, timeLimit:60, body:'In the Hawk-Dove game, what do Hawks do?', options:['Bluff and display, but avoid fighting.','Fight aggressively until death or victory.','Share the resource.','Run away immediately.'], correct:1, explanation:'Hawks are aggressive. Doves are passive. If Hawk meets Dove, Hawk wins. If Hawk meets Hawk, they fight and incur severe cost.' },
+  { id:'p95', moduleId:'m10', title:'Q5: Hawk ESS', difficulty:2, reward:100, timeLimit:60, body:'In Hawk-Dove, if V (value of resource) > C (cost of injury), what is the ESS?', options:['Dove is the ESS.','Hawk is the ESS.','A mixed strategy of Hawk and Dove.','There is no ESS.'], correct:1, explanation:'If the resource is worth more than the cost of fighting, Hawks always win. The population evolves to be entirely aggressive.' },
+  { id:'p96', moduleId:'m10', title:'Q6: Mixed ESS', difficulty:2, reward:100, timeLimit:60, body:'If V < C in Hawk-Dove, what is the ESS?', options:['Pure Hawk.','Pure Dove.','A mixed strategy (probability of playing Hawk = V/C).','No ESS exists.'], correct:2, explanation:'If fighting is too costly, pure Hawk is invaded by Doves (who avoid injury). Pure Dove is invaded by Hawks. The stable state is a mixed population.' },
+  { id:'p97', moduleId:'m10', title:'Q7: Fitness', difficulty:3, reward:200, timeLimit:90, body:'What is the "Fitness" of a strategy?', options:['The physical strength of the animal.','The expected payoff of that strategy when played against a randomly drawn member of the population.','The number of offspring produced.','The probability of mutation.'], correct:1, explanation:'Fitness is relative. If a strategy yields higher payoff than the population average, it will grow in frequency.' },
+  { id:'p98', moduleId:'m10', title:'Q8: First Theorem', difficulty:3, reward:200, timeLimit:90, body:'What is the relationship between ESS and Nash Equilibrium?', options:['ESS and NE are unrelated.','Every ESS is a Nash Equilibrium, but not every NE is an ESS.','Every NE is an ESS, but not every ESS is a NE.','They are identical concepts.'], correct:1, explanation:'An ESS must be a best response to itself (a NE). But it must also be resistant to invasion by mutants, which is an additional stability requirement.' },
+  { id:'p99', moduleId:'m10', title:'Q9: Ritualized Combat', difficulty:3, reward:200, timeLimit:90, body:'Why do animals often engage in "ritualized displays" instead of fatal combat?', options:['They are naturally peaceful.','A mixed ESS. If everyone fought to the death, surviving mutants who avoided conflict would reproduce.','They lack the physical weapons to kill.','They are afraid of predators.'], correct:1, explanation:'Fatal combat is evolutionarily unstable because it destroys the victors too. Ritualized display (Dove-like behavior) can be an ESS if the cost of fighting is high.' },
+  { id:'p100', moduleId:'m10', title:'Q10: Bourgeois', difficulty:4, reward:500, timeLimit:120, body:'What is the "Bourgeois" strategy in Asymmetric Evolutionary Game Theory?', options:['Always play Hawk.','Always play Dove.','Play Hawk if you are the Owner, Dove if you are the Intruder.','Randomize between Hawk and Dove.'], correct:2, explanation:'A convention based on role. The owner fights, the intruder yields. It is an ESS because it avoids costly Hawk-Hawk fights while ensuring someone wins the resource.' }
 ];
 
 // ============== DATA: PROJECT SPECTRUM ==============
 const PROJECT_PHASES = [
-  {
-    id:'ph1', moduleId:'m1', title:'Phase 1: Market Entry',
-    scenario:'You are CEO of Apex Telecom. You are considering entering a new city\'s market. The incumbent, Zenith Corp, can either Aggressively price-war (hurting both) or Accommodate (sharing the market). You must choose to Enter or Stay Out. If you Enter and they Accommodate, you make $50M. If you Enter and they Fight, you lose $20M. If you Stay Out, you make $0. Model this as a matrix.',
-    options:[
-      'Enter. Zenith will surely accommodate because fighting hurts them too.',
-      'Model the game. If Zenith\'s payoff for Accommodating (30) > Fighting (-10), they will accommodate. But you must also check your own payoff. The matrix reveals Enter is dominant if Zenith is rational. Enter.',
-      'Stay Out. The risk of a price war is too high.',
-      'Enter and immediately launch a massive marketing campaign to force Zenith out.'
-    ],
-    correct:1,
-    explanation:'Option B is the game-theoretic approach. You map the Normal Form. If Zenith\'s dominant strategy is to Accommodate (because 30 > -10), your best response is to Enter (50 > 0). You don\'t rely on psychology; you rely on payoff matrices.'
-  },
-  {
-    id:'ph2', moduleId:'m2', title:'Phase 2: The Ad War',
-    scenario:'Apex and Zenith are both deciding on advertising budgets. You can spend $10M or $0. If both spend $10M, they cancel out, and both are down $10M. If one spends $10M and the other $0, the spender takes the market (+$30M) and the other loses (-$20M). If both spend $0, status quo (+$10M each). What do you do?',
-    options:[
-      'Spend $0 and trust Zenith to do the same.',
-      'Spend $10M. Spending strictly dominates $0. If Zenith spends $0, you get 30 > 10. If Zenith spends $10M, you get -10 > -20. Both will spend $10M, resulting in a Prisoner\'s Dilemma (-10, -10).',
-      'Form a cartel with Zenith to cap ad spend at $0.',
-      'Spend $5M as a compromise.'
-    ],
-    correct:1,
-    explanation:'This is a classic Prisoner\'s Dilemma via Dominance. Spending $10M strictly dominates $0. Both firms rationally spend $10M, resulting in a net loss of $10M each. You must execute the dominant strategy, even though mutual non-advertising is socially optimal.'
-  },
-  {
-    id:'ph3', moduleId:'m3', title:'Phase 3: The Standard',
-    scenario:'To roll out 5G, Apex and Zenith must choose a radio standard: mmWave or Sub-6. Both prefer to use the same standard. Apex prefers mmWave (higher speed). Zenith prefers Sub-6 (better range). Miscoordination means no roaming, yielding $0 for both. What is the strategic reality?',
-    options:[
-      'Force mmWave. You are the market leader.',
-      'There are two Nash Equilibria: (mmWave, mmWave) and (Sub-6, Sub-6). You must use focal points, government regulation, or negotiation to select one. Pure math cannot solve it.',
-      'Adopt mmWave and wait for Zenith to follow.',
-      'Build a dual-standard network at double the cost.'
-    ],
-    correct:1,
-    explanation:'This is the Battle of the Sexes. There are two pure Nash Equilibria. Game theory identifies them but doesn\'t dictate selection. You need a coordination mechanism (Schelling point) to avoid the (0,0) miscoordination trap.'
-  },
-  {
-    id:'ph4', moduleId:'m4', title:'Phase 4: The Audit',
-    scenario:'The telecom regulator audits Apex for compliance. The regulator can Audit or Not Audit. You can Comply or Violate. Auditing costs the regulator $1M. Violating makes you $5M if uncaught, but costs you $10M in fines if caught. How do you behave?',
-    options:[
-      'Always Comply. It is the right thing to do.',
-      'Always Violate. The regulator won\'t audit because it costs them money.',
-      'Mix your strategy. You should Violate with a specific probability that makes the Regulator indifferent to Auditing. The Regulator should Audit with a probability that makes you indifferent to Complying. This is a mixed-strategy Nash Equilibrium.',
-      'Bribe the regulator.'
-    ],
-    correct:2,
-    explanation:'This is an Inspection Game (a variant of Matching Pennies). If you always Comply, they never Audit. If they never Audit, you always Violate. There is no pure strategy equilibrium. You must randomize your compliance based on the Indifference Principle to avoid being exploited.'
-  },
-  {
-    id:'ph5', moduleId:'m5', title:'Phase 5: The Expansion',
-    scenario:'You are expanding into a rural town. You can Build a massive fiber network immediately (costly) or Test the market with wireless first. If you Test, the town council might later block fiber expansion. You draw the game tree. What principle guides your decision?',
-    options:[
-      'Test the market. It is cheaper upfront.',
-      'Use Backward Induction. Look at the final nodes. If the council will block you later (payoff 0), you must Build immediately (payoff 10) to remove their future leverage. Subgame Perfection dictates this.',
-      'Test the market and hope the council cooperates.',
-      'Threaten to sue the council if they block you.'
-    ],
-    correct:1,
-    explanation:'By drawing the Extensive Form tree and using Backward Induction, you see that testing gives the council a future decision node where blocking is their dominant strategy. To achieve Subgame Perfect Equilibrium, you must prevent that node from ever being reached by Building immediately.'
-  },
-  {
-    id:'ph6', moduleId:'m6', title:'Phase 6: The Collusion',
-    scenario:'Apex and Zenith have silently maintained high prices for 5 years, making $50M/yr each. A new CEO takes over Zenith. You know Zenith could cut prices to steal your market for a one-time gain of $100M, but it would trigger a price war forever (both make $10M/yr). What sustains the peace?',
-    options:[
-      'Trust and a handshake.',
-      'The Grim Trigger. If the discount factor (future value) is high enough, the long-term loss of $40M/yr outweighs the one-time gain of $50M. Zenith\'s new CEO will mathematically maintain the peace.',
-      'A legally binding contract (which is illegal for collusion).',
-      'Praying Zenith doesn\'t understand game theory.'
-    ],
-    correct:1,
-    explanation:'This is an Infinitely Repeated Game. The cooperation is sustained by the shadow of the future. If the discount factor δ is high enough, the Folk Theorem guarantees cooperation is a Nash Equilibrium. The Grim Trigger strategy enforces it.'
-  },
-  {
-    id:'ph7', moduleId:'m7', title:'Phase 7: The Spectrum Unknown',
-    scenario:'The government is auctioning a new 6GHz band. Zenith\'s true valuation of the band is unknown to you. They could be a "Strategic" type (value $80M) or a "Desperate" type (value $120M, needs it to survive). You must decide your opening bid without knowing their type. What concept applies?',
-    options:[
-      'Assume they are Strategic and bid low.',
-      'Bayesian Game. You assign a prior probability to Zenith\'s type. You calculate the expected payoff of your bid based on the probability of facing each type, then find the Bayesian Nash Equilibrium.',
-      'Bid your maximum valuation regardless of their type.',
-      'Wait for their bid and react, which is impossible in a sealed-bid auction.'
-    ],
-    correct:1,
-    explanation:'This is a Game of Incomplete Information. Harsanyi\'s framework requires you to assign prior probabilities to Zenith\'s Types and calculate your expected utility. You play a best response to the expected strategy of the population of possible Zeniths (Bayesian Nash Equilibrium).'
-  },
-  {
-    id:'ph8', moduleId:'m8', title:'Phase 8: The Auction Design',
-    scenario:'You are advising the government on how to auction three new spectrum licenses to maximize revenue and efficiency. Bidders have independent private values. Which mechanism guarantees truth-telling and efficiency?',
-    options:[
-      'First-Price Sealed Bid (highest bidder pays their bid).',
-      'English Ascending Auction (equivalent to VCG for private values). It is incentive-compatible: bidders reveal true values, ensuring licenses go to those who value them most.',
-      'Dutch Descending Auction (first to accept the price wins).',
-      'A lottery system. It is fair and avoids bidding wars.'
-    ],
-    correct:1,
-    explanation:'The VCG mechanism (and its practical equivalent, the English Ascending Auction for independent values) is Incentive Compatible. Bidders reveal their true valuations, ensuring Pareto efficiency. By the Revenue Equivalence Theorem, expected revenue is the same as other formats, but efficiency is guaranteed.'
-  },
-  {
-    id:'ph9', moduleId:'m9', title:'Phase 9: The Network Quality',
-    scenario:'You want to signal to customers that your 5G network is superior to Zenith\'s. Anyone can run ads claiming "Fastest Network." How do you credibly separate yourself from Zenith if your network is actually better?',
-    options:[
-      'Spend $50M on a massive ad campaign.',
-      'Offer a legally binding Service Level Agreement (SLA) with massive penalties for dropped calls. This is costly to fake. If your network was bad, the penalties would bankrupt you. This is a credible separating signal.',
-      'Lower your prices.',
-      'Sponsor a major sports stadium.'
-    ],
-    correct:1,
-    explanation:'Ads and sponsorships are cheap talk; anyone can do them. A punitive SLA is a costly signal. If Apex\'s network is genuinely superior, the expected cost of penalties is low. If Zenith tried to copy it, their inferior network would trigger massive payouts. This creates a Separating Equilibrium.'
-  },
-  {
-    id:'ph10', moduleId:'m10', title:'Phase 10: The Market Evolution',
-    scenario:'Over a decade, Apex and Zenith have alternated between price wars (Hawk) and cooperation (Dove). New startups enter the market, copying whatever strategy is currently most profitable. What determines the long-term stable state of the market?',
-    options:[
-      'The market will eventually become a monopoly (All Hawks).',
-      'The market will reach an Evolutionary Stable Strategy (ESS). The frequencies of aggressive vs. cooperative strategies will stabilize when no mutant strategy can invade the population.',
-      'The market will constantly fluctuate randomly.',
-      'Government regulation will force all to be Doves.'
-    ],
-    correct:1,
-    explanation:'Evolutionary Game Theory models this. Startups are the replicators. Through Replicator Dynamics, strategies with higher payoffs grow. The market stabilizes at an ESS—a mix of strategies where no new entrant can profit by deviating. Pure aggression dies out (price wars destroy value); pure cooperation invites aggression. A mixed state prevails.'
-  }
+  { id:'ph1', moduleId:'m1', title:'Phase 1: Market Entry', scenario:'You are CEO of Apex Telecom. You are considering entering a new city\'s market. The incumbent, Zenith Corp, can either Aggressively price-war (hurting both) or Accommodate (sharing the market). You must choose to Enter or Stay Out. If you Enter and they Accommodate, you make $50M. If you Enter and they Fight, you lose $20M. If you Stay Out, you make $0. Model this as a matrix.', options:['Follow the DOE advice. Hornsdale is a proven model. Partner with Siemens, buy Li-ion containers, and execute the standard playbook safely.','Bid the project out to 5 major EPC firms and take the lowest bidder to save budget, using standard lithium-ion.','Model the game. If Zenith\'s payoff for Accommodating (30) > Fighting (-10), they will accommodate. But you must also check your own payoff. The matrix reveals Enter is dominant if Zenith is rational. Enter.','Invest the $50M into solid-state battery R&D to invent a 10x better chemistry, delaying the project 5 years.'], correct:2, explanation:'Option A is the analogy. Option B is standard procurement. Option D is the tech trap. Option C is the game-theoretic approach. You map the Normal Form. If Zenith\'s dominant strategy is to Accommodate, your best response is to Enter.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Ad War', scenario:'Apex and Zenith are both deciding on advertising budgets. You can spend $10M or $0. If both spend $10M, they cancel out, and both are down $10M. If one spends $10M and the other $0, the spender takes the market (+$30M) and the other loses (-$20M). If both spend $0, status quo (+$10M each). What do you do?', options:['Spend $0 and trust Zenith to do the same.','Spend $10M. Spending strictly dominates $0. If Zenith spends $0, you get 30 > 10. If Zenith spends $10M, you get -10 > -20. Both will spend $10M, resulting in a Prisoner\'s Dilemma (-10, -10).','Form a cartel with Zenith to cap ad spend at $0.','Spend $5M as a compromise.'], correct:1, explanation:'This is a classic Prisoner\'s Dilemma via Dominance. Spending $10M strictly dominates $0. Both firms rationally spend $10M, resulting in a net loss of $10M each. You must execute the dominant strategy, even though mutual non-advertising is socially optimal.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Standard', scenario:'To roll out 5G, Apex and Zenith must choose a radio standard: mmWave or Sub-6. Both prefer to use the same standard. Apex prefers mmWave (higher speed). Zenith prefers Sub-6 (better range). Miscoordination means no roaming, yielding $0 for both. What is the strategic reality?', options:['Force mmWave. You are the market leader.','There are two Nash Equilibria: (mmWave, mmWave) and (Sub-6, Sub-6). You must use focal points, government regulation, or negotiation to select one. Pure math cannot solve it.','Adopt mmWave and wait for Zenith to follow.','Build a dual-standard network at double the cost.'], correct:1, explanation:'This is the Battle of the Sexes. There are two pure Nash Equilibria. Game theory identifies them but doesn\'t dictate selection. You need a coordination mechanism (Schelling point) to avoid the (0,0) miscoordination trap.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Audit', scenario:'The telecom regulator audits Apex for compliance. The regulator can Audit or Not Audit. You can Comply or Violate. Auditing costs the regulator $1M. Violating makes you $5M if uncaught, but costs you $10M in fines if caught. How do you behave?', options:['Always Comply. It is the right thing to do.','Always Violate. The regulator won\'t audit because it costs them money.','Mix your strategy. You should Violate with a specific probability that makes the Regulator indifferent to Auditing. The Regulator should Audit with a probability that makes you indifferent to Complying. This is a mixed-strategy Nash Equilibrium.','Bribe the regulator.'], correct:2, explanation:'This is an Inspection Game (a variant of Matching Pennies). If you always Comply, they never Audit. If they never Audit, you always Violate. There is no pure strategy equilibrium. You must randomize your compliance based on the Indifference Principle to avoid being exploited.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Expansion', scenario:'You are expanding into a rural town. You can Build a massive fiber network immediately (costly) or Test the market with wireless first. If you Test, the town council might later block fiber expansion. You draw the game tree. What principle guides your decision?', options:['Test the market. It is cheaper upfront.','Use Backward Induction. Look at the final nodes. If the council will block you later (payoff 0), you must Build immediately (payoff 10) to remove their future leverage. Subgame Perfection dictates this.','Test the market and hope the council cooperates.','Threaten to sue the council if they block you.'], correct:1, explanation:'By drawing the Extensive Form tree and using Backward Induction, you see that testing gives the council a future decision node where blocking is their dominant strategy. To achieve Subgame Perfect Equilibrium, you must prevent that node from ever being reached by Building immediately.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Collusion', scenario:'Apex and Zenith have silently maintained high prices for 5 years, making $50M/yr each. A new CEO takes over Zenith. You know Zenith could cut prices to steal your market for a one-time gain of $100M, but it would trigger a price war forever (both make $10M/yr). What sustains the peace?', options:['Trust and a handshake.','A legally binding contract.','The Grim Trigger. If the discount factor (future value) is high enough, the long-term loss of $40M/yr outweighs the one-time gain of $50M. Zenith\'s new CEO will mathematically maintain the peace.','Praying Zenith doesn\'t understand game theory.'], correct:2, explanation:'This is an Infinitely Repeated Game. The cooperation is sustained by the shadow of the future. If the discount factor δ is high enough, the Folk Theorem guarantees cooperation is a Nash Equilibrium. The Grim Trigger strategy enforces it.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Spectrum Unknown', scenario:'The government is auctioning a new 6GHz band. Zenith\'s true valuation of the band is unknown to you. They could be a "Strategic" type (value $80M) or a "Desperate" type (value $120M, needs it to survive). You must decide your opening bid without knowing their type. What concept applies?', options:['Assume they are Strategic and bid low.','Bayesian Game. You assign a prior probability to Zenith\'s type. You calculate the expected payoff of your bid based on the probability of facing each type, then find the Bayesian Nash Equilibrium.','Bid your maximum valuation regardless of their type.','Wait for their bid and react, which is impossible in a sealed-bid auction.'], correct:1, explanation:'This is a Game of Incomplete Information. Harsanyi\'s framework requires you to assign prior probabilities to Zenith\'s Types and calculate your expected utility. You play a best response to the expected strategy of the population of possible Zeniths (Bayesian Nash Equilibrium).' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Auction Design', scenario:'You are advising the government on how to auction three new spectrum licenses to maximize revenue and efficiency. Bidders have independent private values. Which mechanism guarantees truth-telling and efficiency?', options:['First-Price Sealed Bid (highest bidder pays their bid).','English Ascending Auction (equivalent to VCG for private values). It is incentive-compatible: bidders reveal true values, ensuring licenses go to those who value them most.','Dutch Descending Auction (first to accept the price wins).','A lottery system. It is fair and avoids bidding wars.'], correct:1, explanation:'The VCG mechanism (and its practical equivalent, the English Ascending Auction for independent values) is Incentive Compatible. Bidders reveal their true valuations, ensuring Pareto efficiency. By the Revenue Equivalence Theorem, expected revenue is the same as other formats, but efficiency is guaranteed.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Network Quality', scenario:'You want to signal to customers that your 5G network is superior to Zenith\'s. Anyone can run ads claiming "Fastest Network." How do you credibly separate yourself from Zenith if your network is actually better?', options:['Spend $50M on a massive ad campaign.','Offer a legally binding Service Level Agreement (SLA) with massive penalties for dropped calls. This is costly to fake. If your network was bad, the penalties would bankrupt you. This is a credible separating signal.','Lower your prices.','Sponsor a major sports stadium.'], correct:1, explanation:'Ads and sponsorships are cheap talk; anyone can do them. A punitive SLA is a costly signal. If Apex\'s network is genuinely superior, the expected cost of penalties is low. If Zenith tried to copy it, their inferior network would trigger massive payouts. This creates a Separating Equilibrium.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Market Evolution', scenario:'Over a decade, Apex and Zenith have alternated between price wars (Hawk) and cooperation (Dove). New startups enter the market, copying whatever strategy is currently most profitable. What determines the long-term stable state of the market?', options:['The market will eventually become a monopoly (All Hawks).','The market will reach an Evolutionary Stable Strategy (ESS). The frequencies of aggressive vs. cooperative strategies will stabilize when no mutant strategy can invade the population.','The market will constantly fluctuate randomly.','Government regulation will force all to be Doves.'], correct:1, explanation:'Evolutionary Game Theory models this. Startups are the replicators. Through Replicator Dynamics, strategies with higher payoffs grow. The market stabilizes at an ESS—a mix of strategies where no new entrant can profit by deviating. Pure aggression dies out (price wars destroy value); pure cooperation invites aggression. A mixed state prevails.' }
 ];
 
 // ============== DATA: REAL-WORLD MISSIONS ==============
@@ -939,7 +806,29 @@ const REAL_WORLD_MISSIONS = [
   { id:'rw5', title:'The Credibility Test', body:'Think of a threat or promise you made recently. Use backward induction: if the time comes to execute it, will it actually be in your rational self-interest? If not, retract it.' },
   { id:'rw6', title:'The Shadow of the Future', body:'In a recurring interaction (work, family), calculate the "discount factor." How much do you value future cooperation vs. a one-time gain today? Adjust your strategy accordingly.' },
   { id:'rw7', title:'The Type Update', body:'Interact with someone whose intentions are unclear. Form a prior belief. After observing one action, use Bayes\' Rule (mentally) to update your belief about their true type.' },
-  { id:'rw8', title:'The Costly Signal', body:'You need to prove your commitment or quality to someone. Brainstorm a signal that is expensive for a dishonest person to fake, but cheap for you. Send it.' }
+  { id:'rw8', title:'The Costly Signal', body:'You need to prove your commitment or quality to someone. Brainstorm a signal that is expensive for a dishonest person to fake, but cheap for you. Send it.' },
+  { id:'rw9', title:'The Best Response', body:'Before a meeting, consider the other party\'s likely strategy. Determine your Best Response to it. Then consider their Best Response to your strategy. Are you in a Nash Equilibrium?' },
+  { id:'rw10', title:'The Focal Point', body:'You need to coordinate with someone without communicating. Identify the "Schelling point"—the most natural, obvious solution. Use it.' },
+  { id:'rw11', title:'The Mixed Strategy', body:'In a competitive game (sports, sales), calculate the mixed strategy equilibrium. Are you playing your optimal randomization frequency?' },
+  { id:'rw12', title:'The Subgame Perfect', body:'Map a sequential decision in your life as a game tree. Does your planned strategy survive backward induction? Or are you relying on a non-credible threat?' },
+  { id:'rw13', title:'The Grim Trigger', body:'Identify a relationship where trust is failing. Is the implicit threat of punishment strong enough to sustain cooperation? Is the discount factor too low?' },
+  { id:'rw14', title:'The Vickrey Auction', body:'Next time you bid on something (eBay, house), remember the Vickrey auction. If it were second-price, would you bid your true value? Use this to calibrate your actual bid.' },
+  { id:'rw15', title:'The Cheap Talk', body:'Listen to a political speech or marketing claim. Identify it as "Cheap Talk." Why is it costless? What costly signal would make it credible?' },
+  { id:'rw16', title:'The Screening', body:'You are uninformed about a candidate\'s quality. Design a screening mechanism (e.g., a test or contract) that forces them to reveal their type.' },
+  { id:'rw17', title:'The ESS', body:'Observe a stable social norm or market behavior. Is it an Evolutionary Stable Strategy? What happens if a "mutant" deviates?' },
+  { id:'rw18', title:'The Zero-Sum', body:'Identify a zero-sum conflict in your life. Recognize that cooperation is impossible. Focus on the Minimax strategy to limit your maximum loss.' },
+  { id:'rw19', title:'The Common Knowledge', body:'In a team meeting, test if "rationality" is common knowledge. Does everyone know that everyone knows the goal? If not, communication is required.' },
+  { id:'rw20', title:'The Risk Dominance', body:'You face two coordination options. One is payoff dominant, the other is risk dominant. Which do you choose? Assess the risk of miscoordination.' },
+  { id:'rw21', title:'The Adverse Selection', body:'Notice adverse selection in a market (e.g., used cars, dating). Why are only "bad" types participating? How can signaling fix it?' },
+  { id:'rw22', title:'The Winner\'s Curse', body:'You are bidding in a competitive auction. Remind yourself of the Winner\'s Curse. Shade your bid down to account for the probability you overestimated.' },
+  { id:'rw23', title:'The Bayesian Prior', body:'Form a prior belief about a stranger. Interact with them. Update your belief based on their actions using Bayes\' Rule.' },
+  { id:'rw24', title:'The Tragedy of the Commons', body:'Identify a shared resource (office kitchen, environment). Is it a Prisoner\'s Dilemma? How can repeated interaction or external enforcement solve it?' },
+  { id:'rw25', title:'The Mechanism Design', body:'You are managing a team. Design a bonus structure (mechanism) that is incentive compatible—truth-telling and hard work are dominant strategies.' },
+  { id:'rw26', title:'The Separating Equilibrium', body:'You want to stand out from the crowd. Find a costly signal that mimics cannot afford. Send it to create a separating equilibrium.' },
+  { id:'rw27', title:'The Pooling Equilibrium', body:'You want to blend in. Avoid costly signals. Stay in the pooling equilibrium where your type is ambiguous.' },
+  { id:'rw28', title:'The Centipede Game', body:'Observe a sequential interaction where backward induction predicts immediate defection, but humans usually cooperate. Why? Trust vs. logic.' },
+  { id:'rw29', title:'The Hawk-Dove', body:'Observe animal behavior or aggressive corporate tactics. Are they playing Hawk or Dove? Is the resource worth the cost of fighting (V > C)?' },
+  { id:'rw30', title:'The Minimax', body:'In a zero-sum game, calculate your Minimax strategy. What is the worst-case scenario if you play optimally? Can you guarantee this floor?' }
 ];
 
 const PROFILES = [
@@ -951,7 +840,7 @@ const PROFILES = [
 ];
 
 // ============== STATE ==============
-const STORAGE_KEY = 'nash-v1';
+const STORAGE_KEY = 'nash-v7';
 let S = null;
 
 function defaultState(){
@@ -961,9 +850,11 @@ function defaultState(){
   CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
   const project = {};
   PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
   return {
     xp:0, streak:0, longestStreak:0, lastVisit:null,
-    modules, cards, project,
+    modules, cards, project, arena,
     daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
     history: [], sessionLog: []
   };
@@ -1212,7 +1103,22 @@ function renderDashboard(){
   
   const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
   const dueCards = getDueCards();
-  const nextProjectPhase = PROJECT_PHASES.find(p => !S.project[p.id].solved && S.modules[p.moduleId].unlocked);
+  
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) {
+        const prevPhaseId = PROJECT_PHASES[i-1].id;
+        if (!S.project[prevPhaseId].solved) canUnlock = false;
+      }
+      if (canUnlock) {
+        nextProjectPhase = p;
+        break;
+      }
+    }
+  }
   
   if(dueCards.length > 0){
     missionTitle.textContent = 'Clear Drill Queue';
@@ -1221,25 +1127,25 @@ function renderDashboard(){
     missionBtn.onclick = () => showView('drills');
   }else if(nextProjectPhase){
     missionTitle.textContent = 'Project Spectrum: ' + nextProjectPhase.title;
-    missionBody.textContent = 'New project phase unlocked. Apply your strategic architecture to the scenario.';
+    missionBody.textContent = 'New project phase unlocked. Apply your strategic architecture to the real-world scenario.';
     missionBtn.textContent = 'Open Project →';
     missionBtn.onclick = () => showView('project');
   }else if(nextModule){
     const prog = moduleProgress(nextModule.id);
     if(prog.done === 0){
       missionTitle.textContent = 'Begin ' + nextModule.codename;
-      missionBody.textContent = nextModule.summary;
+      missionBody.textContent = nextModule.summary + ' Start with the lesson, then test yourself in the Arena.';
       missionBtn.textContent = 'Start Module →';
       missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
     }else{
       missionTitle.textContent = 'Continue ' + nextModule.codename;
-      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module. Finish the remaining items to unlock the next axis.';
       missionBtn.textContent = 'Continue →';
       missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
     }
   }else{
     missionTitle.textContent = 'Architecture Complete';
-    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery. The work is never done — only sharpened.';
     missionBtn.textContent = 'Drill →';
     missionBtn.onclick = () => showView('drills');
   }
@@ -1409,7 +1315,7 @@ function showModuleDetail(moduleId){
   html += '</div>';
   
   if(prog.completed){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. A new Project Spectrum phase may have unlocked.</p>';
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
     const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
     if(nextM && S.modules[nextM.id].unlocked){
       html += '<button class="btn success mt-1" onclick="NASH.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>';
@@ -1460,6 +1366,11 @@ function markLessonRead(moduleId){
     S.modules[moduleId].lessonsRead.push('l1');
     addXP(50, 'lesson read');
     toast('Lesson complete · +50 XP', 'success');
+    
+    if(moduleProgress(moduleId).completed){
+      unlockNextModule(moduleId);
+      toast('Next axis unlocked', 'success');
+    }
   }
   saveState();
   showLesson(moduleId);
@@ -1482,13 +1393,21 @@ function renderProject(){
   html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'MONOPOLY' : 'COMPETING') + '</span></div>';
   html += '</div>';
   
-  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to the telecom market scenario. Phases unlock sequentially as you complete the corresponding training modules. Make the strategic choice to proceed.</p>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to the telecom market scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
   
   html += '<div class="phase-list">';
   PROJECT_PHASES.forEach((p, i) => {
     const m = MODULES.find(x => x.id === p.moduleId);
     const solved = S.project[p.id].solved;
-    const unlocked = S.modules[p.moduleId].unlocked;
+    
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) {
+      const prevPhaseId = PROJECT_PHASES[i-1].id;
+      if (!S.project[prevPhaseId].solved) {
+        unlocked = false;
+      }
+    }
+    
     const active = !solved && unlocked;
     
     html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="NASH.showProjectPhase(\''+p.id+'\')"' : '') + '>';
@@ -1699,21 +1618,32 @@ function renderArena(){
   const container = document.getElementById('arenaContainer');
   
   let html = '<div class="arena-hud">';
-  html += '<div class="hud-stat"><span class="label">Problems:</span><span class="val">' + ARENA.filter(p => S.modules[p.moduleId].problemSolved).length + '/' + ARENA.length + '</span></div>';
-  html += '<div class="hud-stat"><span class="label">Arena XP:</span><span class="val">' + (S.daily.solved * 100) + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div>';
   html += '</div>';
   
-  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Pick a scenario. Each problem tests one axis. Read the situation, choose the most strategic action. Explanations reveal the reasoning. Timed mode.</p>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
   
-  ARENA.forEach((p, i) => {
-    const m = MODULES.find(x => x.id === p.moduleId);
-    const solved = S.modules[p.moduleId].problemSolved;
-    const unlocked = S.modules[p.moduleId].unlocked;
-    html += '<div class="lesson-row' + (solved ? ' read' : '') + '" style="margin-bottom:0.75rem" ' + (unlocked ? 'onclick="NASH.showArenaProblem(\''+p.id+'\')"' : '') + '>';
-    html += '<div class="num">' + String(i+1).padStart(2,'0') + '</div>';
-    html += '<div class="info" style="flex:1"><div class="text-xs text-dim" style="letter-spacing:0.2em;margin-bottom:0.3rem">// ' + m.codename + (solved ? ' · SOLVED' : '') + '</div><div style="font-family:var(--display);font-size:1rem">' + p.title + '</div></div>';
-    html += '<div class="status">' + (unlocked ? (solved ? 'Review' : 'Start') : 'Locked') + '</div>';
-    html += '</div>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="NASH.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content">';
+      html += '<div class="arena-num">' + String(i+1).padStart(2,'0') + '</div>';
+      html += '<div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div>';
+      html += '<div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div>';
+      html += '</div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
   });
   
   container.innerHTML = html;
@@ -1731,13 +1661,15 @@ function showArenaProblem(problemId){
   container.parentElement.classList.add('active');
   
   const m = MODULES.find(x => x.id === p.moduleId);
-  const solved = S.modules[p.moduleId].problemSolved;
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
   
   let html = '<div class="lesson-back" onclick="NASH.show(\'arena\')">← Arena</div>';
   html += '<div class="arena-hud">';
   html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
-  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+100 XP</span></div>';
-  html += '<div class="hud-stat"><span class="label">Time Limit:</span><span class="val" style="color:var(--amber)">' + p.timeLimit + 's</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div>';
   html += '</div>';
   
   html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
@@ -1793,22 +1725,28 @@ function answerProblem(idx){
   html += '<div class="outcome-text">' + p.explanation + '</div>';
   
   if(correct){
-    if(!S.modules[p.moduleId].problemSolved){
-      S.modules[p.moduleId].problemSolved = true;
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
       S.daily.solved += 1;
-      addXP(100, 'arena: ' + p.id);
-      if(moduleProgress(p.moduleId).completed){
-        unlockNextModule(p.moduleId);
-        html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+100 XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>';
+      addXP(p.reward, 'arena: ' + p.id);
+      
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){
+          unlockNextModule(p.moduleId);
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>';
+        }else{
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        }
       }else{
-        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+100 XP</div>';
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
       }
-      flashCombo('+100 XP');
+      flashCombo('+' + p.reward + ' XP');
     }else{
       html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
     }
   }else{
-    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try the next problem.</div>';
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>';
   }
   
   outcome.innerHTML = html;
@@ -1821,9 +1759,7 @@ function answerProblem(idx){
   actions.className = 'lesson-actions';
   actions.style.marginTop = '1.5rem';
   if(correct){
-    const next = ARENA.find(a => !S.modules[a.moduleId].problemSolved && S.modules[a.moduleId].unlocked);
-    if(next){ actions.innerHTML = '<button class="btn" onclick="NASH.showArenaProblem(\''+next.id+'\')">Next Problem →</button>'; }
-    else { actions.innerHTML = '<button class="btn" onclick="NASH.show(\'dashboard\')">Dashboard →</button>'; }
+    actions.innerHTML = '<button class="btn" onclick="NASH.show(\'arena\')">Back to Arena →</button>';
   }else{
     actions.innerHTML = '<button class="btn secondary" onclick="NASH.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="NASH.showArenaProblem(\''+p.id+'\')">Try Again</button>';
   }
@@ -1958,6 +1894,36 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ============== BACKUP & RESTORE ==============
+document.getElementById('exportBtn').onclick = () => {
+  const dataStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([dataStr], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'nash_save.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Save file exported', 'success');
+};
+
+document.getElementById('importBtn').onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      S = JSON.parse(event.target.result);
+      saveState();
+      showView('dashboard');
+      toast('Save file imported successfully', 'success');
+    } catch(err) {
+      toast('Invalid save file', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
 // ============== RESET & NAV ==============
 document.getElementById('resetBtn').onclick = () => {
   if(confirm('Reset ALL progress? This cannot be undone.')){
@@ -1974,11 +1940,11 @@ function bootSequence(){
   const log = document.getElementById('bootLog');
   const bar = document.getElementById('bootBar');
   const lines = [
-    'Initializing strategic architecture v1.0...',
+    'Initializing strategic architecture v7.0...',
     'Loading game theory kernel...',
     'Calibrating SM-2 spaced repetition engine...',
     'Mounting Pareto priority queue...',
-    'Indexing 10 axes / 30 cards / 10 scenarios...',
+    'Indexing 10 axes / 120 cards / 100 arena scenarios...',
     'Initializing Project Spectrum...',
     'NASH online.'
   ];
