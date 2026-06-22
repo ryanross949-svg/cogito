@@ -42,7 +42,7 @@
   .profile-title { font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: var(--magenta); letter-spacing: 0.1em; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,45,156,0.4); }
   .profile-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
   .radar-wrap { display: flex; align-items: center; justify-content: center; padding: 1rem 0; }
-  .radar-svg { width: 100%; max-width: 300px; height: auto; }
+  .radar-svg { width: 100%; max-width: 340px; height: auto; }
   .radar-axis { stroke: var(--border); stroke-width: 1; }
   .radar-ring { fill: none; stroke: var(--border); stroke-width: 1; opacity: 0.5; }
   .radar-poly { fill: rgba(0,217,255,0.15); stroke: var(--cyan); stroke-width: 2; filter: drop-shadow(0 0 8px var(--cyan)); transition: all 0.8s ease; }
@@ -117,11 +117,11 @@
   <div class="hub-grid">
     <div class="panel">
       <div class="panel-label">// Global Mastery Matrix</div>
-      <div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="hubRadarSvg"></svg></div>
+      <div class="radar-wrap"><svg class="radar-svg" viewBox="-140 -140 280 280" id="hubRadarSvg"></svg></div>
     </div>
     <div class="panel">
       <div class="panel-label">// Discipline Breakdown</div>
-      <div id="masteryList" style="display:grid; gap:1rem;"></div>
+      <div id="masteryList" style="display:grid; gap:0.8rem;"></div>
     </div>
   </div>
 
@@ -147,6 +147,10 @@
   <div class="domain-section">
     <div class="domain-title">🧠 AI & Technology</div>
     <div class="grid" id="ai-grid"></div>
+  </div>
+  <div class="domain-section">
+    <div class="domain-title">🧬 Biology & Evolution</div>
+    <div class="grid" id="biology-grid"></div>
   </div>
 
   <button id="feedback-fab">Feedback</button>
@@ -177,38 +181,26 @@ const APPS = [
   { id: 'prima', name: 'PRIMA', domain: 'engineering', axisName: 'Engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
   { id: 'nash', name: 'NASH', domain: 'strategy', axisName: 'Strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v7', href: 'nash.html' },
   { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' },
-  { id: 'fermi', name: 'FERMI', domain: 'engineering', axisName: 'Physics/Math', desc: 'Order-of-magnitude estimation, physics limits, and Fermi problems.', tag: '10 Axes · 120 Cards', storageKey: 'fermi-v1', href: 'fermi.html' }
+  { id: 'fermi', name: 'FERMI', domain: 'engineering', axisName: 'Physics/Math', desc: 'Order-of-magnitude estimation, physics limits, and Fermi problems.', tag: '10 Axes · 120 Cards', storageKey: 'fermi-v1', href: 'fermi.html' },
+  { id: 'darwin', name: 'DARWIN', domain: 'biology', axisName: 'Biology', desc: 'Evolutionary strategy, natural selection, and biological systems.', tag: '10 Axes · 120 Cards', storageKey: 'darwin-v1', href: 'darwin.html' }
 ];
 
-// Replace with your actual GitHub repo details
 const GH_USER = 'YOUR_GITHUB_USERNAME'; 
 const GH_REPO = 'Cogito';
 
 function getLevel(xp) { return Math.floor(Math.sqrt(xp/100)) + 1; }
 function getMaturity(interval) { return Math.min(100, Math.log(interval + 1) / Math.log(30) * 100); }
 
-let totalXP = 0;
-let totalMature = 0;
-let appData = [];
-
-// 1. Log Activity (Global Heatmap)
+let totalXP = 0, totalMature = 0, appData = [];
 let activity = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
 const todayDate = new Date().toISOString().split('T')[0];
-if(!activity.includes(todayDate)){
-  activity.push(todayDate);
-  localStorage.setItem('cogito-activity', JSON.stringify(activity));
-}
+if(!activity.includes(todayDate)){ activity.push(todayDate); localStorage.setItem('cogito-activity', JSON.stringify(activity)); }
 
-// 2. Calculate Streak from Activity
 function calculateStreak(act) {
   if(!act || act.length === 0) return 0;
-  let streak = 0;
-  let d = new Date();
+  let streak = 0, d = new Date();
   if(!act.includes(d.toISOString().split('T')[0])) d.setDate(d.getDate() - 1);
-  while(act.includes(d.toISOString().split('T')[0])) {
-    streak++;
-    d.setDate(d.getDate() - 1);
-  }
+  while(act.includes(d.toISOString().split('T')[0])) { streak++; d.setDate(d.getDate() - 1); }
   return streak;
 }
 let currentStreak = calculateStreak(activity);
@@ -219,14 +211,11 @@ APPS.forEach(app => {
   if (savedData) {
     try {
       const parsed = JSON.parse(savedData);
-      xp = parsed.xp || 0;
-      level = getLevel(xp);
-      totalXP += xp;
+      xp = parsed.xp || 0; level = getLevel(xp); totalXP += xp;
       if (parsed.cards) {
         let totalMat = 0, count = 0;
         Object.values(parsed.cards).forEach(c => {
-          const m = getMaturity(c.interval);
-          totalMat += m;
+          const m = getMaturity(c.interval); totalMat += m;
           if(c.interval >= 21) { matureCount++; totalMature++; }
           count++;
         });
@@ -252,11 +241,10 @@ appData.forEach(app => {
 document.getElementById('globalLevel').textContent = getLevel(totalXP);
 document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
 
-// Radar Drawing
 function drawHubRadar() {
   const svg = document.getElementById('hubRadarSvg');
   svg.innerHTML = '';
-  const n = appData.length, R = 95;
+  const n = appData.length, R = 85; // Reduced R for padding
   [0.25, 0.5, 0.75, 1].forEach(r => {
     const pts = [];
     for(let i=0; i<n; i++){ const a = -Math.PI/2 + (i/n)*Math.PI*2; pts.push((Math.cos(a)*R*r)+','+(Math.sin(a)*R*r)); }
@@ -279,7 +267,7 @@ function drawHubRadar() {
   poly.setAttribute('points', pts.join(' ')); poly.setAttribute('class', 'radar-poly'); svg.appendChild(poly);
   for(let i=0; i<n; i++){
     const a = -Math.PI/2 + (i/n)*Math.PI*2;
-    const x = Math.cos(a)*(R+18), y = Math.sin(a)*(R+18);
+    const x = Math.cos(a)*(R+25), y = Math.sin(a)*(R+25); // Increased label distance
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x',x); text.setAttribute('y',y); text.setAttribute('text-anchor','middle'); text.setAttribute('dominant-baseline','middle');
     text.setAttribute('class','radar-label'); text.textContent = appData[i].axisName;
@@ -292,23 +280,20 @@ drawHubRadar();
 const masteryList = document.getElementById('masteryList');
 appData.forEach(app => {
   const row = document.createElement('div');
-  row.style.cssText = 'display:grid; grid-template-columns:100px 1fr 40px; gap:1rem; align-items:center; font-size:0.85rem;';
+  row.style.cssText = 'display:grid; grid-template-columns:90px 1fr 40px; gap:1rem; align-items:center; font-size:0.8rem;';
   const cls = app.maturity < 30 ? 'var(--red)' : (app.maturity < 70 ? 'var(--amber)' : 'var(--cyan)');
-  row.innerHTML = `<span style="color:var(--text-dim); font-family:var(--display); font-size:0.8rem;">${app.axisName}</span>
+  row.innerHTML = `<span style="color:var(--text-dim); font-family:var(--display); font-size:0.75rem;">${app.axisName}</span>
     <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;"><div style="height:100%; width:${app.maturity}%; background:${cls}; box-shadow:0 0 6px ${cls}; transition:width 0.8s;"></div></div>
     <span style="color:var(--text-dim); text-align:right; font-family:var(--display);">${app.maturity}%</span>`;
   masteryList.appendChild(row);
 });
 
-// Heatmap Render
 function renderHeatmap() {
   const grid = document.getElementById('heatmapGrid');
   grid.innerHTML = '';
-  const days = 150;
-  const today = new Date();
+  const days = 150, today = new Date();
   for(let i = days - 1; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
+    const d = new Date(today); d.setDate(d.getDate() - i);
     const dStr = d.toISOString().split('T')[0];
     const cell = document.createElement('div');
     cell.className = 'heat-cell';
@@ -319,7 +304,6 @@ function renderHeatmap() {
 }
 renderHeatmap();
 
-// Achievements Render
 const ACHIEVEMENTS = [
   { id: 'first_blood', name: 'First Blood', desc: 'Solve 1 Arena problem', icon: '⚔️', check: () => appData.some(a => a.xp > 50) },
   { id: 'streak_7', name: 'Week One', desc: '7-day streak', icon: '🔥', check: () => currentStreak >= 7 },
@@ -327,7 +311,7 @@ const ACHIEVEMENTS = [
   { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 5 globally', icon: '🧬', check: () => getLevel(totalXP) >= 5 },
   { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 10 globally', icon: '🧠', check: () => getLevel(totalXP) >= 10 },
   { id: 'mastery_100', name: 'Master', desc: '100 cards matured', icon: '💎', check: () => totalMature >= 100 },
-  { id: 'renaissance', name: 'Renaissance', desc: 'Start all 4 courses', icon: '🎨', check: () => appData.every(a => a.xp > 0) },
+  { id: 'renaissance', name: 'Renaissance', desc: 'Start all 5 courses', icon: '🎨', check: () => appData.every(a => a.xp > 0) },
   { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 20 globally', icon: '🚀', check: () => getLevel(totalXP) >= 20 }
 ];
 
@@ -344,7 +328,6 @@ function renderAchievements() {
 }
 renderAchievements();
 
-// Profile Calculation
 let maturities = appData.map(a => a.maturity);
 let minMat = Math.min(...maturities), maxMat = Math.max(...maturities), avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length, diff = maxMat - minMat;
 let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
@@ -359,23 +342,14 @@ if (totalXP > 0) {
 document.getElementById('profTitle').textContent = profile.title;
 document.getElementById('profDesc').textContent = profile.desc;
 
-// Theme Switcher
-function setTheme(theme) {
-  document.body.dataset.theme = theme;
-  localStorage.setItem('cogito-theme', theme);
-  document.getElementById('themeMenu').classList.remove('active');
-}
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
 document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
 document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) document.getElementById('themeMenu').classList.remove('active'); });
 
-// Feedback Widget
 const fab = document.getElementById('feedback-fab');
 const modal = document.getElementById('feedback-modal');
-const closeBtn = document.getElementById('closeFeedback');
-const submitBtn = document.getElementById('submitFeedback');
-
 fab.onclick = () => { modal.style.display = 'flex'; };
-closeBtn.onclick = () => { modal.style.display = 'none'; };
+document.getElementById('closeFeedback').onclick = () => { modal.style.display = 'none'; };
 document.querySelectorAll('.fb-yn').forEach(btn => {
   btn.onclick = () => {
     const q = btn.dataset.q, a = btn.dataset.a;
@@ -385,9 +359,8 @@ document.querySelectorAll('.fb-yn').forEach(btn => {
     if(a === 'yes'){ textarea.style.display = 'block'; } else { textarea.style.display = 'none'; textarea.value = ''; }
   };
 });
-submitBtn.onclick = () => {
-  let issueBody = "## Feedback Submission\n\n";
-  let hasContent = false;
+document.getElementById('submitFeedback').onclick = () => {
+  let issueBody = "## Feedback Submission\n\n", hasContent = false;
   const issueText = document.getElementById('fb-issue').value.trim();
   const featureText = document.getElementById('fb-feature').value.trim();
   const courseText = document.getElementById('fb-course').value.trim();
