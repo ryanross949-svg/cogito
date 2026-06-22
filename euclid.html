@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // EUCLID v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">EUCLID</div><div class="boot-sub">Cogito // Spatial & Geometric Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">EUCLID</div><div class="brand-tag">SPATIAL ARCHITECTURE</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="EUCLID.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="EUCLID.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="EUCLID.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="EUCLID.setTheme('light')">Light</button><button class="theme-option" onclick="EUCLID.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Tessellation</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="EUCLID.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of spatial reasoning. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: TESSELLATION</h1><p class="section-sub">A cumulative scenario. Apply geometric reasoning to design a city and navigate curved space.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About EUCLID</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>EUCLID is a cognitive training simulator designed to install the spatial and geometric reasoning patterns used by architects, topologists, and physicists. It trains you to manipulate objects and space in your mind, a fundamentally different cognitive mode than pure logic or estimation.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Tessellation require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>AXIOM</strong> — The axiomatic method, postulates, and deduction</li>
+          <li><strong>CONGRUENCE</strong> — Rigid motions, SAS, SSS, and transformations</li>
+          <li><strong>SIMILARITY</strong> — Scaling, ratios, and Thales\' theorem</li>
+          <li><strong>AREA</strong> — Dissection, Cavalieri\'s principle, and Pythagoras</li>
+          <li><strong>SYMMETRY</strong> — Reflections, rotations, and group theory</li>
+          <li><strong>OPTIMA</strong> — Isoperimetric inequality, shortest paths</li>
+          <li><strong>TILING</strong> — Tessellations, platonic solids, Euler\'s formula</li>
+          <li><strong>CONIC</strong> — Slicing cones, ellipses, and parabolas</li>
+          <li><strong>TOPOLOGY</strong> — Rubber sheet geometry, genus, and knots</li>
+          <li><strong>NON-EUCLID</strong> — Spherical and hyperbolic geometry</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'AXIOM', title:'The Axiomatic Method', summary:'Starting with undeniable truths and building reality through deduction.', lesson:{ title:'The Foundation of Geometry', body: 'Euclidean geometry is built on the axiomatic method. You start with a small set of self-evident truths (axioms/postulates) that cannot be proven, and from them, deduce the entire structure of reality.\n\n## Euclid\'s 5 Postulates\n\n1. A straight line can be drawn between any two points.\n2. A finite straight line can be extended continuously.\n3. A circle can be drawn with any center and radius.\n4. All right angles are equal.\n5. The Parallel Postulate: Given a line and a point not on it, exactly one line through the point is parallel to the original line.\n\n## The Power of Axioms\n\nAxioms are the foundation. If you change an axiom, you change the universe. For 2000 years, mathematicians tried to prove the 5th postulate from the first four. They failed. In the 1800s, they realized why: the 5th postulate is a choice, not a necessity. Changing it creates non-Euclidean geometries (spherical, hyperbolic).\n\n## The Method\n\n1. **Identify your axioms.** What are you assuming to be true?\n2. **Ensure they are independent.** No axiom should be provable from the others.\n3. **Deduce theorems logically.** Every step must follow rigorously from the previous.\n4. **If a result seems absurd, check your axioms.**', takeaways:['Geometry is built on self-evident truths called axioms.','Euclid\'s 5 postulates define flat (Euclidean) space.','The Parallel Postulate is a choice, not a necessity.','Changing an axiom changes the geometry of the universe.','Every theorem must be deduced rigorously from the axioms.'] } },
+  { id:'m2', codename:'CONGRUENCE', title:'Congruence & Motion', summary:'Rigid motions, SAS, SSS, and transformations.', lesson:{ title:'The Architecture of Shape', body: 'Two shapes are congruent if you can pick one up, move it through space, and place it exactly on top of the other. No stretching, no shrinking. Just rigid motion.\n\n## The Rigid Motions\n\nThere are only three ways to move a shape without changing it:\n1. **Translation:** Sliding left, right, up, or down.\n2. **Rotation:** Turning around a fixed point.\n3. **Reflection:** Flipping across a line (like a mirror).\n\nAny combination of these is also a rigid motion.\n\n## Triangle Congruence (SAS)\n\nHow do you prove two triangles are identical without physically moving them? You check Side-Angle-Side (SAS). If two sides and the angle between them are equal, the triangles are congruent. The rest is forced by the geometry.\n\n## The Method\n\n1. **Identify the rigid motion.** Is it a slide, turn, or flip?\n2. **Map corresponding parts.** Which point goes to which?\n3. **Use congruence criteria (SAS, SSS, ASA).** If the inputs match, the whole shape matches.', takeaways:['Congruence means identical in shape and size.','Only three rigid motions exist: Translation, Rotation, Reflection.','SAS: If two sides and the included angle match, the triangles match.','Transformations map every point of a shape to a new point.','If the inputs match, the whole shape is forced by geometry.'] } },
+  { id:'m3', codename:'SIMILARITY', title:'Similarity & Scaling', summary:'Ratios, Thales theorem, and the golden ratio.', lesson:{ title:'The Architecture of Proportion', body: 'Similarity is congruence without the size constraint. Two shapes are similar if they have the same shape but different sizes. One is a scaled-up or scaled-down version of the other.\n\n## Similar Triangles (AA)\n\nIf two angles of a triangle are equal to two angles of another, the triangles are similar. The sides are proportional.\n\n## Thales\' Theorem\n\nIf you have a triangle inscribed in a circle where one side is the diameter, the angle opposite the diameter is always a right angle. This is a powerful geometric constraint that allows you to construct right angles anywhere.\n\n## The Golden Ratio\n\nPhi (φ) = 1.618... It appears when a line is divided such that the ratio of the whole to the long part equals the ratio of the long part to the short part. It is the "most irrational" number, meaning it is hardest to approximate with fractions. This is why plants use it for leaf placement—it minimizes overlap.', takeaways:['Similar shapes have the same angles and proportional sides.','AA: If two angles match, the triangles are similar.','Thales: An angle inscribed in a semicircle is a right angle.','The Golden Ratio (Phi) is the most irrational number.','Scaling preserves angles but multiplies lengths by a constant.'] } },
+  { id:'m4', codename:'AREA', title:'Area & Dissection', summary:'Pythagoras, Cavalieri, and cutting shapes.', lesson:{ title:'The Architecture of Space', body: 'How do you measure space? By dissecting it into shapes you understand.\n\n## The Pythagorean Theorem\n\nIn a right triangle, a² + b² = c². This isn\'t just algebra; it\'s geometry. The area of the square on the hypotenuse equals the sum of the areas on the other two sides.\n\n## Cavalieri\'s Principle\n\nIf two solids have the same height and the same cross-sectional area at every level, they have the same volume. This is why you can calculate the volume of a sphere by comparing it to a cylinder and a cone. It allows you to compute volumes without calculus.\n\n## The Method\n\n1. **Decompose complex shapes** into triangles and rectangles.\n2. **Rearrange pieces** to form a shape you can measure.\n3. **Use Cavalieri\'s Principle** for 3D volumes with equal cross-sections.', takeaways:['a² + b² = c² is a statement about areas of squares.','Cavalieri: Equal cross-sections at every level = equal volume.','Dissection: Cut complex shapes into simple ones to measure them.','Area is measured in square units; Volume in cubic units.','Rearranging pieces preserves area/volume.'] } },
+  { id:'m5', codename:'SYMMETRY', title:'Symmetry & Groups', summary:'Reflections, rotations, and group theory.', lesson:{ title:'The Architecture of Invariance', body: 'Symmetry is what remains unchanged when you transform an object. A square has 8 symmetries (4 rotations, 4 reflections). A circle has infinite.\n\n## Group Theory\n\nThe symmetries of an object form a mathematical structure called a "group." Groups have specific rules: combining two symmetries gives another symmetry; there is an identity (doing nothing); every symmetry has an inverse.\n\n## Conservation Laws\n\nIn physics, Noether\'s Theorem states that every symmetry corresponds to a conservation law. Symmetry under time translation = conservation of energy. Symmetry under spatial translation = conservation of momentum. Symmetry is not just pretty; it is the source of physical law.\n\n## The Method\n\n1. **Identify what is invariant.** What doesn\'t change when you move it?\n2. **Count the symmetries.** How many ways can you map the object onto itself?\n3. **Use symmetry to simplify.** If a problem is symmetric, you only need to solve part of it.', takeaways:['Symmetry is what remains unchanged under transformation.','A square has 8 symmetries; a circle has infinite.','Symmetries form mathematical groups.','Noether\'s Theorem: Every symmetry implies a conservation law.','Use symmetry to reduce problem complexity.'] } },
+  { id:'m6', codename:'OPTIMA', title:'Optimal Geometry', summary:'Isoperimetric inequality and shortest paths.', lesson:{ Title:'The Architecture of Efficiency', body: 'Nature is lazy. It seeks the minimum energy, the shortest path, the maximum area for a given perimeter.\n\n## The Isoperimetric Inequality\n\nFor a given perimeter, the shape that encloses the maximum area is a circle. A square is 78% as efficient. This is why soap bubbles are spheres—they minimize surface area for a given volume.\n\n## The Shortest Path (Reflection)\n\nIf you need to go from point A to point B, touching a line (like a river) along the way, what is the shortest path? Use reflection. Reflect B across the line to B\'. Draw a straight line from A to B\'. Where it crosses the line is your touching point. The angle of incidence equals the angle of reflection.\n\n## The Method\n\n1. **Identify the constraint.** Is perimeter, area, or volume fixed?\n2. **Apply the isoperimetric inequality.** Circles/spheres are optimal.\n3. **Use reflection tricks** to turn bent paths into straight lines.', takeaways:['The circle maximizes area for a given perimeter.','The sphere minimizes surface area for a given volume.','Reflection turns shortest-path problems into straight lines.','Angle of incidence = Angle of reflection.','Nature optimizes geometry to minimize energy.'] } },
+  { id:'m7', codename:'TILING', title:'Tiling & Packing', summary:'Tessellations, platonic solids, and Euler.', lesson:{ title:'The Architecture of Filling Space', body: 'How do you fill a flat plane with shapes without gaps? Only triangles, squares, and hexagons can tile the plane regularly. This is why beehives are hexagonal—it maximizes area while minimizing perimeter (wax).\n\n## Platonic Solids\n\nIn 3D, there are only 5 regular polyhedra (Platonic Solids): Tetrahedron, Cube, Octahedron, Dodecahedron, Icosahedron. You cannot build a 6th. The geometry of 3D space forbids it.\n\n## Euler\'s Formula\n\nFor any convex polyhedron, Vertices - Edges + Faces = 2. V - E + F = 2. This topological invariant holds true whether the shape is a cube, a pyramid, or a soccer ball. It is a property of the space, not the shape.\n\n## The Method\n\n1. **Check the angles.** Shapes tile a plane only if their angles sum to 360° at the vertex.\n2. **Count the symmetries.** Regular tilings require regular polygons.\n3. **Use Euler\'s Formula** to verify topological consistency.', takeaways:['Only triangles, squares, and hexagons tile a plane regularly.','There are exactly 5 Platonic Solids. A 6th is geometrically impossible.','Euler\'s Formula: V - E + F = 2 for any convex polyhedron.','Hexagons minimize perimeter for a given area (beehive principle).','Tiling depends on angle sums summing to 360°.'] } },
+  { id:'m8', codename:'CONIC', title:'Conic Sections', summary:'Slicing cones, ellipses, and parabolas.', lesson:{ title:'The Architecture of Curves', body: 'Take a cone and slice it at different angles. You get circles, ellipses, parabolas, and hyperbolas. These are the conic sections, and they describe the orbits of planets, the path of projectiles, and the shape of satellite dishes.\n\n## The Ellipse\n\nAn ellipse has two foci. The sum of the distances from any point on the ellipse to the two foci is constant. This is why a whisper in one focus of an elliptical room is perfectly heard in the other.\n\n## The Parabola\n\nA parabola has one focus. All rays parallel to the axis reflect off the parabola and converge at the focus. This is why satellite dishes and telescope mirrors are parabolic.\n\n## The Method\n\n1. **Identify the slice.** What angle is the cone cut at?\n2. **Locate the foci.** They dictate the geometric properties.\n3. **Use reflection properties.** Parallel rays converge at the focus.', takeaways:['Conic sections come from slicing a cone.','Circle (horizontal cut), Ellipse (angled), Parabola (parallel to side), Hyperbola (steep).','Ellipse: Sum of distances to two foci is constant.','Parabola: Parallel rays reflect to a single focus.','Orbits and projectiles follow conic sections.'] } },
+  { id:'m9', codename:'TOPOLOGY', title:'Topology', summary:'Rubber sheet geometry, genus, and knots.', lesson:{ title:'The Architecture of Continuous Deformation', body: 'Topology is geometry where size and shape don\'t matter, only connectivity. A coffee mug and a donut are topologically identical (genus 1) because they both have exactly one hole. You can continuously deform one into the other without tearing.\n\n## The Jordan Curve Theorem\n\nAny simple closed curve (a loop that doesn\'t cross itself) divides the plane into two regions: inside and outside. It seems obvious, but proving it rigorously requires topology.\n\n## Knot Theory\n\nA trefoil knot cannot be untied into a circle without cutting. Knot theory studies these embeddings. DNA strands get knotted during replication, and topoisomerases are the enzymes that cut and untie them.\n\n## The Method\n\n1. **Count the holes (genus).** This is the topological invariant.\n2. **Determine if transformations require tearing.** If yes, they are not topologically equivalent.\n3. **Look at connectivity.** How many loops? How many boundaries?', takeaways:['Topology is rubber-sheet geometry.','A coffee mug is topologically identical to a donut (genus 1).','Genus = number of holes. This is invariant under deformation.','The Jordan Curve Theorem: Every loop divides the plane into inside/outside.','Knots cannot be untied without cutting.'] } },
+  { id:'m10', codename:'NON-EUCLID', title:'Non-Euclidean Geometry', summary:'Spherical and hyperbolic space.', lesson:{ title:'The Architecture of Curved Space', body: 'What happens if you drop Euclid\'s 5th Postulate? You get non-Euclidean geometry.\n\n## Spherical Geometry (Positive Curvature)\n\nOn a sphere, there are NO parallel lines. All great circles (like longitude lines) intersect. The sum of angles in a triangle is GREATER than 180°. For example, a triangle from the North Pole to the equator has three 90° angles, totaling 270°.\n\n## Hyperbolic Geometry (Negative Curvature)\n\nOn a hyperbolic surface (like a saddle or Pringle chip), there are INFINITE parallel lines through a point. The sum of angles in a triangle is LESS than 180°.\n\n## Why It Matters\n\nEinstein\'s General Relativity states that mass curves spacetime. Space is not Euclidean; it is locally non-Euclidean. The geometry of the universe depends on how much mass it contains. GPS satellites must correct for this curvature to remain accurate.\n\n## The Method\n\n1. **Identify the curvature.** Is it flat (0), spherical (+), or hyperbolic (-)?\n2. **Check the triangle angles.** Sum > 180 = positive. Sum < 180 = negative.\n3. **Count parallel lines.** 1 = flat. 0 = spherical. Infinite = hyperbolic.', takeaways:['Spherical: No parallel lines. Triangle angles > 180°.','Hyperbolic: Infinite parallel lines. Triangle angles < 180°.','Mass curves spacetime, making the universe non-Euclidean.','Euclid\'s 5th postulate is a choice, not a universal truth.','GPS must correct for spacetime curvature to be accurate.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the axiomatic method?',back:'Starting with self-evident truths (axioms) that cannot be proven, and deducing the entire structure of reality from them logically.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'State Euclid\'s 5th Postulate (The Parallel Postulate).',back:'Given a line and a point not on it, exactly one line through the point is parallel to the original line.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Can the 5th Postulate be proven from the first four?',back:'No. It is an independent axiom. Changing it creates non-Euclidean geometries.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'What happens if you change an axiom?',back:'You change the universe. The entire structure deduced from it becomes different.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What are the first 4 postulates about?',back:'1. Line between 2 points. 2. Extend a line. 3. Circle with any center/radius. 4. All right angles are equal.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'If a geometric result seems absurd, what should you check?',back:'Your axioms. The deduction might be correct, but the foundational assumptions might be wrong for your context.'},
+  {id:'c7',moduleId:'m1',core:false,category:'concept',front:'What makes a good set of axioms?',back:'They should be independent (none provable from others), consistent (no contradictions), and complete.'},
+  {id:'c8',moduleId:'m1',core:false,category:'application',front:'Why did mathematicians fail to prove the 5th postulate for 2000 years?',back:'Because it is a choice, not a necessity. It is independent of the other four.'},
+  {id:'c9',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Axioms are the..."',back:'"...foundation. If you change an axiom, you change the universe."'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is a theorem in geometry?',back:'A statement proven true via rigorous logical deduction from the axioms and previously proven theorems.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'In software design, what acts like "axioms"?',back:'The core requirements or base assumptions. If you change a core requirement, the whole architecture might shift.'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'Is "a straight line is the shortest distance between two points" an axiom or theorem?',back:'In Euclidean geometry, it is essentially an axiom (or a direct consequence of the definition of a line). In differential geometry, it is a theorem.'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What are the three rigid motions?',back:'Translation (slide), Rotation (turn), and Reflection (flip).'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'What does SAS stand for in triangle congruence?',back:'Side-Angle-Side. If two sides and the included angle are equal, the triangles are congruent.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is congruence?',back:'Two shapes are congruent if one can be transformed into the other via rigid motion (no stretching).'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'If two triangles have all three sides equal (SSS), are they congruent?',back:'Yes. SSS is a valid congruence criterion.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'What is a transformation in geometry?',back:'A function that maps every point of a shape to a new point in space.'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'Does reflection preserve orientation?',back:'No. Reflection reverses orientation (like a mirror). Rotation and translation preserve it.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'What is ASA?',back:'Angle-Side-Angle. If two angles and the included side are equal, the triangles are congruent.'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'Can you prove congruence with SSA (Side-Side-Angle)?',back:'Not generally. SSA does not guarantee congruence because the angle might be obtuse or acute, leading to the "ambiguous case".'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "If the inputs match, the whole shape..."',back:'"...is forced by geometry."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'What is an isometry?',back:'A transformation that preserves distances (a rigid motion).'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'A shape is rotated 90°. Are its side lengths changed?',back:'No. Rotation is a rigid motion; it preserves lengths and angles.'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'What is the identity transformation?',back:'Doing nothing. Every point maps to itself. It is the "do nothing" motion.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is similarity in geometry?',back:'Two shapes are similar if they have the same shape but different sizes (proportional sides, equal angles).'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'What does AA mean for triangles?',back:'Angle-Angle. If two angles match, the triangles are similar (sides are proportional).'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'Does scaling preserve angles?',back:'Yes. Scaling (dilation) multiplies lengths by a constant but preserves all angles.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'State Thales\' Theorem.',back:'If a triangle is inscribed in a circle with the diameter as one side, the angle opposite the diameter is a right angle (90°).'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'What is the Golden Ratio (Phi)?',back:'~1.618. It is the most irrational number, hardest to approximate with fractions. A/B = (A+B)/A.'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'Why do plants use the Golden Ratio for leaf placement?',back:'It minimizes overlap, ensuring each leaf gets maximum sunlight.'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'If triangle A has sides 3,4,5 and triangle B has sides 6,8,10, what are they?',back:'Similar. The ratio is 1:2.'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'How do you construct a right angle anywhere using Thales?',back:'Draw a circle. Pick a diameter. Pick any third point on the circle. Connect them to form a triangle. The angle at the third point is 90°.'},
+  {id:'c33',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Similar shapes have the same angles and..."',back:'"...proportional sides."'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'What is a dilation?',back:'A transformation that scales a shape by a factor. It preserves angles but changes lengths.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'Two similar triangles have a scale factor of 1:3. Area ratio?',back:'1:9. Area scales by the square of the length ratio.'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'Is a 3-4-5 triangle similar to a 5-12-13 triangle?',back:'Yes. Both are right triangles. All right triangles with the same angles are similar.'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'State the Pythagorean Theorem.',back:'In a right triangle, a² + b² = c². The sum of squares of the legs equals the square of the hypotenuse.'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'What is Cavalieri\'s Principle?',back:'If two solids have the same height and the same cross-sectional area at every level, they have the same volume.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'Is the Pythagorean theorem about lengths or areas?',back:'Areas. The area of the square on the hypotenuse equals the sum of areas of the squares on the legs.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'How do you measure the area of a complex polygon?',back:'Decompose it into triangles and rectangles, measure those, and sum them.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'Does rearranging pieces of a shape change its area?',back:'No. Area is preserved under dissection and rearrangement.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'Can Cavalieri\'s Principle calculate volumes without calculus?',back:'Yes. By comparing an unknown solid to a known one with equal cross-sections.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is dissection in geometry?',back:'Cutting a complex shape into simpler pieces to measure or prove properties.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'A square has side 5. What is the length of its diagonal?',back:'5√2. (By Pythagoras: 5² + 5² = d²).'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Rearranging pieces preserves..."',back:'"...area and volume."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'What is the area of a triangle?',back:'1/2 * base * height.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'Two cylinders have the same height and cross-section. Volumes?',back:'Equal, by Cavalieri\'s Principle.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What is the unit of area? Volume?',back:'Square units (e.g., m²) for area. Cubic units (e.g., m³) for volume.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is symmetry?',back:'What remains unchanged when you transform an object. (e.g., A square looks the same after 90° rotation).'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'How many symmetries does a square have?',back:'8. (4 rotations: 0°, 90°, 180°, 270°; and 4 reflections: horizontal, vertical, 2 diagonals).'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is a group in mathematics?',back:'A set of elements and an operation that satisfies closure, associativity, identity, and inverse. Symmetries form groups.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'How many symmetries does a circle have?',back:'Infinite. You can rotate it by any angle and reflect it across any diameter.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'What does Noether\'s Theorem state?',back:'Every symmetry in physics corresponds to a conservation law. (e.g., Time symmetry = Energy conservation).'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'Symmetry under spatial translation implies what conservation law?',back:'Conservation of momentum.'},
+  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'What is the "identity" symmetry?',back:'Doing nothing. The object maps to itself.'},
+  {id:'c56',moduleId:'m5',core:false,category:'application',front:'If a problem is symmetric, how can you simplify it?',back:'You only need to solve one part. The symmetry dictates the rest.'},
+  {id:'c57',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Symmetry is what remains..."',back:'"...unchanged under transformation."'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'What is the inverse of a 90° rotation?',back:'A 270° rotation (or -90°). It undoes the original rotation.'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'A butterfly has bilateral symmetry. What does that mean?',back:'A reflection down the center line maps the left side perfectly onto the right side.'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'Why are symmetries useful in physics?',back:'They restrict possible laws. If the universe is symmetric, the laws must respect that symmetry.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'State the Isoperimetric Inequality.', back:'For a given perimeter, the circle encloses the maximum area.'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'What is the most efficient shape for a soap bubble?',back:'A sphere. It minimizes surface area for a given volume.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'Why are beehives hexagonal?',back:'Hexagons tile a plane with minimal perimeter for a given area, minimizing wax usage.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'How do you find the shortest path from A to B touching a line?',back:'Reflect B across the line to B\'. Draw a straight line from A to B\'. The intersection is the touching point.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'In the reflection trick, angle of incidence equals?',back:'Angle of reflection.'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'A square and circle have the same perimeter. Which has more area?',back:'The circle.'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'What does nature optimize in physical systems?',back:'Energy. Systems seek the minimum energy state (e.g., shortest path, minimal surface).'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'A square is X% as efficient as a circle in area/perimeter ratio. X=?',back:'~78%. (Area of square = P²/16. Area of circle = P²/4π. Ratio = 4/π ≈ 1.27. Square is ~78% of circle).'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Nature optimizes geometry to..."',back:'"...minimize energy."'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What is calculus of variations?',back:'The field of math that finds functions that minimize or maximize integrals (e.g., shortest paths, geodesics).'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'Why are Roman arches semicircular?',back:'The semicircle efficiently distributes compressive force downward, minimizing tensile stress.'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'What is a geodesic?',back:'The shortest path between two points on a curved surface (e.g., a great circle on a sphere).'},
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'Which regular polygons can tile a flat plane?',back:'Only triangles, squares, and hexagons.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'How many Platonic Solids exist?',back:'Exactly 5. (Tetrahedron, Cube, Octahedron, Dodecahedron, Icosahedron).'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'State Euler\'s Formula for polyhedra.',back:'Vertices - Edges + Faces = 2. (V - E + F = 2).'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'A cube has 8 vertices and 12 edges. How many faces?',back:'6. (8 - 12 + F = 2 => F = 6).'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'Why can\'t a regular pentagon tile a plane?',back:'Its interior angle is 108°. 108 does not divide 360° evenly, so they leave gaps.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'Why do bees use hexagons instead of circles?',back:'Circles leave gaps. Hexagons tile perfectly and minimize perimeter (wax) for the area.'},
+  {id:'c79',moduleId:'m7',core:false,category:'concept',front:'What is a tessellation?',back:'A tiling of a plane using one or more geometric shapes with no overlaps and no gaps.'},
+  {id:'c80',moduleId:'m7',core:false,category:'application',front:'A polyhedron has 12 faces and 20 vertices. How many edges?',back:'30. (V - E + F = 2 => 20 - E + 12 = 2 => E = 30).'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "There are exactly 5 Platonic Solids. A 6th is..."',back:'"...geometrically impossible."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What makes a solid "Platonic"?',back:'All faces are identical regular polygons, and the same number of faces meet at every vertex.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'Can a sphere be tiled perfectly by hexagons alone?',back:'No. Euler\'s formula requires at least 12 pentagons (like a soccer ball).'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'What is sphere packing?',back:'The problem of arranging non-overlapping spheres in a space to maximize density. (FCC/HCP is optimal in 3D).'},
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is a conic section?',back:'A curve obtained as the intersection of a cone with a plane. (Circle, Ellipse, Parabola, Hyperbola).'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What shape is created when a cone is cut parallel to its side?',back:'A parabola.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'What is the reflection property of an ellipse?',back:'Any ray originating from one focus reflects off the ellipse and passes through the other focus.'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'Why are satellite dishes parabolic?',back:'A parabola reflects all incoming parallel rays to a single point (the focus), maximizing signal strength.'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'What is a focus (plural: foci)?',back:'A fixed point used to define a conic section. Ellipses have 2, parabolas have 1.'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'What shape do planets\' orbits take?',back:'Ellipses, with the sun at one focus (Kepler\'s 1st Law).'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'What is a hyperbola?',back:'A conic section formed when the plane cuts both halves of the double cone. It has two disconnected branches.'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'In an elliptical room, if you stand at one focus and whisper, where is it heard?',back:'At the other focus, perfectly clear, due to the reflection property.'},
+  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Parallel rays reflect off a parabola and..."',back:'"...converge at the focus."'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'How is a circle a special case of an ellipse?',back:'An ellipse where the two foci are at the exact same point (the center).'},
+  {id:'c95',moduleId:'m8',core:false,category:'application',front:'What is the trajectory of a projectile in a vacuum (ignoring Earth\'s curvature)?',back:'A parabola.'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'What defines an ellipse mathematically?',back:'The sum of distances from any point on the curve to the two foci is constant.'},
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is topology?',back:'The study of geometric properties preserved under continuous deformation (stretching, twisting, no tearing).'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'What is a classic topological equivalence?',back:'A coffee mug and a donut (torus). Both have exactly one hole.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'What is genus?',back:'The number of holes in a surface. A sphere has genus 0. A donut has genus 1.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'Can a sphere be continuously deformed into a donut?',back:'No. You must tear it to make the hole. Genus is a topological invariant.'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'State the Jordan Curve Theorem.',back:'Any simple closed curve (loop) in a plane divides the plane into two regions: inside and outside.'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'Can a trefoil knot be untied into a circle without cutting?',back:'No. Knots are topologically distinct from circles.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'What do topologists study instead of distance and angles?',back:'Connectivity, holes, boundaries, and continuity.'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'How do topoisomerases use topology?',back:'They cut and reconnect DNA strands to untie knots that form during replication.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "A coffee mug is topologically identical to..."',back:'"...a donut."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is a homeomorphism?',back:'A continuous stretching and bending that transforms one shape into another without tearing.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Are a square and a circle topologically equivalent?',back:'Yes. You can continuously deform a square into a circle.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'What is the Mobius strip?',back:'A surface with only one side and one boundary, formed by twisting a strip of paper and joining the ends.'},
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is Non-Euclidean geometry?',back:'Geometry where Euclid\'s 5th Postulate (Parallel Postulate) is modified or dropped.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'In spherical geometry, how many parallel lines exist through a point?',back:'Zero. All great circles (lines) on a sphere intersect.'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'In spherical geometry, what is the sum of angles in a triangle?',back:'Greater than 180°. (Can be up to 540°).'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'In hyperbolic geometry, how many parallel lines exist through a point?',back:'Infinite.'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'In hyperbolic geometry, what is the sum of angles in a triangle?',back:'Less than 180°.'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'Why is General Relativity non-Euclidean?',back:'Mass curves spacetime. The geometry near massive objects is not flat.'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'What shape represents negative curvature?',back:'A saddle or Pringle chip. (Hyperbolic).'},
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'Why must GPS satellites correct for relativity?',back:'Time runs faster in orbit (weaker gravity) than on Earth. Without correction, GPS would drift kilometers per day.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Euclid\'s 5th postulate is a choice..."',back:'"...not a universal truth."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is a great circle?',back:'The largest circle that can be drawn on a sphere (e.g., the equator or lines of longitude).'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'A triangle on Earth from North Pole to equator. Angles sum to?',back:'270° (Three 90° angles). Proves Earth is spherical.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What is the geometry of the universe determined by?',back:'Its mass/energy density, which dictates whether it is flat, spherical, or hyperbolic.'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: The 5th Postulate', difficulty:1, reward:50, timeLimit:45, body:'What does Euclid\'s 5th Postulate state?', options:['All right angles are equal.','Given a line and a point not on it, exactly one parallel line passes through the point.','A straight line can be drawn between any two points.','A circle can be drawn with any center and radius.'], correct:1, explanation:'The 5th postulate (Parallel Postulate) states that given a line and a point not on it, exactly one line through the point is parallel. Changing this creates non-Euclidean geometry.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Axiomatic Method', difficulty:2, reward:100, timeLimit:60, body:'If a mathematical result seems absurd, what is the first thing to check?', options:['Your arithmetic.','Your axioms. The deduction might be correct, but the foundation might be wrong.','Your calculator.','Your intuition.'], correct:1, explanation:'Axioms are the foundation. If the logical steps are sound but the result is absurd, the foundational assumptions (axioms) are likely wrong for that context.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Changing Axioms', difficulty:3, reward:200, timeLimit:90, body:'What happens if you change an axiom in a geometric system?', options:['Nothing, theorems remain true.','You create a completely new universe of geometry.','You get a contradiction.','The system collapses.'], correct:1, explanation:'Axioms define the universe. Changing an axiom changes the entire structure deduced from it. Changing the 5th postulate created spherical and hyperbolic geometry.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The 2000-Year Problem', difficulty:4, reward:500, timeLimit:120, body:'Why did mathematicians fail to prove the 5th postulate from the first four for 2000 years?', options:['They weren\'t smart enough.','The 5th postulate is independent and cannot be proven from the others.','They lacked computers.','They were using the wrong coordinates.'], correct:1, explanation:'The 5th postulate is an independent axiom. It is a choice, not a necessity. It cannot be proven from the first four, which is why non-Euclidean geometries exist.' },
+
+  { id:'p5', moduleId:'m2', title:'Q1: Rigid Motions', difficulty:1, reward:50, timeLimit:45, body:'Which of the following is NOT a rigid motion?', options:['Translation','Rotation','Reflection','Dilation (Scaling)'], correct:3, explanation:'Dilation (scaling) changes size, so it is not a rigid motion. Rigid motions (Translation, Rotation, Reflection) preserve size and shape.' },
+  { id:'p6', moduleId:'m2', title:'Q2: SAS Congruence', difficulty:2, reward:100, timeLimit:60, body:'Two triangles have two equal sides and the angle between them equal. What is the conclusion?', options:['They are similar.','They are congruent.','They are right triangles.','Nothing can be concluded.'], correct:1, explanation:'SAS (Side-Angle-Side) is a congruence criterion. If two sides and the included angle match, the triangles are identical (congruent).' },
+  { id:'p7', moduleId:'m2', title:'Q3: Orientation', difficulty:3, reward:200, timeLimit:90, body:'Which transformation reverses orientation?', options:['Translation','Rotation','Reflection','None of the above'], correct:2, explanation:'Reflection reverses orientation (like a mirror image). Translation and rotation preserve orientation.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Ambiguous Case', difficulty:4, reward:500, timeLimit:120, body:'Why does SSA (Side-Side-Angle) not guarantee triangle congruence?', options:['Because angles don\'t matter.','Because the angle might be obtuse or acute, leading to two possible triangles.','Because sides must be parallel.','Because it requires a right angle.'], correct:1, explanation:'SSA is the "ambiguous case." Depending on whether the angle is acute or obtuse, two distinct triangles can be formed with the same SSA measurements.' },
+
+  { id:'p9', moduleId:'m3', title:'Q1: Similarity', difficulty:1, reward:50, timeLimit:45, body:'Two shapes are similar. What is true?', options:['They are identical in size.','They have the same shape but different sizes (proportional sides, equal angles).','They have different shapes.','They are both circles.'], correct:1, explanation:'Similar shapes have the same angles and proportional sides. One is a scaled version of the other.' },
+  { id:'p10', moduleId:'m3', title:'Q2: AA Similarity', difficulty:2, reward:100, timeLimit:60, body:'Two triangles have two corresponding angles equal. What is the conclusion?', options:['They are congruent.','They are similar.','They are isosceles.','Nothing.'], correct:1, explanation:'AA (Angle-Angle) is a similarity criterion. If two angles match, the third must match (sum to 180°), so the triangles are similar.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Thales\' Theorem', difficulty:3, reward:200, timeLimit:90, body:'A triangle is inscribed in a circle with the diameter as one side. What is the angle opposite the diameter?', options:['45°','60°','90°','180°'], correct:2, explanation:'Thales\' Theorem states that any angle inscribed in a semicircle is a right angle (90°).' },
+  { id:'p12', moduleId:'m3', title:'Q4: Area Scaling', difficulty:4, reward:500, timeLimit:120, body:'Two similar triangles have a side length ratio of 1:3. What is the ratio of their areas?', options:['1:3','1:6','1:9','1:12'], correct:2, explanation:'Area scales with the square of the length ratio. If lengths are 1:3, areas are 1²:3² = 1:9.' },
+
+  { id:'p13', moduleId:'m4', title:'Q1: Pythagoras', difficulty:1, reward:50, timeLimit:45, body:'In a right triangle with legs 3 and 4, what is the hypotenuse?', options:['5','6','7','12'], correct:0, explanation:'By Pythagorean Theorem: a² + b² = c². 3² + 4² = 9 + 16 = 25. c = √25 = 5.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Cavalieri\'s Principle', difficulty:2, reward:100, timeLimit:60, body:'Two solids have the same height and cross-sectional area at every level. What is true?', options:['They have the same surface area.','They have the same volume.','They are congruent.','They are spheres.'], correct:1, explanation:'Cavalieri\'s Principle states that if cross-sections are equal at every level, the volumes are equal, regardless of the overall shape.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Pythagoras as Area', difficulty:3, reward:200, timeLimit:90, body:'The Pythagorean theorem (a² + b² = c²) is fundamentally a statement about what?', options:['Lengths of lines.','Areas of squares.','Angles of triangles.','Volumes of cubes.'], correct:1, explanation:'It is a statement about areas. The area of the square built on the hypotenuse equals the sum of the areas of the squares built on the legs.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Diagonal', difficulty:4, reward:500, timeLimit:120, body:'A square has side length 1. What is the exact length of its diagonal?', options:['1','2','√2','π'], correct:2, explanation:'By Pythagoras: 1² + 1² = d². 2 = d². d = √2. This number was so shocking to the Greeks they tried to hide it.' },
+
+  { id:'p17', moduleId:'m5', title:'Q1: Square Symmetries', difficulty:1, reward:50, timeLimit:45, body:'How many symmetries does a square have?', options:['4','6','8','Infinite'], correct:2, explanation:'A square has 8 symmetries: 4 rotations (0°, 90°, 180°, 270°) and 4 reflections (horizontal, vertical, 2 diagonals).' },
+  { id:'p18', moduleId:'m5', title:'Q2: Noether\'s Theorem', difficulty:2, reward:100, timeLimit:60, body:'What does Noether\'s Theorem state in physics?', options:['Energy is always conserved.','Every symmetry corresponds to a conservation law.','Symmetry is beauty.','Circles are perfect.'], correct:1, explanation:'Noether\'s Theorem proves that every continuous symmetry in physics implies a conservation law (e.g., time symmetry = energy conservation).' },
+  { id:'p19', moduleId:'m5', title:'Q3: Conservation Laws', difficulty:3, reward:200, timeLimit:90, body:'Symmetry under spatial translation (moving the experiment across the room) implies what conservation law?', options:['Conservation of Energy','Conservation of Momentum','Conservation of Charge','Conservation of Mass'], correct:1, explanation:'If the laws of physics are the same everywhere in space (spatial symmetry), momentum is conserved.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Problem Simplification', difficulty:4, reward:500, timeLimit:120, body:'A physics problem has spherical symmetry. How should you solve it?', options:['Use Cartesian coordinates (x,y,z).','Solve the whole sphere at once.','Use spherical coordinates and solve for one radius; the angles are invariant.','Give up.'], correct:2, explanation:'Symmetry dictates that the solution cannot depend on the angles, only the radius. You reduce a 3D problem to 1D. This is the power of symmetry.' },
+
+  { id:'p21', moduleId:'m6', title:'Q1: Isoperimetric Inequality', difficulty:1, reward:50, timeLimit:45, body:'For a given perimeter, which 2D shape encloses the maximum area?', options:['Square','Triangle','Circle','Hexagon'], correct:2, explanation:'The circle is the optimal shape. For a given perimeter, it encloses more area than any other shape.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Shortest Path', difficulty:2, reward:100, timeLimit:60, body:'You need to go from A to B, touching a straight river. What is the shortest path?', options:['A straight line from A to B.','Go perpendicular to the river, then to B.','Reflect B across the river to B\', draw a line from A to B\'. The intersection is the optimal touch point.','Walk along the river.'], correct:2, explanation:'The reflection trick turns the bent path into a straight line. The straight line from A to the reflected B\' crosses the river at the optimal point where angle in = angle out.' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Beehive', difficulty:3, reward:200, timeLimit:90, body:'Why do bees build hexagonal cells instead of circular ones?', options:['Hexagons are prettier.','Circles leave gaps; hexagons tile perfectly and minimize perimeter (wax) for the area.','Hexagons are stronger.','It is easier to build.'], correct:1, explanation:'Hexagons are the most efficient regular polygon that tiles a plane. They minimize the perimeter (wax) needed to enclose a given area.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Soap Bubbles', difficulty:4, reward:500, timeLimit:120, body:'Why are soap bubbles spherical?', options:['Because air is round.','To minimize surface area for a given volume, minimizing surface energy.','Because of the wind.','Because pressure pushes out evenly.'], correct:1, explanation:'Nature minimizes energy. A sphere has the minimum surface area for a given volume, which minimizes the surface tension energy of the soap film.' },
+
+  { id:'p25', moduleId:'m7', title:'Q1: Tiling the Plane', difficulty:1, reward:50, timeLimit:45, body:'Which of these regular polygons CANNOT tile a flat plane?', options:['Triangle','Square','Hexagon','Pentagon'], correct:3, explanation:'A regular pentagon has interior angles of 108°. 360° is not divisible by 108°, so pentagons leave gaps when placed together.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Platonic Solids', difficulty:2, reward:100, timeLimit:60, body:'How many Platonic Solids exist?', options:['3','5','7','Infinite'], correct:1, explanation:'There are exactly 5 Platonic Solids: Tetrahedron, Cube, Octahedron, Dodecahedron, Icosahedron. A 6th is geometrically impossible in 3D space.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Euler\'s Formula', difficulty:3, reward:200, timeLimit:90, body:'A polyhedron has 12 faces and 20 vertices. How many edges does it have?', options:['28','30','32','34'], correct:1, explanation:'Euler\'s Formula: V - E + F = 2. 20 - E + 12 = 2. 32 - E = 2. E = 30. (This is the geometry of a dodecahedron).' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Soccer Ball', difficulty:4, reward:500, timeLimit:120, body:'A soccer ball is made of hexagons and pentagons. Why can\'t it be made of hexagons alone?', options:['It would be too heavy.','Euler\'s formula requires exactly 12 pentagons to close the sphere.','Pentagons are cheaper.','Hexagons don\'t curve.'], correct:1, explanation:'Topology (Euler\'s formula) forbids a sphere tiled purely by hexagons. You need exactly 12 pentagons to provide the curvature to close the shape.' },
+
+  { id:'p29', moduleId:'m8', title:'Q1: Conic Sections', difficulty:1, reward:50, timeLimit:45, body:'What shape is created when a cone is cut parallel to its base?', options:['Circle','Ellipse','Parabola','Hyperbola'], correct:0, explanation:'A horizontal cut (parallel to the base) creates a circle. An angled cut creates an ellipse.' },
+  { id:'p30', moduleId:'m8', title:'Q2: The Parabola', difficulty:2, reward:100, timeLimit:60, body:'Why are satellite dishes parabolic?', options:['They look cool.','They reflect all parallel incoming rays to a single focus.','They are cheap to make.','They resist wind.'], correct:1, explanation:'A parabola reflects all parallel rays (satellite signals) to a single point (the focus), where the receiver is placed, maximizing signal strength.' },
+  { id:'p31', moduleId:'m8', title:'Q3: The Ellipse', difficulty:3, reward:200, timeLimit:90, body:'In an elliptical room, if you stand at one focus and whisper, where can it be heard perfectly?', options:['Everywhere.','Only at the center.','At the other focus.','Nowhere.'], correct:2, explanation:'The reflection property of an ellipse: any ray from one focus reflects off the wall and passes through the other focus. This is why "whispering galleries" work.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Planetary Orbits', difficulty:4, reward:500, timeLimit:120, body:'What is the shape of a planet\'s orbit around the sun?', options:['A perfect circle.','An ellipse, with the sun at one focus.','A parabola.','A hyperbola.'], correct:1, explanation:'Kepler\'s 1st Law: Planetary orbits are ellipses, with the sun at one focus (not the center).' },
+
+  { id:'p33', moduleId:'m9', title:'Q1: Topology', difficulty:1, reward:50, timeLimit:45, body:'What is topology?', back:'The study of geometric properties preserved under continuous deformation (stretching, no tearing).', options:['The study of angles.','The study of properties preserved under continuous deformation (stretching, no tearing).','The study of circles.','The study of coordinates.'], correct:0, explanation:'Topology is "rubber-sheet geometry". You can stretch and twist, but not tear. Size and shape don\'t matter; connectivity does.' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Donut', difficulty:2, reward:100, timeLimit:60, body:'Why is a coffee mug topologically equivalent to a donut?', options:['They are the same size.','They both have exactly one hole.','They are both round.','They are made of the same material.'], correct:1, explanation:'Topologically, the number of holes (genus) is what matters. A mug has one hole (the handle), just like a donut. You can deform one into the other.' },
+  { id:'p35', moduleId:'m9', title:'Q3: The Genus', difficulty:3, reward:200, timeLimit:90, body:'What is the genus of a sphere?', options:['0','1','2','Infinite'], correct:0, explanation:'Genus is the number of holes. A sphere has 0 holes. A donut has 1. A figure-8 has 2.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Knot', difficulty:4, reward:500, timeLimit:120, body:'Can a trefoil knot be continuously deformed into a simple circle?', options:['Yes, if you twist it right.','No, you must cut it.','Yes, if you stretch it.','Only in 4D space.'], correct:1, explanation:'A trefoil knot is topologically distinct from a circle. You cannot untie it without cutting the string. Knot theory studies these invariants.' },
+
+  { id:'p37', moduleId:'m10', title:'Q1: Spherical Geometry', difficulty:1, reward:50, timeLimit:45, body:'In spherical geometry, how many parallel lines pass through a point not on a given line?', options:['0','1','2','Infinite'], correct:0, explanation:'Zero. On a sphere, all "lines" (great circles) intersect. There are no parallel lines on a sphere.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Triangle Angles', difficulty:2, reward:100, timeLimit:60, body:'In hyperbolic geometry, what is the sum of angles in a triangle?', options:['Exactly 180°','Greater than 180°','Less than 180°','Always 360°'], correct:2, explanation:'In hyperbolic space (negative curvature, like a saddle), triangle angles sum to less than 180°. In spherical (positive curvature), they sum to more than 180°.' },
+  { id:'p39', moduleId:'m10', title:'Q3: General Relativity', difficulty:3, reward:200, timeLimit:90, body:'Why is the geometry of spacetime non-Euclidean?', options:['Because light bends.','Because mass curves spacetime.','Because the universe is expanding.','Because black holes exist.'], correct:1, explanation:'Einstein\'s General Relativity states that mass/energy curves spacetime. The geometry near massive objects (like stars) is not flat (Euclidean).' },
+  { id:'p40', moduleId:'m10', title:'Q4: The North Pole', difficulty:4, reward:500, timeLimit:120, body:'A triangle on Earth is formed by the North Pole and two points on the equator 90° apart. What is the sum of its angles?', options:['180°','270°','360°','540°'], correct:1, explanation:'The two angles at the equator are 90° each. The angle at the North Pole is 90°. Total = 270°. This proves Earth is spherical (non-Euclidean).' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: City Blueprint', scenario:'You are designing a new city. You must start with foundational rules. What is the geometric equivalent of "axioms" for urban planning?', options:['The building materials.','The core assumptions: grid layout, zoning laws, traffic flow rules. Changing these changes the entire city structure.','The mayor\'s preferences.','The budget.'], correct:1, explanation:'Axioms are the foundational rules. In city planning, the grid layout and zoning laws are the axioms. Changing them (e.g., from grid to radial) completely alters the city\'s geometry.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: Modular Housing', scenario:'You need to mass-produce housing modules that can be stacked and rotated without changing their footprint. What geometric concept are you using?', options:['Similarity','Congruence (Rigid Motions)','Topology','Symmetry'], correct:1, explanation:'You are using congruence. The modules are identical (congruent) and can be moved via rigid motions (translation, rotation) without changing shape or size.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Scaling Parks', scenario:'You have a triangular park design that works for 1 acre. You need to build a similar park for 4 acres. How do the side lengths scale?', options:['They double (1:2 ratio).','They quadruple (1:4 ratio).','They stay the same.','They triple.'], correct:0, explanation:'Area scales with the square of the length. If area is 4x larger, the scale factor is √4 = 2. The side lengths double.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: Calculating Volume', scenario:'You need to calculate the volume of an oddly shaped dome. You slice it horizontally and find the area of each cross-section. What principle allows you to sum these to find volume?', options:['Pythagorean Theorem','Cavalieri\'s Principle','Isoperimetric Inequality','Euler\'s Formula'], correct:1, explanation:'Cavalieri\'s Principle (and integral calculus) allows you to calculate volume by integrating the cross-sectional area over the height.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: Traffic Rotaries', scenario:'You design a traffic rotary (roundabout). It is perfectly circular. How many rotational symmetries does it have?', options:['4','8','360','Infinite'], correct:3, explanation:'A perfect circle has infinite rotational symmetries. You can rotate it by any fraction of a degree and it looks identical.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: Fencing', scenario:'You have 1000 meters of fence. You want to enclose the maximum area for a park. What shape should you use?', options:['Square','Triangle','Circle','Rectangle'], correct:2, explanation:'The Isoperimetric Inequality states that for a given perimeter, the circle encloses the maximum area.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: Paving', scenario:'You need to pave the city plaza with identical regular polygon tiles without cutting any tiles. Which shape can you NOT use?', options:['Triangles','Squares','Hexagons','Pentagons'], correct:3, explanation:'Regular pentagons cannot tile a flat plane because their interior angle (108°) does not divide 360° evenly.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Atrium', scenario:'You design an elliptical atrium. If you place a sound system at one focal point, where will the sound perfectly converge?', options:['At the center.','At the other focal point.','Everywhere.','At the edges.'], correct:1, explanation:'The reflection property of an ellipse: sound waves from one focus reflect off the walls and converge perfectly at the other focus.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: Road Network', scenario:'Your road network has 12 intersections (vertices) and 20 road segments (edges). How many blocks (faces) does it create, assuming it is a planar graph?', options:['8','10','12','14'], correct:1, explanation:'Euler\'s Formula for planar graphs: V - E + F = 2. 12 - 20 + F = 2. F = 10 blocks.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Dome', scenario:'You are building a geodesic dome over the city. The surface is composed of triangular panels. What geometric property does this utilize?', options:['Triangles are rigid. Unlike squares, they cannot be deformed without changing side lengths.','Triangles are cheap.','Triangles are Euclidean.','Triangles are symmetric.'], correct:0, explanation:'A triangle is the only rigid polygon. If you build a structure with triangles (like a geodesic dome), it cannot be deformed without breaking a side. This is structural rigidity.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Axiom Check', body:'Identify a "rule" you follow in life. Is it an axiom (self-evident) or a theorem (derived from something deeper)?' },
+  { id:'rw2', title:'The Rigid Motion', body:'Look at a pattern on a floor or wallpaper. Identify the translations, rotations, and reflections used.' },
+  { id:'rw3', title:'The Similarity', body:'Find two objects of the same shape but different sizes (e.g., two monitors). Verify their proportions are identical.' },
+  { id:'rw4', title:'The Pythagoras', body:'Measure a rectangular room. Calculate the diagonal using a² + b² = c². Verify with a tape measure.' },
+  { id:'rw5', title:'The Symmetry', body:'Count the symmetries of an object on your desk (e.g., a mug, a phone).' },
+  { id:'rw6', title:'The Shortest Path', body:'Look at a map. Find the shortest path between two points that must touch a highway. Use the reflection trick.' },
+  { id:'rw7', title:'The Tiling', body:'Look at a tiled floor. Why does it work? What are the angles? Could you tile it with pentagons?' },
+  { id:'rw8', title:'The Conic', body:'Shine a flashlight at different angles on a wall. Identify the circle, ellipse, and parabola.' },
+  { id:'rw9', title:'The Topology', body:'Look at a coffee mug and a donut. Convince yourself they are topologically identical (genus 1).' },
+  { id:'rw10', title:'The Non-Euclidean', body:'Look at a globe. Trace a triangle starting at the North Pole, down to the equator, along the equator, and back up. The angles sum to 270°, not 180°.' },
+  { id:'rw11', title:'The Foundation', body:'Next time you argue a point, identify your "axioms"—the things you assume to be true without proof.' },
+  { id:'rw12', title:'The Reflection', body:'Look in a mirror. Notice that left and right are swapped, but up and down are not. Why? (Orientation reversal).' },
+  { id:'rw13', title:'The Scale', body:'If you scale a recipe up by 2x, the volume increases by 8x (2³). Check this mentally next time you cook.' },
+  { id:'rw14', title:'The Area', body:'Draw a complex shape on paper. Cut it into triangles and rectangles to estimate its area.' },
+  { id:'rw15', title:'The Invariance', body:'What stays the same when you rotate your phone? The shape and size. That is symmetry.' },
+  { id:'rw16', title:'The Optimum', body:'Why are pipes circular? For a given amount of material (perimeter), they maximize flow (area).' },
+  { id:'rw17', title:'The Hexagon', body:'Look at a honeycomb or a bathroom tile. Why hexagons? They tile perfectly and minimize perimeter.' },
+  { id:'rw18', title:'The Focus', body:'Look at a satellite dish. It is parabolic to focus signals to the receiver at the focus.' },
+  { id:'rw19', title:'The Hole', body:'Count the holes in your clothing (sleeves, neck, buttons). Genus matters in topology.' },
+  { id:'rw20', title:'The Curvature', body:'Stand on a hill. The ground is not flat. The shortest path is not a straight line on a map, but a geodesic on the curved surface.' },
+  { id:'rw21', title:'The Deduction', body:'Prove something simple from first principles, step by step, like Euclid.' },
+  { id:'rw22', title:'The Congruence', body:'Two identical chairs are congruent. You can translate one to overlap the other perfectly.' },
+  { id:'rw23', title:'The Thales', body:'Draw a semicircle. Pick any point on the curve. Connect to the endpoints. It forms a right angle.' },
+  { id:'rw24', title:'The Cavalieri', body:'Stack coins. If they have the same area, the stack volume depends only on height, not alignment.' },
+  { id:'rw25', title:'The Group', body:'Rotate a square 90° four times. You get back to the start. That\'s a group (closure, identity, inverse).' },
+  { id:'rw26', title:'The Isoperimetric', body:'A circle encloses more area than a square of the same perimeter. Nature prefers circles.' },
+  { id:'rw27', title:'The Platonic', body:'There are only 5 Platonic solids. A 6th is impossible in 3D space.' },
+  { id:'rw28', title:'The Ellipse', body:'An ellipse has two foci. The sum of distances from any point to the foci is constant.' },
+  { id:'rw29', title:'The Knot', body:'Tie a knot in a string. You cannot untie it without letting go of the ends. It is topologically distinct from a circle.' },
+  { id:'rw30', title:'The GPS', body:'GPS satellites correct for General Relativity because spacetime is curved by Earth\'s mass.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your spatial profile.' },
+  { threshold: 500, title: 'DRAFTSMAN', desc: 'You see the world in lines, angles, and rigid motions.' },
+  { threshold: 1500, title: 'ARCHITECT', desc: 'You understand symmetry, scaling, and optimal forms.' },
+  { threshold: 3000, title: 'TOPOLOGIST', desc: 'You bend space in your mind. Holes matter more than shapes.' },
+  { threshold: 6000, title: 'GEOMETER', desc: 'You navigate curved space and non-Euclidean realities. Geometry is your native language.' }
+];
+
+const STORAGE_KEY = 'euclid-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// TESSELLATION ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Tessellation. You now possess the complete spatial architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Space is not just a container; it is a structured medium governed by axioms, symmetries, and curvature. By training your mind to manipulate shapes, visualize transformations, and count topological invariants, you have unlocked a cognitive mode distinct from pure logic or calculation. You see the hidden geometry in architecture, nature, and data. You are now a Geometer.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Tessellation: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your spatial architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="EUCLID.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="EUCLID.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="EUCLID.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="EUCLID.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="EUCLID.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="EUCLID.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="EUCLID.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="EUCLID.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'TESSELLATED' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each spatial axis to the city design scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="EUCLID.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="EUCLID.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="EUCLID.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'tessellation: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="EUCLID.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="EUCLID.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="EUCLID.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="EUCLID.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="EUCLID.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="EUCLID.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="EUCLID.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="EUCLID.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="EUCLID.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="EUCLID.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="EUCLID.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="EUCLID.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="EUCLID.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="EUCLID.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="EUCLID.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="EUCLID.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="EUCLID.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="EUCLID.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'euclid_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading spatial/geometry kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Tessellation...', 'EUCLID online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.EUCLID = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  // Track activity for Hub Heatmap
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
