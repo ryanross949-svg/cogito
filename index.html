@@ -19,9 +19,14 @@
                 var(--void);
     color: var(--text); font-family: var(--display); min-height: 100vh; padding: 2rem;
   }
-  header { text-align: center; margin-bottom: 3rem; }
+  header { text-align: center; margin-bottom: 2rem; }
   h1 { font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
   .sub { color: var(--text-dim); font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; }
+  
+  .global-stats { max-width: 800px; margin: 0 auto 3rem; text-align: center; background: var(--panel); border: 1px solid var(--magenta); padding: 2rem; border-radius: 8px; box-shadow: 0 0 30px rgba(255,45,156,0.1); }
+  .global-label { font-size: 0.8rem; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; }
+  .global-value { font-size: 3rem; font-weight: 700; color: var(--cyan); text-shadow: 0 0 15px rgba(0,217,255,0.5); }
+  .global-sub { font-size: 0.9rem; color: var(--green); margin-top: 0.5rem; }
   
   .domain-section { max-width: 1000px; margin: 0 auto 3rem; }
   .domain-title { font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
@@ -35,12 +40,12 @@
     position: relative; overflow: hidden;
   }
   a:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 10px 30px rgba(0,217,255,0.1); }
-  a::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--cyan); opacity: 0; transition: 0.3s; }
-  a:hover::before { opacity: 1; }
   
+  .app-header { display: flex; justify-content: space-between; align-items: center; }
   .app-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
+  .app-level { font-size: 0.8rem; font-weight: 700; color: var(--amber); border: 1px solid var(--amber); padding: 0.2rem 0.5rem; border-radius: 2px; }
   .app-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; flex: 1; }
-  .app-tag { font-size: 0.7rem; color: var(--amber); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; }
+  .app-tag { font-size: 0.7rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; }
   
   .locked { opacity: 0.3; pointer-events: none; }
   
@@ -53,49 +58,67 @@
     <div class="sub">Interactive Training Simulators</div>
   </header>
 
+  <div class="global-stats" id="globalStats">
+    <div class="global-label">// Global Operator Level</div>
+    <div class="global-value" id="globalLevel">1</div>
+    <div class="global-sub" id="globalXp">0 Total XP</div>
+  </div>
+
   <div class="domain-section">
     <div class="domain-title">🛡️ Strategy & Economics</div>
-    <div class="grid">
-      <a href="nash.html">
-        <div class="app-title">NASH</div>
-        <div class="app-desc">Game theory, Nash Equilibria, mechanism design, and strategic decision-making modeled after MIT 14.12.</div>
-        <div class="app-tag">10 Axes · 120 Cards</div>
-      </a>
-    </div>
+    <div class="grid" id="strategy-grid"></div>
   </div>
 
   <div class="domain-section">
     <div class="domain-title">⚙️ Engineering & Execution</div>
-    <div class="grid">
-      <a href="prima.html">
-        <div class="app-title">PRIMA</div>
-        <div class="app-desc">First-principles thinking, the idiot index, and the 5-step engineering algorithm modeled after Elon Musk.</div>
-        <div class="app-tag">10 Axes · 120 Cards</div>
-      </a>
-    </div>
+    <div class="grid" id="engineering-grid"></div>
   </div>
 
   <div class="domain-section">
     <div class="domain-title">🧠 AI & Technology</div>
-    <div class="grid">
-      <a href="oracle.html">
-        <div class="app-title">ORACLE</div>
-        <div class="app-desc">Prompt engineering, agentic workflows, and cognitive symbiosis to stay competitive at the AI frontier.</div>
-        <div class="app-tag">10 Axes · 120 Cards</div>
-      </a>
-    </div>
+    <div class="grid" id="ai-grid"></div>
   </div>
 
-  <div class="domain-section">
-    <div class="domain-title">📐 Mathematics & Physics</div>
-    <div class="grid">
-      <a href="#" class="locked">
-        <div class="app-title">FERMI</div>
-        <div class="app-desc">Coming Soon: Order-of-magnitude estimation, physics limits, and mental math frameworks.</div>
-        <div class="app-tag">In Development</div>
-      </a>
-    </div>
-  </div>
+<script>
+const APPS = [
+  { id: 'prima', name: 'PRIMA', domain: 'engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
+  { id: 'nash', name: 'NASH', domain: 'strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v1', href: 'nash.html' },
+  { id: 'oracle', name: 'ORACLE', domain: 'ai', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v1', href: 'oracle.html' }
+];
 
+function getLevel(xp) { return Math.floor(Math.sqrt(xp/100)) + 1; }
+
+let totalXP = 0;
+
+APPS.forEach(app => {
+  const savedData = localStorage.getItem(app.storageKey);
+  let xp = 0;
+  let level = 1;
+  if (savedData) {
+    try {
+      const parsed = JSON.parse(savedData);
+      xp = parsed.xp || 0;
+      level = getLevel(xp);
+      totalXP += xp;
+    } catch(e) {}
+  }
+  
+  const grid = document.getElementById(app.domain + '-grid');
+  const card = document.createElement('a');
+  card.href = app.href;
+  card.innerHTML = `
+    <div class="app-header">
+      <div class="app-title">${app.name}</div>
+      <div class="app-level">LVL ${level}</div>
+    </div>
+    <div class="app-desc">${app.desc}</div>
+    <div class="app-tag">${app.tag} · ${xp} XP</div>
+  `;
+  grid.appendChild(card);
+});
+
+document.getElementById('globalLevel').textContent = getLevel(totalXP);
+document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
+</script>
 </body>
 </html>
