@@ -3,23 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cognitive Architecture Hub</title>
+<title>Cogito // The Hub</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 <style>
-  body { background: #050810; color: #E0F4FF; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-  h1 { font-size: 2.5rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 2rem; }
-  .grid { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
-  a { text-decoration: none; color: #00D9FF; border: 1px solid #00D9FF; padding: 2rem; border-radius: 8px; width: 250px; text-align: center; transition: 0.3s; background: rgba(0,217,255,0.05); }
-  a:hover { background: #00D9FF; color: #050810; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,217,255,0.2); }
-  a h2 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
-  a p { margin: 0; font-size: 0.85rem; opacity: 0.8; }
+  :root {
+    --void: #050810; --panel: rgba(15,10,26,0.7); 
+    --cyan: #00D9FF; --magenta: #FF2D9C; --green: #00FFA3; --amber: #FFB800;
+    --text: #E6E6FA; --text-dim: #7A6E94;
+    --display: 'Segoe UI', Helvetica, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%),
+                var(--void);
+    color: var(--text); font-family: var(--display); min-height: 100vh; padding: 2rem;
+  }
+  header { text-align: center; margin-bottom: 3rem; }
+  h1 { font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
+  .sub { color: var(--text-dim); font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; }
+  
+  .domain-section { max-width: 1000px; margin: 0 auto 3rem; }
+  .domain-title { font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  
+  a {
+    text-decoration: none; color: var(--text); border: 1px solid rgba(255,255,255,0.1);
+    padding: 1.5rem; border-radius: 6px; background: var(--panel);
+    transition: 0.3s; display: flex; flex-direction: column; gap: 0.5rem;
+    position: relative; overflow: hidden;
+  }
+  a:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 10px 30px rgba(0,217,255,0.1); }
+  a::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--cyan); opacity: 0; transition: 0.3s; }
+  a:hover::before { opacity: 1; }
+  
+  .app-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
+  .app-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; flex: 1; }
+  .app-tag { font-size: 0.7rem; color: var(--amber); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; }
+  
+  .locked { opacity: 0.3; pointer-events: none; }
+  
+  @media(max-width: 600px) { h1 { font-size: 2.2rem; } body { padding: 1rem; } }
 </style>
 </head>
 <body>
-  <h1>Cognitive Architecture</h1>
-  <div class="grid">
-    <a href="prima.html"><h2>PRIMA</h2><p>Elon Musk // First Principles</p></a>
-    <a href="nash.html"><h2>NASH</h2><p>MIT // Game Theory</p></a>
-    <a href="oracle.html"><h2>ORACLE</h2><p>AI // Cognitive Symbiosis</p></a>
+  <header>
+    <h1>Cogito</h1>
+    <div class="sub">Interactive Training Simulators</div>
+  </header>
+
+  <div class="domain-section">
+    <div class="domain-title">🛡️ Strategy & Economics</div>
+    <div class="grid">
+      <a href="nash.html">
+        <div class="app-title">NASH</div>
+        <div class="app-desc">Game theory, Nash Equilibria, mechanism design, and strategic decision-making modeled after MIT 14.12.</div>
+        <div class="app-tag">10 Axes · 120 Cards</div>
+      </a>
+    </div>
   </div>
+
+  <div class="domain-section">
+    <div class="domain-title">⚙️ Engineering & Execution</div>
+    <div class="grid">
+      <a href="prima.html">
+        <div class="app-title">PRIMA</div>
+        <div class="app-desc">First-principles thinking, the idiot index, and the 5-step engineering algorithm modeled after Elon Musk.</div>
+        <div class="app-tag">10 Axes · 120 Cards</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="domain-section">
+    <div class="domain-title">🧠 AI & Technology</div>
+    <div class="grid">
+      <a href="oracle.html">
+        <div class="app-title">ORACLE</div>
+        <div class="app-desc">Prompt engineering, agentic workflows, and cognitive symbiosis to stay competitive at the AI frontier.</div>
+        <div class="app-tag">10 Axes · 120 Cards</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="domain-section">
+    <div class="domain-title">📐 Mathematics & Physics</div>
+    <div class="grid">
+      <a href="#" class="locked">
+        <div class="app-title">FERMI</div>
+        <div class="app-desc">Coming Soon: Order-of-magnitude estimation, physics limits, and mental math frameworks.</div>
+        <div class="app-tag">In Development</div>
+      </a>
+    </div>
+  </div>
+
 </body>
 </html>
