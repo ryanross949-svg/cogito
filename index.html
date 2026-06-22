@@ -13,16 +13,51 @@
     --border: rgba(157,78,221,0.2); --border-bright: rgba(157,78,221,0.5);
     --display: 'Chakra Petch', sans-serif; --mono: 'JetBrains Mono', monospace;
   }
+  /* THEMES */
+  [data-theme="matrix"] {
+    --void:#000000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505;
+    --cyan:#00FF41; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366;
+    --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00;
+    --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5);
+  }
+  [data-theme="cyberpunk"] {
+    --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A;
+    --cyan:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C;
+    --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060;
+    --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6);
+  }
+  [data-theme="light"] {
+    --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF;
+    --cyan:#268BD2; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F;
+    --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1;
+    --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3);
+  }
+  [data-theme="nord"] {
+    --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440;
+    --cyan:#88C0D0; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A;
+    --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A;
+    --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%),
                 radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%),
                 var(--void);
     color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem;
+    transition: background 0.3s, color 0.3s;
   }
   header { text-align: center; margin-bottom: 2rem; }
   h1 { font-family: var(--display); font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
   .sub { color: var(--text-dim); font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; }
+
+  .theme-dropdown { position: relative; display: inline-block; margin-bottom: 2rem; }
+  .theme-btn { font-size: 0.7rem; color: var(--text-dim); background: transparent; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
+  .theme-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .theme-menu { position: absolute; top: 120%; left: 50%; transform: translateX(-50%); background: var(--panel-solid); border: 1px solid var(--border-bright); border-radius: 4px; display: none; flex-direction: column; z-index: 100; min-width: 120px; }
+  .theme-menu.active { display: flex; }
+  .theme-option { padding: 0.5rem 1rem; font-size: 0.7rem; color: var(--text-dim); cursor: pointer; border: none; background: none; text-align: center; font-family: var(--mono); text-transform: uppercase; }
+  .theme-option:hover { background: var(--panel); color: var(--cyan); }
   
   .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; }
   @media(max-width: 800px) { .hub-grid { grid-template-columns: 1fr; } }
@@ -42,9 +77,9 @@
   
   .radar-wrap { display: flex; align-items: center; justify-content: center; padding: 1rem 0; }
   .radar-svg { width: 100%; max-width: 300px; height: auto; }
-  .radar-axis { stroke: rgba(157,78,221,0.15); stroke-width: 1; }
-  .radar-ring { fill: none; stroke: rgba(157,78,221,0.08); stroke-width: 1; }
-  .radar-poly { fill: rgba(0,217,255,0.15); stroke: var(--cyan); stroke-width: 2; filter: drop-shadow(0 0 8px rgba(0,217,255,0.5)); transition: all 0.8s ease; }
+  .radar-axis { stroke: var(--border); stroke-width: 1; }
+  .radar-ring { fill: none; stroke: var(--border); stroke-width: 1; opacity: 0.5; }
+  .radar-poly { fill: rgba(0,217,255,0.15); stroke: var(--cyan); stroke-width: 2; filter: drop-shadow(0 0 8px var(--cyan)); transition: all 0.8s ease; }
   .radar-label { font-family: var(--display); font-size: 10px; fill: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
   .radar-label.active { fill: var(--cyan); }
 
@@ -78,6 +113,16 @@
   <header>
     <h1>Cogito</h1>
     <div class="sub">Interactive Training Simulators</div>
+    <div class="theme-dropdown" style="margin-top: 1rem;">
+      <button class="theme-btn" id="themeBtn">Theme</button>
+      <div class="theme-menu" id="themeMenu">
+        <button class="theme-option" onclick="HUB.setTheme('quantum')">Quantum</button>
+        <button class="theme-option" onclick="HUB.setTheme('matrix')">Matrix</button>
+        <button class="theme-option" onclick="HUB.setTheme('cyberpunk')">Cyberpunk</button>
+        <button class="theme-option" onclick="HUB.setTheme('light')">Light</button>
+        <button class="theme-option" onclick="HUB.setTheme('nord')">Nord</button>
+      </div>
+    </div>
   </header>
 
   <div class="hub-grid">
@@ -124,8 +169,8 @@
 <script>
 const APPS = [
   { id: 'prima', name: 'PRIMA', domain: 'engineering', axisName: 'Engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
-  { id: 'nash', name: 'NASH', domain: 'strategy', axisName: 'Strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v1', href: 'nash.html' },
-  { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v1', href: 'oracle.html' }
+  { id: 'nash', name: 'NASH', domain: 'strategy', axisName: 'Strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v7', href: 'nash.html' },
+  { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' }
 ];
 
 function getLevel(xp) { return Math.floor(Math.sqrt(xp/100)) + 1; }
@@ -193,7 +238,6 @@ function drawHubRadar() {
   const n = appData.length;
   const R = 95;
   
-  // Rings
   [0.25, 0.5, 0.75, 1].forEach(r => {
     const points = [];
     for(let i = 0; i < n; i++){
@@ -206,7 +250,6 @@ function drawHubRadar() {
     svg.appendChild(ring);
   });
   
-  // Axes
   for(let i = 0; i < n; i++){
     const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -216,7 +259,6 @@ function drawHubRadar() {
     svg.appendChild(line);
   }
   
-  // Mastery Polygon
   const points = [];
   for(let i = 0; i < n; i++){
     const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
@@ -228,7 +270,6 @@ function drawHubRadar() {
   poly.setAttribute('class', 'radar-poly');
   svg.appendChild(poly);
   
-  // Labels
   for(let i = 0; i < n; i++){
     const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
     const labelR = R + 18;
@@ -289,6 +330,25 @@ if (totalXP > 0) {
 document.getElementById('profTitle').textContent = profile.title;
 document.getElementById('profDesc').textContent = profile.desc;
 
+// Theme Switcher Logic
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme);
+  document.getElementById('themeMenu').classList.remove('active');
+}
+
+document.getElementById('themeBtn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('themeMenu').classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.theme-dropdown')) {
+    document.getElementById('themeMenu').classList.remove('active');
+  }
+});
+
+window.HUB = { setTheme };
 </script>
 </body>
 </html>
