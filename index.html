@@ -11,46 +11,22 @@
     --cyan: #00D9FF; --magenta: #FF2D9C; --green: #00FFA3; --amber: #FFB800; --red: #FF3355;
     --text: #E6E6FA; --text-dim: #7A6E94; --text-faint: #4A4060;
     --border: rgba(157,78,221,0.2); --border-bright: rgba(157,78,221,0.5);
-    --display: 'Chakra Petch', sans-serif; --mono: 'JetBrains Mono', monospace;
+    --display: 'Segoe UI', Helvetica, sans-serif; --mono: 'JetBrains Mono', monospace;
   }
   /* THEMES */
-  [data-theme="matrix"] {
-    --void:#000000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505;
-    --cyan:#00FF41; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366;
-    --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00;
-    --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5);
-  }
-  [data-theme="cyberpunk"] {
-    --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A;
-    --cyan:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C;
-    --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060;
-    --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6);
-  }
-  [data-theme="light"] {
-    --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF;
-    --cyan:#268BD2; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F;
-    --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1;
-    --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3);
-  }
-  [data-theme="nord"] {
-    --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440;
-    --cyan:#88C0D0; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A;
-    --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A;
-    --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3);
-  }
+  [data-theme="matrix"] { --void:#000000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+  [data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+  [data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+  [data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%),
-                var(--void);
-    color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem;
-    transition: background 0.3s, color 0.3s;
+    background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%), radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%), var(--void);
+    color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem; transition: background 0.3s, color 0.3s;
   }
   header { text-align: center; margin-bottom: 2rem; }
   h1 { font-family: var(--display); font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
   .sub { color: var(--text-dim); font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; }
-
   .theme-dropdown { position: relative; display: inline-block; margin-bottom: 2rem; }
   .theme-btn { font-size: 0.7rem; color: var(--text-dim); background: transparent; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
   .theme-btn:hover { border-color: var(--cyan); color: var(--cyan); }
@@ -61,16 +37,13 @@
   
   .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; }
   @media(max-width: 800px) { .hub-grid { grid-template-columns: 1fr; } }
-
   .panel { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; position: relative; backdrop-filter: blur(8px); border-radius: 4px; }
   .panel::before { content:''; position:absolute; top:-1px; left:-1px; width:18px; height:18px; border-top:1px solid var(--cyan); border-left:1px solid var(--cyan); }
   .panel::after { content:''; position:absolute; bottom:-1px; right:-1px; width:18px; height:18px; border-bottom:1px solid var(--cyan); border-right:1px solid var(--cyan); }
   .panel-label { font-size: 0.6rem; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 1rem; }
-
   .global-stats { text-align: center; }
   .global-value { font-family: var(--display); font-size: 3.5rem; font-weight: 700; color: var(--cyan); text-shadow: 0 0 15px rgba(0,217,255,0.5); line-height: 1; }
   .global-sub { font-size: 0.85rem; color: var(--green); margin-top: 0.5rem; letter-spacing: 0.1em; }
-
   .profile-card { text-align: center; }
   .profile-title { font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: var(--magenta); letter-spacing: 0.1em; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,45,156,0.4); }
   .profile-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
@@ -83,19 +56,27 @@
   .radar-label { font-family: var(--display); font-size: 10px; fill: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
   .radar-label.active { fill: var(--cyan); }
 
+  /* Heatmap */
+  .heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10px, 1fr)); gap: 2px; margin-top: 0.5rem; }
+  .heat-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.05); border-radius: 1px; }
+  .heat-active-1 { background: rgba(0,217,255,0.2); }
+  .heat-active-2 { background: rgba(0,217,255,0.4); }
+  .heat-active-3 { background: rgba(0,217,255,0.6); }
+  .heat-active-4 { background: var(--cyan); box-shadow: 0 0 4px var(--cyan); }
+
+  /* Achievements */
+  .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+  .ach-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem 0.5rem; text-align: center; border-radius: 4px; opacity: 0.4; transition: all 0.3s; }
+  .ach-card.unlocked { opacity: 1; border-color: var(--green); background: rgba(0,255,163,0.05); box-shadow: 0 0 10px rgba(0,255,163,0.1); }
+  .ach-icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
+  .ach-name { font-size: 0.7rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+  .ach-desc { font-size: 0.6rem; color: var(--text-dim); line-height: 1.2; }
+
   .domain-section { max-width: 1000px; margin: 0 auto 3rem; }
   .domain-title { font-family: var(--display); font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
-  
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-  
-  a {
-    text-decoration: none; color: var(--text); border: 1px solid rgba(255,255,255,0.1);
-    padding: 1.5rem; border-radius: 6px; background: var(--panel);
-    transition: 0.3s; display: flex; flex-direction: column; gap: 0.5rem;
-    position: relative; overflow: hidden;
-  }
+  a { text-decoration: none; color: var(--text); border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 6px; background: var(--panel); transition: 0.3s; display: flex; flex-direction: column; gap: 0.5rem; position: relative; overflow: hidden; }
   a:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 10px 30px rgba(0,217,255,0.1); }
-  
   .app-header { display: flex; justify-content: space-between; align-items: center; }
   .app-title { font-family: var(--display); font-size: 1.4rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
   .app-level { font-size: 0.75rem; font-weight: 700; color: var(--amber); border: 1px solid var(--amber); padding: 0.2rem 0.5rem; border-radius: 2px; font-family: var(--mono); }
@@ -103,8 +84,21 @@
   .app-tag { font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; display: flex; justify-content: space-between; }
   .maturity-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
   .maturity-fill { height: 100%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); transition: width 0.8s; }
-  
-  .locked { opacity: 0.3; pointer-events: none; }
+
+  /* Feedback Widget */
+  #feedback-fab { position:fixed; bottom:2rem; right:2rem; z-index:90; background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
+  #feedback-fab:hover { border-color:var(--cyan); color:var(--cyan); }
+  #feedback-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
+  .modal-content { background:var(--panel-solid); border:1px solid var(--cyan); padding:2rem; max-width:500px; width:90%; border-radius:8px; position:relative; }
+  .close-btn { position:absolute; top:1rem; right:1rem; cursor:pointer; color:var(--text-dim); font-size:1.2rem; background:none; border:none; }
+  .modal-title { font-family:var(--display); color:var(--cyan); margin-bottom:1.5rem; letter-spacing:0.1em; }
+  .fb-row { display:grid; gap:1.5rem; }
+  .fb-q { display:flex; justify-content:space-between; align-items:center; }
+  .fb-label { font-size:0.85rem; }
+  .fb-yn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 0.2rem 0.6rem; border-radius: 2px; cursor: pointer; font-family: var(--mono); font-size: 0.7rem; margin-left: 0.5rem; }
+  .fb-yn.selected { background: var(--cyan); color: var(--void); border-color: var(--cyan); }
+  .fb-text { display:none; width:100%; margin-top:0.5rem; background:var(--void); border:1px solid var(--border); color:var(--text); padding:0.75rem; border-radius:4px; font-family:var(--mono); font-size:0.8rem; resize:vertical; }
+  .submit-btn { width:100%; margin-top:1.5rem; background:var(--cyan); color:var(--void); border:none; padding:0.75rem; font-family:var(--mono); font-weight:700; text-transform:uppercase; cursor:pointer; border-radius:4px; letter-spacing:0.1em; }
   
   @media(max-width: 600px) { h1 { font-size: 2.2rem; } body { padding: 1rem; } }
 </style>
@@ -151,19 +145,52 @@
     </div>
   </div>
 
+  <div class="hub-grid">
+    <div class="panel">
+      <div class="panel-label">// Activity Heatmap (Last 150 Days)</div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-label">// Achievements</div>
+      <div class="ach-grid" id="achGrid"></div>
+    </div>
+  </div>
+
   <div class="domain-section">
     <div class="domain-title">🛡️ Strategy & Economics</div>
     <div class="grid" id="strategy-grid"></div>
   </div>
-
   <div class="domain-section">
     <div class="domain-title">⚙️ Engineering & Execution</div>
     <div class="grid" id="engineering-grid"></div>
   </div>
-
   <div class="domain-section">
     <div class="domain-title">🧠 AI & Technology</div>
     <div class="grid" id="ai-grid"></div>
+  </div>
+
+  <!-- Feedback Widget -->
+  <button id="feedback-fab">Feedback</button>
+  <div id="feedback-modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeFeedback">&times;</button>
+      <h3 class="modal-title">// Transmit Feedback</h3>
+      <div class="fb-row">
+        <div>
+          <div class="fb-q"><span class="fb-label">Any issues or bugs?</span><div><button class="fb-yn" data-q="issue" data-a="yes">Yes</button><button class="fb-yn" data-q="issue" data-a="no">No</button></div></div>
+          <textarea class="fb-text" id="fb-issue" placeholder="Describe the issue..."></textarea>
+        </div>
+        <div>
+          <div class="fb-q"><span class="fb-label">Any features you want added?</span><div><button class="fb-yn" data-q="feature" data-a="yes">Yes</button><button class="fb-yn" data-q="feature" data-a="no">No</button></div></div>
+          <textarea class="fb-text" id="fb-feature" placeholder="Describe the feature..."></textarea>
+        </div>
+        <div>
+          <div class="fb-q"><span class="fb-label">Any courses you want to learn?</span><div><button class="fb-yn" data-q="course" data-a="yes">Yes</button><button class="fb-yn" data-q="course" data-a="no">No</button></div></div>
+          <textarea class="fb-text" id="fb-course" placeholder="Describe the course..."></textarea>
+        </div>
+      </div>
+      <button class="submit-btn" id="submitFeedback">Submit to GitHub</button>
+    </div>
   </div>
 
 <script>
@@ -173,294 +200,231 @@ const APPS = [
   { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' }
 ];
 
+// Replace with your actual GitHub repo details
+const GH_USER = 'YOUR_GITHUB_USERNAME'; 
+const GH_REPO = 'Cogito';
+
 function getLevel(xp) { return Math.floor(Math.sqrt(xp/100)) + 1; }
 function getMaturity(interval) { return Math.min(100, Math.log(interval + 1) / Math.log(30) * 100); }
 
 let totalXP = 0;
+let totalMature = 0;
 let appData = [];
+
+// 1. Log Activity (Global Heatmap)
+let activity = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
+const todayDate = new Date().toISOString().split('T')[0];
+if(!activity.includes(todayDate)){
+  activity.push(todayDate);
+  localStorage.setItem('cogito-activity', JSON.stringify(activity));
+}
+
+// 2. Calculate Streak from Activity
+function calculateStreak(act) {
+  if(!act || act.length === 0) return 0;
+  let streak = 0;
+  let d = new Date();
+  if(!act.includes(d.toISOString().split('T')[0])) d.setDate(d.getDate() - 1);
+  while(act.includes(d.toISOString().split('T')[0])) {
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+let currentStreak = calculateStreak(activity);
 
 APPS.forEach(app => {
   const savedData = localStorage.getItem(app.storageKey);
-  let xp = 0;
-  let level = 1;
-  let maturity = 0;
-  
+  let xp = 0, level = 1, maturity = 0, matureCount = 0;
   if (savedData) {
     try {
       const parsed = JSON.parse(savedData);
       xp = parsed.xp || 0;
       level = getLevel(xp);
       totalXP += xp;
-      
       if (parsed.cards) {
-        let totalMat = 0;
-        let count = 0;
+        let totalMat = 0, count = 0;
         Object.values(parsed.cards).forEach(c => {
-          totalMat += getMaturity(c.interval);
+          const m = getMaturity(c.interval);
+          totalMat += m;
+          if(c.interval >= 21) { matureCount++; totalMature++; }
           count++;
         });
         maturity = count > 0 ? Math.round(totalMat / count) : 0;
       }
     } catch(e) {}
   }
-  
-  appData.push({ ...app, xp, level, maturity });
+  appData.push({ ...app, xp, level, maturity, matureCount });
 });
 
-// Render App Cards
 appData.forEach(app => {
   const grid = document.getElementById(app.domain + '-grid');
   const card = document.createElement('a');
   card.href = app.href;
   card.innerHTML = `
-    <div class="app-header">
-      <div class="app-title">${app.name}</div>
-      <div class="app-level">LVL ${app.level}</div>
-    </div>
+    <div class="app-header"><div class="app-title">${app.name}</div><div class="app-level">LVL ${app.level}</div></div>
     <div class="app-desc">${app.desc}</div>
-    <div class="app-tag">
-      <span>${app.tag}</span>
-      <span>${app.xp} XP</span>
-    </div>
-    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>
-  `;
+    <div class="app-tag"><span>${app.tag}</span><span>${app.xp} XP</span></div>
+    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>`;
   grid.appendChild(card);
 });
 
-// Render Global Stats
 document.getElementById('globalLevel').textContent = getLevel(totalXP);
 document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
 
-// Render Hub Radar
+// Radar Drawing
 function drawHubRadar() {
   const svg = document.getElementById('hubRadarSvg');
   svg.innerHTML = '';
-  const n = appData.length;
-  const R = 95;
-  
+  const n = appData.length, R = 95;
   [0.25, 0.5, 0.75, 1].forEach(r => {
-    const points = [];
-    for(let i = 0; i < n; i++){
-      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
-      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
-    }
+    const pts = [];
+    for(let i=0; i<n; i++){ const a = -Math.PI/2 + (i/n)*Math.PI*2; pts.push((Math.cos(a)*R*r)+','+(Math.sin(a)*R*r)); }
     const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    ring.setAttribute('points', points.join(' '));
-    ring.setAttribute('class', 'radar-ring');
-    svg.appendChild(ring);
+    ring.setAttribute('points', pts.join(' ')); ring.setAttribute('class', 'radar-ring'); svg.appendChild(ring);
   });
-  
-  for(let i = 0; i < n; i++){
-    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+  for(let i=0; i<n; i++){
+    const a = -Math.PI/2 + (i/n)*Math.PI*2;
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
-    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
-    line.setAttribute('class', 'radar-axis');
-    svg.appendChild(line);
+    line.setAttribute('x1',0); line.setAttribute('y1',0); line.setAttribute('x2',Math.cos(a)*R); line.setAttribute('y2',Math.sin(a)*R);
+    line.setAttribute('class','radar-axis'); svg.appendChild(line);
   }
-  
-  const points = [];
-  for(let i = 0; i < n; i++){
-    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+  const pts = [];
+  for(let i=0; i<n; i++){
+    const a = -Math.PI/2 + (i/n)*Math.PI*2;
     const r = R * (appData[i].maturity / 100);
-    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+    pts.push((Math.cos(a)*r)+','+(Math.sin(a)*r));
   }
   const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  poly.setAttribute('points', points.join(' '));
-  poly.setAttribute('class', 'radar-poly');
-  svg.appendChild(poly);
-  
-  for(let i = 0; i < n; i++){
-    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
-    const labelR = R + 18;
-    const x = Math.cos(angle) * labelR;
-    const y = Math.sin(angle) * labelR;
+  poly.setAttribute('points', pts.join(' ')); poly.setAttribute('class', 'radar-poly'); svg.appendChild(poly);
+  for(let i=0; i<n; i++){
+    const a = -Math.PI/2 + (i/n)*Math.PI*2;
+    const x = Math.cos(a)*(R+18), y = Math.sin(a)*(R+18);
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', x); text.setAttribute('y', y);
-    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
-    text.setAttribute('class', 'radar-label');
-    text.textContent = appData[i].axisName;
+    text.setAttribute('x',x); text.setAttribute('y',y); text.setAttribute('text-anchor','middle'); text.setAttribute('dominant-baseline','middle');
+    text.setAttribute('class','radar-label'); text.textContent = appData[i].axisName;
     if(appData[i].maturity > 50) text.classList.add('active');
     svg.appendChild(text);
   }
 }
 drawHubRadar();
 
-// Render Mastery List
 const masteryList = document.getElementById('masteryList');
 appData.forEach(app => {
   const row = document.createElement('div');
   row.style.cssText = 'display:grid; grid-template-columns:100px 1fr 40px; gap:1rem; align-items:center; font-size:0.85rem;';
   const cls = app.maturity < 30 ? 'var(--red)' : (app.maturity < 70 ? 'var(--amber)' : 'var(--cyan)');
-  row.innerHTML = `
-    <span style="color:var(--text-dim); font-family:var(--display); font-size:0.8rem;">${app.axisName}</span>
-    <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
-      <div style="height:100%; width:${app.maturity}%; background:${cls}; box-shadow:0 0 6px ${cls}; transition:width 0.8s;"></div>
-    </div>
-    <span style="color:var(--text-dim); text-align:right; font-family:var(--display);">${app.maturity}%</span>
-  `;
+  row.innerHTML = `<span style="color:var(--text-dim); font-family:var(--display); font-size:0.8rem;">${app.axisName}</span>
+    <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;"><div style="height:100%; width:${app.maturity}%; background:${cls}; box-shadow:0 0 6px ${cls}; transition:width 0.8s;"></div></div>
+    <span style="color:var(--text-dim); text-align:right; font-family:var(--display);">${app.maturity}%</span>`;
   masteryList.appendChild(row);
 });
 
-// Calculate Robust Operator Profile
-let maturities = appData.map(a => a.maturity);
-let minMat = Math.min(...maturities);
-let maxMat = Math.max(...maturities);
-let avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length;
-let diff = maxMat - minMat;
-
-let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
-
-if (totalXP > 0) {
-  if (avgMat < 15) {
-    profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape, but remains unbalanced. Keep pushing.' };
-  } else if (maxMat > 75 && minMat < 20) {
-    profile = { title: 'ULTRA-SPECIALIST', desc: 'You have achieved deep mastery in one domain while neglecting the others. A laser focus, but vulnerable to blind spots. Diversify your training.' };
-  } else if (avgMat > 75 && diff < 20) {
-    profile = { title: 'RENAISSANCE OPERATOR', desc: 'You are a true Centaur. Highly balanced and deeply mastered across all disciplines. The ultimate competitive moat.' };
-  } else if (avgMat > 40 && diff < 30) {
-    profile = { title: 'POLYMATH', desc: 'You are building a robust latticework. Your mastery is balanced and growing across multiple domains. Continue the ascent.' };
-  } else if (diff > 40) {
-    profile = { title: 'FRAGMENTED THINKER', desc: 'Your mastery is highly imbalanced. You have spikes of brilliance but deep valleys. Shore up your weaknesses to unlock synthesis.' };
-  } else {
-    profile = { title: 'OPERATOR', desc: 'You are progressing steadily. Continue pushing the boundaries of your mastery across all axes.' };
+// Heatmap Render
+function renderHeatmap() {
+  const grid = document.getElementById('heatmapGrid');
+  grid.innerHTML = '';
+  const days = 150;
+  const today = new Date();
+  for(let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dStr = d.toISOString().split('T')[0];
+    const cell = document.createElement('div');
+    cell.className = 'heat-cell';
+    if(activity.includes(dStr)) {
+      // Simulating intensity based on random/mock XP gained that day. For now, just mark as active.
+      cell.classList.add('heat-active-4'); 
+    }
+    cell.title = dStr;
+    grid.appendChild(cell);
   }
 }
+renderHeatmap();
 
+// Achievements Render
+const ACHIEVEMENTS = [
+  { id: 'first_blood', name: 'First Blood', desc: 'Solve 1 Arena problem', icon: '⚔️', check: () => appData.some(a => a.xp > 50) },
+  { id: 'streak_7', name: 'Week One', desc: '7-day streak', icon: '🔥', check: () => currentStreak >= 7 },
+  { id: 'streak_30', name: 'Unbroken', desc: '30-day streak', icon: '🛡️', check: () => currentStreak >= 30 },
+  { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 5 globally', icon: '🧬', check: () => getLevel(totalXP) >= 5 },
+  { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 10 globally', icon: '🧠', check: () => getLevel(totalXP) >= 10 },
+  { id: 'mastery_100', name: 'Master', desc: '100 cards matured', icon: '💎', check: () => totalMature >= 100 },
+  { id: 'renaissance', name: 'Renaissance', desc: 'Start all 3 courses', icon: '🎨', check: () => appData.every(a => a.xp > 0) },
+  { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 20 globally', icon: '🚀', check: () => getLevel(totalXP) >= 20 }
+];
+
+function renderAchievements() {
+  const grid = document.getElementById('achGrid');
+  grid.innerHTML = '';
+  ACHIEVEMENTS.forEach(ach => {
+    const unlocked = ach.check();
+    const card = document.createElement('div');
+    card.className = 'ach-card' + (unlocked ? ' unlocked' : '');
+    card.innerHTML = `<span class="ach-icon">${unlocked ? ach.icon : '🔒'}</span><div class="ach-name">${ach.name}</div><div class="ach-desc">${ach.desc}</div>`;
+    grid.appendChild(card);
+  });
+}
+renderAchievements();
+
+// Profile Calculation
+let maturities = appData.map(a => a.maturity);
+let minMat = Math.min(...maturities), maxMat = Math.max(...maturities), avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length, diff = maxMat - minMat;
+let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
+if (totalXP > 0) {
+  if (avgMat < 15) profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape.' };
+  else if (maxMat > 75 && minMat < 20) profile = { title: 'ULTRA-SPECIALIST', desc: 'Deep mastery in one domain, neglecting others. Diversify your training.' };
+  else if (avgMat > 75 && diff < 20) profile = { title: 'RENAISSANCE OPERATOR', desc: 'Highly balanced and deeply mastered across all disciplines.' };
+  else if (avgMat > 40 && diff < 30) profile = { title: 'POLYMATH', desc: 'Robust latticework. Balanced and growing across multiple domains.' };
+  else if (diff > 40) profile = { title: 'FRAGMENTED THINKER', desc: 'Highly imbalanced. Spikes of brilliance but deep valleys.' };
+  else profile = { title: 'OPERATOR', desc: 'Progressing steadily across all axes.' };
+}
 document.getElementById('profTitle').textContent = profile.title;
 document.getElementById('profDesc').textContent = profile.desc;
 
-// Theme Switcher Logic
+// Theme Switcher
 function setTheme(theme) {
   document.body.dataset.theme = theme;
   localStorage.setItem('cogito-theme', theme);
   document.getElementById('themeMenu').classList.remove('active');
 }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) document.getElementById('themeMenu').classList.remove('active'); });
 
-document.getElementById('themeBtn').onclick = (e) => {
-  e.stopPropagation();
-  document.getElementById('themeMenu').classList.toggle('active');
+// Feedback Widget
+const fab = document.getElementById('feedback-fab');
+const modal = document.getElementById('feedback-modal');
+const closeBtn = document.getElementById('closeFeedback');
+const submitBtn = document.getElementById('submitFeedback');
+
+fab.onclick = () => { modal.style.display = 'flex'; };
+closeBtn.onclick = () => { modal.style.display = 'none'; };
+document.querySelectorAll('.fb-yn').forEach(btn => {
+  btn.onclick = () => {
+    const q = btn.dataset.q, a = btn.dataset.a;
+    document.querySelectorAll(`.fb-yn[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const textarea = document.getElementById('fb-' + q);
+    if(a === 'yes'){ textarea.style.display = 'block'; } else { textarea.style.display = 'none'; textarea.value = ''; }
+  };
+});
+submitBtn.onclick = () => {
+  let issueBody = "## Feedback Submission\n\n";
+  let hasContent = false;
+  const issueText = document.getElementById('fb-issue').value.trim();
+  const featureText = document.getElementById('fb-feature').value.trim();
+  const courseText = document.getElementById('fb-course').value.trim();
+  if(issueText){ issueBody += `### Issues\n${issueText}\n\n`; hasContent = true; }
+  if(featureText){ issueBody += `### Feature Requests\n${featureText}\n\n`; hasContent = true; }
+  if(courseText){ issueBody += `### Course Requests\n${courseText}\n\n`; hasContent = true; }
+  if(!hasContent){ alert("Please provide some feedback first!"); return; }
+  const title = "Feedback: " + (issueText ? "Issue reported" : featureText ? "Feature requested" : "Course requested");
+  const url = `https://github.com/${GH_USER}/${GH_REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(issueBody)}`;
+  window.open(url, '_blank');
+  modal.style.display = 'none';
 };
 
-document.addEventListener('click', (e) => {
-  if(!e.target.closest('.theme-dropdown')) {
-    document.getElementById('themeMenu').classList.remove('active');
-  }
-});
-
 window.HUB = { setTheme };
-</script>
-<!-- Feedback Button -->
-<div id="feedback-fab" style="position:fixed;bottom:2rem;right:2rem;z-index:90;background:transparent;border:1px solid var(--border-bright);color:var(--text-dim);padding:0.5rem 1rem;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;transition:all 0.2s;">Feedback</div>
-
-<!-- Feedback Modal -->
-<div id="feedback-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;justify-content:center;align-items:center;backdrop-filter:blur(5px);">
-  <div style="background:var(--panel-solid);border:1px solid var(--cyan);padding:2rem;max-width:500px;width:90%;border-radius:8px;position:relative;">
-    <span id="close-feedback" style="position:absolute;top:1rem;right:1rem;cursor:pointer;color:var(--text-dim);font-size:1.2rem;">&times;</span>
-    <h3 style="font-family:var(--display);color:var(--cyan);margin-bottom:1.5rem;letter-spacing:0.1em;">// Transmit Feedback</h3>
-    
-    <div style="display:grid;gap:1.5rem;">
-      <!-- Q1: Issues -->
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <label style="font-size:0.85rem;">Any issues or bugs?</label>
-          <div>
-            <button class="fb-yn" data-q="issue" data-a="yes">Yes</button>
-            <button class="fb-yn" data-q="issue" data-a="no">No</button>
-          </div>
-        </div>
-        <textarea id="fb-issue" style="display:none;width:100%;margin-top:0.5rem;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.75rem;border-radius:4px;font-family:var(--mono);font-size:0.8rem;" placeholder="Describe the issue..."></textarea>
-      </div>
-
-      <!-- Q2: Features -->
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <label style="font-size:0.85rem;">Any features you want added?</label>
-          <div>
-            <button class="fb-yn" data-q="feature" data-a="yes">Yes</button>
-            <button class="fb-yn" data-q="feature" data-a="no">No</button>
-          </div>
-        </div>
-        <textarea id="fb-feature" style="display:none;width:100%;margin-top:0.5rem;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.75rem;border-radius:4px;font-family:var(--mono);font-size:0.8rem;" placeholder="Describe the feature..."></textarea>
-      </div>
-
-      <!-- Q3: Courses -->
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <label style="font-size:0.85rem;">Any courses you want to learn?</label>
-          <div>
-            <button class="fb-yn" data-q="course" data-a="yes">Yes</button>
-            <button class="fb-yn" data-q="course" data-a="no">No</button>
-          </div>
-        </div>
-        <textarea id="fb-course" style="display:none;width:100%;margin-top:0.5rem;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.75rem;border-radius:4px;font-family:var(--mono);font-size:0.8rem;" placeholder="Describe the course..."></textarea>
-      </div>
-    </div>
-
-    <button id="submit-feedback" style="width:100%;margin-top:1.5rem;background:var(--cyan);color:var(--void);border:none;padding:0.75rem;font-family:var(--mono);font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px;letter-spacing:0.1em;">Submit to GitHub</button>
-  </div>
-</div>
-
-<style>
-.fb-yn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 0.2rem 0.6rem; border-radius: 2px; cursor: pointer; font-family: var(--mono); font-size: 0.7rem; margin-left: 0.5rem; }
-.fb-yn.selected { background: var(--cyan); color: var(--void); border-color: var(--cyan); }
-</style>
-
-<script>
-(function(){
-  const fab = document.getElementById('feedback-fab');
-  const modal = document.getElementById('feedback-modal');
-  const closeBtn = document.getElementById('close-feedback');
-  const submitBtn = document.getElementById('submit-feedback');
-  
-  // REPLACE THESE WITH YOUR ACTUAL GITHUB DETAILS
-  const GH_USER = 'ryanross949-svg'; 
-  const GH_REPO = 'cogito';
-
-  // Show modal
-  fab.onclick = () => { modal.style.display = 'flex'; };
-  closeBtn.onclick = () => { modal.style.display = 'none'; };
-
-  // Handle Yes/No toggles
-  document.querySelectorAll('.fb-yn').forEach(btn => {
-    btn.onclick = () => {
-      const q = btn.dataset.q;
-      const a = btn.dataset.a;
-      // Reset buttons in group
-      document.querySelectorAll(`.fb-yn[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      
-      const textarea = document.getElementById('fb-' + q);
-      if(a === 'yes'){ textarea.style.display = 'block'; }
-      else { textarea.style.display = 'none'; textarea.value = ''; }
-    };
-  });
-
-  // Submit to GitHub
-  submitBtn.onclick = () => {
-    let issueBody = "## Feedback Submission\n\n";
-    let hasContent = false;
-
-    const issueText = document.getElementById('fb-issue').value.trim();
-    const featureText = document.getElementById('fb-feature').value.trim();
-    const courseText = document.getElementById('fb-course').value.trim();
-
-    if(issueText){ issueBody += `### Issues\n${issueText}\n\n`; hasContent = true; }
-    if(featureText){ issueBody += `### Feature Requests\n${featureText}\n\n`; hasContent = true; }
-    if(courseText){ issueBody += `### Course Requests\n${courseText}\n\n`; hasContent = true; }
-
-    if(!hasContent){
-      alert("Please provide some feedback first!");
-      return;
-    }
-
-    const title = "Feedback: " + (issueText ? "Issue reported" : featureText ? "Feature requested" : "Course requested");
-    const url = `https://github.com/${GH_USER}/${GH_REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(issueBody)}`;
-    
-    window.open(url, '_blank');
-    modal.style.display = 'none';
-  };
-})();
 </script>
 </body>
 </html>
