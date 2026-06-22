@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // MACH v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">MACH</div><div class="boot-sub">Cogito // Physics of Motion v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">MACH</div><div class="brand-tag">SPATIAL REASONING</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="MACH.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="MACH.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="MACH.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="MACH.setTheme('light')">Light</button><button class="theme-option" onclick="MACH.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Orbital</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="MACH.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of physical mechanics. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: ORBITAL</h1><p class="section-sub">A cumulative scenario. Apply classical mechanics to launch a satellite.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About MACH</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>MACH is a cognitive training simulator designed to install the spatial reasoning and physical intuition used by orbital mechanics and engineers. It trains you to predict motion, leverage forces, and navigate systems under constraints.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Orbital require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>INERTIA</strong> — The First Law. Resistance to change.</li>
+          <li><strong>FORCE</strong> — F=ma. Cause and effect in acceleration.</li>
+          <li><strong>ACTION</strong> — 3rd Law. Equal and opposite reactions.</li>
+          <li><strong>ENERGY</strong> — Work, kinetic/potential, conservation.</li>
+          <li><strong>MOMENTUM</strong> — Impulse, collisions, continuity.</li>
+          <li><strong>TORQUE</strong> — Rotational motion and leverage.</li>
+          <li><strong>GRAVITY</strong> — Inverse square law, orbits.</li>
+          <li><strong>THERMO</strong> — Heat, entropy, work over time.</li>
+          <li><strong>WAVE</strong> — Frequency, resonance, interference.</li>
+          <li><strong>RELATIV</strong> — Time dilation, frames of reference.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'INERTIA', title:'The First Law', summary:'Resistance to change. Objects in motion stay in motion.', lesson:{ title:'The Architecture of Resistance', body: 'Inertia is the resistance of any physical object to a change in its state of motion or rest. It is the fundamental reason why strategies, organizations, and projectiles behave the way they do.\n\n## Newton\'s First Law\n\nAn object at rest stays at rest. An object in motion stays in motion at a constant speed and in a straight line unless acted upon by an unbalanced force.\n\nIn business, a resting company (Blockbuster) stays at rest unless disrupted. A moving company (Amazon) stays in motion until friction (regulation, new tech) stops it.\n\n## Mental Inertia\n\nYour brain is a physical object with neural pathways. It has mental inertia. Changing your mind requires energy (force). This is why paradigm shifts are hard. You are fighting the inertia of established neural pathways.\n\n## The Method\n\n1. **Identify the current state:** Is the system at rest or in motion?\n2. **Identify the forces:** What is acting on it?\n3. **If no force exists:** The state will persist indefinitely. Do not expect spontaneous change.\n4. **To change state:** Apply an unbalanced force.', takeaways:['Inertia = resistance to change in motion.','Objects at rest stay at rest; objects in motion stay in motion.','Mental inertia makes paradigm shifts energetically expensive.','If no unbalanced force exists, the current state persists indefinitely.','To change a system\'s trajectory, you must apply force.'] } },
+  { id:'m2', codename:'FORCE', title:'The Second Law', summary:'F=ma. Cause and effect in acceleration.', lesson:{ title:'The Architecture of Acceleration', body: 'Force equals mass times acceleration (F = ma). This is the most actionable equation in physics because it defines the relationship between cause (Force), the obstacle (Mass), and the result (Acceleration).\n\n## The Equation of Strategy\n\nIf you want to accelerate a project (a), you must apply force (F). But the amount of acceleration you get depends inversely on the mass (m) of the project. A massive, bloated project requires immense force to move slightly. A lean, lightweight project accelerates rapidly with the same force.\n\n## Mass as Friction\n\nIn organizations, "mass" is not just headcount. It is bureaucracy, legacy code, and entrenched interests. You can apply massive force (capital, marketing) to a heavy organization and get negligible acceleration because the mass is too high.\n\n## The Method\n\n1. **Define the desired acceleration:** How fast do you need to change?\n2. **Estimate the mass:** How much bureaucracy/complexity exists?\n3. **Calculate required force:** F = ma. If mass is huge, force must be exponential.\n4. **Alternative:** Reduce mass (layoffs, re-architecting) to achieve the same acceleration with less force.', takeaways:['Force = Mass x Acceleration (F=ma).','Mass (bureaucracy) inversely limits acceleration for a given force.','A lean project accelerates faster with the same effort.','To move faster, either increase force or decrease mass.','Applying force to a massive system yields negligible results.'] } },
+  { id:'m3', codename:'ACTION', title:'The Third Law', summary:'For every action, there is an equal and opposite reaction.', lesson:{ title:'The Architecture of Systems', body: 'For every action, there is an equal and opposite reaction. You cannot push a system without the system pushing back.\n\n## Unintended Consequences\n\nIn complex systems, the "reaction" is often delayed or hidden. You launch a new feature (action). Users hate it and leave (reaction). You cut prices (action). Competitors cut prices more (reaction).\n\nThe Third Law guarantees that interventions are never one-way. If you apply pressure to a market, a competitor, or an organism, expect a counter-force of equal magnitude.\n\n## Leverage\n\nIf you push a wall, the wall pushes back. But if you push the ground (action), the ground pushes you up (reaction), allowing you to jump. Leverage is finding the right surface to apply your action so the reaction propels you forward.\n\n## The Method\n\n1. **Before acting, model the reaction:** What will the system do in response?\n2. **Find the leverage point:** Where can you apply force to get a favorable reaction?\n3. **Prepare for equal magnitude:** The reaction will be as strong as your action. Do not start a fight you cannot win.', takeaways:['For every action, there is an equal and opposite reaction.','Interventions in systems are never one-way.','Expect unintended consequences and counter-forces.','Leverage = finding the surface where your action yields a favorable reaction.','The reaction will match your action; do not start fights you cannot finish.'] } },
+  { id:'m4', codename:'ENERGY', title:'Conservation', summary:'Work, kinetic/potential, and the conservation of energy.', lesson:{ title:'The Architecture of Work', body: 'Energy is the capacity to do work. It cannot be created or destroyed, only transformed. This is the First Law of Thermodynamics.\n\n## Potential vs Kinetic\n\nPotential energy is stored (money in the bank, a team trained but not deployed, a boulder at the top of a hill). Kinetic energy is active (money spent on ads, a team executing, a boulder rolling).\n\nStrategy is the conversion of potential to kinetic at the right time and place. Raising capital is building potential. Deploying it is converting to kinetic. If you deploy too early, you waste it. If you never deploy, it remains potential forever.\n\n## The Conservation Rule\n\nBecause energy is conserved, there are no free lunches. If a system outputs energy, it must have consumed it from somewhere. If a competitor is growing fast (high kinetic energy), they are burning massive potential (capital, goodwill) to do so.\n\n## The Method\n\n1. **Audit your energy:** Is your organization storing potential or spending kinetic?\n2. **Time the conversion:** Convert potential to kinetic only when the leverage is highest.\n3. **Respect conservation:** If output seems magical, find the hidden input.', takeaways:['Energy cannot be created or destroyed, only transformed.','Potential energy is stored (capital, trained teams). Kinetic energy is active (execution, deployment).','Strategy is the timed conversion of potential to kinetic.','There are no free lunches; high output requires high input.','If a system seems to output magic, find the hidden input.'] } },
+  { id:'m5', codename:'MOMENTUM', title:'Impulse', summary:'Mass in motion. Collisions and continuity.', lesson:{ title:'The Architecture of Mass in Motion', body: 'Momentum is mass in motion (p = mv). It is the measure of how hard it is to stop a moving object.\n\n## Impulse\n\nImpulse is the change in momentum (Force x Time). A small force applied over a long time can have the same effect as a massive force applied briefly. This is why "long-term compounding" (small force, long time) can beat "viral spikes" (large force, short time).\n\n## Collisions\n\nIn an elastic collision, momentum is transferred perfectly. In an inelastic collision, energy is lost to heat/deformation. When companies merge, it is an inelastic collision. Momentum is lost to integration friction. The bigger the collision, the more momentum is lost.\n\n## The Method\n\n1. **Build momentum early:** p=mv. Get mass moving.\n2. **Sustain it:** Once moving, momentum carries you. Less force is needed to maintain than to start.\n3. **Beware inelastic collisions:** Mergers and pivots destroy momentum. Expect a 30-50% loss.', takeaways:['Momentum = Mass x Velocity (p=mv).','Impulse: Small force over long time can equal large force over short time.','Momentum sustains motion; it is harder to start than to maintain.','Inelastic collisions (mergers, pivots) destroy momentum via friction.','Build momentum early; it becomes self-sustaining.'] } },
+  { id:'m6', codename:'TORQUE', title:'Rotational Force', summary:'Leverage, fulcrums, and rotational mechanics.', lesson:{ title:'The Architecture of Leverage', body: 'Torque is rotational force. It equals Force x Distance from the fulcrum (τ = r x F). It is the physics of leverage.\n\n## The Lever\n\nArchimedes said: "Give me a lever long enough and a fulcrum on which to place it, and I shall move the world." A small force applied at a long distance can overcome a massive force applied at a short distance.\n\nIn business, leverage is doing 1x the work for 10x the output. Software is a lever. Capital is a lever. Media is a lever. Brand is a lever.\n\n## The Fulcrum\n\nThe fulcrum is the pivot point. Without a solid fulcrum, the lever breaks. You can apply massive force with a long lever, but if the fulcrum (your core competency, your cash flow, your team) is weak, the system collapses.\n\n## The Method\n\n1. **Find the longest lever:** What action gives disproportionate output? (Software, media, capital).\n2. **Secure the fulcrum:** Ensure your foundation (cash flow, core tech) is unbreakable.\n3. **Apply force:** A small push at the end of a long lever moves the world.', takeaways:['Torque = Force x Distance (Leverage).','A small force at a long distance overcomes a large force at a short distance.','Levers: Software, capital, media, brand. They multiply force.','The fulcrum (foundation) must be solid or the lever breaks.','Find the longest lever and secure the fulcrum before pushing.'] } },
+  { id:'m7', codename:'GRAVITY', title:'Inverse Square', summary:'The law of universal gravitation and orbital mechanics.', lesson:{ title:'The Architecture of Attraction', body: 'Gravity is the attraction between masses. It follows an inverse-square law: F = G * (m1*m2) / r^2. The force drops off exponentially with distance.\n\n## Network Effects\n\nIn platforms, gravity is the network effect. A large platform (mass) attracts users (smaller mass). The closer you are to the center (the core use case), the stronger the pull. As you move away (adjacent markets), the pull drops exponentially.\n\n## Orbital Velocity\n\nTo stay in orbit, you must move sideways fast enough to counteract the pull of gravity. If you move too slow, you fall into the planet (acquisition/bankruptcy). If you move too fast, you escape orbit (hyper-growth, leaving the ecosystem).\n\nCompanies must balance their growth rate (orbital velocity) against the gravity of their core market. Move too slow, the market crushes you. Move too fast, you lose the gravity that holds your ecosystem together.\n\n## The Method\n\n1. **Assess your mass:** Are you a planet (large gravity) or an asteroid (negligible)?\n2. **Calculate the gravity field:** How strong is the network effect? It drops exponentially at the edges.\n3. **Maintain orbital velocity:** Grow fast enough to not fall, slow enough to not escape.', takeaways:['Gravity (attraction) follows an inverse-square law. Distance kills it.','Network effects are gravity. Large platforms attract smaller ones.','Orbital velocity: Grow fast enough to avoid falling, slow enough to not escape the ecosystem.','Attraction drops exponentially at the edges of your market.','Balance growth rate against the gravity of the core market.'] } },
+  { id:'m8', codename:'THERMO', title:'Entropy', summary:'Heat, work, and the 2nd Law of Thermodynamics.', lesson:{ title:'The Architecture of Heat', body: 'Thermodynamics governs heat, work, and entropy. The 2nd Law states that in a closed system, entropy (disorder) always increases.\n\n## Heat Death of a Company\n\nA company is a closed system if it stops absorbing energy (new talent, new ideas). When it closes its borders, entropy increases. Bureaucracy grows. Communication breaks down. The system trends toward heat death—a state of maximum entropy where no work can be extracted.\n\nTo fight entropy, you must inject energy (new hires, reorganizations, new markets) from outside the system.\n\n## Efficiency Limits\n\nThe Carnot efficiency limits how much work you can extract from heat. 1 - (T_cold / T_hot). If your inputs (T_hot) and environment (T_cold) are close in temperature, you get almost zero work. You need a massive temperature difference (a massive gap between your tech and the status quo) to get high efficiency.\n\n## The Method\n\n1. **Recognize entropy is default:** Disorder increases without intervention.\n2. **Open the system:** Import energy (ideas, people) to fight decay.\n3. **Maximize the temperature gradient:** The bigger the gap between your innovation and the market standard, the more work you can extract.', takeaways:['Entropy (disorder) always increases in a closed system.','Companies trend toward heat death (bureaucracy) without external energy.','To fight decay, inject new talent and ideas from outside.','Efficiency requires a massive temperature gradient (gap between you and the status quo).','Entropy is the default; maintaining order requires energy.'] } },
+  { id:'m9', codename:'WAVE', title:'Resonance', summary:'Frequency, interference, and constructive amplification.', lesson:{ title:'The Architecture of Vibration', body: 'Waves transfer energy without transferring matter. They are defined by frequency (how often) and amplitude (how strong).\n\n## Resonance\n\nEvery object has a natural frequency. If you apply a force at that exact frequency, the amplitude grows exponentially. This is resonance. A singer can shatter glass by hitting the exact resonant frequency.\n\nIn marketing, resonance is finding the message that perfectly matches the market\'s natural frequency. You don\'t need a massive ad budget (force); you need the exact right message (frequency) to cause exponential amplification (virality).\n\n## Interference\n\nWhen two waves meet, they interfere. Constructive interference (waves aligned) doubles the amplitude. Destructive interference (waves misaligned) cancels them out. If your product team and marketing team are out of phase, they cancel each other out. Alignment doubles your impact.\n\n## The Method\n\n1. **Find the natural frequency:** What message makes the market vibrate?\n2. **Apply force at that frequency:** Stop pushing random messages. Find the resonant frequency.\n3. **Align phases:** Ensure all departments are in constructive interference.', takeaways:['Waves transfer energy without transferring matter.','Resonance: Applying force at the natural frequency causes exponential amplification.','Marketing virality is finding the resonant frequency of the market.','Constructive interference (alignment) doubles output. Destructive interference cancels it.','You don\'t need more force; you need the right frequency.'] } },
+  { id:'m10', codename:'RELATIV', title:'Frame of Reference', summary:'Time dilation, the speed of light, and relativity.', lesson:{ title:'The Architecture of Perspective', body: 'Einstein\'s Theory of Relativity states that time and space are relative, not absolute. The only constant is the speed of light (c).\n\n## Time Dilation\n\nAs you approach the speed of light, time slows down relative to an outside observer. In business, high-growth startups experience time dilation. A year in a startup feels like a decade in a corporate giant. The faster you move, the slower the outside world seems, giving you a massive strategic advantage.\n\n## Frame of Reference\n\nThere is no absolute frame of reference. Your perspective depends on your velocity. An acquisition looks great from the acquirer\'s frame (synergies) but terrible from the acquiree\'s frame (loss of autonomy). To negotiate, you must transform into their frame of reference.\n\n## The Speed Limit\n\nThe speed of light is the absolute limit. You cannot go faster. In organizations, the "speed of light" is the speed of human decision-making and communication. You cannot iterate faster than humans can think and agree. No amount of capital breaks this limit.\n\n## The Method\n\n1. **Use time dilation:** Move so fast that competitors seem frozen.\n2. **Change frames:** To understand a system, look at it from another\'s velocity.\n3. **Respect the speed limit:** You cannot move faster than the humans in the system.', takeaways:['Time and space are relative; only the speed of light is constant.','Time dilation: Moving fast makes the outside world seem slow.','There is no absolute frame of reference; perspective depends on velocity.','To negotiate, transform into the other party\'s frame of reference.','The speed of light is the absolute limit; you cannot beat human decision speed.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'State Newton\'s First Law.',back:'An object at rest stays at rest. An object in motion stays in motion at a constant speed and in a straight line unless acted upon by an unbalanced force.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'What is "Mental Inertia"?',back:'The resistance of established neural pathways to change. Changing your mind requires energy (force), fighting the inertia of old beliefs.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'If no unbalanced force exists, what happens to the current state?',back:'It persists indefinitely. Do not expect spontaneous change without an applied force.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'Why do paradigm shifts feel hard?',back:'You are fighting the inertia of established neural pathways. Changing direction requires immense force.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'Inertia is the resistance to change in...?',back:'Motion or rest.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'A company is losing market share. What must happen to change its trajectory?',back:'An unbalanced force (new leadership, new tech, capital injection) must be applied. Otherwise, it will continue its trajectory.'},
+  {id:'c7',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Objects at rest stay at rest unless..."',back:'"...acted upon by an unbalanced force."'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'Inertia is proportional to...?',back:'Mass. The more massive (complex/bureaucratic) a system, the more force required to change it.'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'A boulder is rolling downhill. What happens if friction is zero?',back:'It rolls forever at constant speed. Without an unbalanced force (friction), motion persists.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'Why is it harder to start a project than to maintain it?',back:'Starting requires overcoming static inertia. Maintaining only requires overcoming dynamic friction, which is often less.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'A resting company (Blockbuster) stays at rest unless...?',back:'Disrupted by an unbalanced force (Netflix).'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "To change a system\'s trajectory, you must..."',back:'"...apply force."'},
+  
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'State Newton\'s Second Law.',back:'Force equals mass times acceleration (F = ma).'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'In F=ma, what does "mass" represent in an organization?',back:'Bureaucracy, legacy code, and entrenched interests. It is the resistance to acceleration.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'If you apply the same force to a heavy object and a light object, which accelerates more?',back:'The light object. Acceleration is inversely proportional to mass.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'A massive, bloated project requires immense force to move slightly. What is the alternative?',back:'Reduce mass (layoffs, re-architecting) to achieve the same acceleration with less force.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'What is the most actionable equation in physics for strategy?',back:'F=ma. It defines the relationship between cause (Force), obstacle (Mass), and result (Acceleration).'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'You want to accelerate faster. You cannot increase force. What do you do?',back:'Decrease mass. Cut scope, remove features, reduce headcount.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'What happens if you apply massive force to a massive system?',back:'You get negligible acceleration. F=ma means a/m is tiny.'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'Why do startups outmaneuver corporations?',back:'They have low mass (bureaucracy). The same force (capital, talent) yields massive acceleration.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "To move faster, either increase force or..."',back:'"...decrease mass."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'Acceleration is _______ proportional to mass.',back:'Inversely.'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'A team is stuck. You add more people (mass). What happens to acceleration?',back:'It often decreases. Brooks\'s Law: Adding people to a late project makes it later. Mass increases faster than force.'},
+  {id:'c24',moduleId:'m2',core:false,category:'quote',front:'Complete the equation: "F = "',back:'ma (mass x acceleration).'},
+  
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'State Newton\'s Third Law.',back:'For every action, there is an equal and opposite reaction.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'You launch a feature users hate. What is the reaction?',back:'Users leave. The system pushes back with equal magnitude.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'Can you push a system without the system pushing back?',back:'No. Interventions are never one-way. Expect a counter-force.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'You cut prices. What is the competitor\'s reaction?',back:'They cut prices more. The reaction matches the action.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'What is leverage in the context of the 3rd Law?',back:'Finding the right surface to apply your action so the reaction propels you forward (e.g., pushing the ground to jump).'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'Before acting in a complex system, what must you model?',back:'The reaction. What will the system do in response?'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'The reaction will be as strong as your action. What does this imply?',back:'Do not start a fight you cannot win.'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'You apply pressure to a market. What happens?',back:'A counter-force of equal magnitude emerges (competitors, regulators).'},
+  {id:'c33',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "For every action, there is..."',back:'"...an equal and opposite reaction."'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'Unintended consequences are often...',back:'Delayed or hidden reactions to your intervention.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'You push a wall. It doesn\'t move. Where did the energy go?',back:'The wall pushed back with equal force. No net movement occurred.'},
+  {id:'c36',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Interventions in systems are never..."',back:'"...one-way."'},
+  
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'State the First Law of Thermodynamics.',back:'Energy cannot be created or destroyed, only transformed.'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'Difference between Potential and Kinetic energy?',back:'Potential is stored (capital, trained team). Kinetic is active (spending, executing).'},
+  {id:'c39',moduleId:'m4',core:false,category:'application',front:'What is strategy in terms of energy?',back:'The timed conversion of potential to kinetic at the right time and place.'},
+  {id:'c40',moduleId:'m4',core:false,category:'concept',front:'If a system outputs energy, what must be true?',back:'It must have consumed it from somewhere. There are no free lunches.'},
+  {id:'c41',moduleId:'m4',core:false,category:'application',front:'A competitor is growing fast (high kinetic energy). What are they burning?',back:'Massive potential (capital, goodwill, burn rate) to sustain it.'},
+  {id:'c42',moduleId:'m4',core:false,category:'concept',front:'Raising capital is building what kind of energy?',back:'Potential energy.'},
+  {id:'c43',moduleId:'m4',core:false,category:'application',front:'You deploy capital into a new market. What are you doing?',back:'Converting potential to kinetic energy.'},
+  {id:'c44',moduleId:'m4',core:false,category:'concept',front:'If output seems magical, what should you look for?',back:'The hidden input. Energy is conserved.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Energy cannot be created or destroyed, only..."',back:'"...transformed."'},
+  {id:'c46',moduleId:'m4',core:false,category:'application',front:'If you deploy potential energy too early, what happens?',back:'You waste it. The conversion yields low return.'},
+  {id:'c47',moduleId:'m4',core:false,category:'concept',front:'A boulder at the top of a hill has what kind of energy?',back:'Potential energy.'},
+  {id:'c48',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "There are no free lunches; high output requires..."',back:'"...high input."'},
+  
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'Formula for Momentum?',back:'p = mv (Mass x Velocity).'},
+  {id:'c50',moduleId:'m5',core:true,category:'concept',front:'What is Impulse?',back:'The change in momentum (Force x Time).'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'How can a small force over a long time beat a large force over a short time?',back:'Impulse (F x t) can be equal. Long-term compounding beats viral spikes.'},
+  {id:'c52',moduleId:'m5',core:false,category:'concept',front:'Once an object is moving, is it harder to start or maintain?',back:'Maintain. Momentum carries it. Less force is needed to maintain than to start.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'Two companies merge. This is an inelastic collision. What happens to momentum?',back:'Momentum is lost to integration friction. Expect a 30-50% loss.'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'In an elastic collision, what happens to momentum?',back:'It is transferred perfectly.'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'Why should you build momentum early?',back:'Once mass is moving, it becomes self-sustaining.'},
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'Momentum is the measure of how hard it is to...',back:'...stop a moving object.'},
+  {id:'c57',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Momentum = "',back:'mv (Mass x Velocity).'},
+  {id:'c58',moduleId:'m5',core:false,category:'application',front:'You pivot your startup. What happens to your momentum?',back:'It is destroyed. You must rebuild from scratch.'},
+  {id:'c59',moduleId:'m5',core:false,category:'concept',front:'A heavy object moving slowly has the same momentum as a light object moving...',back:'...fast.'},
+  {id:'c60',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Inelastic collisions (mergers, pivots)..."',back:'"...destroy momentum via friction."'},
+  
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'Formula for Torque?',back:'τ = r x F (Force x Distance from fulcrum).'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'What is a "Lever" in business?',back:'Something that does 1x the work for 10x the output. Software, capital, media, brand.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'A small force at a long distance can overcome a massive force at a short distance. What is this?',back:'Leverage (Torque).'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'You have a long lever but a weak fulcrum. What happens?',back:'The system collapses. The fulcrum (foundation) must be solid.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'What is the fulcrum in a business context?',back:'Your core competency, cash flow, or team. The pivot point.'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'Name 3 levers in business.',back:'Software, capital, media, brand, network effects.'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'Archimedes: "Give me a lever long enough and a fulcrum..."',back:'"...and I shall move the world."'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'You want disproportionate output. What must you find?',back:'The longest lever and secure the fulcrum.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Torque = "',back:'r x F (Radius x Force).'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'If you double the distance (lever arm), what happens to torque?',back:'It doubles. τ is proportional to r.'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'Why is writing software a better lever than consulting?',back:'Software is written once and copied infinitely. Consulting is 1:1 time for money.'},
+  {id:'c72',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Find the longest lever and..."',back:'"...secure the fulcrum before pushing."'},
+  
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'Gravity follows what law?',back:'Inverse-square law. F = G * (m1*m2) / r^2.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'What is "Gravity" in platform businesses?',back:'The network effect. Large platforms attract smaller ones.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'If you double the distance between two masses, what happens to the gravitational force?',back:'It drops to 1/4 (inverse square).'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'You launch an adjacent product. Why might it fail to attract users?',back:'The gravity (network effect) drops exponentially at the edges of your core market.'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'What is "Orbital Velocity"?',back:'Moving sideways fast enough to counteract the pull of gravity. Not falling in, not escaping.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'A company grows too slow. What happens?',back:'It falls into the planet (acquisition or bankruptcy).'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'A company grows too fast. What happens?',back:'It escapes orbit (hyper-growth, losing the ecosystem gravity).'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'In a market, the "mass" is the...',back:'Total addressable market and platform size.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Network effects are gravity. Large platforms..."',back:'"...attract smaller ones."'},
+  {id:'c82',moduleId:'m7',core:false,category:'application',front:'Why is it hard to compete with a monopolist?',back:'Their gravity (network effect) is so strong it pulls all users in, leaving no mass for competitors.'},
+  {id:'c83',moduleId:'m7',core:false,category:'concept',front:'Attraction drops exponentially at the...',back:'...edges of your market.'},
+  {id:'c84',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Balance growth rate against..."',back:'"...the gravity of the core market."'},
+  
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'State the 2nd Law of Thermodynamics.',back:'In a closed system, entropy (disorder) always increases.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What is the "Heat Death" of a company?',back:'A state of maximum entropy where no work can be extracted. Bureaucracy grows, communication breaks down.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'How do you fight entropy in an organization?',back:'Inject energy (new talent, new ideas, new markets) from outside the system.'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'A company stops hiring externally. What happens?',back:'It becomes a closed system. Entropy increases. Bureaucracy grows.'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'What is the Carnot efficiency limit?',back:'1 - (T_cold / T_hot). The maximum work extractable from a temperature difference.'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'If your tech and the market standard are similar, how much work can you extract?',back:'Almost zero. You need a massive temperature gradient (gap) for high efficiency.'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'Entropy is the default. Maintaining order requires...',back:'...energy.'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'A massive gap between your innovation and the status quo yields...',back:'...high efficiency and massive work output.'},
+  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Entropy (disorder) always increases in..."',back:'"...a closed system."'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'Why do organizations become bureaucratic over time?',back:'Without external energy, they trend toward heat death (maximum entropy).'},
+  {id:'c95',moduleId:'m8',core:false,category:'application',front:'Reorganizations are an attempt to...',back:'...inject energy and reduce entropy.'},
+  {id:'c96',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "To fight decay, inject..."',back:'"...new talent and ideas from outside."'},
+  
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is Resonance?',back:'Applying a force at an object\'s natural frequency, causing exponential amplification.'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'What is Resonance in marketing?',back:'Finding the message that perfectly matches the market\'s natural frequency, causing virality.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'Do you need a massive force to cause resonance?',back:'No. A small force at the exact right frequency is enough.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'What is Constructive Interference?',back:'When two waves align, doubling the amplitude. (Product and Marketing aligned).'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'What is Destructive Interference?',back:'When two waves are misaligned, canceling each other out. (Departments out of phase).'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'Your team is pushing random messages. What are they missing?',back:'The resonant frequency of the market.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'Waves transfer energy without...',back:'...transferring matter.'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'If Product and Marketing are out of phase, what happens?',back:'They cancel each other out (Destructive Interference). Output is zero.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "You don\'t need more force; you need..."',back:'"...the right frequency."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'A singer can shatter glass by...',back:'...hitting the exact resonant frequency.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Virality is a result of...',back:'...resonance.'},
+  {id:'c108',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Constructive interference (alignment)..."',back:'"...doubles output."'},
+  
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is constant in Einstein\'s Theory of Relativity?',back:'The speed of light (c). Time and space are relative.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What is "Time Dilation" in business?',back:'High-growth startups move so fast that a year feels like a decade in a corporate giant.'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'Is there an absolute frame of reference?',back:'No. Perspective depends on velocity.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'An acquisition looks great from the acquirer\'s frame but terrible from the acquiree\'s frame. Why?',back:'There is no absolute frame of reference. Perspective depends on velocity (position).'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'What is the "Speed of Light" limit in organizations?',back:'The speed of human decision-making and communication. You cannot iterate faster than humans can think.'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'How do startups use time dilation as an advantage?',back:'They move so fast that competitors seem frozen.'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'To negotiate effectively, you must...',back:'...transform into the other party\'s frame of reference.'},
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'Can capital break the "speed of light" (human decision speed)?',back:'No. No amount of capital makes humans think faster.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Time and space are relative; only..."',back:'"...the speed of light is constant."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'The faster you move, the _______ the outside world seems.',back:'Slower.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'Why do big companies miss disruption?',back:'Their frame of reference is so slow that startups seem invisible until it\'s too late.'},
+  {id:'c120',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "The speed of light is the absolute limit; you cannot beat..."',back:'"...human decision speed."'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: Inertia', difficulty:1, reward:50, timeLimit:45, body:'A massive corporation is losing market share but refuses to change its strategy. What physical law explains this?', options:['F=ma','Inertia (1st Law)','Entropy','Gravity'], correct:1, explanation:'Inertia. An object at rest stays at rest. Without an unbalanced force (new leadership), the state persists.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Mental Inertia', difficulty:2, reward:100, timeLimit:60, body:'You try to convince your team to adopt a new framework, but they resist. Why?', options:['They are stupid.','Mental inertia. Established neural pathways require energy (force) to change.','F=ma','Entropy'], correct:1, explanation:'Mental inertia. Changing minds requires force to overcome the inertia of old beliefs.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Rolling Boulder', difficulty:3, reward:200, timeLimit:90, body:'A competitor is gaining momentum (a rolling boulder). You try to stop them by standing in front of them. What happens?', options:['You stop them easily.','You are crushed. Momentum requires an equal or greater opposing force to stop.','They stop due to friction.','They accelerate.'], correct:1, explanation:'Momentum is hard to stop. You need an equal or greater force, not just a roadblock.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Static vs Dynamic', difficulty:4, reward:500, timeLimit:120, body:'Why is it often harder to START a new initiative than to maintain an ongoing one?', options:['Starting requires overcoming static inertia. Maintaining only overcomes dynamic friction, which is often less.','People are lazy.','F=ma','Entropy increases'], correct:0, explanation:'Static friction (inertia) is usually greater than dynamic friction. Getting started is the hardest part.' },
+  
+  { id:'p5', moduleId:'m2', title:'Q1: F=ma', difficulty:1, reward:50, timeLimit:45, body:'You apply 10 units of force to a project with 2 units of mass. What is the acceleration?', options:['5','20','8','0.2'], correct:0, explanation:'a = F/m. 10/2 = 5.' },
+  { id:'p6', moduleId:'m2', title:'Q2: The Heavy Project', difficulty:2, reward:100, timeLimit:60, body:'A project is bloated with 100 units of mass. You apply 10 units of force. What is the acceleration?', options:['10','100','0.1','1000'], correct:2, explanation:'a = 10/100 = 0.1. Massive mass yields negligible acceleration.' },
+  { id:'p7', moduleId:'m2', title:'Q3: The Lean Startup', difficulty:3, reward:200, timeLimit:90, body:'A startup has mass 2. A corporation has mass 100. Both apply 10 units of force. What is the startup\'s advantage?', options:['5x','50x','10x','100x'], correct:1, explanation:'Startup a = 5. Corp a = 0.1. Startup accelerates 50x faster.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Adding People', difficulty:4, reward:500, timeLimit:120, body:'A team is behind schedule. You add more people (mass). Why does acceleration often decrease?', options:['Brooks\'s Law. Mass increases faster than force. F=ma dictates acceleration drops.','They are untrained.','Communication overhead decreases.','Gravity increases.'], correct:0, explanation:'Adding people increases mass (bureaucracy) faster than force (productivity). a = F/m drops.' },
+  
+  { id:'p9', moduleId:'m3', title:'Q1: Action/Reaction', difficulty:1, reward:50, timeLimit:45, body:'You launch a feature users hate. What is the reaction?', options:['Users leave','Users love it','Nothing','Sales increase'], correct:0, explanation:'3rd Law. The system pushes back with equal magnitude. Users leave.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Price War', difficulty:2, reward:100, timeLimit:60, body:'You cut prices by 20%. What is the competitor\'s reaction?', options:['They raise prices','They cut prices by 20% or more (equal/opposite reaction)','They go bankrupt','Nothing'], correct:1, explanation:'3rd Law. Expect a counter-force of equal magnitude. They cut prices too.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Leverage', difficulty:3, reward:200, timeLimit:90, body:'You push a wall. It doesn\'t move. What happened to the energy?', options:['It disappeared','The wall pushed back with equal force. No net movement.','It turned into heat','You broke the wall'], correct:1, explanation:'3rd Law. The wall reacted with equal force. No net acceleration occurred.' },
+  { id:'p12', moduleId:'m3', title:'Q4: The Unbalanced Force', difficulty:4, reward:500, timeLimit:120, body:'You want to jump (propel yourself up). What surface do you push against?', options:['The air','The ground. The ground pushes you up (reaction).','A wall','Nothing'], correct:1, explanation:'Leverage. Push the ground (action), ground pushes you up (reaction). Find the right surface.' },
+  
+  { id:'p13', moduleId:'m4', title:'Q1: Conservation', difficulty:1, reward:50, timeLimit:45, body:'A competitor is growing fast (high kinetic energy). What are they burning?', options:['Nothing, it\'s magic','Massive potential (capital, burn rate)','Air','Momentum'], correct:1, explanation:'1st Law of Thermo. Energy is conserved. High kinetic output requires massive potential input.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Potential vs Kinetic', difficulty:2, reward:100, timeLimit:60, body:'Raising capital is building what kind of energy?', options:['Kinetic','Potential','Entropy','Heat'], correct:1, explanation:'Capital is stored. It is potential energy until deployed.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Strategy', difficulty:3, reward:200, timeLimit:90, body:'Strategy is the timed conversion of...?', options:['Kinetic to potential','Potential to kinetic','Mass to energy','Force to mass'], correct:1, explanation:'Strategy is converting potential (capital, team) to kinetic (execution) at the right time and place.' },
+  { id:'p16', moduleId:'m4', title:'Q4: No Free Lunch', difficulty:4, reward:500, timeLimit:120, body:'A system seems to output magical results with no visible input. What do you do?', options:['Believe the magic','Look for the hidden input. Energy is conserved.','Assume it\'s a scam','Copy it immediately'], correct:1, explanation:'1st Law. Find the hidden input. There are no free lunches.' },
+  
+  { id:'p17', moduleId:'m5', title:'Q1: Momentum', difficulty:1, reward:50, timeLimit:45, body:'Formula for momentum?', options:['p=mv','F=ma','E=mc^2','V=IR'], correct:0, explanation:'p = mv (Mass x Velocity).' },
+  { id:'p18', moduleId:'m5', title:'Q2: Impulse', difficulty:2, reward:100, timeLimit:60, body:'How can a small force over a long time beat a large force over a short time?', options:['F=ma','Impulse (F x t) can be equal. Long-term compounding beats viral spikes.','Entropy','Resonance'], correct:1, explanation:'Impulse = F x t. Compounding (small F, long t) can equal viral spikes (large F, short t).' },
+  { id:'p19', moduleId:'m5', title:'Q3: Mergers', difficulty:3, reward:200, timeLimit:90, body:'Two companies merge (inelastic collision). What happens to momentum?', options:['It increases','It is lost to integration friction. Expect 30-50% loss.','It stays the same','It doubles'], correct:1, explanation:'Inelastic collisions destroy momentum via friction. Expect a 30-50% loss.' },
+  { id:'p20', moduleId:'m5', title:'Q4: The Pivot', difficulty:4, reward:500, timeLimit:120, body:'You pivot your startup. What happens to your momentum?', options:['It increases','It is destroyed. You rebuild from scratch.','It stays the same','It converts to potential'], correct:1, explanation:'A pivot is an inelastic collision with reality. Momentum is destroyed and must be rebuilt.' },
+  
+  { id:'p21', moduleId:'m6', title:'Q1: Torque', difficulty:1, reward:50, timeLimit:45, body:'Formula for Torque?', options:['τ = r x F','F = ma','p = mv','E = mc^2'], correct:0, explanation:'Torque = Radius x Force (Leverage).' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Lever', difficulty:2, reward:100, timeLimit:60, body:'What is a "Lever" in business?', options:['A physical tool','Something that does 1x work for 10x output. Software, capital, media.','A manager','A meeting'], correct:1, explanation:'Levers multiply force. Software is written once and copied infinitely.' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Fulcrum', difficulty:3, reward:200, timeLimit:90, body:'You have a long lever but a weak fulcrum. What happens?', options:['You move the world','The system collapses. The fulcrum (foundation) must be solid.','Nothing','F=ma'], correct:1, explanation:'Without a solid fulcrum (cash flow, core tech), the lever breaks under pressure.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Distance', difficulty:4, reward:500, timeLimit:120, body:'If you double the distance (lever arm), what happens to torque?', options:['Halves','Doubles. τ is proportional to r.','Quadruples','Stays the same'], correct:1, explanation:'τ = r x F. Double r, double τ. Leverage increases linearly with distance.' },
+  
+  { id:'p25', moduleId:'m7', title:'Q1: Gravity', difficulty:1, reward:50, timeLimit:45, body:'Gravity follows what law?', options:['Linear','Inverse-square','Exponential','Logarithmic'], correct:1, explanation:'F = G * (m1*m2) / r^2. Force drops exponentially with distance.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Network Effects', difficulty:2, reward:100, timeLimit:60, body:'In platforms, what is "Gravity"?', options:['The CEO','The network effect. Large platforms attract smaller ones.','The budget','The code'], correct:1, explanation:'Network effects are gravity. A large platform pulls users in.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Edges', difficulty:3, reward:200, timeLimit:90, body:'You launch an adjacent product. Why might it fail to attract users?', options:['Bad design','Gravity (network effect) drops exponentially at the edges of your core market.','F=ma','Entropy'], correct:1, explanation:'Inverse-square law. The pull weakens exponentially as you move away from the core.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Orbital Velocity', difficulty:4, reward:500, timeLimit:120, body:'What is "Orbital Velocity" in business?', options:['Moving as fast as possible','Balancing growth rate against the gravity of the core market. Not falling in, not escaping.','Moving slowly','F=ma'], correct:1, explanation:'Grow fast enough to not fall (bankruptcy), slow enough to not escape (lose ecosystem gravity).' },
+  
+  { id:'p29', moduleId:'m8', title:'Q1: Entropy', difficulty:1, reward:50, timeLimit:45, body:'State the 2nd Law of Thermodynamics.', options:['Energy is conserved','In a closed system, entropy (disorder) always increases.','F=ma','Gravity is inverse-square'], correct:1, explanation:'Entropy always increases. Disorder is the default state.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Heat Death', difficulty:2, reward:100, timeLimit:60, body:'A company stops hiring externally. What happens?', options:['It becomes more efficient','It becomes a closed system. Entropy increases. Bureaucracy grows.','It innovates faster','It shrinks'], correct:1, explanation:'Without external energy (new talent), the system trends toward heat death (max entropy).' },
+  { id:'p31', moduleId:'m8', title:'Q3: Carnot Limit', difficulty:3, reward:200, timeLimit:90, body:'If your tech and the market standard are similar, how much work can you extract?', options:['Almost zero. You need a massive temperature gradient (gap) for high efficiency.','100%','50%','It depends on mass'], correct:0, explanation:'Carnot efficiency: 1 - (T_cold/T_hot). Small gap = small efficiency.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Fighting Entropy', difficulty:4, reward:500, timeLimit:120, body:'How do you fight entropy in an organization?', options:['Layoffs','Inject energy (new talent, new ideas, new markets) from outside the system.','More meetings','Stricter rules'], correct:1, explanation:'Entropy is default. Maintaining order requires importing external energy.' },
+  
+  { id:'p33', moduleId:'m9', title:'Q1: Resonance', difficulty:1, reward:50, timeLimit:45, body:'What is Resonance?', options:['Loud noise','Applying a force at an object\'s natural frequency, causing exponential amplification.','F=ma','Entropy'], correct:1, explanation:'Resonance: small force at the right frequency yields massive amplitude.' },
+  {id:'p34', moduleId:'m9', title:'Q2: Marketing', difficulty:2, reward:100, timeLimit:60, body:'What is Resonance in marketing?', options:['Spending more on ads','Finding the message that perfectly matches the market\'s natural frequency (virality).','A/B testing','SEO'], correct:1, explanation:'You don\'t need more force (budget); you need the right frequency (message).' },
+  {id:'p35', moduleId:'m9', title:'Q3: Interference', difficulty:3, reward:200, timeLimit:90, body:'Product and Marketing are out of phase. What happens?', options:['Constructive interference','Destructive interference. They cancel each other out.','Resonance','Entropy'], correct:1, explanation:'Misaligned waves cancel out. Output is zero.' },
+  {id:'p36', moduleId:'m9', title:'Q4: Alignment', difficulty:4, reward:500, timeLimit:120, body:'Product and Marketing are perfectly aligned (in phase). What happens?', options:['Nothing','Constructive interference. Amplitude doubles.','Entropy','F=ma'], correct:1, explanation:'Aligned waves double the amplitude. Alignment doubles impact.' },
+  
+  {id:'p37', moduleId:'m10', title:'Q1: Relativity', difficulty:1, reward:50, timeLimit:45, body:'What is constant in Einstein\'s Theory of Relativity?', options:['Time','Space','The speed of light (c)','Mass'], correct:2, explanation:'Time and space are relative. Only c is constant.' },
+  {id:'p38', moduleId:'m10', title:'Q2: Time Dilation', difficulty:2, reward:100, timeLimit:60, body:'A high-growth startup experiences what effect?', options:['Time speeds up','Time dilation. A year feels like a decade in a corporate giant.','Gravity','Entropy'], correct:1, explanation:'Moving fast makes the outside world seem slow. Strategic advantage.' },
+  {id:'p39', moduleId:'m10', title:'Q3: Frame of Reference', difficulty:3, reward:200, timeLimit:90, body:'An acquisition looks great from the acquirer\'s frame but terrible from the acquiree\'s frame. Why?', options:['They are wrong','There is no absolute frame of reference. Perspective depends on velocity.','F=ma','Entropy'], correct:1, explanation:'To negotiate, you must transform into the other party\'s frame of reference.' },
+  {id:'p40', moduleId:'m10', title:'Q4: The Speed Limit', difficulty:4, reward:500, timeLimit:120, body:'What is the "Speed of Light" limit in organizations?', options:['The speed of light','The speed of human decision-making. You cannot iterate faster than humans can think.','Internet speed','F=ma'], correct:1, explanation:'No amount of capital breaks this limit. You cannot move faster than the humans in the system.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Launch Pad', scenario:'Your team is stagnant. You need to initiate movement. What is the first step?', options:['Fire everyone','Apply an unbalanced force (new leadership, capital, or pivot) to overcome static inertia.','Wait for the market to change','Hire more people'], correct:1, explanation:'Inertia. An object at rest stays at rest. You must apply an unbalanced force to change state.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Acceleration', scenario:'You have limited capital (Force). The project is bloated (Mass). How do you maximize acceleration?', options:['Increase mass','Decrease mass (cut scope, reduce headcount) to maximize a = F/m.','Burn the capital faster','Pray'], correct:1, explanation:'F=ma. To increase acceleration with fixed Force, you must decrease Mass. Cut scope.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Pushback', scenario:'You launch an aggressive marketing campaign. What must you anticipate?', options:['Nothing','The 3rd Law. Competitors and users will push back with equal magnitude.','Gravity','Entropy'], correct:1, explanation:'For every action, an equal and opposite reaction. Prepare for the counter-force.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Capital Deployment', scenario:'You just raised $50M (Potential Energy). When do you deploy it (convert to Kinetic)?', options:['Immediately, everywhere','At the point of maximum leverage, timing the conversion for highest impact.','Never','Slowly over 10 years'], correct:1, explanation:'Strategy is the timed conversion of potential to kinetic. Deploy when leverage is highest.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Merger', scenario:'You are acquiring a competitor. What should you model for?', options:['Synergy','An inelastic collision. Expect a 30-50% loss of momentum due to integration friction.','Exponential growth','Perfect transfer'], correct:1, explanation:'Inelastic collisions destroy momentum. Plan for the friction tax.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Lever', scenario:'You want to scale output without scaling headcount. What do you need?', options:['More meetings','A long lever (software, media) and a solid fulcrum (core competency).','More capital','More time'], correct:1, explanation:'Torque = r x F. Find the longest lever and secure the fulcrum before pushing.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Adjacent Market', scenario:'You want to expand into an adjacent market. Why is it harder than expected?', options:['Bad product','Inverse-square law. Gravity (network effect) drops exponentially at the edges.','F=ma','Entropy'], correct:1, explanation:'Network effects are gravity. The pull weakens exponentially as you move from the core.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Bureaucracy', scenario:'Your company is becoming slow and bureaucratic. What is happening?', options:['Nothing','Entropy is increasing. You must inject external energy (new talent, reorg).','F=ma','Gravity'], correct:1, explanation:'2nd Law. Closed systems trend toward heat death. Open the system and inject energy.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Viral Message', scenario:'You have a small marketing budget. How do you achieve massive reach?', options:['You can\'t','Find the resonant frequency of the market. A small force at the right frequency causes exponential amplification.','Spam','Wait'], correct:1, explanation:'Resonance. You don\'t need more force; you need the right frequency.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Negotiation', scenario:'You are negotiating a partnership. The other side seems unreasonable. What do you do?', options:['Walk away','Transform into their frame of reference. There is no absolute frame.','Impose your will','Give up'], correct:1, explanation:'Relativity. Perspective depends on velocity. Understand their frame to negotiate effectively.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Inertia Audit', body:'Identify a project or habit that is "at rest". What unbalanced force is needed to move it?' },
+  { id:'rw2', title:'The Mass Reduction', body:'Look at your current workload. What "mass" (tasks, features, commitments) can you cut to accelerate faster with the same force?' },
+  { id:'rw3', title:'The Reaction', body:'Before making a decision today, model the equal and opposite reaction. Who will push back?' },
+  { id:'rw4', title:'The Energy Audit', body:'Is your organization storing potential (planning) or spending kinetic (executing)? Is the timing right?' },
+  { id:'rw5', title:'The Momentum Check', body:'What is moving in your life? Are you maintaining it, or letting friction slow it down?' },
+  { id:'rw6', title:'The Lever Search', body:'Find one task you do manually. What software or system could act as a lever to multiply your output?' },
+  { id:'rw7', title:'The Gravity Field', body:'Assess your network. Where is the strongest gravity (attraction)? Where does it drop off?' },
+  { id:'rw8', title:'The Entropy Battle', body:'Look at a messy room or disorganized system. Recognize that disorder is the default. Inject energy to restore order.' },
+  { id:'rw9', title:'The Resonant Message', body:'Listen to a viral song or trending topic. What "frequency" does it hit that causes resonance?' },
+  { id:'rw10', title:'The Frame Shift', body:'Try to understand a disagreement from the other person\'s frame of reference. There is no absolute right.' },
+  { id:'rw11', title:'The Static vs Dynamic', body:'Notice the difference between starting a task (static inertia) and continuing it (dynamic friction). Which is harder?' },
+  { id:'rw12', title:'The F=ma Calculation', body:'Estimate the "mass" of a problem. How much force (time, money) do you need to apply to accelerate a solution?' },
+  { id:'rw13', title:'The Leverage Point', body:'In a conflict, identify the fulcrum. Where can you apply pressure to get a favorable reaction?' },
+  { id:'rw14', title:'The Potential Store', body:'Build potential energy today: learn a new skill, save money, or document a process for later use.' },
+  { id:'rw15', title:'The Collision', body:'Observe a meeting between two teams. Is it elastic (momentum transfers) or inelastic (momentum is lost to friction)?' },
+  { id:'rw16', title:'The Torque Arm', body:'Double the distance of your leverage. Instead of doing a task yourself, delegate it or automate it.' },
+  { id:'rw17', title:'The Network Gravity', body:'Why do users stick to your product? Identify the "mass" that creates the gravity.' },
+  { id:'rw18', title:'The Heat Death', body:'Identify a process in your work that is trending toward maximum entropy. Inject energy to reverse it.' },
+  { id:'rw19', title:'The Frequency Match', body:'Adjust your communication style to match the listener\'s frequency. Do they resonate?' },
+  { id:'rw20', title:'The Time Dilation', body:'Move so fast today that the rest of the world seems frozen. Experience startup time dilation.' },
+  { id:'rw21', title:'The Unbalanced Force', body:'Apply an unbalanced force to a stagnant situation. See how it accelerates.' },
+  { id:'rw22', title:'The Mass Cut', body:'Cut one unnecessary feature or meeting from your day. Measure the increase in acceleration.' },
+  { id:'rw23', title:'The Counter-Force', body:'Anticipate the pushback before you act. Prepare your defense for the equal and opposite reaction.' },
+  { id:'rw24', title:'The Kinetic Conversion', body:'Deploy stored potential (an idea, a plan) into kinetic action today.' },
+  { id:'rw25', title:'The Sustained Momentum', body:'Once moving, use less force to maintain speed. Don\'t burn out; ride the momentum.' },
+  { id:'rw26', title:'The Long Lever', body:'Write a piece of content or code once. Watch it act as a lever, working for you infinitely.' },
+  { id:'rw27', title:'The Inverse Square', body:'Notice how your influence drops off exponentially the further you get from your core competency.' },
+  { id:'rw28', title:'The External Energy', body:'Import one new idea or person into your closed system to fight entropy.' },
+  { id:'rw29', title:'The Alignment', body:'Align your actions with your goals. Watch for constructive interference (amplitude doubling).' },
+  { id:'rw30', title:'The Perspective', body:'Shift your frame of reference. How does your strategy look from a competitor\'s velocity?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your spatial profile.' },
+  { threshold: 500, title: 'OBSERVER', desc: 'You see the forces acting on systems.' },
+  { threshold: 1500, title: 'ENGINEER', desc: 'You calculate mass, force, and acceleration.' },
+  { threshold: 3000, title: 'ARCHITECT', desc: 'You leverage torque and network gravity to move markets.' },
+  { threshold: 6000, title: 'MACH OPERATOR', desc: 'You bend space and time to execute at the frontier.' }
+];
+
+const STORAGE_KEY = 'mach-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// ORBITAL ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Orbital. You now possess the complete physical architecture.</p>';
+      html += '<p><strong>The Secret:</strong> The universe runs on mechanics. Inertia, force, and leverage are not just equations; they are the levers of reality. By mapping business and engineering problems to their physical constraints, you bypass the noise of "best practices" and operate on the bedrock of physics. You are now a Mach Operator.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Orbital: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your physical architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="MACH.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="MACH.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="MACH.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="MACH.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="MACH.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="MACH.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="MACH.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="MACH.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'ORBITAL' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each physical axis to the launch scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="MACH.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="MACH.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MACH.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'orbital: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="MACH.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="MACH.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="MACH.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="MACH.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MACH.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="MACH.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="MACH.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="MACH.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="MACH.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="MACH.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="MACH.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="MACH.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="MACH.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="MACH.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MACH.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="MACH.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="MACH.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MACH.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'mach_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading physics kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Orbital...', 'MACH online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.MACH = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  // Track activity for Hub Heatmap
+  try { 
+    let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); 
+    const today = new Date().toISOString().split('T')[0];
+    if(!act.includes(today)) { 
+      act.push(today); 
+      localStorage.setItem('cogito-activity', JSON.stringify(act)); 
+    } 
+  } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
