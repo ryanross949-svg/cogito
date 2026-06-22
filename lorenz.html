@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // LORENZ v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0a0a12; --void-2:#10101a; --panel:rgba(15,15,25,0.7); --panel-solid:#0f0f1a;
+  --cyan:#9D4EDD; --cyan-dim:#5a2d8a; --magenta:#00D9FF; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E6E6FA; --text-dim:#7A7A8F; --text-faint:#3A3A4A;
+  --border:rgba(157,78,221,0.2); --border-bright:rgba(157,78,221,0.5);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(157,78,221,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,217,255,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(157,78,221,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(157,78,221,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(157,78,221,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(157,78,221,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(10,10,18,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(157,78,221,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(10,10,18,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(157,78,221,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(157,78,221,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(157,78,221,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(157,78,221,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(157,78,221,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(157,78,221,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(157,78,221,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(157,78,221,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(157,78,221,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(157,78,221,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(157,78,221,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(157,78,221,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(157,78,221,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(157,78,221,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(157,78,221,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(0,217,255,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">LORENZ</div><div class="boot-sub">Cogito // Chaos Theory Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">LORENZ</div><div class="brand-tag">EDGE OF CHAOS</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="LORENZ.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="LORENZ.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="LORENZ.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="LORENZ.setTheme('light')">Light</button><button class="theme-option" onclick="LORENZ.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Strange</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="LORENZ.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of non-linear dynamics. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: STRANGE</h1><p class="section-sub">A cumulative scenario. Navigate a complex, non-linear market.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About LORENZ</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>LORENZ is a cognitive training simulator designed to install the strategic thinking patterns required to navigate chaos, complexity, and non-linear systems. It trains you to recognize when deterministic prediction is impossible and how to build robust systems that survive the Butterfly Effect.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Strange require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>SENSITIVITY</strong> — The Butterfly Effect, initial conditions</li>
+          <li><strong>NONLINEAR</strong> — Non-linear dynamics, disproportionality</li>
+          <li><strong>ATTRACT</strong> — Strange attractors, bounded chaos</li>
+          <li><strong>BIFURC</strong> — Bifurcation, period doubling, Feigenbaum</li>
+          <li><strong>FRACTAL</strong> — Fractal geometry, self-similarity, non-integer dimensions</li>
+          <li><strong>PHASE</strong> — Phase space, trajectories, topological mixing</li>
+          <li><strong>FEEDBACK</strong> — Positive/negative loops driving non-linear behavior</li>
+          <li><strong>PREDICT</strong> — Predictability horizon, Lyapunov time, ensemble forecasting</li>
+          <li><strong>EMERGE</strong> — Edge of chaos, criticality, self-organization</li>
+          <li><strong>NAVIGATE</strong> — Robustness vs prediction, exploiting chaos</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'SENSITIVITY', title:'The Butterfly Effect', summary:'Sensitive dependence on initial conditions.', lesson:{ title:'The Architecture of Unpredictability', body: 'In 1961, Edward Lorenz was running weather simulations. He printed out a sequence of numbers, stopped the simulation, and restarted it by typing the numbers back in. To save space, he had rounded the numbers from 6 decimal places to 3. The result? A completely different weather pattern.\n\nThis is the Butterfly Effect: a butterfly flaps its wings in Brazil, causing a tornado in Texas. Small changes in initial conditions lead to wildly divergent outcomes.\n\n## Why Prediction Fails\n\nHuman intuition expects proportionality: a small push yields a small movement. But in non-linear systems, the relationship between input and output is exponential. A 0.0001% change in the starting state doesn\'t yield a 0.0001% change in the outcome; it yields a 100% change.\n\n## The Method\n\n1. **Identify if the system is chaotic.** Does it have feedback loops and non-linear interactions?\n2. **Recognize that perfect measurement is impossible.** You cannot know the initial state to infinite precision.\n3. **Abandon long-term point prediction.** You cannot predict the weather 30 days out.\n4. **Focus on boundaries and attractors.** You can predict the *range* of outcomes, even if you can\'t predict the specific outcome.', takeaways:['Small changes in initial conditions lead to wildly different outcomes.','Human intuition expects proportionality; chaos delivers exponential divergence.','Perfect measurement is impossible, therefore long-term point prediction is impossible.','You can predict the range (attractor) even if you can\'t predict the specific point.','Focus on robustness, not precision.'] } },
+  { id:'m2', codename:'NONLINEAR', title:'Non-linear Dynamics', summary:'Small inputs, massive outputs. Proportionality breaks.', lesson:{ title:'The Architecture of Disproportion', body: 'A linear system is like a faucet: turn the knob 10%, get 10% more water. A non-linear system is like a dam: increase the water level 10% and it might hold, or it might burst and flood the valley.\n\nMost of reality is non-linear. Markets, ecosystems, traffic, and human relationships do not scale linearly. They feature thresholds, tipping points, and exponential curves.\n\n## The Logistic Map\n\nThe simplest equation showing chaos is the logistic map: x_next = r * x * (1 - x).\nIf r (growth rate) is low, the population dies out. If r is medium, it stabilizes. But if r is high (around 4), the population bounces chaotically, never settling, highly sensitive to the starting value.\n\n## The Method\n\n1. **Test for linearity.** Does doubling the input double the output?\n2. **If non-linear, look for thresholds.** Where does the dam break?\n3. **Never extrapolate linearly in a non-linear system.** "Past performance is not indicative of future results" is literally true here.', takeaways:['Linear systems scale proportionally; non-linear systems do not.','Non-linear systems feature thresholds, tipping points, and exponential curves.','The logistic map shows how simple non-linear equations produce chaos.','Never extrapolate linearly in a non-linear domain.','Look for the threshold where the system breaks.'] } },
+  { id:'m3', codename:'ATTRACT', title:'Strange Attractors', summary:'Bounded chaos. The shape of unpredictability.', lesson:{ title:'The Architecture of Boundaries', body: 'Chaos is not randomness. It is bounded. A strange attractor is the shape that a chaotic system traces out over time. It never repeats the exact same path, but it always stays within a specific region of phase space.\n\n## The Lorenz Attractor\n\nEdward Lorenz\'s weather equations produced a 3D shape that looks like a butterfly. The system swirls around one wing, then suddenly flips to the other. You can\'t predict *when* it will flip, but you know it *will* flip, and it will stay within the wings.\n\n## Why This Is Useful\n\nIn business and life, you cannot predict the specific event (the stock price tomorrow), but you can predict the attractor (the market will oscillate between boom and bust).\n\n## The Method\n\n1. **Don\'t predict the exact trajectory.**\n2. **Identify the attractor.** What is the bounded space the system operates in?\n3. **Map the shape of the boundaries.** What are the min and max limits?', takeaways:['Chaos is bounded, not random.','A strange attractor is the shape a chaotic system traces over time.','You cannot predict the exact path, but you can predict the boundaries.','The Lorenz attractor looks like a butterfly; the system flips unpredictably between wings.','Identify the attractor to understand the system\'s limits.'] } },
+  { id:'m4', codename:'BIFURC', title:'Bifurcation', summary:'Period doubling, Feigenbaum, transitions to chaos.', lesson:{ title:'The Architecture of Transition', body: 'How does a system go from stable to chaotic? Through bifurcation. A bifurcation is a qualitative change in the system\'s behavior as a parameter is varied.\n\n## Period Doubling\n\nImagine a faucet dripping. At low pressure, it drips steadily (Period 1). Increase the pressure slightly, and it starts dripping in pairs: drip-drip... drip-drip (Period 2). Increase it more, and it becomes Period 4, then 8, then 16.\n\nThe intervals between these doublings shrink geometrically. The ratio of these intervals is the Feigenbaum constant (~4.669). This constant is universal—it appears in fluid dynamics, electronics, and biology. It is the mathematical signature of the transition to chaos.\n\n## The Method\n\n1. **Look for period doubling.** If a system\'s oscillation period splits, it is approaching chaos.\n2. **Recognize the universality.** The path to chaos is predictable, even if the chaos itself is not.\n3. **Watch for parameter shifts.** A small change in the environment can flip a stable system into a chaotic one.', takeaways:['Bifurcation is a qualitative change in system behavior.','Period doubling (1 -> 2 -> 4 -> 8) is the path to chaos.','The Feigenbaum constant (~4.669) is the universal ratio of period doubling.','The transition to chaos is mathematically predictable, even if the chaos is not.','Small parameter shifts can flip a stable system chaotic.'] } },
+  { id:'m5', codename:'FRACTAL', title:'Fractal Geometry', summary:'Self-similarity, Mandelbrot, non-integer dimensions.', lesson:{ title:'The Architecture of Self-Similarity', body: 'How long is the coastline of Britain? It depends on the length of your ruler. A 100-mile ruler gives one answer. A 1-mile ruler gives a much longer answer because it fits into all the bays. A 1-inch ruler gives an almost infinite length.\n\nThis is the coastline paradox. Coastlines are fractals: they are self-similar at all scales. Zoom in, and you see the same jaggedness.\n\n## Non-Integer Dimensions\n\nA line is 1D. A square is 2D. A fractal coastline is ~1.25 D. It has a fractional dimension. It fills space more than a line, but less than a plane.\n\n## The Method\n\n1. **Look for self-similarity.** Does the pattern repeat at different scales?\n2. **Beware of scale-dependent metrics.** A metric that changes with your ruler is a fractal.\n3. **Use power laws.** Fractals scale according to power laws, not linear proportions.', takeaways:['Fractals are self-similar across scales.','The coastline paradox: length depends on the ruler.\nFractals have non-integer dimensions (e.g., 1.25D).','Metrics on fractal systems change depending on the scale of measurement.','Fractals scale via power laws, not linear proportions.'] } },
+  { id:'m6', codename:'PHASE', title:'Phase Space', summary:'Trajectories, topological mixing, state representation.', lesson:{ title:'The Architecture of State', body: 'Phase space is a graph where every possible state of a system is represented as a point. A pendulum\'s phase space is a 2D graph of position vs. velocity. As it swings, it traces a circle.\n\n## Topological Mixing\n\nIn a chaotic system, the trajectories in phase space stretch and fold. Like kneading dough, two points that start close together get stretched apart, then folded over. Eventually, every region of the phase space is mixed with every other region.\n\nThis is why you can\'t predict the future: the present state gets smeared out over the entire space.\n\n## The Method\n\n1. **Map the variables.** What are the axes of your system\'s phase space?\n2. **Visualize the trajectory.** Is it a loop (stable), a spiral (dying), or a strange attractor (chaotic)?\n3. **Identify topological mixing.** Are nearby states getting stretched apart?', takeaways:['Phase space represents every possible state of a system as a point.','Trajectories show how the system evolves over time.','Topological mixing (stretching and folding) destroys predictability.','A loop is stable; a strange attractor is chaotic.','Mapping the phase space reveals the system\'s fundamental behavior.'] } },
+  { id:'m7', codename:'FEEDBACK', title:'Feedback Loops', summary:'Positive/negative loops driving non-linear behavior.', lesson:{ title:'The Architecture of Amplification', body: 'Feedback loops are the engine of non-linear dynamics. Negative feedback stabilizes (thermostat). Positive feedback destabilizes (microphone screech, market bubbles).\n\n## The Non-linear Engine\n\nChaos requires non-linearity, and feedback loops provide it. When the output of a system feeds back into the input, the next output depends on the previous output. This creates exponential growth or decay.\n\n## The Method\n\n1. **Trace the loops.** Where does the output feed back into the input?\n2. **Determine polarity.** Is it positive (amplifying) or negative (stabilizing)?\n3. **Look for delays.** Feedback with delays causes oscillation (bullwhip effect in supply chains).\n4. **Find the non-linearity.** The feedback itself might be non-linear (e.g., network effects).', takeaways:['Negative feedback stabilizes; positive feedback destabilizes.','Feedback loops create non-linear dynamics.','Delays in feedback loops cause oscillation.','Trace the loops to understand system behavior.','Network effects are a form of positive feedback.'] } },
+  { id:'m8', codename:'PREDICT', title:'Predictability Horizon', summary:'Lyapunov time, limits of forecasting.', lesson:{ title:'The Architecture of the Horizon', body: 'Chaos theory doesn\'t say "you can\'t predict anything." It says "you can\'t predict anything *indefinitely*." There is a predictability horizon.\n\n## Lyapunov Time\n\nThe Lyapunov exponent measures how fast nearby trajectories diverge. The inverse of this is the Lyapunov time: the time scale over which predictions are valid. For weather, it\'s about 10 days. For the solar system, it\'s 5 million years.\n\n## Ensemble Forecasting\n\nSince we can\'t know the exact initial state, we run simulations with slightly perturbed initial conditions. If they all agree, we have high confidence. If they diverge (the "spaghetti plot"), we have low confidence.\n\n## The Method\n\n1. **Calculate the predictability horizon.** How far out can you reliably predict?\n2. **Use ensemble forecasting.** Run multiple scenarios. If they diverge, stop predicting.\n3. **Accept the horizon.** Do not pretend you can predict beyond it.', takeaways:['Chaos sets a predictability horizon, not total unpredictability.','Lyapunov time is the timescale over which predictions remain valid.','Weather horizon: ~10 days. Solar system: ~5 million years.','Ensemble forecasting: run multiple scenarios to measure confidence.','Never predict beyond the horizon.'] } },
+  { id:'m9', codename:'EMERGE', title:'Edge of Chaos', summary:'Criticality, self-organization, computation.', lesson:{ title:'The Architecture of Criticality', body: 'Systems naturally evolve to the edge of chaos. This is self-organized criticality. A sandpile: you drop grains, it builds up, then avalanches. The system tunes itself to the critical point where it is neither frozen (order) nor gaseous (disorder), but fluid.\n\n## The Edge of Chaos\n\nAt the edge of chaos, information processing is maximized. Neurons in the brain, ecologies, and financial markets all operate near criticality. It is the balance between rigidity and randomness where adaptation thrives.\n\n## The Method\n\n1. **Look for avalanches.** Power-law distributions (many small events, few large ones) indicate criticality.\n2. **Avoid over-stabilizing.** Suppressing small avalanches leads to massive ones (forest fire suppression).\n3. **Embrace volatility.** The edge of chaos requires small failures to stay adaptive.', takeaways:['Systems naturally evolve to the edge of chaos (criticality).','At the critical point, information processing is maximized.','Power-law distributions indicate criticality (many small, few large events).','Suppressing small fluctuations leads to massive ones (forest fires).','The edge of chaos is where adaptation and computation thrive.'] } },
+  { id:'m10', codename:'NAVIGATE', title:'Navigating Chaos', summary:'Robustness vs prediction, exploiting chaos.', lesson:{ title:'The Architecture of Robustness', body: 'If you cannot predict the future, how do you navigate it? You build robust systems, not precise plans.\n\n## Robustness vs Efficiency\n\nEfficiency optimizes for a single expected future. Robustness optimizes for survival across many possible futures. The just-in-time supply chain is efficient; the redundant supply chain is robust. In a chaotic world, robustness wins.\n\n## The Barbell Strategy\n\nNassim Taleb\'s barbell: 90% in ultra-safe assets, 10% in ultra-risky. You are robust to negative shocks (the 90%) while exposed to positive black swans (the 10%). You avoid the "middle" (medium risk) which is fragile to unexpected chaos.\n\n## The Method\n\n1. **Stop predicting, start preparing.** Build systems that survive any scenario.\n2. **Embrace optionality.** Options have value in chaos because you can choose to exercise them only if the future is favorable.\n3. **Use the barbell strategy.** Combine extreme safety with small bets on the tail.\n4. **Love volatility.** If you are robust, volatility is your friend (antifragility).', takeaways:['In chaos, robustness beats efficiency.','Efficiency optimizes for one future; robustness survives all futures.','The barbell strategy: 90% ultra-safe, 10% ultra-risky. Avoid the middle.','Optionality has value in chaos because you can choose to exercise it.','Build antifragility: systems that gain from volatility.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the Butterfly Effect?',back:'Sensitive dependence on initial conditions. Small changes in the starting state lead to wildly divergent outcomes.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'Why did Lorenz\'s weather simulation diverge?',back:'He restarted it using numbers rounded to 3 decimal places instead of 6. A 0.0001% change caused a 100% different outcome.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Why does long-term point prediction fail in chaotic systems?',back:'Perfect measurement is impossible. You cannot know the initial state to infinite precision, so errors compound exponentially.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'If you can\'t predict the specific point, what CAN you predict?',back:'The attractor. You can predict the *range* or boundaries of outcomes, even if you can\'t predict the specific event.'},
+  {id:'c5',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "A butterfly flaps its wings in Brazil, causing..."',back:'"...a tornado in Texas."'},
+  {id:'c6',moduleId:'m1',core:false,category:'concept',front:'Does chaos mean complete randomness?',back:'No. Chaos is deterministic (it follows rules) but unpredictable due to sensitivity. Randomness has no rules.'},
+  {id:'c7',moduleId:'m1',core:false,category:'application',front:'What is the strategic response to the Butterfly Effect?',back:'Focus on robustness, not precision. Build systems that survive unexpected shocks.'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'What is the difference between linear and chaotic systems?',back:'Linear systems scale proportionally. Chaotic systems have exponential divergence from small changes.'},
+  {id:'c9',moduleId:'m1',core:false,category:'concept',front:'Is the Butterfly Effect a bug or a feature of reality?',back:'A feature. It is the mathematical property of non-linear feedback systems.'},
+  {id:'c10',moduleId:'m1',core:false,category:'application',front:'Can you eliminate the Butterfly Effect?',back:'No. It is a structural property of non-linear dynamics. You can only adapt to it.'},
+  {id:'c11',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Human intuition expects proportionality; chaos delivers..."',back:'"...exponential divergence."'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'What did Edward Lorenz discover in 1961?',back:'The Butterfly Effect (sensitive dependence on initial conditions) via weather simulations.'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'Difference between linear and non-linear systems?',back:'Linear: input doubles, output doubles. Non-linear: input doubles, output might explode or collapse. Proportionality breaks.'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'Example of a linear vs non-linear system?',back:'Linear: a faucet (10% turn = 10% water). Non-linear: a dam (10% more water might hold or burst).'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is the logistic map?',back:'x_next = r * x * (1 - x). A simple non-linear equation that produces chaos at high r values.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'What happens to the logistic map at r=4?',back:'It bounces chaotically, never settling, highly sensitive to the starting value.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'What is a threshold/tipping point?',back:'A point where a small change in input causes a massive, qualitative change in output (the dam breaks).'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'Why is "past performance is not indicative of future results" true in non-linear systems?',back:'Because you cannot extrapolate linearly. The system might hit a threshold tomorrow that it didn\'t hit today.'},
+  {id:'c19',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Never extrapolate linearly in a..."',back:'"...non-linear domain."'},
+  {id:'c20',moduleId:'m2',core:false,category:'concept',front:'What are the signatures of non-linear systems?',back:'Thresholds, tipping points, exponential curves, and feedback loops.'},
+  {id:'c21',moduleId:'m2',core:false,category:'application',front:'A market grows 10% for 5 years. Do you expect 10% next year?',back:'Not necessarily. Markets are non-linear. A threshold might be hit.'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'Why do linear models fail in reality?',back:'Because reality is mostly non-linear. Linear models assume proportionality, which breaks at thresholds.'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'How do you test for linearity?',back:'Check if doubling the input doubles the output across all ranges.'},
+  {id:'c24',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Linear systems scale proportionally; non-linear systems..."',back:'"...do not."'}, 
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is a strange attractor?',back:'The bounded shape that a chaotic system traces over time. It never repeats exactly, but stays within limits.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'What does the Lorenz attractor look like?',back:'A butterfly. The system swirls around one wing, then unpredictably flips to the other.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'Is chaos random?',back:'No. Chaos is bounded. It stays within the attractor.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'In business, what is the equivalent of an attractor?',back:'The market oscillates between boom and bust. You can\'t predict the exact day, but you know the boundaries.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'Can you predict the exact trajectory within an attractor?',back:'No. You can predict the boundaries, but not the specific path.'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'How do you use attractors strategically?',back:'Don\'t predict the exact event. Map the shape of the boundaries (min/max limits).'},
+  {id:'c31',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Chaos is bounded, not..."',back:'"...random."'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'What is phase space?',back:'A graph where every possible state of a system is a point. The attractor is the region the points cluster in.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'If you know the attractor, what do you know?',back:'You know the system will stay within that region, even if it bounces unpredictably inside it.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'Do chaotic systems ever settle down?',back:'No. That\'s why they\'re chaotic. They constantly move within the attractor.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'How is an attractor different from an equilibrium?',back:'Equilibrium is a single stable point. An attractor is a dynamic region the system orbits.'},
+  {id:'c36',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "You cannot predict the path, but you can predict the..."',back:'"...boundaries."'}, 
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is bifurcation?',back:'A qualitative change in a system\'s behavior as a parameter is varied (e.g., steady drip -> paired drip).'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'What is period doubling?',back:'The oscillation period splits: 1 -> 2 -> 4 -> 8. It is the path to chaos.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'What is the Feigenbaum constant?',back:'~4.669. The universal ratio of the intervals between period doublings.'},
+  {id:'c40',moduleId:'m4',core:false,category:'concept',front:'Is the transition to chaos predictable?',back:'Yes. The path (period doubling) follows the Feigenbaum constant, even though the chaos itself is unpredictable.'},
+  {id:'c41',moduleId:'m4',core:false,category:'application',front:'Example of bifurcation in real life?',back:'A dripping faucet. Increase pressure slightly, and it goes from steady (Period 1) to paired (Period 2).'},
+  {id:'c42',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "The transition to chaos is mathematically predictable, even if..."',back:'"...the chaos is not."'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What causes bifurcation?',back:'A small shift in a system parameter (e.g., temperature, pressure, growth rate).'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'How do you spot an approaching bifurcation?',back:'Look for period doubling. If oscillations start splitting, the system is heading to chaos.'},
+  {id:'c45',moduleId:'m4',core:false,category:'concept',front:'What happens after infinite period doublings?',back:'Chaos. The system never repeats.'},
+  {id:'c46',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Bifurcation is a qualitative change in..."',back:'"...system behavior."'}, 
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'In business, what is a bifurcation?',back:'A small change in the market (e.g., interest rates) that flips a stable industry into a chaotic one.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'Why is Feigenbaum\'s constant significant?',back:'It proves the transition to chaos is universal. The same math applies to fluids, circuits, and biology.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is a fractal?',back:'A shape that is self-similar at all scales. Zoom in, and you see the same pattern.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'The coastline paradox: how long is the coast of Britain?',back:'It depends on your ruler. A 1-inch ruler gives a near-infinite length. Coastlines are fractals.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is a non-integer dimension?',back:'A fractal dimension. A coastline is ~1.25D. It fills space more than a line, less than a plane.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'Why do fractals matter in business?',back:'Markets are fractal. A 1-minute chart looks like a 1-day chart looks like a 1-year chart.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'Do fractals scale linearly?',back:'No. They scale via power laws.'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'What is a scale-dependent metric?',back:'A metric that changes depending on the scale of measurement (like coastline length).'},
+  {id:'c55',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Zoom in, and you see..."',back:'"...the same pattern."'}, 
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'What is self-similarity?',back:'The property where a part of an object resembles the whole.'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'How do you detect a fractal?',back:'Plot the metric vs. the scale on a log-log graph. If it\'s a straight line, it\'s a fractal.'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'Are fractals chaotic?',back:'Yes. Fractals are the geometric fingerprints of chaos.'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'If a market is fractal, what does that mean for prediction?',back:'You can\'t predict the specific move, but you can predict the volatility pattern at different timescales.'},
+  {id:'c60',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Fractals scale via power laws, not..."',back:'"...linear proportions."'}, 
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is phase space?',back:'A graph where every possible state of a system is a point. Axes are the variables (position, velocity, etc.).'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'What does a trajectory in phase space represent?',back:'How the system evolves over time.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'What is topological mixing?',back:'Trajectories stretch and fold (like kneading dough). Nearby points get smeared across the whole space.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'Why does topological mixing destroy predictability?',back:'Because the present state gets smeared out. You can\'t tell where a point came from or where it\'s going.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'What is a loop in phase space?',back:'A stable oscillation (e.g., a pendulum).'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'What is a strange attractor in phase space?',back:'A chaotic, bounded region. The system orbits inside it but never repeats.'},
+  {id:'c67',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "A loop is stable; a strange attractor is..."',back:'"...chaotic."'}, 
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'How do you use phase space strategically?',back:'Map the variables. Visualize if the trajectory is a loop (stable), spiral (dying), or attractor (chaotic).'},
+  {id:'c69',moduleId:'m6',core:false,category:'concept',front:'What are the axes of a pendulum\'s phase space?',back:'Position and Velocity.'},
+  {id:'c70',moduleId:'m6',core:false,category:'application',front:'If two points start close in phase space, what happens in a chaotic system?',back:'They diverge exponentially due to topological mixing.'},
+  {id:'c71',moduleId:'m6',core:false,category:'concept',front:'Does topological mixing mean the system is random?',back:'No. It\'s deterministic, but the mixing makes it impossible to track.'},
+  {id:'c72',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Phase space represents every possible state of a system as a..."',back:'"...point."'}, 
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'Difference between negative and positive feedback?',back:'Negative stabilizes (thermostat). Positive amplifies (microphone screech, bubbles).'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'What do feedback loops create?',back:'Non-linear dynamics. The next output depends on the previous output.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What causes oscillation in feedback loops?',back:'Delays. If the feedback is delayed, the system overshoots and corrects, causing waves.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'What is the bullwhip effect?',back:'A supply chain oscillation caused by delayed feedback. Small retail changes cause massive factory swings.'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'What are network effects?',back:'A form of positive feedback. The more users, the more valuable, attracting more users.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'How do you trace feedback loops?',back:'Follow the output back to the input. Determine polarity (+/-) and look for delays.'},
+  {id:'c79',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Negative feedback stabilizes; positive feedback..."',back:'"...destabilizes."'}, 
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'Is positive feedback always bad?',back:'No. It drives growth and tipping points. But it leads to busts if unchecked.'},
+  {id:'c81',moduleId:'m7',core:false,category:'application',front:'Why do markets bubble?',back:'Positive feedback. Rising prices attract buyers, pushing prices higher.'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is the engine of non-linear dynamics?',back:'Feedback loops.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'How do you stop a positive feedback loop?',back:'Introduce negative feedback (e.g., circuit breakers in markets).'},
+  {id:'c84',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Delays in feedback loops cause..."',back:'"...oscillation."'}, 
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is the predictability horizon?',back:'The timescale over which predictions remain valid. Beyond it, chaos makes prediction impossible.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What is Lyapunov time?',back:'The inverse of the Lyapunov exponent. It measures how fast trajectories diverge, setting the predictability horizon.'},
+  {id:'c87',moduleId:'m8',core:false,category:'application',front:'What is the predictability horizon for weather?',back:'~10 days.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What is ensemble forecasting?',back:'Running simulations with slightly perturbed initial conditions. If they agree, high confidence. If they diverge, low confidence.'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'What is a spaghetti plot?',back:'A visualization of ensemble forecasts. The lines spread out, showing low confidence.'},
+  {id:'c90',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Chaos sets a predictability horizon, not..."',back:'"...total unpredictability."'}, 
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'Can you predict beyond the horizon?',back:'No. You can only predict the attractor (range), not the specific state.'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'How do you use the predictability horizon strategically?',back:'Calculate it. Do not pretend you can predict beyond it. Plan for the range.'},
+  {id:'c93',moduleId:'m8',core:false,category:'concept',front:'Does chaos mean the future is totally unknown?',back:'No. The future is bounded by the attractor.'},
+  {id:'c94',moduleId:'m8',core:false,category:'application',front:'If ensemble forecasts diverge immediately, what does that mean?',back:'The system is highly chaotic. The predictability horizon is very short.'},
+  {id:'c95',moduleId:'m8',core:false,category:'concept',front:'Why do long-term economic forecasts fail?',back:'Because the economy is chaotic, and the horizon is likely months, not decades.'},
+  {id:'c96',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Lyapunov time is the timescale over which..."',back:'"...predictions remain valid."'}, 
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is self-organized criticality?',back:'Systems naturally evolve to the edge of chaos. They tune themselves to the critical point.'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'Example of self-organized criticality?',back:'A sandpile. Drop grains, it builds up, then avalanches. It stays at the critical angle.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'What is the edge of chaos?',back:'The transition zone between order and randomness where computation and adaptation thrive.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'What indicates criticality?',back:'Power-law distributions. Many small events, few large ones (avalanches, earthquakes).'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'Why do brains operate near criticality?',back:'It maximizes information processing. Too ordered = rigid. Too random = noise.'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'What happens if you suppress small fluctuations?',back:'You get massive ones. (Forest fire suppression leads to mega-fires).'},
+  {id:'c103',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Systems naturally evolve to the..."',back:'"...edge of chaos."'}, 
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'Is criticality stable?',back:'No, it is metastable. It constantly avalanches.'},
+  {id:'c105',moduleId:'m9',core:false,category:'application',front:'How do you manage a critical system?',back:'Embrace volatility. Allow small failures to prevent large ones.'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'Do avalanches have a typical size?',back:'No. They follow a power law. Size is inversely proportional to frequency.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Are markets critical?',back:'Yes. Small daily fluctuations, occasional crashes. Power-law distributed.'},
+  {id:'c108',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Power-law distributions indicate..."',back:'"...criticality."'}, 
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'Robustness vs Efficiency?',back:'Efficiency optimizes for one expected future. Robustness survives many possible futures.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What is the barbell strategy?',back:'90% ultra-safe, 10% ultra-risky. Avoid the middle. Robust to negative shocks, exposed to positive black swans.'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'Why does robustness beat efficiency in chaos?',back:'Because chaos means the expected future probably won\'t happen. You need to survive the unexpected.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'Example of robust vs fragile?',back:'Just-in-time supply chain (fragile/efficient) vs redundant supply chain (robust/inefficient).'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'What is optionality?',back:'The right, but not the obligation, to act. Options have value in chaos because you only exercise them if the future is favorable.'},
+  {id:'c114',moduleId:'m10',core:false,category:'concept',front:'What is antifragility?',back:'A property where a system gains from volatility and shocks (e.g., muscle growth from lifting weights).'},
+  {id:'c115',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "In chaos, robustness beats..."',back:'"...efficiency."'}, 
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'Why avoid the "middle" in the barbell strategy?',back:'Medium risk is fragile. It gets wiped out in extreme events, unlike the ultra-safe (survives) or ultra-risky (limited downside).'},
+  {id:'c117',moduleId:'m10',core:false,category:'concept',front:'Should you try to predict in a chaotic world?',back:'No. You should prepare. Build systems that survive any scenario.'},
+  {id:'c118',moduleId:'m10',core:false,category:'application',front:'How does volatility help an antifragile system?',back:'It provides the stressors needed to adapt and grow stronger.'},
+  {id:'c119',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Stop predicting, start..."',back:'"...preparing."'}, 
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What is the ultimate goal in navigating chaos?',back:'To become antifragile: to benefit from unpredictability rather than just survive it.'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: The Butterfly Effect', difficulty:1, reward:50, timeLimit:60, body:'You are forecasting sales. You predict 10,000 units. What is the chaotic perspective?', options:['You are probably exactly right.','A tiny change in the market (e.g., a viral tweet) could cause you to sell 100,000 or 1,000. Small changes compound.','You should use a linear model.','Sales are not chaotic.'], correct:1, explanation:'The Butterfly Effect means small initial changes lead to wildly divergent outcomes. A tiny market shift can disproportionately affect sales.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Lorenz\'s Discovery', difficulty:2, reward:100, timeLimit:60, body:'Lorenz restarted his weather simulation with rounded numbers. What happened?', options:['It produced the exact same weather.','It produced completely different weather.','It crashed.','It predicted the future perfectly.'], correct:1, explanation:'Rounding from 6 to 3 decimal places was a tiny change in initial conditions, which led to a 100% different outcome. This is sensitive dependence.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Prediction Horizon', difficulty:3, reward:200, timeLimit:90, body:'Can you predict the exact weather 30 days from now?', options:['Yes, with a big enough computer.','Yes, if you measure the initial conditions perfectly.','No. The predictability horizon for weather is ~10 days. Errors compound exponentially.','No, weather is random.'], correct:2, explanation:'Chaos sets a horizon (~10 days for weather). Beyond that, perfect measurement is impossible and errors grow exponentially. You cannot predict the exact state.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Strategic Response', difficulty:4, reward:500, timeLimit:120, body:'If you cannot predict the exact future, what is the correct strategic response?', options:['Try harder to predict.','Hire more analysts.','Focus on robustness. Build systems that survive any scenario.','Give up.'], correct:2, explanation:'In chaos, precision is impossible. The correct response is robustness: building systems that survive unexpected shocks, rather than optimizing for a single predicted future.' },
+
+  { id:'p5', moduleId:'m2', title:'Q1: Linear vs Non-linear', difficulty:1, reward:50, timeLimit:60, body:'You double the marketing budget. Sales double. Is this linear or non-linear?', options:['Linear','Non-linear','Chaotic','Fractal'], correct:0, explanation:'If doubling input doubles output proportionally, it is linear. Non-linear systems break proportionality (e.g., doubling input might 10x output or cause a collapse).' },
+  { id:'p6', moduleId:'m2', title:'Q2: The Faucet', difficulty:2, reward:100, timeLimit:60, body:'You turn the faucet knob 10%. Water increases 10%. You turn it 90%. It sprays everywhere. What is this?', options:['A linear system','A non-linear system with a threshold','A random system','A fractal'], correct:1, explanation:'The faucet behaves linearly at low flow but hits a threshold where behavior qualitatively changes (spraying). This is non-linear dynamics.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Extrapolation', difficulty:3, reward:200, timeLimit:90, body:'A stock has grown 10% per year for 5 years. Do you expect 10% next year?', options:['Yes, past performance indicates future results.','Yes, it is linear.','Not necessarily. Markets are non-linear. A threshold might be hit.','No, it will crash.'], correct:2, explanation:'Markets are non-linear. You cannot extrapolate linearly. A small change in conditions might cause a qualitative shift (bubble or crash).' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Logistic Map', difficulty:4, reward:500, timeLimit:120, body:'The logistic map (x_next = r * x * (1-x)) at r=4 produces what?', options:['A stable equilibrium','Periodic oscillation','Chaos. The value bounces unpredictably and never settles.','Zero'], correct:2, explanation:'At r=4, the logistic map is fully chaotic. It never settles, and is highly sensitive to the starting value.' },
+
+  { id:'p9', moduleId:'m3', title:'Q1: Bounded Chaos', difficulty:1, reward:50, timeLimit:60, body:'Is chaos the same as randomness?', options:['Yes','No. Chaos is deterministic and bounded. It follows rules and stays within an attractor.','Yes, it is unpredictable','No, chaos is linear'], correct:1, explanation:'Chaos is not random. It follows deterministic rules and stays within a bounded region (the strange attractor). It is unpredictable but not unbounded.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Lorenz Attractor Shape', difficulty:2, reward:100, timeLimit:60, body:'What does the Lorenz attractor look like?', options:['A circle','A straight line','A butterfly','A sphere'], correct:2, explanation:'The Lorenz attractor looks like a butterfly. The system swirls around one wing, then unpredictably flips to the other.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Market Attractor', difficulty:3, reward:200, timeLimit:90, body:'In the stock market, what is the "attractor"?', options:['The exact price tomorrow','The long-term trend line','The bounded oscillation between boom and bust. You can\'t predict the day, but you know the range.','The Fed interest rate'], correct:2, explanation:'You cannot predict the specific price (the trajectory), but you can predict the boundaries (the attractor): markets oscillate between boom and bust.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Strategic Use', difficulty:4, reward:500, timeLimit:120, body:'How do you use an attractor strategically?', options:['Predict the exact event.','Map the boundaries (min/max limits). Don\'t predict the path.','Ignore it','Try to break it'], correct:1, explanation:'You cannot predict the exact path within the attractor. You map the shape of the boundaries to know the range of possible outcomes.' },
+
+  { id:'p13', moduleId:'m4', title:'Q1: Bifurcation', difficulty:1, reward:50, timeLimit:60, body:'What is bifurcation?', options:['A split in a company','A qualitative change in system behavior as a parameter varies','A linear equation','A random event'], correct:1, explanation:'Bifurcation is a qualitative change in behavior (e.g., a steady drip becoming a paired drip) as a parameter (like pressure) changes.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Period Doubling', difficulty:2, reward:100, timeLimit:60, body:'What is period doubling?', options:['The period halves','The oscillation period splits: 1 -> 2 -> 4 -> 8. It is the path to chaos.','The system stabilizes','The system stops'], correct:1, explanation:'Period doubling (1 -> 2 -> 4 -> 8) is the universal path to chaos. The intervals between doublings shrink geometrically.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Feigenbaum Constant', difficulty:3, reward:200, timeLimit:90, body:'What is the Feigenbaum constant (~4.669)?', options:['The speed of light','The universal ratio of intervals between period doublings','The interest rate','The market P/E ratio'], correct:1, explanation:'The Feigenbaum constant is the ratio of the intervals between period doublings. It is universal—it appears in fluids, circuits, and biology.' },
+  { id:'p16', moduleId:'m4', title:'Q4: Predictability of Transition', difficulty:4, reward:500, timeLimit:120, body:'Is the transition to chaos predictable?', options:['No, it\'s random.','Yes, the path (period doubling) follows the Feigenbaum constant, even though the chaos is unpredictable.','Yes, it\'s linear','No, it depends on the system.'], correct:1, explanation:'The transition to chaos (via period doubling) is mathematically predictable and universal (Feigenbaum). The chaos itself is not.' },
+
+  { id:'p17', moduleId:'m5', title:'Q1: Fractals', difficulty:1, reward:50, timeLimit:60, body:'What is a fractal?', options:['A type of equation','A shape that is self-similar at all scales. Zoom in, see the same pattern.','A random line','A linear graph'], correct:1, explanation:'A fractal is self-similar. Zooming in reveals the same structure as the whole (e.g., a coastline or a fern).' },
+  { id:'p18', moduleId:'m5', title:'Q2: Coastline Paradox', difficulty:2, reward:100, timeLimit:60, body:'How long is the coast of Britain?', options:['10,000 miles','It depends on your ruler. A 1-inch ruler gives a near-infinite length.','It is unmeasurable','5,000 miles'], correct:1, explanation:'The coastline is a fractal. The shorter your ruler, the more nooks and crannies you measure, making the coastline longer. There is no single "true" length.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Fractal Dimension', difficulty:3, reward:200, timeLimit:90, body:'A coastline has a dimension of ~1.25. What does this mean?', options:['It is 1.25 miles long','It is a non-integer dimension. It fills space more than a line (1D), less than a plane (2D).','It is 1.25D','It is a mistake'], correct:1, explanation:'Fractals have non-integer dimensions. A coastline is too jagged to be 1D, but doesn\'t fill 2D space like a square. It is ~1.25D.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Market Fractals', difficulty:4, reward:500, timeLimit:120, body:'How are markets fractal?', options:['They are random','A 1-minute chart looks like a 1-day chart looks like a 1-year chart. Self-similar.','They are linear','They only go up'], correct:1, explanation:'Market volatility patterns repeat at different timescales. The structure is self-similar, which is the definition of a fractal.' },
+
+  { id:'p21', moduleId:'m6', title:'Q1: Phase Space', difficulty:1, reward:50, timeLimit:60, body:'What is phase space?', options:['A graph of time vs distance','A graph where every possible state of a system is a point','A type of equation','The final state'], correct:1, explanation:'Phase space represents every possible state as a point. Axes are variables (position, velocity). Trajectories show how the system evolves.' },
+  { id:'p22', moduleId:'m6', title:'Q2: Topological Mixing', difficulty:2, reward:100, timeLimit:60, body:'What is topological mixing?', options:['Adding ingredients','Trajectories stretch and fold (like dough). Nearby points get smeared across the space.','A linear process','A stable state'], correct:1, explanation:'In chaos, trajectories stretch and fold. Two nearby points get pulled apart and folded over, eventually mixing across the entire space.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Why Mixing Kills Prediction', difficulty:3, reward:200, timeLimit:90, body:'Why does topological mixing destroy predictability?', options:['Because the system stops','Because the present state gets smeared out. You can\'t tell where a point came from or where it\'s going.','Because it is random','Because the graph is 2D'], correct:1, explanation:'Mixing smears the present state across the phase space. You lose track of where the system is, making future prediction impossible.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Trajectory Shapes', difficulty:4, reward:500, timeLimit:120, body:'In phase space, what does a loop vs a strange attractor mean?', options:['Loop = dying, Attractor = stable','Loop = stable oscillation, Attractor = chaotic bounded motion','Loop = chaotic, Attractor = linear','They are the same'], correct:1, explanation:'A loop is a stable, repeating oscillation (pendulum). A strange attractor is a chaotic, bounded region where the system never repeats.' },
+
+  { id:'p25', moduleId:'m7', title:'Q1: Feedback Types', difficulty:1, reward:50, timeLimit:60, body:'Difference between negative and positive feedback?', options:['Negative is bad, Positive is good','Negative stabilizes (thermostat). Positive amplifies (screech).','Negative amplifies, Positive stabilizes','They are the same'], correct:1, explanation:'Negative feedback corrects deviations (thermostat). Positive feedback amplifies them (microphone screech, market bubbles).' },
+  { id:'p26', moduleId:'m7', title:'Q2: The Engine of Chaos', difficulty:2, reward:100, timeLimit:60, body:'What creates non-linear dynamics?', options:['Linear equations','Feedback loops. The next output depends on the previous output.','Random noise','Stability'], correct:1, explanation:'Feedback loops are the engine of non-linear dynamics. When output feeds back into input, the system becomes non-linear and potentially chaotic.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Delays', difficulty:3, reward:200, timeLimit:90, body:'What do delays in feedback loops cause?', options:['Stability','Oscillation. The system overshoots and corrects, causing waves.','Chaos','Linear growth'], correct:1, explanation:'Delayed feedback causes oscillation. The system reacts to old information, overshoots, and corrects, creating waves (bullwhip effect).' },
+  { id:'p28', moduleId:'m7', title:'Q4: Market Bubbles', difficulty:4, reward:500, timeLimit:120, body:'Why do markets bubble?', options:['Random chance','Positive feedback. Rising prices attract buyers, pushing prices higher.','Negative feedback','Linear dynamics'], correct:1, explanation:'Bubbles are positive feedback loops. Price rises -> attracts buyers -> price rises more. The loop amplifies until it collapses.' },
+
+  { id:'p29', moduleId:'m8', title:'Q1: Horizon', difficulty:1, reward:50, timeLimit:60, body:'What is the predictability horizon?', options:['The edge of the universe','The timescale over which predictions remain valid','The end of the project','The limit of a ruler'], correct:1, explanation:'The predictability horizon is the time limit for valid forecasts. Beyond it, chaos makes prediction impossible.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Weather Horizon', difficulty:2, reward:100, timeLimit:60, body:'What is the predictability horizon for weather?', options:['1 year','10 days','1 month','100 years'], correct:1, explanation:'Due to the Butterfly Effect, weather predictions lose validity after about 10 days. Errors compound exponentially after that.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Ensemble Forecasting', difficulty:3, reward:200, timeLimit:90, body:'How do you measure confidence in a chaotic forecast?', options:['Ask an expert','Ensemble forecasting. Run simulations with slightly perturbed initial conditions. If they agree, high confidence.','Use a bigger computer','Guess'], correct:1, explanation:'Ensemble forecasting runs multiple scenarios with tiny variations. If they converge, high confidence. If they diverge (spaghetti plot), low confidence.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Economic Forecasts', difficulty:4, reward:500, timeLimit:120, body:'Why do 10-year economic forecasts fail?', options:['Because economists are dumb','Because the economy is chaotic, and the horizon is likely months, not decades.','Because of politics','Because of random events'], correct:1, explanation:'The economy is a chaotic system. The predictability horizon is short. Decade-long forecasts are impossible because errors compound exponentially.' },
+
+  { id:'p33', moduleId:'m9', title:'Q1: Criticality', difficulty:1, reward:50, timeLimit:60, body:'What is self-organized criticality?', options:['A system that organizes itself to be perfectly stable','A system that tunes itself to the edge of chaos (e.g., a sandpile).','A critical mass','A random event'], correct:1, explanation:'Systems naturally evolve to the edge of chaos. A sandpile builds up until it hits the critical angle, then avalanches. It tunes itself to criticality.' },
+  { id:'p34', moduleId:'m9', title:'Q2: Power Laws', difficulty:2, reward:100, timeLimit:60, body:'What indicates criticality?', options:['A normal distribution','Power-law distributions. Many small events, few large ones (avalanches).','A linear graph','Constant values'], correct:1, explanation:'Critical systems produce power-law distributions. There is no "typical" size. There are many small avalanches and a few massive ones.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Forest Fires', difficulty:3, reward:200, timeLimit:90, body:'What happens if you suppress small forest fires?', options:['The forest becomes safe','You get massive mega-fires. Suppressing small fluctuations leads to large ones.','Nothing','The forest dies'], correct:1, explanation:'Suppressing small fires allows fuel to build up. The system moves away from criticality, then catastrophically avalanches in a mega-fire.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Edge of Chaos', difficulty:4, reward:500, timeLimit:120, body:'Why do brains and ecologies operate near criticality?', options:['To conserve energy','It maximizes information processing and adaptation. Too ordered = rigid. Too random = noise.','To avoid chaos','Because of evolution'], correct:1, explanation:'At the edge of chaos, systems balance order and randomness. This maximizes computation and adaptation. Life thrives at the critical point.' },
+
+  { id:'p37', moduleId:'m10', title:'Q1: Robust vs Efficient', difficulty:1, reward:50, timeLimit:60, body:'Difference between robustness and efficiency?', options:['They are the same','Efficiency optimizes for one future. Robustness survives many futures.','Robustness is cheaper','Efficiency is safer'], correct:1, explanation:'Efficiency (just-in-time supply) optimizes for the expected. Robustness (redundancy) prepares for the unexpected. In chaos, robustness wins.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Barbell', difficulty:2, reward:100, timeLimit:60, body:'What is the barbell strategy?', options:['100% in stocks','90% ultra-safe, 10% ultra-risky. Avoid the middle.','50% stocks, 50% bonds','All in crypto'], correct:1, explanation:'90% ultra-safe protects you from negative shocks. 10% ultra-risky exposes you to positive black swans. The middle is fragile.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Optionality', difficulty:3, reward:200, timeLimit:90, body:'Why is optionality valuable in chaos?', back:'Because you can choose to exercise it only if the future is favorable.', options:['Because it is cheap','Because you can choose to exercise it only if the future is favorable.','Because it is linear','Because it is safe'], correct:1, explanation:'In chaos, you can\'t predict the future. Options (the right, not the obligation) are valuable because you only act if the future is favorable.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Antifragility', difficulty:4, reward:500, timeLimit:120, body:'What is the ultimate goal in navigating chaos?', options:['Perfect prediction','Maximum efficiency','Antifragility: systems that gain from volatility and shocks.','Stability'], correct:2, explanation:'Robust systems survive shocks. Antifragile systems (like muscles or evolution) get stronger from them. In chaos, antifragility is the ultimate adaptation.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Viral Launch', scenario:'You launch a new app. On day 1, you get 100 users. What is the chaotic perspective?', options:['You will have 100 users forever.','A tiny change (e.g., a celebrity tweet) could cause exponential, unpredictable growth or collapse. Plan for the range, not the exact number.','You can linearly extrapolate 100 users/day.','It is random.'], correct:1, explanation:'The Butterfly Effect applies to network effects. A small initial perturbation can cause wildly divergent outcomes. Plan for robustness, not a specific trajectory.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Marketing Threshold', scenario:'You double ad spend. Sales double. You double again. Sales stay flat. What happened?', options:['The market is broken.','You hit a non-linear threshold/tipping point. The linear relationship broke.','You need to spend more.','It is random.'], correct:1, explanation:'Markets are non-linear. The proportional relationship held for a while, then you hit a threshold where the system\'s behavior qualitatively changed.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Market Attractor', scenario:'Your competitor\'s stock price bounces wildly. How do you strategize?', options:['Predict the exact price tomorrow.','Map the attractor. You can\'t predict the exact day, but you know it oscillates within a bounded range. Plan for the boundaries.','Ignore it','Wait for it to stabilize'], correct:1, explanation:'Chaos is bounded. You cannot predict the specific trajectory (price), but you can map the strange attractor (the range of oscillation).' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Bifurcating Market', scenario:'A small change in regulation causes your industry to oscillate unpredictably. What is this?', options:['Random noise','A bifurcation. The system crossed a parameter threshold and transitioned from stable to chaotic.','A linear shift','A mistake'], correct:1, explanation:'A bifurcation is a qualitative change in behavior caused by a parameter shift. The industry crossed the threshold into chaos.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Scale Problem', scenario:'Your 1-day chart looks identical to your 1-year chart. What is this?', options:['A coincidence','A fractal. The market is self-similar across scales.','A linear system','Random'], correct:1, explanation:'Fractals are self-similar. If the pattern repeats at different timescales, the system is fractal. You can\'t predict the specific move, but you can predict the volatility pattern.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Smeared State', scenario:'You try to track a specific user\'s journey through your app, but they bounce unpredictably. Why?', options:['Bad UX','Topological mixing. Trajectories stretch and fold, smearing the state across phase space.','Random clicks','Linear flow'], correct:1, explanation:'In a chaotic system (like a complex app with feedback loops), nearby trajectories mix. You lose track of where a specific user came from or where they\'re going.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Bullwhip', scenario:'A small increase in retail demand causes your factory to overproduce massively. Why?', options:['Linear scaling','Delayed positive feedback (the bullwhip effect). The delay causes oscillation.','Random error','Good management'], correct:1, explanation:'Delayed feedback in supply chains causes the bullwhip effect. A small retail signal amplifies through delayed reactions, causing massive factory oscillations.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Horizon', scenario:'Your analyst presents a 5-year revenue forecast. What do you do?', options:['Execute it precisely.','Recognize the predictability horizon is likely months. Use it as a boundary, not a point prediction.','Trust it completely','Fire the analyst'], correct:1, explanation:'In a chaotic market, the predictability horizon is short. A 5-year forecast is useless as a point prediction. Use it only to map the boundaries of possible outcomes.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Avalanching System', scenario:'Your servers handle small traffic spikes well, but occasionally crash catastrophically. Why?', options:['Bad code','Self-organized criticality. The system is at the edge of chaos, producing power-law distributed crashes.','Random luck','Linear load'], correct:1, explanation:'Systems tune themselves to criticality. Most spikes are small, but occasionally a massive avalanche occurs. Power-law distributions indicate criticality.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Strategy', scenario:'You cannot predict the market. What is your strategic response?', options:['Hire better predictors.','Build an antifragile company. Use the barbell strategy. Gain from volatility.','Optimize for maximum efficiency','Give up'], correct:1, explanation:'In chaos, robustness beats efficiency. Use the barbell strategy (90% safe, 10% risky) to survive shocks and exploit black swans. Become antifragile.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Sensitive Task', body:'Identify a task today where a tiny mistake could ruin the whole outcome. That\'s the Butterfly Effect.' },
+  { id:'rw2', title:'The Threshold', body:'Find a process in your work. Is it linear, or is there a threshold where it breaks?' },
+  { id:'rw3', title:'The Bounded Range', body:'Instead of predicting the exact outcome of an event, predict the range (attractor). What are the min and max limits?' },
+  { id:'rw4', title:'The Fractal Pattern', body:'Look at a 1-minute chart and a 1-day chart of the same stock. Do they look similar? That\'s a fractal.' },
+  { id:'rw5', title:'The Feedback Loop', body:'Trace a feedback loop in your life. Is it positive (amplifying) or negative (stabilizing)? Is there a delay?' },
+  { id:'rw6', title:'The Horizon', body:'What is the predictability horizon for your industry? Days? Months? Stop predicting beyond it.' },
+  { id:'rw7', title:'The Power Law', body:'Observe fluctuations in your work. Are they normally distributed, or do you see power laws (many small, few huge)?' },
+  { id:'rw8', title:'The Barbell', body:'Apply the barbell to your portfolio or schedule: 90% ultra-safe, 10% ultra-risky. Avoid the middle.' },
+  { id:'rw9', title:'The Robust Check', body:'Is your supply chain efficient or robust? In chaos, robust wins.' },
+  { id:'rw10', title:'The Avalanche', body:'Notice how small stressors build up until you avalanche (stress, mess). That\'s self-organized criticality.' },
+  { id:'rw11', title:'The Phase Space', body:'Map the variables of a problem (e.g., time, money, energy). Visualize the trajectory. Is it a loop or chaos?' },
+  { id:'rw12', title:'The Bifurcation', body:'Did a small change in your environment cause a qualitative shift in your behavior? That\'s a bifurcation.' },
+  { id:'rw13', title:'The Non-linear', body:'Double your effort on a task. Did the output double, or did it explode/collapse? Test for non-linearity.' },
+  { id:'rw14', title:'The Coastline', body:'Measure a jagged line (coastline, cloud edge). The shorter your ruler, the longer it gets. It\'s a fractal.' },
+  { id:'rw15', title:'The Ensemble', body:'Run 3 scenarios for tomorrow (good, bad, weird). If they diverge wildly, confidence is low.' },
+  { id:'rw16', title:'The Optionality', body:'Find an option in your life (a choice, not an obligation). In chaos, options have high value.' },
+  { id:'rw17', title:'The Antifragile', body:'Find a system that gets stronger from stress (muscles, immunity). How can you make your work antifragile?' },
+  { id:'rw18', title:'The Bullwhip', body:'Notice how a small delay in communication causes massive swings in a project. That\'s delayed feedback.' },
+  { id:'rw19', title:'The Criticality', body:'Are you suppressing small failures? Stop. Let small fires burn to prevent mega-fires.' },
+  { id:'rw20', title:'The Edge', body:'Are you too rigid or too chaotic in your habits? Aim for the edge of chaos.' },
+  { id:'rw21', title:'The Tipping Point', body:'Identify a tipping point in your market. What small parameter shift would flip the system?' },
+  { id:'rw22', title:'The Scale', body:'Look at your metrics. Do they change depending on the timeframe? That\'s scale-dependence.' },
+  { id:'rw23', title:'The Mixing', body:'Watch how rumors spread in a group. They stretch and fold, mixing everyone\'s understanding. Topological mixing.' },
+  { id:'rw24', title:'The Bubble', body:'Identify a positive feedback loop in the market (rising prices -> more buyers). It will eventually burst.' },
+  { id:'rw25', title:'The Forecast', body:'Stop checking 10-day weather forecasts. They are beyond the horizon. Check 3-day.' },
+  { id:'rw26', title:'The Sandpile', body:'Drop sand. Watch it build, then avalanche. The system tunes itself to criticality.' },
+  { id:'rw27', title:'The Safe Bet', body:'Ensure 90% of your assets/time are ultra-safe. Survive the shock.' },
+  { id:'rw28', title:'The Risky Bet', body:'Ensure 10% of your assets/time are ultra-risky. Expose yourself to the black swan.' },
+  { id:'rw29', title:'The Efficiency Trap', body:'Find an "efficient" process. How would it die in chaos? Add redundancy.' },
+  { id:'rw30', title:'The Chaos Mindset', body:'Accept that you cannot predict the future. Focus on preparation and robustness.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your chaos profile.' },
+  { threshold: 500, title: 'OBSERVER', desc: 'You recognize the Butterfly Effect in daily life.' },
+  { threshold: 1500, title: 'NAVIGATOR', desc: 'You map attractors and avoid linear extrapolation.' },
+  { threshold: 3000, title: 'STRATEGIST', desc: 'You build robust systems that survive unpredictability.' },
+  { threshold: 6000, title: 'LORENZ OPERATOR', desc: 'You exploit chaos. You are antifragile.' }
+];
+
+const STORAGE_KEY = 'lorenz-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// STRANGE ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Strange. You now possess the complete architecture of chaos.</p>';
+      html += '<p><strong>The Secret:</strong> Chaos is not the enemy; it is the medium. By abandoning the illusion of long-term prediction and embracing robustness, you transform unpredictability from a threat into an advantage. You do not predict the future; you survive it, and you gain from it. You are antifragile.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Strange: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your chaos architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="LORENZ.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="LORENZ.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="LORENZ.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="LORENZ.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="LORENZ.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="LORENZ.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="LORENZ.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="LORENZ.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'STRANGE' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each chaos axis to a non-linear market. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="LORENZ.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="LORENZ.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="LORENZ.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'strange: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="LORENZ.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="LORENZ.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="LORENZ.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="LORENZ.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="LORENZ.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="LORENZ.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="LORENZ.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="LORENZ.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="LORENZ.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="LORENZ.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="LORENZ.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="LORENZ.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="LORENZ.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="LORENZ.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="LORENZ.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="LORENZ.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="LORENZ.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="LORENZ.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(157,78,221,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(157, 78, 221, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'lorenz_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading chaos theory kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Strange...', 'LORENZ online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.LORENZ = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const today = new Date().toISOString().split('T')[0]; if(!act.includes(today)) { act.push(today); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
