@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NASH // Strategic Architecture v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00FFA3; --cyan-dim:#008F5A; --magenta:#FF2D9C; --amber:#FFB800; --green:#00D9FF; --red:#FF3355;
+  --text:#E0FFEC; --text-dim:#6B8F7C; --text-faint:#3A5947;
+  --border:rgba(0,255,163,0.15); --border-bright:rgba(0,255,163,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{
+  background:
+    radial-gradient(ellipse at 20% 10%,rgba(0,255,163,0.08),transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),
+    var(--void);
+  min-height:100vh; position:relative; font-size:14px; line-height:1.6;
+}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,163,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,163,0.03) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;z-index:1;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:linear-gradient(rgba(0,255,163,0.02) 50%,transparent 50%);
+  background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;
+}
+
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,255,163,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,255,163,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,255,163,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+
+.mission{background:linear-gradient(135deg,rgba(0,255,163,0.08),rgba(0,255,163,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;position:relative;overflow:hidden;}
+.btn::before{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,255,163,0.3),transparent);transition:left 0.4s;}
+.btn:hover::before{left:100%;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,255,163,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,163,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,255,163,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,255,163,0.03);}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,255,163,0.04);border-left:2px solid var(--cyan);}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,255,163,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,163,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,217,255,0.05);}
+
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+
+.arena-container, .project-container{max-width:900px;margin:0 auto;}
+.arena-hud, .project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,255,163,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,217,255,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,255,163,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,255,163,0.1);position:relative;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,255,163,0.3);text-transform:uppercase;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,217,255,0.3);}
+
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:rgba(0,255,163,0.15);stroke-width:1;}
+.radar-ring{fill:none;stroke:rgba(0,255,163,0.08);stroke-width:1;}
+.radar-poly{fill:rgba(0,255,163,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px rgba(0,255,163,0.5));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,163,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(255,45,156,0.05), rgba(0,255,163,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,184,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,184,0,0.1);}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,184,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+
+@media(max-width:700px){
+  .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
+  .stats-strip{flex-wrap:wrap;gap:0.85rem;}
+  .nav{padding:0 1rem;}
+  .nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}
+  .view{padding:1rem;}
+  .lesson-title{font-size:1.7rem;}
+  .drill-card{padding:1.75rem 1.25rem;min-height:340px;}
+  .drill-question{font-size:1.1rem;}
+  .scenario{padding:1.5rem;}
+  .mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}
+  .big-stat-value{font-size:1.8rem;}
+  .section-title{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div id="boot">
+  <div class="boot-logo">NASH</div>
+  <div class="boot-sub">Strategic Architecture v1.0 // Game Theory Protocol</div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div>
+      <div class="brand">NASH</div>
+      <div class="brand-tag">STRATEGIC ARCHITECTURE</div>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
+      <div class="stat-pill">XP <b id="topXp">0</b></div>
+      <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
+      <div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+    <div class="nav-item" data-view="project">Project Spectrum</div>
+    <div class="nav-item" data-view="drills">Drills</div>
+    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="stats">Stats</div>
+    <div class="nav-item" data-view="about">About</div>
+  </nav>
+  
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1>
+      <p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      
+      <div class="dash-grid">
+        <div class="panel mission">
+          <div class="panel-label">// Next Mission</div>
+          <h2 id="missionTitle">Initialize Training</h2>
+          <p id="missionBody">Loading strategic architecture...</p>
+          <div class="flex gap-1" style="flex-wrap:wrap">
+            <button class="btn" id="missionBtn">Begin →</button>
+            <button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-label">// Daily Output</div>
+          <div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div>
+          <div class="big-stat-sub">cards reviewed today</div>
+          <div class="mt-2" style="display:grid;gap:0.4rem">
+            <div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div>
+            <div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div>
+            <div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// Daily Real-World Mission</div>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
+          <button class="btn secondary" id="rtBtn" onclick="NASH.completeRTMission()">Mark Complete · +25 XP</button>
+        </div>
+        <div class="profile-card">
+          <div class="panel-label">// Operator Profile</div>
+          <div class="profile-title" id="profTitle">UNRANKED</div>
+          <div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div>
+        </div>
+      </div>
+
+      <div id="secretUnlockContainer"></div>
+      
+      <div class="panel">
+        <div class="panel-label">// Ten-Axis Mastery</div>
+        <div class="dash-grid" style="margin:0">
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg>
+          </div>
+          <div class="mastery-list" id="masteryList"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="view" id="view-modules">
+      <h1 class="section-title">Training Modules</h1>
+      <p class="section-sub">Ten axes of game-theoretic reasoning. Sequential unlock.</p>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </section>
+    
+    <section class="view" id="view-project">
+      <h1 class="section-title">Project: SPECTRUM</h1>
+      <p class="section-sub">A cumulative scenario. Navigate a market entry, a price war, and a 5G spectrum auction against rational adversaries.</p>
+      <div class="project-container" id="projectContainer"></div>
+    </section>
+    
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    
+    <section class="view" id="view-drills">
+      <h1 class="section-title">Spaced Repetition Drills</h1>
+      <p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p>
+      <div class="filter-bar" id="drillFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="core">★ Core Only</button>
+        <button class="filter-btn" data-filter="concept">Concepts</button>
+        <button class="filter-btn" data-filter="application">Application</button>
+        <button class="filter-btn" data-filter="quote">Quotes</button>
+      </div>
+      <div class="drill-container" id="drillContainer"></div>
+    </section>
+    
+    <section class="view" id="view-arena">
+      <h1 class="section-title">Combat Arena</h1>
+      <p class="section-sub">Scenario-based problem solving. Apply principles under pressure.</p>
+      <div class="arena-container" id="arenaContainer"></div>
+    </section>
+    
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1>
+      <p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat">
+          <div class="big-stat-label">Total XP</div>
+          <div class="big-stat-value" id="statXp">0</div>
+          <div class="big-stat-sub" id="statLevel">Level 1</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Cards Mature</div>
+          <div class="big-stat-value" id="statMature">0</div>
+          <div class="big-stat-sub" id="statMatureSub">of 0 total</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Retention Rate</div>
+          <div class="big-stat-value" id="statRetention">--</div>
+          <div class="big-stat-sub">last 100 reviews</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Longest Streak</div>
+          <div class="big-stat-value" id="statLongStreak">0</div>
+          <div class="big-stat-sub" id="statCurStreak">current: 0d</div>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Card Maturity Distribution</div>
+        <div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Session Log</div>
+        <div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Reset</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p>
+        <button class="btn danger" id="resetBtn">Reset All Progress</button>
+      </div>
+    </section>
+    
+    <section class="view" id="view-about">
+      <h1 class="section-title">About NASH</h1>
+      <p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>NASH is a cognitive training simulator designed to install the strategic thinking patterns used in advanced game theory, modeled after MIT OpenCourseWare 14.12. It is not a textbook. It is a workout.</p>
+        
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul>
+          <li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality. Forgetting curve combat.</li>
+          <li><strong>Active Recall:</strong> Every drill requires generation, not recognition. You must produce the answer, not just identify it.</li>
+          <li><strong>Interleaving:</strong> Drills mix concepts across modules. Forced discrimination strengthens memory vs. blocked practice.</li>
+          <li><strong>Elaboration:</strong> Arena problems and Project Spectrum require applying concepts to novel scenarios.</li>
+        </ul>
+        
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>MATRIX</strong> — Normal form games, players, strategies, and payoffs</li>
+          <li><strong>DOMINANCE</strong> — Iterated elimination of strictly dominated strategies</li>
+          <li><strong>EQUILIBRIUM</strong> — Nash Equilibrium and mutual best responses</li>
+          <li><strong>MIXED</strong> — Mixed strategies and zero-sum games</li>
+          <li><strong>EXTENSIVE</strong> — Game trees, backward induction, and credible threats</li>
+          <li><strong>REPEATED</strong> — Iterated games, trigger strategies, and the Folk Theorem</li>
+          <li><strong>BAYESIAN</strong> — Incomplete information and Bayesian updating</li>
+          <li><strong>MECHANISM</strong> — Auctions, VCG, and incentive-compatible design</li>
+          <li><strong>SIGNALLING</strong> — Separating vs. pooling equilibria</li>
+          <li><strong>EVOLUTIONARY</strong> — Evolutionary Stable Strategies (ESS)</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ============== DATA: MODULES ==============
+const MODULES = [
+  {
+    id:'m1', codename:'MATRIX', title:'The Normal Form',
+    summary:'Players, strategies, and payoff matrices.',
+    lesson:{
+      title:'The Architecture of Interaction',
+      body: 'Game theory is the study of mathematical models of strategic interaction among rational decision-makers. It is the physics of human and economic behavior.\n\n' +
+            '## The Primitives\n\n' +
+            'Every game consists of three elements:\n' +
+            '1. **Players**: The decision-makers involved.\n' +
+            '2. **Strategies**: The actions available to each player.\n' +
+            '3. **Payoffs**: The utility (or profit, or evolutionary fitness) each player receives for every combination of strategies chosen.\n\n' +
+            'We represent this in **Normal Form** (or Strategic Form) as a matrix. The rows represent Player 1\'s strategies; the columns represent Player 2\'s strategies. The intersections contain the payoffs.\n\n' +
+            '## The Prisoner\'s Dilemma\n\n' +
+            'The most famous game is the Prisoner\'s Dilemma. Two criminals are interrogated separately. They can Cooperate (C) with each other by staying silent, or Defect (D) by confessing.\n\n' +
+            '> If both Cooperate, they get 1 year each. If both Defect, they get 3 years each. If one Defects and the other Cooperates, the defector goes free (0) and the cooperator gets 5 years.\n\n' +
+            'In matrix form (using positive payoffs where higher is better):' +
+            '\n\n- (C, C) = (3, 3)' +
+            '\n- (D, D) = (1, 1)' +
+            '\n- (D, C) = (5, 0)' +
+            '\n- (C, D) = (0, 5)\n\n' +
+            '## Rationality Assumption\n\n' +
+            'Game theory assumes players are **rational** (they want to maximize their own payoff) and have **common knowledge of rationality** (I know you are rational, you know I know you are rational, ad infinitum). This assumption is the bedrock of all classical game theory, though behavioral economics later challenges it.',
+      takeaways:[
+        'A game requires Players, Strategies, and Payoffs.',
+        'Normal Form represents games as matrices.',
+        'The Prisoner\'s Dilemma demonstrates individual rationality can lead to collective ruin.',
+        'Game theory assumes rational payoff-maximizing players.',
+        'Common knowledge of rationality is required for deep strategic deduction.'
+      ]
+    }
+  },
+  {
+    id:'m2', codename:'DOMINANCE', title:'Strict Dominance',
+    summary:'Iterated elimination of dominated strategies.',
+    lesson:{
+      title:'The Path of Certainty',
+      body: 'How do we solve a game? The first and most powerful tool is the concept of **Dominance**.\n\n' +
+            '## Strictly Dominant Strategies\n\n' +
+            'A strategy A *strictly dominates* strategy B if A yields a higher payoff than B *regardless of what the other player does*. If you have a strictly dominant strategy, you should always play it. It is the only rational choice.\n\n' +
+            'In the Prisoner\'s Dilemma, look at Player 1\'s choice. If Player 2 Cooperates, Defecting gives 5 > 3. If Player 2 Defects, Defecting gives 1 > 0. Defecting strictly dominates Cooperating. Both players realize this, and both Defect. They get (1,1) instead of the socially optimal (3,3).\n\n' +
+            '## Iterated Elimination (IESDS)\n\n' +
+            'What if no strategy strictly dominates all others? We use Iterated Elimination of Strictly Dominated Strategies (IESDS).\n\n' +
+            '1. Look at Player 1\'s strategies. If one is strictly worse than another under all conditions, delete the row.\n' +
+            '2. Now look at Player 2\'s strategies, knowing Player 1 will never play the deleted row. Delete any strictly dominated columns.\n' +
+            '3. Repeat until no strategies can be eliminated.\n\n' +
+            'If this process leaves exactly one strategy for each player, the game is **dominance solvable**.\n\n' +
+            '## The Trap of Weak Dominance\n\n' +
+            'A strategy *weakly dominates* another if it is at least as good in all cases, and strictly better in at least one case. Be careful: eliminating weakly dominated strategies can cause you to miss equilibria or lose a viable option. Stick to strict dominance for elimination.',
+      takeaways:[
+        'Strategy A strictly dominates B if A > B always.',
+        'A strictly dominant strategy should always be played.',
+        'IESDS iteratively removes dominated strategies to solve games.',
+        'Prisoner\'s Dilemma: Defect strictly dominates Cooperate.',
+        'Avoid eliminating weakly dominated strategies; it can break solutions.'
+      ]
+    }
+  },
+  {
+    id:'m3', codename:'EQUILIBRIUM', title:'Nash Equilibrium',
+    summary:'Mutual best responses and the Nash Equilibrium.',
+    lesson:{
+      title:'The Unilateral Deviation Test',
+      body: 'John Nash proved that every finite game has at least one equilibrium. The **Nash Equilibrium (NE)** is the central concept of game theory.\n\n' +
+            '## The Definition\n\n' +
+            'A set of strategies is a Nash Equilibrium if no player can strictly improve their payoff by unilaterally changing their strategy, assuming the other players\' strategies remain fixed.\n\n' +
+            'It is a state of mutual best response. I am playing my best response to your strategy, and you are playing your best response to mine.\n\n' +
+            '## The Coordination Problem\n\n' +
+            'Consider the Stag Hunt. Two hunters can hunt a Stag (S) or a Hare (H). Catching a Stag requires both. Catching a Hare can be done alone.\n\n' +
+            '- (S, S) = (5, 5)' +
+            '\n- (H, H) = (2, 2)' +
+            '\n- (S, H) = (0, 2)' +
+            '\n- (H, S) = (2, 0)\n\n' +
+            'This game has TWO pure-strategy Nash Equilibria: (S, S) and (H, H). (S, S) is "payoff dominant" (better for both). (H, H) is "risk dominant" (safer, because you get 2 even if the other hunts Stag). Which one will they play? Game theory cannot answer this purely mathematically; it requires culture, communication, or history.\n\n' +
+            '## The Battle of the Sexes\n\n' +
+            'Two players want to coordinate, but have different preferences. (Opera, Opera) = (3, 2). (Football, Football) = (2, 3). Miscoordination yields (0,0). Again, two Nash Equilibria. The challenge is not finding the NE; it is selecting among them.',
+      takeaways:[
+        'Nash Equilibrium: no player can profitably deviate unilaterally.',
+        'NE represents mutual best responses.',
+        'Every finite game has at least one Nash Equilibrium.',
+        'Stag Hunt illustrates the tension between payoff dominance and risk dominance.',
+        'Multiple equilibria require coordination mechanisms (culture, communication).'
+      ]
+    }
+  },
+  {
+    id:'m4', codename:'MIXED', title:'Mixed Strategies',
+    summary:'Randomization and zero-sum games.',
+    lesson:{
+      title:'The Mathematics of Unpredictability',
+      body: 'What happens when no pure strategy Nash Equilibrium exists? Consider Matching Pennies. Player 1 wants to match; Player 2 wants to mismatch. If Player 1 plays Heads, Player 2 plays Tails. If Player 2 plays Tails, Player 1 plays Tails. There is no stable point.\n\n' +
+            '## Randomization\n\n' +
+            'The solution is to randomize. A **mixed strategy** is a probability distribution over pure strategies. Nash proved that every finite game has an equilibrium in mixed strategies.\n\n' +
+            'How do we find it? A player randomizes to make the *opponent indifferent* between their own strategies. If I play Heads 50% of the time and Tails 50% of the time, my opponent gets the same expected payoff whether they play Heads or Tails. They are indifferent, meaning they cannot exploit me.\n\n' +
+            '## Zero-Sum Games\n\n' +
+            'In a Zero-Sum game, one player\'s gain is exactly the other\'s loss (e.g., poker, options trading). The Minimax Theorem (von Neumann) states that the value of a zero-sum game is determined by both players minimizing the maximum loss the other can inflict.\n\n' +
+            '## The Indifference Principle\n\n' +
+            'To calculate a mixed strategy equilibrium for Player 1, set Player 2\'s expected payoffs equal to each other, and solve for Player 1\'s probabilities. You do not optimize your own payoff directly; you optimize the mixture that makes your opponent\'s exploitation impossible.',
+      takeaways:[
+        'When no pure strategy NE exists, players must randomize (Mixed Strategies).',
+        'Every finite game has at least one mixed strategy Nash Equilibrium.',
+        'You randomize to make your opponent indifferent.',
+        'Zero-sum games are solved via the Minimax Theorem.',
+        'Indifference Principle: set opponent\'s expected payoffs equal to solve for probabilities.'
+      ]
+    }
+  },
+  {
+    id:'m5', codename:'EXTENSIVE', title:'Extensive Form Games',
+    summary:'Game trees, backward induction, and credible threats.',
+    lesson:{
+      title:'The Sequence of Action',
+      body: 'The Normal Form (matrix) assumes simultaneous moves. But many games are sequential. For these, we use the **Extensive Form** (game tree).\n\n' +
+            '## The Game Tree\n\n' +
+            'The game starts at an initial decision node. Branches represent actions. Terminal nodes yield payoffs. We use information sets to denote what a player knows when making a decision (if they don\'t know which node they are at, the nodes are in the same information set).\n\n' +
+            '## Backward Induction\n\n' +
+            'To solve a perfect-information extensive form game, we use **Backward Induction**. Start at the end of the tree. At the last decision nodes, the player will choose the action with the highest payoff. Replace those branches with the resulting payoffs. Work backwards to the root.\n\n' +
+            '## The Centipede Game\n\n' +
+            'A classic example. Two players alternate taking a growing pot of money. At each turn, a player can "Take" (ending the game) or "Pass" (growing the pot). Backward induction says the first player should Take immediately. But experimentally, humans usually Pass a few times. This reveals a tension between strict backward induction and cooperative intuition.\n\n' +
+            '## Credible Threats and Subgame Perfection\n\n' +
+            'A threat is only meaningful if it is credible—i.e., if you would actually carry it out when the time comes. A **Subgame Perfect Equilibrium (SPE)** is a refinement of Nash Equilibrium that eliminates non-credible threats. It requires strategies to be a Nash Equilibrium in every subgame.',
+      takeaways:[
+        'Extensive Form uses game trees to model sequential moves.',
+        'Backward Induction solves perfect-information games by reasoning from the end.',
+        'Subgame Perfect Equilibrium (SPE) eliminates non-credible threats.',
+        'The Centipede Game shows tension between logic and cooperation.',
+        'A threat is only valid if executing it is rational at the time of execution.'
+      ]
+    }
+  },
+  {
+    id:'m6', codename:'REPEATED', title:'Repeated Games',
+    summary:'The Folk Theorem, trigger strategies, and cooperation.',
+    lesson:{
+      title:'The Shadow of the Future',
+      body: 'The Prisoner\'s Dilemma ends in defection. But what if you play it 100 times? Does the shadow of the future enable cooperation?\n\n' +
+            '## Finitely Repeated Games\n\n' +
+            'If a game is repeated a known, finite number of times, backward induction destroys cooperation. In the last round (Round 100), there is no future, so both players Defect (it is a one-shot PD). Knowing Round 100 is Defect, Round 99 has no future, so both Defect. The unraveling continues to Round 1. Finite repetition yields the same outcome as one-shot.\n\n' +
+            '## Infinitely Repeated Games\n\n' +
+            'If the game is infinite (or ends with a probability < 1 each round), cooperation becomes rational. We use a discount factor (δ) to value future payoffs less than present ones (due to impatience or risk of game ending).\n\n' +
+            '## Trigger Strategies\n\n' +
+            'A **Grim Trigger** strategy says: "I will Cooperate as long as you have always Cooperated. If you ever Defect, I will Defect forever." This is unforgiving.\n\n' +
+            'A **Tit-for-Tat** strategy says: "I will start by Cooperating, and then do whatever you did in the previous round." This is forgiving and famous for winning Axelrod\'s tournament.\n\n' +
+            '## The Folk Theorem\n\n' +
+            'The Folk Theorem states that in an infinitely repeated game, almost any feasible payoff can be sustained as an equilibrium if the discount factor is high enough (players care enough about the future). This is powerful but mathematically chaotic: it means outcomes are hard to predict.',
+      takeaways:[
+        'Finite repetition of a PD unravels via backward induction.',
+        'Infinite (or probabilistic) repetition allows cooperation.',
+        'Grim Trigger: any defection causes permanent defection.',
+        'Tit-for-Tat: cooperative, retaliatory, forgiving.',
+        'The Folk Theorem: almost any payoff is sustainable if players value the future enough.'
+      ]
+    }
+  },
+  {
+    id:'m7', codename:'BAYESIAN', title:'Bayesian Games',
+    summary:'Incomplete information and Bayesian updating.',
+    lesson:{
+      title:'The Architecture of the Unknown',
+      body: 'Classical game theory assumes payoffs are common knowledge. Reality is not so clean. What if you don\'t know the other player\'s payoff structure? (e.g., are they a strong competitor or a weak one?)\n\n' +
+            '## Harsanyi\'s Trick\n\n' +
+            'John Harsanyi introduced **Bayesian Games**. He modeled incomplete information by introducing "Types." Nature moves first, assigning a Type to each player based on a prior probability distribution. Player 1 might be "Strong" with 30% probability or "Weak" with 70% probability. Player 1 knows their own type; Player 2 only knows the prior.\n\n' +
+            '## Beliefs and Updating\n\n' +
+            'Players maintain **beliefs** about the other players\' types. When Player 2 observes Player 1 making a move, Player 2 updates their beliefs using Bayes\' Rule.\n\n' +
+            '> P(Type | Action) = [ P(Action | Type) * P(Type) ] / P(Action)\n\n' +
+            '## Bayesian Nash Equilibrium (BNE)\n\n' +
+            'A BNE is a set of strategies (one for each type of each player) and beliefs such that every type is playing a best response to their beliefs about the other players\' strategies. It is Nash Equilibrium extended to the fog of incomplete information.',
+      takeaways:[
+        'Bayesian Games model situations where types/payoffs are unknown.',
+        'Harsanyi introduced "Types" and Nature\'s initial move.',
+        'Players use Bayes\' Rule to update beliefs after observing actions.',
+        'Bayesian Nash Equilibrium (BNE) extends NE to incomplete information.',
+        'BNE requires strategies to be best responses to expected strategies of all types.'
+      ]
+    }
+  },
+  {
+    id:'m8', codename:'MECHANISM', title:'Mechanism Design',
+    summary:'Reverse game theory, auctions, and VCG.',
+    lesson:{
+      title:'Designing the Game',
+      body: 'Game theory tells you what happens *given* a set of rules. **Mechanism Design** (reverse game theory) asks: what rules should I design to achieve a desired outcome, assuming players will game the rules strategically?\n\n' +
+            '## Incentive Compatibility\n\n' +
+            'A mechanism is **Incentive Compatible** if truth-telling is a dominant strategy. You cannot do better than revealing your true value.\n\n' +
+            '## The VCG Mechanism\n\n' +
+            'The Vickrey-Clarke-Groves (VCG) mechanism is the holy grail of mechanism design. In a VCG auction, you bid your true value. The winner is the highest bidder, but they pay the *social harm* they cause to others (i.e., the second-highest bid). This is the Second-Price Sealed-Bid Auction.\n\n' +
+            '## Revenue Equivalence Theorem\n\n' +
+            'A stunning result: under certain conditions, all standard auction formats (English, Dutch, First-Price Sealed-Bid, Second-Price Sealed-Bid) yield the exact same expected revenue for the seller, assuming bidders are rational and values are independent. The choice of auction format doesn\'t change the seller\'s expected profit.',
+      takeaways:[
+        'Mechanism Design is reverse game theory: designing rules to achieve outcomes.',
+        'Incentive Compatibility means truth-telling is the dominant strategy.',
+        'Vickrey (Second-Price) Auctions are incentive-compatible.',
+        'VCG mechanism: winner pays the externality (social harm) they impose.',
+        'Revenue Equivalence Theorem: standard auction formats yield the same expected revenue.'
+      ]
+    }
+  },
+  {
+    id:'m9', codename:'SIGNALLING', title:'Signalling & Cheap Talk',
+    summary:'Separating vs. pooling equilibria.',
+    lesson:{
+      title:'The Cost of Credibility',
+      body: 'How do you communicate your type when anyone can lie? Michael Spence introduced **Signalling**. A signal is an action that is costly to fake.\n\n' +
+            '## The Spence Education Model\n\n' +
+            'Why do we get MBAs if they teach nothing useful? To signal productivity. Assume workers are either High productivity (fast learners) or Low productivity (slow learners). Getting an MBA is costly. The cost is higher for Low productivity workers (they struggle more). If the wage premium for an MBA is high enough, High workers get the MBA and Low workers do not. The signal separates them.\n\n' +
+            '## Separating vs. Pooling Equilibria\n\n' +
+            'In a **Separating Equilibrium**, different types send different signals. The employer perfectly infers the worker\'s type.\n\n' +
+            'In a **Pooling Equilibrium**, all types send the same signal. The employer learns nothing and pays the average wage.\n\n' +
+            '## Cheap Talk\n\n' +
+            'When signals cost nothing to send (e.g., a politician saying "I am honest"), it is called **Cheap Talk**. Without a cost differential, cheap talk cannot separate types. It is just noise. Credibility requires skin in the game.',
+      takeaways:[
+        'A Signal must be costly to fake to convey information.',
+        'Spence Model: education signals productivity because it is costlier for low types.',
+        'Separating Equilibrium: types reveal themselves via distinct actions.',
+        'Pooling Equilibrium: types blend, no information is revealed.',
+        'Cheap Talk (costless signals) cannot credibly separate types.'
+      ]
+    }
+  },
+  {
+    id:'m10', codename:'EVOLUTIONARY', title:'Evolutionary Game Theory',
+    summary:'Replicator dynamics and ESS.',
+    lesson:{
+      title:'The Biology of Strategy',
+      body: 'Game theory escaped economics and entered biology. John Maynard Smith created **Evolutionary Game Theory**. It drops the assumption of rationality entirely. Instead, strategies are genetically hardwired, and payoffs represent reproductive fitness.\n\n' +
+            '## Replicator Dynamics\n\n' +
+            'If a strategy yields a higher-than-average payoff, the proportion of the population using it grows. The **Replicator Dynamic** mathematically describes how strategy frequencies evolve over time based on their relative fitness.\n\n' +
+            '## Evolutionary Stable Strategy (ESS)\n\n' +
+            'A strategy is an ESS if, when adopted by an entire population, no mutant strategy can invade it.\n\n' +
+            'Test: Let strategy A be the incumbent. Let B be a mutant entering at frequency ε.\n' +
+            'A is an ESS if either:' +
+            '\n1. A plays better against A than B does against A.' +
+            '\n2. A and B play equally well against A, but A plays better against B than B does against B.\n\n' +
+            '## The Hawk-Dove Game\n\n' +
+            'Animals compete for resources. Hawks fight; Doves bluff. If Hawk meets Dove, Hawk wins. If Dove meets Dove, they split. If Hawk meets Hawk, they fight and incur severe cost. The ESS is often a mixed strategy, explaining why animals rarely fight to the death.',
+      takeaways:[
+        'Evolutionary Game Theory applies to biology, dropping rationality.',
+        'Payoffs represent reproductive fitness.',
+        'Replicator Dynamic: high-payoff strategies grow in frequency.',
+        'Evolutionary Stable Strategy (ESS) resists invasion by mutants.',
+        'Hawk-Dove game explains why mixed strategies (ritualized conflict) evolve.'
+      ]
+    }
+  }
+];
+
+// ============== DATA: FLASHCARDS ==============
+const CARDS = [
+  // M1
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What are the three primitives of any game in normal form?',back:'1. Players. 2. Strategies (actions available). 3. Payoffs (utility for every combination of strategies).'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'In the Prisoner\'s Dilemma, what are the payoffs for (Defect, Cooperate)?',back:'The Defector gets the highest payoff (Temptation = 5), and the Cooperator gets the lowest (Sucker = 0).'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What does "Common Knowledge of Rationality" mean?',back:'I know you are rational, you know I know, I know you know I know, ad infinitum. It is required for deep strategic deduction.'},
+  // M2
+  {id:'c4',moduleId:'m2',core:true,category:'concept',front:'Definition of a Strictly Dominant Strategy?',back:'A strategy that yields a strictly higher payoff than any other strategy, regardless of what the opponent plays.'},
+  {id:'c5',moduleId:'m2',core:true,category:'application',front:'What is IESDS?',back:'Iterated Elimination of Strictly Dominated Strategies. You iteratively remove strategies that are strictly dominated until only one profile remains (if solvable).'},
+  {id:'c6',moduleId:'m2',core:false,category:'concept',front:'Why avoid eliminating WEAKLY dominated strategies?',back:'Because it can eliminate viable equilibria and the order of elimination matters. Strict elimination is mathematically safe; weak is not.'},
+  // M3
+  {id:'c7',moduleId:'m3',core:true,category:'concept',front:'Definition of a Nash Equilibrium?',back:'A set of strategies where no player can strictly improve their payoff by unilaterally deviating. It is a state of mutual best response.'},
+  {id:'c8',moduleId:'m3',core:true,category:'application',front:'In the Stag Hunt, which equilibrium is risk dominant?',back:'The Hare/Hare equilibrium is risk dominant (guarantees a payoff without relying on the other player). Stag/Stag is payoff dominant.'},
+  {id:'c9',moduleId:'m3',core:false,category:'concept',front:'Does game theory tell us how to select between multiple Nash Equilibria?',back:'No. Pure game theory identifies them, but selection requires culture, communication, or focal points (Schelling).'},
+  // M4
+  {id:'c10',moduleId:'m4',core:true,category:'concept',front:'Why use a Mixed Strategy?',back:'To prevent the opponent from exploiting you. You randomize to make the opponent indifferent between their strategies.'},
+  {id:'c11',moduleId:'m4',core:true,category:'application',front:'How do you solve for a player\'s mixed strategy probabilities?',back:'Set the opponent\'s expected payoffs for their pure strategies equal to each other, then solve for the probability. (The Indifference Principle).'},
+  {id:'c12',moduleId:'m4',core:false,category:'concept',front:'What is the Minimax Theorem (von Neumann)?',back:'In zero-sum games, the value of the game is determined by both players minimizing the maximum loss the other can inflict. Optimal play yields the Nash Equilibrium.'},
+  // M5
+  {id:'c13',moduleId:'m5',core:true,category:'concept',front:'How do you solve a perfect-information Extensive Form game?',back:'Backward Induction. Start at the terminal decision nodes, assume players choose their best action, and work backwards to the root.'},
+  {id:'c14',moduleId:'m5',core:true,category:'application',front:'What is a Subgame Perfect Equilibrium (SPE)?',back:'A refinement of Nash Equilibrium that requires strategies to be a Nash Equilibrium in every subgame. It eliminates non-credible threats.'},
+  {id:'c15',moduleId:'m5',core:false,category:'concept',front:'What is a non-credible threat?',back:'A threat to take an action that would not be rational to execute if the decision node were actually reached.'},
+  // M6
+  {id:'c16',moduleId:'m6',core:true,category:'concept',front:'Why does cooperation fail in a finitely repeated Prisoner\'s Dilemma?',back:'Because of backward induction. The last round has no future, so players defect. This unravels all the way back to the first round.'},
+  {id:'c17',moduleId:'m6',core:true,category:'application',front:'What is a Grim Trigger strategy?',back:'"I will cooperate as long as you have always cooperated. If you ever defect, I will defect forever." It is unforgiving.'},
+  {id:'c18',moduleId:'m6',core:false,category:'quote',front:'Summarize the Folk Theorem.',back:'In an infinitely repeated game, almost any feasible payoff can be sustained as an equilibrium if the discount factor is high enough (players value the future enough).'},
+  // M7
+  {id:'c19',moduleId:'m7',core:true,category:'concept',front:'How did Harsanyi model incomplete information?',back:'By introducing "Types." Nature moves first, assigning types based on a probability distribution. You know your type, but only the prior of others.'},
+  {id:'c20',moduleId:'m7',core:true,category:'application',front:'What is the formula for Bayesian updating?',back:'P(Type | Action) = [ P(Action | Type) * P(Type) ] / P(Action). It updates beliefs based on observed actions.'},
+  {id:'c21',moduleId:'m7',core:false,category:'concept',front:'What is a Bayesian Nash Equilibrium (BNE)?',back:'A set of strategies and beliefs where every type of every player is playing a best response to their beliefs about the other players\' strategies.'},
+  // M8
+  {id:'c22',moduleId:'m8',core:true,category:'concept',front:'What is Mechanism Design?',back:'Reverse game theory. Designing the rules of a game to achieve a desired outcome, assuming players will behave strategically.'},
+  {id:'c23',moduleId:'m8',core:true,category:'application',front:'What is the VCG (Vickrey-Clarke-Groves) mechanism?',back:'An auction where the winner pays the social harm (externality) they impose on others. It makes truth-telling a dominant strategy (Incentive Compatible).'},
+  {id:'c24',moduleId:'m8',core:false,category:'quote',front:'Summarize the Revenue Equivalence Theorem.',back:'Under certain conditions, all standard auction formats (English, Dutch, First-Price, Second-Price) yield the exact same expected revenue for the seller.'},
+  // M9
+  {id:'c25',moduleId:'m9',core:true,category:'concept',front:'What makes a signal credible?',back:'It must be differentially costly. It must cost more for a dishonest type to send than an honest type, making it impossible to fake profitably.'},
+  {id:'c26',moduleId:'m9',core:true,category:'application',front:'Difference between Separating and Pooling Equilibria?',back:'Separating: different types send different signals (information is revealed). Pooling: all types send the same signal (no information is revealed).'},
+  {id:'c27',moduleId:'m9',core:false,category:'concept',front:'Why is "Cheap Talk" (costless signals) ineffective?',back:'Without a cost differential, any type can send any signal. Therefore, signals cannot separate types, and rational players ignore them.'},
+  // M10
+  {id:'c28',moduleId:'m10',core:true,category:'concept',front:'What is an Evolutionary Stable Strategy (ESS)?',back:'A strategy that, when adopted by a whole population, cannot be invaded by a small group of mutants playing a different strategy.'},
+  {id:'c29',moduleId:'m10',core:true,category:'application',front:'What does the Replicator Dynamic describe?',back:'How the frequency of strategies in a population changes over time. Strategies with above-average payoff grow in frequency.'},
+  {id:'c30',moduleId:'m10',core:false,category:'quote',front:'How does the Hawk-Dove game explain animal behavior?',back:'It shows that fighting to the death (Hawk vs Hawk) is usually not an ESS. The stable state is often a mixed strategy of ritualized conflict (Dove).'}
+];
+
+// ============== DATA: ARENA PROBLEMS ==============
+const ARENA = [
+  { id:'p1',moduleId:'m1', title:'The Duopoly', timeLimit:60, body:'You run Firm A. Firm B is your only competitor. You can set prices High or Low. If both go High, both make $5M. If both go Low, both make $1M. If one goes Low and the other High, the Low firm makes $7M and the High firm makes $0. Construct the normal form and identify the trap.', options:['Set High prices and hope Firm B cooperates.','Recognize this as a Prisoner\'s Dilemma. Low strictly dominates High. Both will go Low, making $1M each.','Collude with Firm B to set High prices. It is the socially optimal outcome.','Set High prices to signal goodwill.'], correct:1, explanation:'Setting Low prices strictly dominates High. If B goes High, you get $7M > $5M. If B goes Low, you get $1M > $0M. Rationality traps you both at $1M.' },
+  { id:'p2',moduleId:'m2', title:'The Product Launch', timeLimit:45, body:'Your team is deciding on features for a new phone. You can add Feature X (costs $10) or not. Feature X provides $5 of value to the user. Your competitor is facing the exact same decision. What is the strategic move?', options:['Add Feature X because it adds value to the user.','Do not add Feature X. It is strictly dominated. The cost ($10) exceeds the value ($5), but if your competitor adds it, you are forced to match it, burning money for no market share gain.','Add Feature X only if you think your competitor will.','Do not add Feature X. Let the competitor add it and steal their market share.'], correct:1, explanation:'If neither adds X, you split the market. If both add X, you split the market but incurred $10 cost for $5 value (net loss of $5). Adding X is a strictly dominated strategy if the value doesn\'t exceed the cost and doesn\'t win market share.' },
+  { id:'p3',moduleId:'m3', title:'The Tech Standard', timeLimit:60, body:'Two tech giants must choose a charging standard: USB-C or Lightning. Both prefer to use the same standard. Giant A prefers USB-C (payoff 5). Giant B prefers Lightning (payoff 5). Miscoordination yields 0 for both. How many pure-strategy Nash Equilibria exist?', options:['Zero. They will never agree.','One. (USB-C, USB-C) because it is better for consumers.','Two. (USB-C, USB-C) and (Lightning, Lightning). The challenge is coordinating on which one.','One. (USB-C, Lightning) as a compromise.'], correct:2, explanation:'This is the Battle of the Sexes. If both choose USB-C, neither wants to switch alone (0 < 5 or 2). If both choose Lightning, same. There are two Nash Equilibria. Game theory doesn\'t tell us which one; history or power does.' },
+  { id:'p4',moduleId:'m4', title:'The Penalty Kick', timeLimit:45, body:'You are a soccer goalie. The striker is equally good shooting left or right. If you dive the right way, you save it 50% of the time. If you dive the wrong way, you never save it. The striker has a tendency to shoot left 70% of the time. What is your optimal mixed strategy?', options:['Dive left 100% of the time to exploit their tendency.','Dive right 30% of the time and left 70% of the time.','Randomize to make the striker indifferent. Calculate the exact mix so the striker\'s expected success is equal whether they shoot left or right.','Dive right 50% of the time and left 50% of the time.'], correct:2, explanation:'If you just follow their 70% tendency, they will adapt. To play optimally, you must randomize so the striker cannot exploit your pattern. You set your probabilities to make them indifferent to shooting left or right (Minimax).' },
+  { id:'p5',moduleId:'m5', title:'The Entry Deterrence', timeLimit:90, body:'You are a monopolist. A startup is considering entering your market. If they enter, you can either Fight (price war, you both lose $10M) or Accommodate (you share the market, you make $20M, they make $20M). You threaten the startup: "If you enter, I will fight." Is your threat credible?', options:['Yes. You are the monopolist. You set the rules.','Yes. Fighting shows strength for future competitors.','No. If they actually enter, fighting gives you -$10M while accommodating gives you $20M. Backward induction reveals the threat is non-credible. The startup will enter.','No. The startup doesn\'t care about your threats.'], correct:2, explanation:'This is the Chain Store Paradox. By backward induction, if the startup enters, fighting is strictly worse for you. The startup knows you are rational and will ignore the threat. It is not Subgame Perfect.' },
+  { id:'p6',moduleId:'m6', title:'The Cartel', timeLimit:60, body:'You and a rival are in a cartel, agreeing to keep prices high. You interact every quarter indefinitely. If one cheats, they make $100M and the other makes $0. If both hold, both make $50M. If both cheat, both make $10M. What sustains cooperation?', options:['Goodwill and corporate ethics.','A legally binding contract.','The shadow of the future. If the discount factor is high enough, the threat of future punishment (Grim Trigger) makes cooperation rational.','The government auditing prices.'], correct:2, explanation:'In a repeated game, the Folk Theorem applies. If the future is valued highly enough (high discount factor), the long-term loss of $40M per period from a price war outweighs the one-time gain of $50M from cheating. Cooperation is sustained by trigger strategies.' },
+  { id:'p7',moduleId:'m7', title:'The Acquisition', timeLimit:90, body:'You are buying a startup. The startup is either a "Unicorn" (worth $100M) or a "Dud" (worth $0). You believe there is a 50% chance it is a Unicorn. The founder asks for $40M. If the founder knows their true type, what happens?', options:['Both types will ask for $40M, and you will buy it for an expected value of $50M.','Only the Dud will accept $40M. The Unicorn knows it is worth $100M and will walk away. You face adverse selection (the Lemon\'s Problem).','You will buy it because $40M < $50M expected value.','The Unicorn will lower its price to $30M to beat the Dud.'], correct:1, explanation:'This is adverse selection (Akerlof\'s Market for Lemons). The Dud will accept $40M (since 40 > 0). The Unicorn will reject it (since 40 < 100). Only the Dud sells. The signal (accepting the offer) perfectly separates the types, and you lose money.' },
+  { id:'p8',moduleId:'m8', title:'The Spectrum Auction', timeLimit:90, body:'You are bidding for a 5G license. Your true valuation is $50M. The government is using a Second-Price Sealed-Bid (Vickrey) auction. The highest bidder wins and pays the second-highest bid. What is your optimal bid?', options:['Bid $40M to get a deal.','Bid $50M. In a Vickrey auction, truth-telling is the dominant strategy. You maximize profit regardless of others.','Bid $60M to guarantee you win, since you only pay the second price.','Bid $10M and hope everyone else bids low.'], correct:1, explanation:'In a VCG/Vickrey auction, bidding your true value is strictly dominant. If you bid lower, you risk losing a profitable license. If you bid higher, you risk the "winner\'s curse" (paying more than it is worth if the second bid is >$50M). Truth-telling is incentive compatible.' },
+  { id:'p9',moduleId:'m9', title:'The MBA Hire', timeLimit:60, body:'You are hiring a CEO. Candidates are either "Geniuses" (worth $10M/yr) or "Average" (worth $2M/yr). Getting an MBA costs a Genius $100K in effort, but costs an Average person $5M in effort (they struggle immensely). You offer $5M/yr to anyone with an MBA. Is this a credible separating equilibrium?', options:['Yes. Only Geniuses will get the MBA because the cost ($100K) is less than the wage ($5M). Average candidates won\'t ($5M cost > $5M wage).','No. Both will get MBAs because the wage is $5M.','Yes. Both will get MBAs, creating a pooling equilibrium.','No. MBAs are useless. You should hire randomly.'], correct:0, explanation:'This is the Spence Signalling model. The cost differential makes the signal credible. The Genius gets the MBA (Net: 5M - 100K = 4.9M). The Average candidate does not (Net: 5M - 5M = 0). The MBA perfectly separates the types, justifying the $5M wage.' },
+  { id:'p10',moduleId:'m10', title:'The Retail War', timeLimit:60, body:'Two retail chains operate in a city. They can either engage in cutthroat pricing (Hawk) or premium pricing (Dove). If both play Hawk, they bleed cash and both fail (Payoff 0). If both play Dove, they both thrive (Payoff 3). What is the evolutionary stable state over time?', options:['All Hawks. Survival of the fittest.','All Doves. Cooperation is always best.','A mixed strategy. Some stores will be Hawks, some Doves, stabilizing when the expected payoff of both strategies is equal.','Hawks will mutate into Doves instantly.'], correct:2, explanation:'If everyone is a Dove, a Hawk mutant thrives (gets 5 vs 3). If everyone is a Hawk, they all fail (0), so a Dove mutant might survive better by avoiding direct conflict. The Replicator Dynamic pushes the population to a mixed Evolutionary Stable Strategy (ESS) where the frequencies balance out.' }
+];
+
+// ============== DATA: PROJECT SPECTRUM ==============
+const PROJECT_PHASES = [
+  {
+    id:'ph1', moduleId:'m1', title:'Phase 1: Market Entry',
+    scenario:'You are CEO of Apex Telecom. You are considering entering a new city\'s market. The incumbent, Zenith Corp, can either Aggressively price-war (hurting both) or Accommodate (sharing the market). You must choose to Enter or Stay Out. If you Enter and they Accommodate, you make $50M. If you Enter and they Fight, you lose $20M. If you Stay Out, you make $0. Model this as a matrix.',
+    options:[
+      'Enter. Zenith will surely accommodate because fighting hurts them too.',
+      'Model the game. If Zenith\'s payoff for Accommodating (30) > Fighting (-10), they will accommodate. But you must also check your own payoff. The matrix reveals Enter is dominant if Zenith is rational. Enter.',
+      'Stay Out. The risk of a price war is too high.',
+      'Enter and immediately launch a massive marketing campaign to force Zenith out.'
+    ],
+    correct:1,
+    explanation:'Option B is the game-theoretic approach. You map the Normal Form. If Zenith\'s dominant strategy is to Accommodate (because 30 > -10), your best response is to Enter (50 > 0). You don\'t rely on psychology; you rely on payoff matrices.'
+  },
+  {
+    id:'ph2', moduleId:'m2', title:'Phase 2: The Ad War',
+    scenario:'Apex and Zenith are both deciding on advertising budgets. You can spend $10M or $0. If both spend $10M, they cancel out, and both are down $10M. If one spends $10M and the other $0, the spender takes the market (+$30M) and the other loses (-$20M). If both spend $0, status quo (+$10M each). What do you do?',
+    options:[
+      'Spend $0 and trust Zenith to do the same.',
+      'Spend $10M. Spending strictly dominates $0. If Zenith spends $0, you get 30 > 10. If Zenith spends $10M, you get -10 > -20. Both will spend $10M, resulting in a Prisoner\'s Dilemma (-10, -10).',
+      'Form a cartel with Zenith to cap ad spend at $0.',
+      'Spend $5M as a compromise.'
+    ],
+    correct:1,
+    explanation:'This is a classic Prisoner\'s Dilemma via Dominance. Spending $10M strictly dominates $0. Both firms rationally spend $10M, resulting in a net loss of $10M each. You must execute the dominant strategy, even though mutual non-advertising is socially optimal.'
+  },
+  {
+    id:'ph3', moduleId:'m3', title:'Phase 3: The Standard',
+    scenario:'To roll out 5G, Apex and Zenith must choose a radio standard: mmWave or Sub-6. Both prefer to use the same standard. Apex prefers mmWave (higher speed). Zenith prefers Sub-6 (better range). Miscoordination means no roaming, yielding $0 for both. What is the strategic reality?',
+    options:[
+      'Force mmWave. You are the market leader.',
+      'There are two Nash Equilibria: (mmWave, mmWave) and (Sub-6, Sub-6). You must use focal points, government regulation, or negotiation to select one. Pure math cannot solve it.',
+      'Adopt mmWave and wait for Zenith to follow.',
+      'Build a dual-standard network at double the cost.'
+    ],
+    correct:1,
+    explanation:'This is the Battle of the Sexes. There are two pure Nash Equilibria. Game theory identifies them but doesn\'t dictate selection. You need a coordination mechanism (Schelling point) to avoid the (0,0) miscoordination trap.'
+  },
+  {
+    id:'ph4', moduleId:'m4', title:'Phase 4: The Audit',
+    scenario:'The telecom regulator audits Apex for compliance. The regulator can Audit or Not Audit. You can Comply or Violate. Auditing costs the regulator $1M. Violating makes you $5M if uncaught, but costs you $10M in fines if caught. How do you behave?',
+    options:[
+      'Always Comply. It is the right thing to do.',
+      'Always Violate. The regulator won\'t audit because it costs them money.',
+      'Mix your strategy. You should Violate with a specific probability that makes the Regulator indifferent to Auditing. The Regulator should Audit with a probability that makes you indifferent to Complying. This is a mixed-strategy Nash Equilibrium.',
+      'Bribe the regulator.'
+    ],
+    correct:2,
+    explanation:'This is an Inspection Game (a variant of Matching Pennies). If you always Comply, they never Audit. If they never Audit, you always Violate. There is no pure strategy equilibrium. You must randomize your compliance based on the Indifference Principle to avoid being exploited.'
+  },
+  {
+    id:'ph5', moduleId:'m5', title:'Phase 5: The Expansion',
+    scenario:'You are expanding into a rural town. You can Build a massive fiber network immediately (costly) or Test the market with wireless first. If you Test, the town council might later block fiber expansion. You draw the game tree. What principle guides your decision?',
+    options:[
+      'Test the market. It is cheaper upfront.',
+      'Use Backward Induction. Look at the final nodes. If the council will block you later (payoff 0), you must Build immediately (payoff 10) to remove their future leverage. Subgame Perfection dictates this.',
+      'Test the market and hope the council cooperates.',
+      'Threaten to sue the council if they block you.'
+    ],
+    correct:1,
+    explanation:'By drawing the Extensive Form tree and using Backward Induction, you see that testing gives the council a future decision node where blocking is their dominant strategy. To achieve Subgame Perfect Equilibrium, you must prevent that node from ever being reached by Building immediately.'
+  },
+  {
+    id:'ph6', moduleId:'m6', title:'Phase 6: The Collusion',
+    scenario:'Apex and Zenith have silently maintained high prices for 5 years, making $50M/yr each. A new CEO takes over Zenith. You know Zenith could cut prices to steal your market for a one-time gain of $100M, but it would trigger a price war forever (both make $10M/yr). What sustains the peace?',
+    options:[
+      'Trust and a handshake.',
+      'The Grim Trigger. If the discount factor (future value) is high enough, the long-term loss of $40M/yr outweighs the one-time gain of $50M. Zenith\'s new CEO will mathematically maintain the peace.',
+      'A legally binding contract (which is illegal for collusion).',
+      'Praying Zenith doesn\'t understand game theory.'
+    ],
+    correct:1,
+    explanation:'This is an Infinitely Repeated Game. The cooperation is sustained by the shadow of the future. If the discount factor δ is high enough, the Folk Theorem guarantees cooperation is a Nash Equilibrium. The Grim Trigger strategy enforces it.'
+  },
+  {
+    id:'ph7', moduleId:'m7', title:'Phase 7: The Spectrum Unknown',
+    scenario:'The government is auctioning a new 6GHz band. Zenith\'s true valuation of the band is unknown to you. They could be a "Strategic" type (value $80M) or a "Desperate" type (value $120M, needs it to survive). You must decide your opening bid without knowing their type. What concept applies?',
+    options:[
+      'Assume they are Strategic and bid low.',
+      'Bayesian Game. You assign a prior probability to Zenith\'s type. You calculate the expected payoff of your bid based on the probability of facing each type, then find the Bayesian Nash Equilibrium.',
+      'Bid your maximum valuation regardless of their type.',
+      'Wait for their bid and react, which is impossible in a sealed-bid auction.'
+    ],
+    correct:1,
+    explanation:'This is a Game of Incomplete Information. Harsanyi\'s framework requires you to assign prior probabilities to Zenith\'s Types and calculate your expected utility. You play a best response to the expected strategy of the population of possible Zeniths (Bayesian Nash Equilibrium).'
+  },
+  {
+    id:'ph8', moduleId:'m8', title:'Phase 8: The Auction Design',
+    scenario:'You are advising the government on how to auction three new spectrum licenses to maximize revenue and efficiency. Bidders have independent private values. Which mechanism guarantees truth-telling and efficiency?',
+    options:[
+      'First-Price Sealed Bid (highest bidder pays their bid).',
+      'English Ascending Auction (equivalent to VCG for private values). It is incentive-compatible: bidders reveal true values, ensuring licenses go to those who value them most.',
+      'Dutch Descending Auction (first to accept the price wins).',
+      'A lottery system. It is fair and avoids bidding wars.'
+    ],
+    correct:1,
+    explanation:'The VCG mechanism (and its practical equivalent, the English Ascending Auction for independent values) is Incentive Compatible. Bidders reveal their true valuations, ensuring Pareto efficiency. By the Revenue Equivalence Theorem, expected revenue is the same as other formats, but efficiency is guaranteed.'
+  },
+  {
+    id:'ph9', moduleId:'m9', title:'Phase 9: The Network Quality',
+    scenario:'You want to signal to customers that your 5G network is superior to Zenith\'s. Anyone can run ads claiming "Fastest Network." How do you credibly separate yourself from Zenith if your network is actually better?',
+    options:[
+      'Spend $50M on a massive ad campaign.',
+      'Offer a legally binding Service Level Agreement (SLA) with massive penalties for dropped calls. This is costly to fake. If your network was bad, the penalties would bankrupt you. This is a credible separating signal.',
+      'Lower your prices.',
+      'Sponsor a major sports stadium.'
+    ],
+    correct:1,
+    explanation:'Ads and sponsorships are cheap talk; anyone can do them. A punitive SLA is a costly signal. If Apex\'s network is genuinely superior, the expected cost of penalties is low. If Zenith tried to copy it, their inferior network would trigger massive payouts. This creates a Separating Equilibrium.'
+  },
+  {
+    id:'ph10', moduleId:'m10', title:'Phase 10: The Market Evolution',
+    scenario:'Over a decade, Apex and Zenith have alternated between price wars (Hawk) and cooperation (Dove). New startups enter the market, copying whatever strategy is currently most profitable. What determines the long-term stable state of the market?',
+    options:[
+      'The market will eventually become a monopoly (All Hawks).',
+      'The market will reach an Evolutionary Stable Strategy (ESS). The frequencies of aggressive vs. cooperative strategies will stabilize when no mutant strategy can invade the population.',
+      'The market will constantly fluctuate randomly.',
+      'Government regulation will force all to be Doves.'
+    ],
+    correct:1,
+    explanation:'Evolutionary Game Theory models this. Startups are the replicators. Through Replicator Dynamics, strategies with higher payoffs grow. The market stabilizes at an ESS—a mix of strategies where no new entrant can profit by deviating. Pure aggression dies out (price wars destroy value); pure cooperation invites aggression. A mixed state prevails.'
+  }
+];
+
+// ============== DATA: REAL-WORLD MISSIONS ==============
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Payoff Matrix', body:'Identify a negotiation or decision in your life today. Write down the players, your available strategies, and estimate the payoffs. Map it as a matrix.' },
+  { id:'rw2', title:'The Dominance Check', body:'Review a complex choice you are facing. Are any of your options strictly dominated by another? Eliminate them ruthlessly before analyzing further.' },
+  { id:'rw3', title:'The Nash Hunt', body:'Find a stalemate in a relationship or project. Identify if it is a Nash Equilibrium—where neither side wants to deviate unilaterally, even if the outcome is suboptimal.' },
+  { id:'rw4', title:'The Randomizer', body:'Identify a repetitive habit where you are predictable (e.g., route to work, communication style). Deliberately randomize your pattern to prevent exploitation and observe the results.' },
+  { id:'rw5', title:'The Credibility Test', body:'Think of a threat or promise you made recently. Use backward induction: if the time comes to execute it, will it actually be in your rational self-interest? If not, retract it.' },
+  { id:'rw6', title:'The Shadow of the Future', body:'In a recurring interaction (work, family), calculate the "discount factor." How much do you value future cooperation vs. a one-time gain today? Adjust your strategy accordingly.' },
+  { id:'rw7', title:'The Type Update', body:'Interact with someone whose intentions are unclear. Form a prior belief. After observing one action, use Bayes\' Rule (mentally) to update your belief about their true type.' },
+  { id:'rw8', title:'The Costly Signal', body:'You need to prove your commitment or quality to someone. Brainstorm a signal that is expensive for a dishonest person to fake, but cheap for you. Send it.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your strategic profile.' },
+  { threshold: 500, title: 'STRATEGIST', desc: 'You see the matrices hidden in daily interactions. Dominance is becoming a reflex.' },
+  { threshold: 1500, title: 'TACTICIAN', desc: 'You calculate equilibria and understand the difference between risk and payoff dominance.' },
+  { threshold: 3000, title: 'EQUILIBRIST', desc: 'You navigate extensive form games and mixed strategies with precision. Reality bends to your models.' },
+  { threshold: 6000, title: 'MECHANISM ARCHITECT', desc: 'You design the games others play. You use signalling and mechanism design to shape rational behavior.' }
+];
+
+// ============== STATE ==============
+const STORAGE_KEY = 'nash-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      return Object.assign(def, parsed);
+    }
+  }catch(e){}
+  return defaultState();
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+// ============== PROGRESSION ==============
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){
+  const lvl = level(S.xp);
+  const cur = xpForLevel(lvl);
+  const next = xpForLevel(lvl+1);
+  return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 };
+}
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){
+    toast('LEVEL UP — LVL '+newLvl, 'success');
+    flashCombo('LVL '+newLvl);
+  }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){
+    S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null };
+  }
+  if(!S.daily.rtMissionId){
+    const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length);
+    S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id;
+  }
+}
+
+function unlockNextModule(moduleId){
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if(idx >= 0 && idx < MODULES.length - 1){
+    S.modules[MODULES[idx+1].id].unlocked = true;
+  }
+}
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){
+  let current = PROFILES[0];
+  for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; }
+  return current;
+}
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// FINAL ARCHITECTURE UNLOCKED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Spectrum. You now possess the complete architecture of strategic interaction.</p>';
+      html += '<p><strong>The Secret:</strong> Game theory is not about being clever in the moment; it is about designing the rules of the game so that rational actors naturally align with your goals. You do not play the game; you design the mechanism. You do not make threats; you create subgame perfect incentives. You do not hope for cooperation; you engineer the discount factor. The math is simple; the discipline is absolute.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+// ============== SPACED REPETITION (SM-2) ==============
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){
+    card.repetitions = 0; card.interval = 0; card.wrong += 1;
+  }else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else {
+      const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8);
+      card.interval = Math.max(1, Math.round(card.interval * factor));
+    }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){
+    card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if(card.ease < 1.3) card.ease = 1.3;
+  }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else {
+    const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8);
+    interval = Math.max(1, Math.round(interval * factor));
+  }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => {
+    if(a.core !== b.core) return a.core ? -1 : 1;
+    return S.cards[a.id].due - S.cards[b.id].due;
+  });
+}
+
+// ============== UI: HELPERS ==============
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+// ============== VIEWS ==============
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  const nextProjectPhase = PROJECT_PHASES.find(p => !S.project[p.id].solved && S.modules[p.moduleId].unlocked);
+  
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Spectrum: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your strategic architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){
+      rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5';
+    } else {
+      rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1';
+    }
+  }
+
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100);
+      totalMaturity += maturity;
+    });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length;
+  const R = 95;
+  
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30));
+      totalMaturity += maturity;
+    });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="NASH.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="NASH.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="NASH.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  
+  html += '</div>';
+  
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. A new Project Spectrum phase may have unlocked.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){
+      html += '<button class="btn success mt-1" onclick="NASH.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>';
+    }
+    html += '<button class="btn secondary mt-1" onclick="NASH.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="NASH.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){
+    html += '<button class="btn" onclick="NASH.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>';
+  }else{
+    html += '<button class="btn secondary" disabled>✓ Read</button>';
+  }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    html += '<button class="btn secondary" onclick="NASH.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>';
+  }
+  html += '</div>';
+  
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+// ============== PROJECT SPECTRUM ==============
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Market Cap:</span><span class="val">$50M</span></div>';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'MONOPOLY' : 'COMPETING') + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to the telecom market scenario. Phases unlock sequentially as you complete the corresponding training modules. Make the strategic choice to proceed.</p>';
+  
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    const unlocked = S.modules[p.moduleId].unlocked;
+    const active = !solved && unlocked;
+    
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="NASH.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info">';
+    html += '<div class="phase-title">' + p.title + '</div>';
+    html += '<div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div>';
+    html += '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  
+  let html = '<div class="lesson-back" onclick="NASH.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div>';
+  html += '</div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="NASH.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGICALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'spectrum: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="NASH.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){
+      actions.innerHTML = '<button class="btn success" onclick="NASH.show(\'dashboard\')">View Final Report →</button>';
+    }
+    else { actions.innerHTML = '<button class="btn" onclick="NASH.show(\'modules\')">Continue Training →</button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="NASH.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="NASH.showProjectPhase(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== DRILLS ==============
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => {
+    btn.onclick = () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderDrills();
+    };
+  });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="NASH.show(\'arena\')">Arena →</button></div>';
+    return;
+  }
+  
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="NASH.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div>';
+  html += '<div>Axis: <b>' + module.codename + '</b></div>';
+  html += '<div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="NASH.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="NASH.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="NASH.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="NASH.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="NASH.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+// ============== ARENA ==============
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  
+  let html = '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Problems:</span><span class="val">' + ARENA.filter(p => S.modules[p.moduleId].problemSolved).length + '/' + ARENA.length + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Arena XP:</span><span class="val">' + (S.daily.solved * 100) + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Pick a scenario. Each problem tests one axis. Read the situation, choose the most strategic action. Explanations reveal the reasoning. Timed mode.</p>';
+  
+  ARENA.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.modules[p.moduleId].problemSolved;
+    const unlocked = S.modules[p.moduleId].unlocked;
+    html += '<div class="lesson-row' + (solved ? ' read' : '') + '" style="margin-bottom:0.75rem" ' + (unlocked ? 'onclick="NASH.showArenaProblem(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="info" style="flex:1"><div class="text-xs text-dim" style="letter-spacing:0.2em;margin-bottom:0.3rem">// ' + m.codename + (solved ? ' · SOLVED' : '') + '</div><div style="font-family:var(--display);font-size:1rem">' + p.title + '</div></div>';
+    html += '<div class="status">' + (unlocked ? (solved ? 'Review' : 'Start') : 'Locked') + '</div>';
+    html += '</div>';
+  });
+  
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.modules[p.moduleId].problemSolved;
+  
+  let html = '<div class="lesson-back" onclick="NASH.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+100 XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Time Limit:</span><span class="val" style="color:var(--amber)">' + p.timeLimit + 's</span></div>';
+  html += '</div>';
+  
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="NASH.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){
+      clearInterval(arenaTimer);
+      if(problemState === 'idle'){ answerProblem(-1); }
+    }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.modules[p.moduleId].problemSolved){
+      S.modules[p.moduleId].problemSolved = true;
+      S.daily.solved += 1;
+      addXP(100, 'arena: ' + p.id);
+      if(moduleProgress(p.moduleId).completed){
+        unlockNextModule(p.moduleId);
+        html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+100 XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>';
+      }else{
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+100 XP</div>';
+      }
+      flashCombo('+100 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try the next problem.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = ARENA.find(a => !S.modules[a.moduleId].problemSolved && S.modules[a.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="NASH.showArenaProblem(\''+next.id+'\')">Next Problem →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="NASH.show(\'dashboard\')">Dashboard →</button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="NASH.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="NASH.showArenaProblem(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== STATS ==============
+function renderStats(){
+  renderTopbar();
+  
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => {
+    if(c.interval >= 21) mature++;
+    else if(c.interval >= 7) young++;
+    else if(c.interval >= 1) learning++;
+    else newCards++;
+  });
+  
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){
+    const correctCount = recent.filter(h => h.correct).length;
+    document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%';
+  }else{ document.getElementById('statRetention').textContent = '--'; }
+  
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,255,163,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){
+    log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>';
+  }else{
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+// ============== PARTICLES ==============
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 255, 163, ' + p.o + ')';
+      ctx.fill();
+    });
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(0, 255, 163, ' + (0.1 * (1 - d/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){
+    if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; }
+  }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){
+    const map = { '1': 1, '2': 3, '3': 4, '4': 5 };
+    if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); }
+  }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); }
+  }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); }
+  }
+});
+
+// ============== RESET & NAV ==============
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error');
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { showView(item.dataset.view); });
+});
+
+// ============== BOOT ==============
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = [
+    'Initializing strategic architecture v1.0...',
+    'Loading game theory kernel...',
+    'Calibrating SM-2 spaced repetition engine...',
+    'Mounting Pareto priority queue...',
+    'Indexing 10 axes / 30 cards / 10 scenarios...',
+    'Initializing Project Spectrum...',
+    'NASH online.'
+  ];
+  
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      setTimeout(() => {
+        document.getElementById('boot').classList.add('fade');
+        document.getElementById('app').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('boot').style.display = 'none';
+          showView('dashboard');
+        }, 800);
+      }, 300);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+// ============== PUBLIC API ==============
+window.NASH = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase
+};
+
+// ============== INIT ==============
+function init(){
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>

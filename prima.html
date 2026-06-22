@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRIMA // Cognitive Architecture v5.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{
+  background:
+    radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),
+    var(--void);
+  min-height:100vh; position:relative; font-size:14px; line-height:1.6;
+}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;z-index:1;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);
+  background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;
+}
+
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;position:relative;overflow:hidden;}
+.btn::before{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,217,255,0.3),transparent);transition:left 0.4s;}
+.btn:hover::before{left:100%;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+
+.arena-container, .project-container{max-width:900px;margin:0 auto;}
+.arena-hud, .project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:rgba(0,217,255,0.15);stroke-width:1;}
+.radar-ring{fill:none;stroke:rgba(0,217,255,0.08);stroke-width:1;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px rgba(0,217,255,0.5));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(255,45,156,0.05), rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,184,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,184,0,0.1);}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,184,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+
+@media(max-width:700px){
+  .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
+  .stats-strip{flex-wrap:wrap;gap:0.85rem;}
+  .nav{padding:0 1rem;}
+  .nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}
+  .view{padding:1rem;}
+  .lesson-title{font-size:1.7rem;}
+  .drill-card{padding:1.75rem 1.25rem;min-height:340px;}
+  .drill-question{font-size:1.1rem;}
+  .scenario{padding:1.5rem;}
+  .mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}
+  .big-stat-value{font-size:1.8rem;}
+  .section-title{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div id="boot">
+  <div class="boot-logo">PRIMA</div>
+  <div class="boot-sub">Cognitive Architecture v5.0 // The Prometheus Protocol</div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div>
+      <div class="brand">PRIMA</div>
+      <div class="brand-tag">COGNITIVE ARCHITECTURE</div>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
+      <div class="stat-pill">XP <b id="topXp">0</b></div>
+      <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
+      <div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+    <div class="nav-item" data-view="project">Project Prometheus</div>
+    <div class="nav-item" data-view="drills">Drills</div>
+    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="stats">Stats</div>
+    <div class="nav-item" data-view="about">About</div>
+  </nav>
+  
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1>
+      <p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      
+      <div class="dash-grid">
+        <div class="panel mission">
+          <div class="panel-label">// Next Mission</div>
+          <h2 id="missionTitle">Initialize Training</h2>
+          <p id="missionBody">Loading cognitive architecture...</p>
+          <div class="flex gap-1" style="flex-wrap:wrap">
+            <button class="btn" id="missionBtn">Begin →</button>
+            <button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-label">// Daily Output</div>
+          <div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div>
+          <div class="big-stat-sub">cards reviewed today</div>
+          <div class="mt-2" style="display:grid;gap:0.4rem">
+            <div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div>
+            <div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div>
+            <div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// Daily Real-World Mission</div>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
+          <button class="btn secondary" id="rtBtn" onclick="PRIMA.completeRTMission()">Mark Complete · +25 XP</button>
+        </div>
+        <div class="profile-card">
+          <div class="panel-label">// Operator Profile</div>
+          <div class="profile-title" id="profTitle">UNRANKED</div>
+          <div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div>
+        </div>
+      </div>
+
+      <div id="secretUnlockContainer"></div>
+      
+      <div class="panel">
+        <div class="panel-label">// Ten-Axis Mastery</div>
+        <div class="dash-grid" style="margin:0">
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg>
+          </div>
+          <div class="mastery-list" id="masteryList"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="view" id="view-modules">
+      <h1 class="section-title">Training Modules</h1>
+      <p class="section-sub">Ten axes of first-principles cognition. Sequential unlock.</p>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </section>
+    
+    <section class="view" id="view-project">
+      <h1 class="section-title">Project: PROMETHEUS</h1>
+      <p class="section-sub">A cumulative scenario. Apply the 10 axes to build a 1GW autonomous microgrid in the Nevada desert. Budget: $50M.</p>
+      <div class="project-container" id="projectContainer"></div>
+    </section>
+    
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    
+    <section class="view" id="view-drills">
+      <h1 class="section-title">Spaced Repetition Drills</h1>
+      <p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p>
+      <div class="filter-bar" id="drillFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="core">★ Core Only</button>
+        <button class="filter-btn" data-filter="concept">Concepts</button>
+        <button class="filter-btn" data-filter="application">Application</button>
+        <button class="filter-btn" data-filter="quote">Quotes</button>
+      </div>
+      <div class="drill-container" id="drillContainer"></div>
+    </section>
+    
+    <section class="view" id="view-arena">
+      <h1 class="section-title">Combat Arena</h1>
+      <p class="section-sub">Scenario-based problem solving. Apply principles under pressure.</p>
+      <div class="arena-container" id="arenaContainer"></div>
+    </section>
+    
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1>
+      <p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat">
+          <div class="big-stat-label">Total XP</div>
+          <div class="big-stat-value" id="statXp">0</div>
+          <div class="big-stat-sub" id="statLevel">Level 1</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Cards Mature</div>
+          <div class="big-stat-value" id="statMature">0</div>
+          <div class="big-stat-sub" id="statMatureSub">of 0 total</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Retention Rate</div>
+          <div class="big-stat-value" id="statRetention">--</div>
+          <div class="big-stat-sub">last 100 reviews</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Longest Streak</div>
+          <div class="big-stat-value" id="statLongStreak">0</div>
+          <div class="big-stat-sub" id="statCurStreak">current: 0d</div>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Card Maturity Distribution</div>
+        <div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Session Log</div>
+        <div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Reset</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p>
+        <button class="btn danger" id="resetBtn">Reset All Progress</button>
+      </div>
+    </section>
+    
+    <section class="view" id="view-about">
+      <h1 class="section-title">About PRIMA</h1>
+      <p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>PRIMA is a cognitive training simulator designed to install the thinking patterns used by Elon Musk and other first-principles operators. It is not a biography. It is a workout.</p>
+        
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul>
+          <li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality. Forgetting curve combat.</li>
+          <li><strong>Active Recall:</strong> Every drill requires generation, not recognition. You must produce the answer, not just identify it.</li>
+          <li><strong>Interleaving:</strong> Drills mix concepts across modules. Forced discrimination strengthens memory vs. blocked practice.</li>
+          <li><strong>Elaboration:</strong> Arena problems and Project Prometheus require applying concepts to novel scenarios.</li>
+        </ul>
+        
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>AXIOM</strong> — First principles as default reasoning mode</li>
+          <li><strong>INDEX</strong> — The idiot index; cost decomposition</li>
+          <li><strong>NEGATE</strong> — Questioning requirements; "the best part is no part"</li>
+          <li><strong>FERMI</strong> — Physics-based order-of-magnitude reasoning</li>
+          <li><strong>ASYMM</strong> — Asymmetric bets and expected value</li>
+          <li><strong>VELOC</strong> — Execution velocity as force multiplier</li>
+          <li><strong>LOOP</strong> — Closing feedback loops with reality</li>
+          <li><strong>WEAVE</strong> — Cross-domain transfer of mental models</li>
+          <li><strong>ALGO</strong> — The 5-step engineering algorithm</li>
+          <li><strong>PSYCH</strong> — Psychological architecture & pain tolerance</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ============== DATA: MODULES ==============
+const MODULES = [
+  {
+    id:'m1', codename:'AXIOM', title:'First Principles Foundations',
+    summary:'Reasoning from fundamental truths instead of analogy.',
+    lesson:{
+      title:'The Foundation',
+      body: 'Most cognition is analogical. We do X because similar entities do X. We adopt norms because norms exist. This is computationally cheap and socially safe. It is also why most innovation is incremental: you can only optimize what already exists.\n\n' +
+            '## The SpaceX Moment\n\n' +
+            'In 2002, Musk wanted to send a payload to Mars. He looked at rocket prices: $65M for a launch. Most people stopped here. The analogy was "rockets are expensive."\n\n' +
+            'Instead, he asked: *What is a rocket made of?* Aluminum alloys, titanium, copper, carbon fiber. *And what is the commodity market value of those materials?* Roughly 2% of a rocket\'s price. The remaining 98% was manufacturing, supply chain, legacy processes, and margin — all attackable.\n\n' +
+            'That single decomposition — materials vs. system — is the entire birth of SpaceX. Same physics. Different reasoning.\n\n' +
+            '## The Method\n\n' +
+            '1. **Identify the assumption** you\'re operating under. Write it down explicitly.\n' +
+            '2. **Decompose** until you hit physics, math, or a definitional truth you cannot deduce further.\n' +
+            '3. **Rebuild** the solution from those primitives.\n\n' +
+            'The hard part is step 1. Most assumptions are invisible. They feel like reality, not choices.\n\n' +
+            '## Why It\'s Lonely\n\n' +
+            'First-principles thinking will be wrong, often. You\'ll appear ignorant to domain experts because you\'ll question things they take for granted. You\'ll also occasionally be right in ways they cannot see, because their expertise is itself analogical — they know *how things are done*, not *why*.\n\n' +
+            '> The discipline is to apply the method consistently, accept being wrong in public, and update fast when reality pushes back.\n\n' +
+            'The reward is step-change. You don\'t get 10% improvements from first principles. You get 10x — or you fail. There is rarely a middle outcome.',
+      takeaways:[
+        'First principles = reason from fundamental truths, not analogies',
+        'Analogy is faster; first principles is harder but produces step-change',
+        'SpaceX question: "What is this made of, and what is the commodity value?"',
+        'Most assumptions are invisible. Naming them is the first discipline',
+        'Expect to be wrong often. Update fast. The reward is 10x — or nothing.'
+      ]
+    }
+  },
+  {
+    id:'m2', codename:'INDEX', title:'The Idiot Index',
+    summary:'Cost decomposition: finished cost vs. raw material cost.',
+    lesson:{
+      title:'High-Index Attack Surfaces',
+      body: 'Musk coined the term "idiot index" internally at Tesla and SpaceX. It\'s simple: the ratio of a finished part\'s cost to the cost of its raw materials.\n\n' +
+            '> Idiot Index = Finished Part Cost / Raw Material Cost\n\n' +
+            'If a part costs $1,000 finished and $50 in raw materials, the idiot index is 20. That means 95% of the cost is added by the manufacturing process, the supply chain, and margin. Almost all of that is attackable.\n\n' +
+            'A low idiot index (close to 1) means the part is essentially a commodity — you\'re paying for the materials themselves. Little room to optimize.\n\n' +
+            '## Diagnostic Power\n\n' +
+            'The idiot index is not just a metric — it\'s a *diagnostic*. When you see an index of 50 on a part, you don\'t need to know anything about metallurgy or manufacturing to know something is wrong. You just need to ask: *Where does that 49x come from?*\n\n' +
+            'This is what makes first-principles thinking scale: it lets non-experts ask expert-shaming questions. A 22-year-old engineer with a calculator can identify inefficiencies that have survived decades of expert stewardship.\n\n' +
+            '## The Method\n\n' +
+            '1. **List** the major cost components of any system you want to attack.\n' +
+            '2. **Calculate** for each: finished cost / commodity input cost.\n' +
+            '3. **Sort** by idiot index, descending.\n' +
+            '4. **Attack** the top 3 items. That\'s where step-change reductions live.\n' +
+            '5. **Don\'t optimize** a part with index 2. You\'ll save 5%. **Re-architect** a part with index 50. You can save 80%.\n\n' +
+            'The strategic question is never "can we make this cheaper?" It is "is this a high-index component, and if so, what process is inflating it?"',
+      takeaways:[
+        'Idiot Index = finished cost / raw material cost',
+        'High index (≥10) → step-change opportunity via redesign',
+        'Low index (~1-2) → commodity; little room',
+        'Lets non-experts identify inefficiencies that experts miss',
+        'Sort by index before deciding whether to optimize or redesign'
+      ]
+    }
+  },
+  {
+    id:'m3', codename:'NEGATE', title:'Questioning Requirements',
+    summary:'The best part is no part. Deletion beats optimization.',
+    lesson:{
+      title:'The Best Part Is No Part',
+      body: '> The best part is no part. — Musk\n\n' +
+            'The most powerful question in engineering is not *how do we make this better?* It\'s *do we need this at all?*\n\n' +
+            'Requirements have a way of accreting. Someone, at some point, decided the widget needed a thermal shield. That decision gets encoded in a spec. Years later, no one remembers why. The spec becomes the requirement. Engineers design to it. The thermal shield ships in every unit.\n\n' +
+            'But: who wrote the spec? On what authority? What problem was it solving? Is that problem still real?\n\n' +
+            '## The Tesla Wiring Harness\n\n' +
+            'When Tesla redesigned the Model 3 wiring, they didn\'t optimize the existing harness. They asked: *Why does a car need 3 miles of wire?* The answer, decomposed, was: because each function needs to talk to a central computer, and centralization requires long wires. So they moved to domain controllers — decentralized compute, much shorter wires. Roughly 50% reduction in harness length.\n\n' +
+            'The requirement wasn\'t "3 miles of wire." The requirement was "functions must communicate." Wire was an implementation. Question the implementation.\n\n' +
+            '## The Method\n\n' +
+            'For every requirement, ask:\n' +
+            '1. *Who originated this requirement?* (If unknown, treat as suspect.)\n' +
+            '2. *What problem was it solving?* (If unknown, treat as suspect.)\n' +
+            '3. *Is that problem still real?* (Conditions change.)\n' +
+            '4. *Is the requirement the strictest possible solution?* (Often over-specified.)\n' +
+            '5. *What happens if we delete it entirely?* (The most powerful question.)\n\n' +
+            'You\'ll find that 30-50% of requirements in any mature system are either obsolete or were never necessary. They survive because no one had the mandate to delete them.\n\n' +
+            'This is why Musk\'s "hardcore" management style produces results: he has the mandate to delete things that no one else will.\n\n' +
+            '## Warning\n\n' +
+            'Deleting requirements is high-variance. Sometimes you delete something load-bearing that no one understood. The discipline is to **delete aggressively, measure rigorously, and restore fast** if you broke something. Not delete cautiously and accept the cruft.',
+      takeaways:[
+        '"The best part is no part" — deletion beats optimization',
+        'Requirements accrete; they do not get pruned naturally',
+        'For every requirement: who originated? what problem? still real? strictest possible? what if deleted?',
+        '30-50% of requirements in mature systems are unnecessary',
+        'Delete aggressively, measure rigorously, restore fast'
+      ]
+    }
+  },
+  {
+    id:'m4', codename:'FERMI', title:'Physics-Based Reasoning',
+    summary:'Order-of-magnitude estimation. Governing equations.',
+    lesson:{
+      title:'Reason From The Limit',
+      body: 'A specific flavor of first principles is physics-based reasoning: reasoning in terms of energy, mass, force, and the laws that govern them.\n\n' +
+            'Engineers often reason by spec: "The motor is rated for 50 kW." Physicists reason by limit: "What is the theoretical maximum efficiency of an electric motor?" (Answer: ~98%.) The gap between spec and limit is where innovation lives.\n\n' +
+            '## Fermi Problems\n\n' +
+            'Enrico Fermi was famous for estimating things from minimal data: "How many piano tuners in Chicago?" He\'d decompose: population, households with pianos, tuning frequency, tuners\' capacity. The answer would be order-of-magnitude correct.\n\n' +
+            'This skill is essential because it lets you sanity-check *any* number anyone gives you. If a supplier quotes $10M for a tool, your Fermi estimate of what steel + labor + machine time *should* cost might be $1M. That\'s a 10x idiot index. The quote is suspicious.\n\n' +
+            '## The Rocket Equation\n\n' +
+            'Musk\'s deep advantage in rockets is that he actually understands the Tsiolkovsky rocket equation:\n\n' +
+            '> Δv = Isp · g · ln(m₀/m₁)\n\n' +
+            'He can reason from this directly. He knows the only ways to increase payload are: better Isp (engine chemistry), lower dry mass (materials), or higher mass ratio (staging, refueling).\n\n' +
+            'When an engineer says "we can\'t get more payload," Musk doesn\'t accept "we can\'t." He asks: *Which term in the equation are we losing to?* That conversation goes very differently than "we can\'t."\n\n' +
+            '## The Method\n\n' +
+            '1. **Identify the governing equation** for the system. There\'s almost always one.\n' +
+            '2. **Find the leverage terms** — usually the ones with the largest gap between current state and theoretical maximum.\n' +
+            '3. **Attack that term.**\n' +
+            '4. **Sanity-check** all numbers via Fermi estimation. Never accept a number you can\'t ballpark.\n\n' +
+            'If you can\'t do Fermi estimation on a domain, you don\'t understand the domain. This is the test.',
+      takeaways:[
+        'Physics-based reasoning > spec-based reasoning',
+        'Ask: what is the theoretical limit? What is our current state? Where is the gap?',
+        'Fermi estimation = sanity-check any number by decomposing to fundamentals',
+        'Identify the governing equation; find the leverage term; attack it',
+        'If you cannot Fermi-estimate a domain, you do not understand it'
+      ]
+    }
+  },
+  {
+    id:'m5', codename:'ASYMM', title:'Asymmetric Bets',
+    summary:'Expected value across full distributions. Tail outcomes.',
+    lesson:{
+      title:'Optimize For The Tail',
+      body: '> Failure is an option here. If things are not failing, you are not innovating enough. — Musk\n\n' +
+            'Most business reasoning optimizes for the median outcome. Musk optimizes for the tail.\n\n' +
+            'Expected value = probability × payoff. Most people overweight probability and underweight payoff. Musk does the inverse: he takes bets where the payoff is enormous if successful, and the downside is bounded.\n\n' +
+            '## The SpaceX + Tesla Bet\n\n' +
+            'In 2008, Musk had roughly $180M from PayPal. He put $100M into SpaceX, $70M into Tesla, and kept $10M for living expenses. Both companies were near death. Conventional wisdom said: "Diversify. Don\'t bet everything on two long-shot startups."\n\n' +
+            'But Musk reasoned: if both fail, he\'s broke either way (he\'d have to start over from zero). If one succeeds, the payoff is civilization-scale (cheap space access; mass EV adoption). The asymmetry favored concentration.\n\n' +
+            'He didn\'t diversify because diversification would have guaranteed a smaller maximum outcome. The downside was the same (zero), so he maximized the upside.\n\n' +
+            '## The Method\n\n' +
+            'For every major decision:\n' +
+            '1. **Enumerate outcomes** (best, base, worst case).\n' +
+            '2. **Estimate probabilities honestly.** Don\'t round 5% to 0%.\n' +
+            '3. **Estimate payoffs at scale.** Don\'t truncate the tail.\n' +
+            '4. **Compute expected value** across the full distribution.\n' +
+            '5. **Pay special attention** to bets where worst case is survivable and best case is huge. Those are the asymmetric ones.\n' +
+            '6. **If you concentrate**, concentrate where the leverage is highest.\n\n' +
+            'The mistake most people make: they treat low-probability events as zero-probability. A 5% chance of a $100B outcome is worth $5B in expectation. That is not zero. It is enormous.\n\n' +
+            '## The Survival Constraint\n\n' +
+            'One critical caveat: you must survive the worst case. If worst case = death (financial, physical, reputational), the bet is not asymmetric — it is suicidal. Musk survived 2008 by the skin of his teeth. He did not plan to survive; he got lucky. The method is right; do not push the survival constraint.',
+      takeaways:[
+        'Optimize for tail outcomes, not median outcomes',
+        'EV = probability × payoff, summed across the full distribution',
+        'People overweight probability; first-principles thinkers overweight payoff',
+        'Never treat low-probability events as zero-probability',
+        'Survival constraint: worst case must be survivable'
+      ]
+    }
+  },
+  {
+    id:'m6', codename:'VELOC', title:'Execution Velocity',
+    summary:'Cycle time as primary KPI. Iterate faster than reality decays.',
+    lesson:{
+      title:'Cycle Time Is The Weapon',
+      body: '> If you are not moving fast, you are moving slow. — Musk\n\n' +
+            'Velocity is itself a first principle. Not speed — *velocity*. Directional speed.\n\n' +
+            'Why does velocity matter? Because information has a half-life. The longer you take to ship, the more your assumptions decay. A 12-month development cycle means you are designing for the world as it was 12 months ago.\n\n' +
+            '## The Starship Method\n\n' +
+            'Starship prototypes were blown up, on purpose, repeatedly. Each explosion was data. Each iteration took weeks, not years. The conventional aerospace approach would have been: 5 years of design, 2 years of testing, $5B budget, and a single high-stakes maiden flight.\n\n' +
+            'Musk\'s approach: build in 6 weeks, fly, explode, identify failure mode, fix, fly again. Total spend per iteration: ~$20M. Total information gained per dollar: orders of magnitude higher.\n\n' +
+            'This works because *most of what you believe about your design is wrong*. The faster you encounter reality, the faster you correct.\n\n' +
+            '## The Method\n\n' +
+            '1. **Shorten the build-test-learn loop** above all else. Everything else is secondary.\n' +
+            '2. **Accept that early versions will be wrong.** Plan for it.\n' +
+            '3. **Parallelize aggressively.** Run multiple experiments simultaneously.\n' +
+            '4. **Don\'t over-engineer the prototype.** The prototype\'s job is to fail informatively.\n' +
+            '5. **Measure cycle time** as the primary KPI. Most orgs don\'t even track it.\n' +
+            '6. **Velocity compounds.** A team that iterates 10x faster gets 10x more learning cycles per year. The gap widens.\n\n' +
+            '## The Trap\n\n' +
+            'Most organizations optimize for not-looking-bad. They ship late but polished. Musk optimizes for looking-bad-but-learning-fast. He ships early and broken, on purpose.\n\n' +
+            'This requires a culture that tolerates public failure. Most cultures do not. That is why most organizations are slow. Not because they are dumb — because they are optimizing for the wrong thing.',
+      takeaways:[
+        'Velocity = directional speed; matters because information decays',
+        'Shorten the build-test-learn loop above all else',
+        'Early versions will be wrong; plan for it',
+        'Parallelize experiments; do not over-engineer prototypes',
+        'Measure cycle time as primary KPI',
+        'Most orgs optimize for not-looking-bad; optimize for learning-fast instead'
+      ]
+    }
+  },
+  {
+    id:'m7', codename:'LOOP', title:'Feedback Loops With Reality',
+    summary:'Tighten the loop. Failures are data. No middlemen.',
+    lesson:{
+      title:'Close The Loop With Reality',
+      body: '> You should always take the path that you think is most likely to be correct, and then update based on feedback. It\'s just like the scientific method. — Musk\n\n' +
+            'A first principle without a feedback loop is a religion. The method matters only if you also have a mechanism to discover when you are wrong.\n\n' +
+            '## Why Most Loops Are Broken\n\n' +
+            'Most organizations have feedback loops that look like:\n\n' +
+            '> Build thing → ship thing → wait for quarterly review → hear filtered feedback → decide whether to act → ...\n\n' +
+            'The loop is long. The signal is filtered. By the time feedback arrives, the team that built the thing has moved on.\n\n' +
+            'A tight loop is:\n\n' +
+            '> Build → ship → measure → fix → repeat, in hours or days.\n\n' +
+            'The tighter the loop, the faster the learning. SpaceX\'s loop on Starship is measured in weeks. NASA\'s loop on SLS is measured in years. Same physics, same problem; loop tightness is the entire competitive delta.\n\n' +
+            '## The Method\n\n' +
+            '1. **Identify the tightest possible feedback loop** for your domain.\n' +
+            '2. **Instrument ruthlessly.** You cannot improve what you do not measure.\n' +
+            '3. **Close the loop with the actual decision-maker.** No middlemen.\n' +
+            '4. **Feed failures back into design immediately.** Do not queue them.\n' +
+            '5. **Track loop time as a metric.** Reduce it.\n\n' +
+            '## The Starship Explosions, Revisited\n\n' +
+            'When Starship SN8 exploded on landing in December 2020, Musk tweeted congratulations to the team. Why? Because the explosion was data. The vehicle flew, the flip maneuver worked, the engines relit — and one component failed late. That is an enormous amount of information for $20M and 6 weeks of work.\n\n' +
+            'The conventional aerospace response would have been: "This is a disaster. Months of review. Heads will roll." Musk\'s response: "We learned what we needed. Build SN9."\n\n' +
+            'The loop closed in days. The competition\'s loop closes in years.\n\n' +
+            '## The Trap\n\n' +
+            'You will be tempted to add process to "prevent failures." Process slows loops. Slower loops mean fewer failures per year, but also less learning. Net result: you are slower, not safer.\n\n' +
+            'The discipline is to accept failures as the cost of velocity, and to make each failure cheap enough to be tolerable.',
+      takeaways:[
+        'A first principle without a feedback loop is a religion',
+        'Tighten the build-test-learn loop above all',
+        'Instrument ruthlessly; you cannot improve what you do not measure',
+        'Close the loop with the actual decision-maker; no middlemen',
+        'Failures are data; make them cheap and informative',
+        'Process slows loops; do not add process to prevent failure'
+      ]
+    }
+  },
+  {
+    id:'m8', codename:'WEAVE', title:'Cross-Domain Transfer',
+    summary:'Structural similarity across fields. Latticework of models.',
+    lesson:{
+      title:'The Latticework',
+      body: '> It is knowledge of how to apply the scientific method across different fields. So you can take an idea from one field and apply it to another. — Musk\n\n' +
+            'The deepest form of first-principles thinking is the recognition that principles *transfer*. A physics insight applies to manufacturing. A software architecture applies to organizational design. A biological mechanism applies to a business model.\n\n' +
+            'Charlie Munger called this the "latticework of mental models." Musk\'s version is more operational: he does not just collect models, he instinctively translates them across domains.\n\n' +
+            '## Examples\n\n' +
+            '- **Software iteration → rocket design:** Agile methodology, applied to aerospace. SLS still uses waterfall. Starship uses continuous deployment. Result: SpaceX iterates 50x faster.\n' +
+            '- **Manufacturing vertical integration → battery production:** Tesla didn\'t just buy cells; they built the Gigafactory. The decision came from an automotive manufacturing instinct applied to battery chemistry.\n' +
+            '- **Video game design → car UI:** Tesla\'s interface feels game-like because Musk hired game developers to design it. The mental model: a car dashboard is a game UI, not a control panel.\n' +
+            '- **Physics first principles → tunnel boring:** The Boring Company started with the question "why are tunnels so expensive?" Decomposed: most of the cost is the boring machine\'s diameter and speed. Solution: smaller diameter, continuous boring.\n\n' +
+            '## The Method\n\n' +
+            '1. **Build a personal library** of mental models, drawn from many fields. Do not specialize; range.\n' +
+            '2. **For each new problem**, ask: "What is this *actually* a problem of?" Often it has been solved in another domain.\n' +
+            '3. **Translate the solution.** The translation is the hard part — you have to find the *structural* similarity, not the surface similarity.\n' +
+            '4. **Cross-pollinate intentionally.** Talk to people outside your field. Read outside your discipline.\n\n' +
+            '## The Trap\n\n' +
+            'You can fool yourself into thinking a model transfers when it doesn\'t. The test is *structural similarity*: do the underlying dynamics match? If yes, transfer works. If no, you are just pattern-matching on the surface.\n\n' +
+            'This is why first-principles thinking is the prerequisite: you cannot recognize structural similarity across domains unless you have decomposed each domain to its primitives. Without decomposition, you are just doing analogy with extra steps.',
+      takeaways:[
+        'Mental models transfer across domains',
+        'For each problem, ask: "What is this actually a problem of?"',
+        'Build a latticework of models from many fields; range widely',
+        'Translation requires finding structural similarity, not surface similarity',
+        'First-principles decomposition is the prerequisite for cross-domain transfer'
+      ]
+    }
+  },
+  {
+    id:'m9', codename:'ALGO', title:'The Engineering Algorithm',
+    summary:'The 5-step protocol: Question, Delete, Simplify, Accelerate, Automate.',
+    lesson:{
+      title:'The Musk Algorithm',
+      body: 'Musk has a strict, repeatable algorithm for building and improving anything. He has stated it explicitly multiple times. It is the operating system for Tesla and SpaceX manufacturing.\n\n' +
+            '## The 5 Steps\n\n' +
+            '1. **Question the requirements.** Make the requirements less dumb. Every requirement should come with the name of the person who made it. Requirements are often wrong from the start.\n' +
+            '2. **Delete the part or process.** If you are not occasionally adding things back in, you are not deleting enough. The bias should be toward deletion. "The best part is no part."\n' +
+            '3. **Simplify or optimize.** *Only after* you have deleted. Most engineers optimize a part that should not exist.\n' +
+            '4. **Accelerate cycle time.** Speed up the process. But only *after* you have questioned, deleted, and simplified. Accelerating a broken process just makes you fail faster.\n' +
+            '5. **Automate.** This is the final step. Automate everything that remains. But if you automate before deleting/simplifying, you have locked in inefficiency forever.\n\n' +
+            '## The Trap\n\n' +
+            'Engineers are trained to optimize. They skip steps 1 and 2 and jump straight to step 3. They make a bad process slightly better. Or worse, they jump to step 5 and automate a process that should not exist.\n\n' +
+            'Musk\'s algorithm forces deletion before optimization. This is counter-intuitive. It feels destructive. But it is the only way to achieve a step-change in efficiency.\n\n' +
+            '## Application\n\n' +
+            'When Tesla struggled with Model 3 production ("production hell"), the bottleneck was the general assembly line. Musk applied the algorithm:\n' +
+            '- Questioned why certain steps existed (they didn\'t need to).\n' +
+            '- Deleted unnecessary sensors and brackets.\n' +
+            '- Simplified the wiring harness.\n' +
+            '- Accelerated the line speed.\n' +
+            '- Automated only the stable, simplified steps.\n\n' +
+            'The line went from 2,000 cars/week to 5,000 cars/week. Same physical space. Different algorithm.',
+      takeaways:[
+        'The Algorithm: 1. Question 2. Delete 3. Simplify 4. Accelerate 5. Automate',
+        'Order matters. Never optimize a part that should not exist.',
+        'Delete aggressively. If you aren\'t adding things back occasionally, you aren\'t deleting enough.',
+        'Engineers naturally skip to step 3 (optimize). Discipline forces steps 1 & 2.',
+        'Automate last. Automating a bad process locks in inefficiency forever.'
+      ]
+    }
+  },
+  {
+    id:'m10', codename:'PSYCH', title:'Psychological Architecture',
+    summary:'Demon mode, pain tolerance, and narrative leverage.',
+    lesson:{
+      title:'The Architecture of Tolerance',
+      body: 'The thinking methods in modules 1-9 are necessary but not sufficient. Musk\'s ultimate leverage is psychological. He possesses an abnormal tolerance for pain, chaos, and risk.\n\n' +
+            '## Demon Mode\n\n' +
+            'Walter Isaacson called it "demon mode." It is a state of intense, often harsh, hyper-focus. When Musk enters demon mode, sleep stops. Social niceties stop. He sleeps on the factory floor. He fires people who slow the loop. He becomes a vector for pure velocity.\n\n' +
+            'Most people cannot operate in demon mode without breaking. It destroys marriages, friendships, and health. Musk has sacrificed all three repeatedly. It is not a sustainable operating mode for humans; it is a sacrifice he has chosen to make.\n\n' +
+            '## Pain Tolerance\n\n' +
+            'In 2008, Musk was simultaneously running SpaceX (which had just failed its 3rd Falcon 1 launch) and Tesla (which was out of money). He was borrowing money to pay rent. A sane person would have shut one down. Musk doubled down on both.\n\n' +
+            'His pain tolerance is not masochism; it is a calculated asymmetry. He knows that if he can survive the trough, the upside is civilization-scale. He treats emotional pain as a variable to be managed, not a signal to retreat.\n\n' +
+            '## Narrative Leverage\n\n' +
+            'Musk\'s final secret is his use of narrative as leverage. He sells the future before he builds it.\n\n' +
+            '- He sold Mars colonization before he had a rocket that could reach orbit.\n' +
+            '- He sold full self-driving before the software worked.\n' +
+            '- He sold the Cybertruck before the factory to build it existed.\n\n' +
+            'This narrative draws capital, attracts the best engineers, and forces his own hand. Once the narrative is public, failure becomes publicly catastrophic, which removes the option to quietly give up. It is a bridge-burning mechanism that forces success.\n\n' +
+            '## The Synthesis\n\n' +
+            'To achieve what he has done, you must combine the algorithm with the architecture:\n' +
+            '1. Use first principles to find the 10x opportunity.\n' +
+            '2. Use the idiot index to find the leverage point.\n' +
+            '3. Use velocity and tight loops to iterate.\n' +
+            '4. Use narrative leverage to attract capital and talent.\n' +
+            '5. Use demon mode to survive the inevitable trough of sorrow.\n\n' +
+            'There is no secret sauce. There is only an irrational tolerance for pain, a relentless obsession with the fundamental truth, and the willingness to be publicly wrong until you are undeniably right. The algorithm is simple; the execution is masochistic.',
+      takeaways:[
+        'Demon mode: hyper-focus, sleep deprivation, ruthless velocity. Not sustainable, but highly effective.',
+        'Pain tolerance: treat emotional pain as a variable to manage, not a signal to retreat.',
+        'Narrative leverage: sell the future before you build it. Burn the boats.',
+        'Surviving the "trough of sorrow" is the filter. Most people quit here.',
+        'There is no secret. Only an irrational obsession with truth and an extreme tolerance for pain.'
+      ]
+    }
+  }
+];
+
+// ============== DATA: FLASHCARDS ==============
+const CARDS = [
+  // M1
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the difference between first-principles thinking and analogy thinking?',back:'First principles reasons from fundamental truths. Analogy reasons from existing solutions. Analogy is faster and safer but produces only incremental results.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'What single question birthed SpaceX?',back:'"What is a rocket made of, and what is the commodity market value of those materials?" Answer: ~2% of a typical rocket price. The other 98% was process, supply chain, margin — all attackable.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What are the three steps of first-principles thinking?',back:'(1) Identify the assumption explicitly. (2) Decompose to fundamental truths (physics, math, definitions). (3) Rebuild the solution from those primitives.'},
+  {id:'c4',moduleId:'m1',core:false,category:'concept',front:'Why is first-principles thinking described as "lonely"?',back:'You appear ignorant to experts because you question what they take for granted. You are also occasionally right in ways they cannot see, because their expertise is itself analogical.'},
+  // M2
+  {id:'c6',moduleId:'m2',core:true,category:'concept',front:'Idiot Index formula?',back:'Idiot Index = Finished Part Cost / Raw Material Cost. High index means most cost is process/margin. Low index means it is essentially a commodity.'},
+  {id:'c7',moduleId:'m2',core:true,category:'application',front:'An idiot index of 50 means what?',back:'98% of the cost is process, supply chain, and margin. Only 2% is material. This is a massive step-change opportunity — redesign the process, do not optimize the part.'},
+  {id:'c8',moduleId:'m2',core:false,category:'concept',front:'When should you optimize vs. redesign based on idiot index?',back:'Optimize low-index parts (index ~1-3) for incremental gains. Redesign high-index parts (index ≥10) for step-change. Sorting by index first is the discipline.'},
+  {id:'c9',moduleId:'m2',core:false,category:'application',front:'Example of idiot-index attack at Tesla?',back:'Battery packs had a high idiot index. Tesla built the Gigafactory to vertically integrate cell manufacturing. Same chemistry, radically lower system cost.'},
+  // M3
+  {id:'c11',moduleId:'m3',core:true,category:'quote',front:'Complete the phrase: "The best part is..."',back:'"...no part." Deleting a part is always better than optimizing it.'},
+  {id:'c12',moduleId:'m3',core:true,category:'concept',front:'What percentage of requirements in mature systems are unnecessary?',back:'Roughly 30-50%. Requirements accrete over time; they rarely get pruned. They survive because no one has the mandate to delete them.'},
+  {id:'c13',moduleId:'m3',core:false,category:'concept',front:'Five questions to ask of any requirement?',back:'(1) Who originated it? (2) What problem was it solving? (3) Is that problem still real? (4) Is this the strictest possible solution? (5) What happens if we delete it entirely?'},
+  {id:'c14',moduleId:'m3',core:false,category:'application',front:'Tesla Model 3 wiring: what was the requirement vs. the implementation?',back:'Requirement: "functions must communicate." Implementation: "3 miles of wire." Tesla moved to domain controllers (decentralized compute) and cut harness length ~50%.'},
+  // M4
+  {id:'c16',moduleId:'m4',core:true,category:'concept',front:'Physics-based reasoning vs. spec-based reasoning?',back:'Spec: "the motor is rated 50 kW." Physics: "what is the theoretical max efficiency of an electric motor?" (~98%). The gap is where innovation lives.'},
+  {id:'c17',moduleId:'m4',core:true,category:'concept',front:'What is a Fermi problem?',back:'Estimate an unknown quantity from minimal data by decomposition. Example: "How many piano tuners in Chicago?" Decompose to population, % with pianos, tuner capacity.'},
+  {id:'c18',moduleId:'m4',core:false,category:'application',front:'Why Fermi-estimate every number you are given?',back:'To sanity-check quotes and claims. If a supplier quotes $10M and your Fermi estimate is $1M, you have an idiot index of 10. You do not need to be an expert to detect the gap.'},
+  {id:'c19',moduleId:'m4',core:false,category:'application',front:'Tsiolkovsky rocket equation?',back:'Δv = Isp · g · ln(m₀/m₁). Only three ways to increase payload: better Isp (engine chemistry), lower dry mass (materials), or higher mass ratio (staging, refueling).'},
+  // M5
+  {id:'c21',moduleId:'m5',core:true,category:'concept',front:'Expected value formula with fat tails?',back:'EV = Σ (probability × payoff) across the full distribution of outcomes. Do not truncate the tail. Do not round low probabilities to zero.'},
+  {id:'c22',moduleId:'m5',core:true,category:'concept',front:'The common EV mistake most people make?',back:'Treating low-probability events as zero-probability. A 5% chance of a $100B outcome is worth $5B in expectation. That is not zero — it is enormous.'},
+  {id:'c23',moduleId:'m5',core:false,category:'application',front:'Musk\'s 2008 PayPal fortune allocation?',back:'$100M SpaceX, $70M Tesla, $10M living expenses. He concentrated because the downside (zero) was the same as diversifying, but the upside was civilization-scale.'},
+  {id:'c24',moduleId:'m5',core:false,category:'concept',front:'The survival constraint on asymmetric bets?',back:'The worst case must be survivable. If worst case = death (financial, physical, reputational), the bet is suicidal, not asymmetric.'},
+  // M6
+  {id:'c26',moduleId:'m6',core:true,category:'concept',front:'Velocity vs. speed?',back:'Velocity = directional speed. Speed without direction is just motion. Velocity implies a target and a feedback loop, not just activity.'},
+  {id:'c27',moduleId:'m6',core:true,category:'concept',front:'Why does velocity matter fundamentally?',back:'Information has a half-life. The longer your cycle, the more your assumptions decay. A 12-month development cycle means you are designing for the world as it was 12 months ago.'},
+  {id:'c28',moduleId:'m6',core:false,category:'application',front:'Starship prototype approach?',back:'Build in 6 weeks, fly, explode, identify failure mode, fix, fly again. ~$20M per iteration. Orders of magnitude more information per dollar than the conventional aerospace approach.'},
+  {id:'c29',moduleId:'m6',core:false,category:'application',front:'Primary KPI for innovation teams?',back:'Cycle time. Most organizations do not even track it. They track output, headcount, velocity-points — but not the actual loop time from idea to measured reality.'},
+  // M7
+  {id:'c31',moduleId:'m7',core:true,category:'concept',front:'A first principle without a feedback loop is what?',back:'A religion. The method matters only if you have a mechanism to discover when you are wrong. Without the loop, conviction becomes dogma.'},
+  {id:'c32',moduleId:'m7',core:true,category:'concept',front:'Tight loop vs. loose loop?',back:'Tight: build → ship → measure → fix in hours or days. Loose: build → ship → quarterly review → filtered feedback → committee → decision (months). Loop tightness is the entire competitive delta.'},
+  {id:'c33',moduleId:'m7',core:false,category:'application',front:'Why did Musk congratulate the SN8 team after explosion?',back:'The explosion was data. The vehicle flew, the flip maneuver worked, the engines relit — one component failed late. That is enormous information for $20M and 6 weeks.'},
+  {id:'c35',moduleId:'m7',core:false,category:'concept',front:'The trap of adding process to prevent failures?',back:'Process slows loops. Slower loops mean fewer failures per year, but also less learning. Net result: you are slower, not safer. The discipline is cheap failures, not no failures.'},
+  // M8
+  {id:'c36',moduleId:'m8',core:true,category:'concept',front:'Munger\'s latticework vs. Musk\'s version?',back:'Munger collects mental models across disciplines. Musk instinctively translates them across domains. Musk\'s version is more operational.'},
+  {id:'c37',moduleId:'m8',core:true,category:'concept',front:'Test for whether a model transfers across domains?',back:'Structural similarity. Do the underlying dynamics match? If yes, transfer works. If no, you are pattern-matching on the surface — analogy with extra steps.'},
+  {id:'c39',moduleId:'m8',core:false,category:'application',front:'Example: software → aerospace transfer?',back:'Agile/continuous deployment applied to rocket design. SLS uses waterfall (5-year cycles). Starship uses iterative (6-week cycles). SpaceX iterates ~50x faster.'},
+  {id:'c40',moduleId:'m8',core:false,category:'application',front:'The Boring Company\'s first-principles question?',back:'"Why are tunnels so expensive?" Decomposed: most cost is the boring machine\'s diameter and speed. Solution: smaller diameter, continuous boring.'},
+  // M9 - ALGO
+  {id:'c41',moduleId:'m9',core:true,category:'quote',front:'What are the 5 steps of the Musk Algorithm?',back:'1. Question requirements. 2. Delete the part/process. 3. Simplify/optimize. 4. Accelerate cycle time. 5. Automate.'},
+  {id:'c42',moduleId:'m9',core:true,category:'concept',front:'Why must you delete *before* you optimize?',back:'Most engineers optimize a part that should not exist. If you optimize a bad process, you waste effort and lock in inefficiency.'},
+  {id:'c43',moduleId:'m9',core:false,category:'concept',front:'The rule about adding things back in after deletion?',back:'If you are not occasionally adding things back in, you are not deleting enough. The bias must be toward deletion.'},
+  {id:'c44',moduleId:'m9',core:false,category:'concept',front:'Why is Automation the LAST step?',back:'If you automate a broken process, you lock in inefficiency forever. Automate only what remains after questioning, deleting, simplifying, and accelerating.'},
+  // M10 - PSYCH
+  {id:'c45',moduleId:'m10',core:true,category:'concept',front:'What is "Demon Mode"?',back:'A state of intense, often harsh hyper-focus. Sleep stops. Social niceties stop. It is a vector for pure velocity. Highly effective, highly destructive.'},
+  {id:'c46',moduleId:'m10',core:true,category:'concept',front:'How does Musk treat emotional pain during the "trough of sorrow"?',back:'As a variable to be managed, not a signal to retreat. His pain tolerance is a calculated asymmetry to survive the trough and reach civilization-scale upside.'},
+  {id:'c47',moduleId:'m10',core:false,category:'application',front:'What is "Narrative Leverage"?',back:'Selling the future before you build it (e.g., Mars colonization before reaching orbit). It attracts capital/talent and burns the boats, removing the option to quietly give up.'},
+  {id:'c48',moduleId:'m10',core:false,category:'concept',front:'What is the "Secret" to achieving what Musk has done?',back:'There is no secret. Only an irrational obsession with the fundamental truth, an extreme tolerance for pain, and the willingness to be publicly wrong until undeniably right.'}
+];
+
+// ============== DATA: ARENA PROBLEMS ==============
+const ARENA = [
+  { id:'p1',moduleId:'m1', title:'The Coffee Shop', timeLimit:60, body:'You want to open a coffee shop. Industry standard: $8K/mo rent for prime location, $25K espresso machine, 3 baristas, $100K designer interior. Industry wisdom says "location is everything." Most fail within 18 months. You have $150K. Friends tell you to find cheaper rent to extend runway. Apply first principles.', options:['Find cheaper rent in a slightly less prime spot — saves $3K/mo, extends runway to 24 months.','Question the primitive: what is the minimum viable unit of "coffee shop"? A cart? A subscription? Direct-to-consumer beans? The "shop" itself is an analogy.','Lease used equipment to reduce capex by 40%.','Partner with an existing cafe for revenue share; no upfront location cost.'], correct:1, explanation:'Options A, C, D are optimizations within the existing model. B is the only first-principles move — it questions whether "coffee shop" is the right primitive.' },
+  { id:'p2',moduleId:'m2', title:'The SaaS Acquisition Cost', timeLimit:60, body:'You advise a friend running a SaaS company. Customer acquisition cost (CAC) is $400. They have been trying to optimize ad spend — different channels, A/B tests, better targeting. Marginal improvements of 5-10%. They ask for help. Apply the idiot index concept.', options:['Run more A/B tests on ad copy; optimize conversion rate.','Decompose CAC: ad spend / conversion rate / sales team cost / churn-replacement cost. Calculate the index for each component. Attack the highest.','Switch to a cheaper ad platform.','Hire a growth hacker to find new channels.'], correct:1, explanation:'The friend is optimizing without decomposing. CAC = $400 is a system-level number. Always decompose first, then attack the highest-index component.' },
+  { id:'p3',moduleId:'m3', title:'The 47-Feature Spec', timeLimit:45, body:'You lead a team building an internal tool. The spec has 47 features. PM says all are required for v1. Engineering estimates 6 months. Deadline is 3 months. PM will not budge. Apply the "question requirements" principle.', options:['Negotiate to ship 30 features in 3 months, defer 17 to v2.','For each feature, ask: who originated this? What problem? Still real? Strictest possible? What if we delete it entirely?','Hire more engineers to hit the deadline.','Push the deadline to 6 months; ship all 47 features.'], correct:1, explanation:'Option A accepts the spec as ground truth and haggles over scope. B is the only move that questions the spec itself. You will likely find 30-50% of features are obsolete.' },
+  { id:'p4',moduleId:'m4', title:'The $5M Robotic Arm', timeLimit:60, body:'A vendor quotes your team $5M for a custom robotic arm. Your CFO asks: "Is that reasonable?" Most people would say "I don\'t know, we\'re not robotic arm experts." Apply Fermi estimation.', options:['Get three competing quotes to establish market rate.','Fermi decompose: motors (~$50K), sensors (~$20K), structural steel (~$10K), control electronics (~$30K), assembly labor (~$100K), integration (~$100K). Ballpark: $300-500K. Quote is 10x. Something is wrong.','Trust the vendor; they are the expert.','Ask a robotic arm expert to evaluate the quote.'], correct:1, explanation:'A and D outsource judgment. C abdicates it. B is the only move that lets you reason about the quote without being an expert. The components of a robotic arm are commodity items with known prices.' },
+  { id:'p5',moduleId:'m5', title:'The Career Bet', timeLimit:90, body:'You are 30, have $200K saved, stable $150K/yr job. Two options: (1) Stay, save aggressively, retire at 60 with $3M. (2) Quit, build a startup with 5% chance of $1B exit, 20% chance of $10M exit, 75% chance of $0 (lost savings, but employable). Friends say option 2 is "too risky." Apply expected value thinking.', options:['Take option 1; safety first. $3M guaranteed retirement.','Calculate EV: (0.05 × $1B) + (0.20 × $10M) + (0.75 × $0) = $52M. Option 1 EV: $3M. Option 2 EV: $52M. Take option 2 — worst case (returning to a job) is survivable.','Take option 2; the upside is too good to pass up.','Compromise: keep job, build startup on nights and weekends.'], correct:1, explanation:'A and C are emotional — fear or greed. D sounds pragmatic but usually fails. B is the only rigorous move: compute EV across the full distribution. Option 2\'s EV is ~17x option 1\'s.' },
+  { id:'p6',moduleId:'m6', title:'The 4-Month Estimate', timeLimit:45, body:'Your team is building a new product feature. Engineering says it will take 4 months to ship "production-ready." You push back; they say "we can ship in 2 weeks but it will be buggy." Apply the velocity principle.', options:['Take the 4-month estimate; quality matters.','Ship in 2 weeks. Bugs are feedback. The 4-month version would be designed for assumptions that are 4 months stale by ship date.','Split the difference: 2 months, with some polish.','Ship a demo to internal stakeholders in 2 weeks; ship to customers in 4 months.'], correct:1, explanation:'The engineering team is optimizing for not-looking-bad. Bugs = looking bad. But the 4-month version optimizes for assumptions that will be 4 months stale at ship. Cycle time is the primary KPI.' },
+  { id:'p7',moduleId:'m7', title:'The Quarterly Survey', timeLimit:45, body:'Your company has a quarterly customer satisfaction survey. Results come 6 weeks after the quarter ends, filtered through an analytics team. By the time product sees results, the quarter is long over. The team is frustrated. Apply the feedback loop principle.', options:['Add more questions to the survey for richer data.','Kill the quarterly survey. Instrument the product for real-time usage signals. Add a one-click in-app feedback widget. Product sees signals daily.','Speed up the analytics team\'s processing pipeline.','Move to monthly surveys.'], correct:1, explanation:'The loop is too long, regardless of survey frequency or processing speed. A real-time in-app signal closes the loop in hours, not months. The quarterly survey is a religious ritual.' },
+  { id:'p8',moduleId:'m8', title:'The Hospital No-Shows', timeLimit:90, body:'You advise a hospital struggling with patient no-shows. ~20% of appointments are missed, costing $2M/yr. Industry solutions: reminder calls, SMS, deposits. Marginal improvements. Apply cross-domain transfer.', options:['Implement a smarter reminder system (SMS + email + voice).','Charge a no-show deposit.','Ask: what is this *actually* a problem of? It is a commitment-device / capacity-utilization problem. Airlines solved it with overbooking. Apply: schedule 110% capacity, accept 5% bumping cost, capture 95% utilization.','Fire patients who no-show more than 3 times.'], correct:2, explanation:'A, B, D optimize within the existing model. C asks the structural question: what is this actually a problem of? The structural similarity: fixed capacity, low marginal cost per slot, variable no-show rate.' },
+  { id:'p9',moduleId:'m9', title:'The Over-Engineered Factory', timeLimit:60, body:'You take over a factory producing widgets. The line is fully automated, but output is low and costs are high. The robots are complex, break down often, and require specialized technicians. Apply the Musk Algorithm.', options:['Optimize the robots\' software to reduce breakdowns.','Accelerate the line speed to increase throughput.','Question the requirement for the robot, delete it, replace with a simpler manual step if viable, THEN optimize and accelerate.','Buy better, more expensive robots that break down less.'], correct:2, explanation:'You jumped to Step 3 or 4. The Algorithm says: 1. Question, 2. Delete, 3. Simplify, 4. Accelerate, 5. Automate. Automation of a step you don\'t need locks in inefficiency.' },
+  { id:'p10',moduleId:'m10', title:'The Trough of Sorrow', timeLimit:90, body:'Your startup just launched. The product works, but user growth is flat and your PR launch fell flat. You have 6 months of runway left. The team is demoralized. Your co-founder suggests pivoting to a safer B2B model to extend runway. Apply the PSYCH principle.', options:['Pivot immediately. Survival is the only mandate.','Enter "demon mode". Sleep on the floor. Fire the complainers. Cut features to the bone. Sell the future harder than ever. Treat the pain as a variable.','Take a 2-week vacation to clear your head and avoid burnout.','Lower prices to buy growth.'], correct:1, explanation:'Pivoting out of fear is retreating from the trough of sorrow. A and C are逃避. D ruins unit economics. B is the Musk response: extreme pain tolerance, hyper-focus, and using narrative leverage to force success.' }
+];
+
+// ============== DATA: PROJECT PROMETHEUS ==============
+const PROJECT_PHASES = [
+  {
+    id:'ph1', moduleId:'m1', title:'Phase 1: The Architecture',
+    scenario:'You are appointed Lead Architect for Prometheus. The directive: deploy a 1-Gigawatt autonomous microgrid in the Nevada desert to stabilize the US Western Interconnect. Budget: $50M. The DOE suggests using standard large-scale lithium-ion battery containers (like Hornsdale in Australia) and partnering with existing utility integrators. How do you proceed?',
+    options:[
+      'Follow the DOE advice. Hornsdale is a proven model. Partner with Siemens, buy Li-ion containers, and execute the standard playbook safely.',
+      'Decompose the problem. A battery is anode, cathode, electrolyte, separator, and casing. The commodity cost of these raw materials is ~$40/kWh, but finished packs cost $150/kWh. The idiot index is ~4. Reject the standard playbook and build a vertical manufacturing line for sodium-ion (cheaper materials) directly on-site.',
+      'Bid the project out to 5 major EPC (Engineering, Procurement, Construction) firms and take the lowest bidder to save budget.',
+      'Abandon lithium-ion entirely and invest the $50M into researching solid-state batteries, hoping for a 5-year breakthrough.'
+    ],
+    correct:1,
+    explanation:'Following the Hornsdale analogy (Option A) yields incremental results. Option C locks in legacy EPC margins. Option D ignores timeline. Option B is the SpaceX move: decompose to raw materials, calculate the idiot index, and vertically integrate to attack the 4x gap. You choose sodium-ion because the raw materials are cheaper and the physics work for grid storage.'
+  },
+  {
+    id:'ph2', moduleId:'m2', title:'Phase 2: The Enclosure',
+    scenario:'Your team needs 1,000 environmental enclosures to protect the battery racks from the Nevada desert heat. Your supplier quotes $25,000 per enclosure. You have $25M allocated for this. The supplier says this is the standard rate for NEMA 4X rated stainless steel enclosures with active HVAC. What is your move?',
+    options:[
+      'Negotiate the price down to $20,000 per unit by committing to a 5-year service contract.',
+      'The raw 304 stainless steel sheet metal required for one enclosure costs $800. The idiot index is 31. Reject the supplier. Buy raw steel coils and a fleet of automated press brakes. Stamp the enclosures in-house for $2,500 each.',
+      'Order the enclosures but skip the HVAC to save $5,000 per unit.',
+      'Switch to plastic enclosures to save money.'
+    ],
+    correct:1,
+    explanation:'Option A is incremental optimization. Option C breaks the requirement (thermal management). Option B is the idiot index attack: $25k vs $800 material cost is an index of 31. Almost all the cost is process and margin. By bringing stamping in-house, you save $22.5M on this single component, freeing up massive capital for the rest of the project.'
+  },
+  {
+    id:'ph3', moduleId:'m3', title:'Phase 3: The Permit',
+    scenario:'The Nevada Bureau of Land Management (BLM) requires a $5M, 18-month Environmental Impact Study (EIS) before construction can begin, because the site is habitat for the desert tortoise. The standard utility approach is to pay the fee, wait 18 months, and hire biologists to relocate the tortoises. Your budget and timeline cannot survive an 18-month delay. What do you do?',
+    options:[
+      'Pay the $5M and wait. Government requirements are non-negotiable.',
+      'Question the requirement. The actual problem is "do not harm the tortoises." An 18-month study is the implementation. What if we delete the need for the study by moving the site 5 miles east to already-disturbed BLM land? The tortoises aren\'t there. Apply for a Categorical Exclusion instead.',
+      'Start construction illegally and pay the fines later, prioritizing velocity.',
+      'Launch a PR campaign against the BLM to force a waiver.'
+    ],
+    correct:1,
+    explanation:'Option A surrenders to the analogy of "how utilities deal with government." Option C is suicidal. Option D is slow and unpredictable. Option B questions the requirement. The requirement wasn\'t "do an EIS"; it was "don\'t harm tortoises." By moving to disturbed land, you delete the EIS requirement entirely, saving $5M and 18 months.'
+  },
+  {
+    id:'ph4', moduleId:'m4', title:'Phase 4: The Heat Limit',
+    scenario:'Your lead thermal engineer says the sodium-ion cells will degrade too fast in the Nevada summer heat. She insists you need a $10M liquid-cooling loop system for the battery racks. You are not a thermal engineer. How do you evaluate this?',
+    options:[
+      'Trust your lead engineer. She has a PhD in thermal dynamics. Approve the $10M cooling loop.',
+      'Fermi estimate the heat load. 1GW capacity, 95% round-trip efficiency = 50MW of heat to dissipate. Spread across 1,000 racks, that\'s 50kW per rack. Air cooling at high desert wind speeds can handle ~10kW. The gap is 5x. Liquid cooling is mathematically required, but you can use off-the-shelf HVAC chillers instead of custom titanium loops, cutting the cost from $10M to $2M.',
+      'Reject the cooling system and just let the batteries run hot. Velocity matters more than degradation.',
+      'Hire an outside consulting firm to do a 6-month thermal study.'
+    ],
+    correct:1,
+    explanation:'Option A abdicates judgment. Option C breaks the physics. Option D adds time. Option B is the Fermi move. You don\'t need a PhD to multiply efficiency loss by capacity to get heat load. Once you confirm the heat load mathematically requires liquid cooling, you question the *implementation* (custom titanium loops) and replace it with commodity HVAC chillers. You satisfy the physics for 20% of the cost.'
+  },
+  {
+    id:'ph5', moduleId:'m5', title:'Phase 5: The Capital Allocation',
+    scenario:'You have $15M left. You have two paths to reach the full 1GW capacity. Path A: Build out the remaining 500MW yourself using your new manufacturing line. High probability (90%), but caps your upside at just the DOE contract. Path B: Spend $10M on a massive PR campaign announcing a "Global Grid Transformation" and open pre-orders for 10GW of capacity from utilities worldwide, using the remaining $5M to build a 100MW demonstration block. Low probability of working (20%), but if it works, you secure $2B in pre-orders.',
+    options:[
+      'Take Path A. A 90% chance of finishing the project is the responsible choice. Secure the bag.',
+      'Take Path B. Calculate EV: (0.20 * $2B) = $400M. Path A EV: (0.90 * $50M) = $45M. Path B is 8x higher EV. The worst case (losing the project) is survivable because you can rebuild. Use narrative leverage to force the upside.',
+      'Split the difference: spend $5M on PR, $10M on buildout.',
+      'Abandon the project and return the remaining capital to the DOE.'
+    ],
+    correct:1,
+    explanation:'Option A optimizes for the median. Option B optimizes for the tail. This is the PayPal fortune bet applied to corporate strategy. By using the PR campaign as narrative leverage, you are selling the future before you build it. If it fails, you lose the project but keep your team and IP. The asymmetry favors the tail bet.'
+  },
+  {
+    id:'ph6', moduleId:'m6', title:'Phase 6: The Deployment',
+    scenario:'The demonstration block is built, but integration with the Western Interconnect requires custom power electronics software. Your engineering team says it will take 6 months to write, test, and deploy the code safely. The DOE is breathing down your neck for a milestone demo in 3 weeks. What is the protocol?',
+    options:[
+      'Tell the DOE the milestone is impossible. Quality and safety cannot be rushed. Take the 6 months.',
+      'Ship a "good enough" version in 2 weeks. Hardcode the safety limits, skip the UI, and run it on a local loop. Deploy it to the grid in a controlled 10MW test. Let it crash. Patch it. Iterate daily. Hit the 3-week milestone with a working, if ugly, system.',
+      'Hire 50 more contractors to write the code in parallel to hit the 3-week deadline.',
+      'Fake the demo by running the system off hidden diesel generators.'
+    ],
+    correct:1,
+    explanation:'Option A is too slow. Option C adds communication overhead and usually makes things slower (Brooks\'s Law). Option D is fraud. Option B is the Starship method. The 6-month version optimizes for assumptions about the grid that might be stale. Ship in 2 weeks, instrument heavily, and let reality teach you. Cycle time is the primary KPI.'
+  },
+  {
+    id:'ph7', moduleId:'m7', title:'Phase 7: The Degradation',
+    scenario:'Three months into operation, the demonstration block\'s capacity is degrading 2% per month—much faster than the 0.5% expected. The DOE is threatening to pull funding. Your VP of Engineering wants to commission a 4-month internal study to find the root cause. What do you do?',
+    options:[
+      'Commission the 4-month study. You need rigorous data before making changes.',
+      'Shut the plant down to prevent further degradation.',
+      'Instrument every single cell in the rack with real-time voltage and temperature sensors. Publish the live data stream to your engineering Slack. Wait 48 hours. The pattern of degradation will reveal itself immediately. Push an OTA (Over-The-Air) software update to the BMS (Battery Management System) to balance the cells differently.',
+      'Blame the supplier and sue them for defective cells.'
+    ],
+    correct:2,
+    explanation:'Option A is a broken feedback loop. By the time the study is done, the plant is dead. Option C tightens the loop to 48 hours. By instrumenting ruthlessly and feeding the data directly to the decision-makers, you turn a 4-month mystery into a 48-hour debugging session. You fix it via software, validating the loop.'
+  },
+  {
+    id:'ph8', moduleId:'m8', title:'Phase 8: The Logistics',
+    scenario:'You secured $2B in global pre-orders (Path B worked!). Now you must deploy 500 microgrids across 4 continents simultaneously. Your logistics team says it\'s impossible to hire enough project managers to oversee construction sites worldwide. You are bottlenecked by human capital. How do you solve this?',
+    options:[
+      'Hire 500 project managers and fly them around the world. It\'s expensive, but it\'s the only way.',
+      'Pause the global rollout until you can train a sufficient management cadre.',
+      'Recognize this is structurally a "deployment pipeline" problem, identical to software CI/CD (Continuous Integration/Continuous Deployment). Transfer the model: ship the microgrids as fully containerized, "plug-and-play" units. Build them in Nevada. The only on-site work is pouring a concrete pad and plugging in two cables. Delete the need for on-site PMs entirely.',
+      'Outsource the construction to local governments and hope they figure it out.'
+    ],
+    correct:2,
+    explanation:'Options A and B accept the bottleneck. Option D is chaos. Option C is the cross-domain transfer. By treating the physical grid like a software deployment, you delete the complexity of on-site construction. You ship a product, not a project. This is the latticework of mental models in action: software architecture applied to heavy industry.'
+  },
+  {
+    id:'ph9', moduleId:'m9', title:'Phase 9: The Factory',
+    scenario:'To meet demand, you are building the Gigafactory of microgrids in Nevada. The production line is struggling. The robotic arms installing the battery modules are misaligned 10% of the time, causing stoppages. The line manager wants to buy $5M vision systems to help the robots align better. Apply the Algorithm.',
+    options:[
+      'Buy the $5M vision systems. The robots need better inputs to align.',
+      'Apply the 5 steps. 1. Question the requirement: do we need the robotic arm? 2. Delete: the alignment issue is caused by a slight variance in the frame stamping. 3. Simplify: add a physical, passive alignment pin to the stamping die so the module can only drop in one way. 4. Accelerate: the robot no longer needs to search for alignment, cycle time drops 20%. 5. Automate: keep the robot, but it now does a dumb, fast task.',
+      'Fire the line manager and get someone who can make the robots work.',
+      'Slow down the line speed so the robots have more time to align.'
+    ],
+    correct:1,
+    explanation:'Option A optimizes a bad process (Step 3 before Step 1/2). Option D accelerates a broken process (Step 4 before Step 1/2). Option B applies the algorithm correctly. You question the requirement for complex robotic vision, delete the variance at the source (the stamping die), simplify the interface, and only then let the robot do its job. You solved a $5M software/hardware problem with a $50 piece of metal.'
+  },
+  {
+    id:'ph10', moduleId:'m10', title:'Phase 10: The Fire',
+    scenario:'A thermal runaway event occurs at the Nevada demonstration facility. A 50MW block catches fire and burns to the ground. No one is hurt, but the DOE suspends your contract, and the media declares sodium-ion dead. Your $2B in pre-orders are at risk of cancellation. Your board asks you to step down. What is your psychological architecture?',
+    options:[
+      'Resign. The project failed, and taking responsibility means stepping aside gracefully.',
+      'Pivot the company to lithium-ion to appease the media and DOE.',
+      'Enter demon mode. Sleep in the factory. Fire anyone who suggests pivoting. Investigate the fire forensically: it was a specific BMS software bug in the cooling loop (which you fixed in Phase 7, but an old build was accidentally loaded). Hold a press conference, show the data, sell the future harder than ever. Burn the boats. Treat the pain as a variable.',
+      'Take a 3-month sabbatical to recover from the trauma.'
+    ],
+    correct:2,
+    explanation:'Option A is rational surrender. Option B is retreating from the trough of sorrow. Option D is逃避. Option C is the psychological architecture of an operator. The fire was data. The narrative is not "sodium-ion failed"; it is "we found a software bug in a 50MW system, fixed it, and proved the hardware is fundamentally safe." You survive the trough using demon mode and narrative leverage. The company does not die.'
+  }
+];
+
+// ============== DATA: REAL-WORLD MISSIONS ==============
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Idiot Index Audit', body:'Pick one object on your desk. Estimate its retail price. Then, estimate the cost of its raw materials (plastic, metal, silicon). Calculate the idiot index. If it\'s >5, ask yourself: what process is inflating the cost?' },
+  { id:'rw2', title:'The Assumption Hunter', body:'Write down 3 things you "have to do" today. For each, ask: Who originated this requirement? What problem was it solving? Is that problem still real? If you can\'t answer, consider deleting it.' },
+  { id:'rw3', title:'The 10-Minute Fermi', body:'Estimate the number of coffee shops in your city. Decompose: population, % who drink coffee daily, cups per day per drinker, capacity of one shop. Do not look up the answer until you\'ve finished the calculation.' },
+  { id:'rw4', title:'The Loop Tightener', body:'Identify one feedback loop in your life (work, relationships, habits). Estimate its current cycle time in days. Write down one change you could make to halve that cycle time.' },
+  { id:'rw5', title:'The Tailbet', body:'Identify a decision you are avoiding because the probability of success is "too low." Calculate the EV. If the worst case is survivable and the EV is positive, the bet is asymmetric. Commit to it today.' },
+  { id:'rw6', title:'The Latticework Bridge', body:'Take a problem you are facing right now. Ask: "What is this *actually* a problem of?" Look for structural similarity to a problem solved in biology, physics, or software engineering. Translate the solution.' },
+  { id:'rw7', title:'The Algorithm Audit', body:'Pick a process in your work. Apply the 5 steps: Question requirements, Delete parts, Simplify, Accelerate, Automate. Notice where you instinctively want to skip to Step 3 (Optimize) before Step 2 (Delete).' },
+  { id:'rw8', title:'Demon Mode Trigger', body:'Identify one critical task you have been procrastinating on due to complexity. Enter "demon mode" for 2 hours: phone off, door closed, no niceties. Pure velocity. Observe your resistance to this state.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your psychometric profile.' },
+  { threshold: 500, title: 'RECRUIT', desc: 'You have begun the descent into first-principles reasoning. The analogies are starting to feel heavy.' },
+  { threshold: 1500, title: 'OPERATOR', desc: 'You actively question requirements and decompose problems. The idiot index is becoming a reflex.' },
+  { threshold: 3000, title: 'ARCHITECT', desc: 'You think in terms of leverage terms, governing equations, and asymmetric bets. Reality bends faster around you.' },
+  { threshold: 6000, title: 'PRINCIPAL', desc: 'You iterate at the speed of reality. Feedback loops are tight. Cross-domain transfer is instinctive. The Algorithm is installed.' }
+];
+
+// ============== STATE ==============
+const STORAGE_KEY = 'prima-v5';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      return Object.assign(def, parsed);
+    }
+  }catch(e){}
+  return defaultState();
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+// ============== PROGRESSION ==============
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){
+  const lvl = level(S.xp);
+  const cur = xpForLevel(lvl);
+  const next = xpForLevel(lvl+1);
+  return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 };
+}
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){
+    toast('LEVEL UP — LVL '+newLvl, 'success');
+    flashCombo('LVL '+newLvl);
+  }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){
+    S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null };
+  }
+  if(!S.daily.rtMissionId){
+    const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length);
+    S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id;
+  }
+}
+
+function unlockNextModule(moduleId){
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if(idx >= 0 && idx < MODULES.length - 1){
+    S.modules[MODULES[idx+1].id].unlocked = true;
+  }
+}
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){
+  let current = PROFILES[0];
+  for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; }
+  return current;
+}
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// FINAL ARCHITECTURE UNLOCKED</h2>';
+      html += '<p>You have completed all 10 axes and successfully deployed Project Prometheus. You now possess the complete cognitive algorithm.</p>';
+      html += '<p><strong>The Secret:</strong> There is no secret sauce. There is only an irrational tolerance for pain, a relentless obsession with the fundamental truth, and the willingness to be publicly wrong until you are undeniably right. The algorithm is simple; the execution is masochistic. Most people will not pay the price. Will you?</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+// ============== SPACED REPETITION (SM-2) ==============
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){
+    card.repetitions = 0; card.interval = 0; card.wrong += 1;
+  }else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else {
+      const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8);
+      card.interval = Math.max(1, Math.round(card.interval * factor));
+    }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){
+    card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if(card.ease < 1.3) card.ease = 1.3;
+  }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else {
+    const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8);
+    interval = Math.max(1, Math.round(interval * factor));
+  }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => {
+    if(a.core !== b.core) return a.core ? -1 : 1;
+    return S.cards[a.id].due - S.cards[b.id].due;
+  });
+}
+
+// ============== UI: HELPERS ==============
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+// ============== VIEWS ==============
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  const nextProjectPhase = PROJECT_PHASES.find(p => !S.project[p.id].solved && S.modules[p.moduleId].unlocked);
+  
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Prometheus: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your cognitive architecture to the real-world scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){
+      rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5';
+    } else {
+      rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1';
+    }
+  }
+
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100);
+      totalMaturity += maturity;
+    });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length;
+  const R = 95;
+  
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30));
+      totalMaturity += maturity;
+    });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="PRIMA.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="PRIMA.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="PRIMA.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  
+  html += '</div>';
+  
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. A new Project Prometheus phase may have unlocked.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){
+      html += '<button class="btn success mt-1" onclick="PRIMA.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>';
+    }
+    html += '<button class="btn secondary mt-1" onclick="PRIMA.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="PRIMA.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){
+    html += '<button class="btn" onclick="PRIMA.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>';
+  }else{
+    html += '<button class="btn secondary" disabled>✓ Read</button>';
+  }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    html += '<button class="btn secondary" onclick="PRIMA.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>';
+  }
+  html += '</div>';
+  
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+// ============== PROJECT PROMETHEUS ==============
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Budget:</span><span class="val">$50M</span></div>';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'OPERATIONAL' : 'IN DEVELOPMENT') + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to the project scenario. Phases unlock sequentially as you complete the corresponding training modules. Make the principled choice to proceed.</p>';
+  
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    const unlocked = S.modules[p.moduleId].unlocked;
+    const active = !solved && unlocked;
+    
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="PRIMA.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info">';
+    html += '<div class="phase-title">' + p.title + '</div>';
+    html += '<div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div>';
+    html += '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  
+  let html = '<div class="lesson-back" onclick="PRIMA.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div>';
+  html += '</div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="PRIMA.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PATH') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'prometheus: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="PRIMA.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){
+      actions.innerHTML = '<button class="btn success" onclick="PRIMA.show(\'dashboard\')">View Final Report →</button>';
+    }
+    else { actions.innerHTML = '<button class="btn" onclick="PRIMA.show(\'modules\')">Continue Training →</button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="PRIMA.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="PRIMA.showProjectPhase(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== DRILLS ==============
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => {
+    btn.onclick = () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderDrills();
+    };
+  });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="PRIMA.show(\'arena\')">Arena →</button></div>';
+    return;
+  }
+  
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="PRIMA.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div>';
+  html += '<div>Axis: <b>' + module.codename + '</b></div>';
+  html += '<div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="PRIMA.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="PRIMA.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="PRIMA.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="PRIMA.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="PRIMA.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+// ============== ARENA ==============
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  
+  let html = '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Problems:</span><span class="val">' + ARENA.filter(p => S.modules[p.moduleId].problemSolved).length + '/' + ARENA.length + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Arena XP:</span><span class="val">' + (S.daily.solved * 100) + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Pick a scenario. Each problem tests one axis. Read the situation, choose the most principled action. Explanations reveal the reasoning. Timed mode.</p>';
+  
+  ARENA.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.modules[p.moduleId].problemSolved;
+    const unlocked = S.modules[p.moduleId].unlocked;
+    html += '<div class="lesson-row' + (solved ? ' read' : '') + '" style="margin-bottom:0.75rem" ' + (unlocked ? 'onclick="PRIMA.showArenaProblem(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="info" style="flex:1"><div class="text-xs text-dim" style="letter-spacing:0.2em;margin-bottom:0.3rem">// ' + m.codename + (solved ? ' · SOLVED' : '') + '</div><div style="font-family:var(--display);font-size:1rem">' + p.title + '</div></div>';
+    html += '<div class="status">' + (unlocked ? (solved ? 'Review' : 'Start') : 'Locked') + '</div>';
+    html += '</div>';
+  });
+  
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.modules[p.moduleId].problemSolved;
+  
+  let html = '<div class="lesson-back" onclick="PRIMA.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+100 XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Time Limit:</span><span class="val" style="color:var(--amber)">' + p.timeLimit + 's</span></div>';
+  html += '</div>';
+  
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="PRIMA.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){
+      clearInterval(arenaTimer);
+      if(problemState === 'idle'){ answerProblem(-1); }
+    }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ PRINCIPLED' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.modules[p.moduleId].problemSolved){
+      S.modules[p.moduleId].problemSolved = true;
+      S.daily.solved += 1;
+      addXP(100, 'arena: ' + p.id);
+      if(moduleProgress(p.moduleId).completed){
+        unlockNextModule(p.moduleId);
+        html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+100 XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>';
+      }else{
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+100 XP</div>';
+      }
+      flashCombo('+100 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try the next problem.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = ARENA.find(a => !S.modules[a.moduleId].problemSolved && S.modules[a.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="PRIMA.showArenaProblem(\''+next.id+'\')">Next Problem →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="PRIMA.show(\'dashboard\')">Dashboard →</button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="PRIMA.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="PRIMA.showArenaProblem(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== STATS ==============
+function renderStats(){
+  renderTopbar();
+  
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => {
+    if(c.interval >= 21) mature++;
+    else if(c.interval >= 7) young++;
+    else if(c.interval >= 1) learning++;
+    else newCards++;
+  });
+  
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){
+    const correctCount = recent.filter(h => h.correct).length;
+    document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%';
+  }else{ document.getElementById('statRetention').textContent = '--'; }
+  
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){
+    log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>';
+  }else{
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+// ============== PARTICLES ==============
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')';
+      ctx.fill();
+    });
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){
+    if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; }
+  }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){
+    const map = { '1': 1, '2': 3, '3': 4, '4': 5 };
+    if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); }
+  }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); }
+  }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); }
+  }
+});
+
+// ============== RESET & NAV ==============
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error');
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { showView(item.dataset.view); });
+});
+
+// ============== BOOT ==============
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = [
+    'Initializing cognitive architecture v5.0...',
+    'Loading first-principles kernel...',
+    'Calibrating SM-2 spaced repetition engine...',
+    'Mounting Pareto priority queue...',
+    'Indexing 10 axes / 48 cards / 10 scenarios...',
+    'Initializing Project Prometheus...',
+    'PRIMA online.'
+  ];
+  
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      setTimeout(() => {
+        document.getElementById('boot').classList.add('fade');
+        document.getElementById('app').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('boot').style.display = 'none';
+          showView('dashboard');
+        }, 800);
+      }, 300);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+// ============== PUBLIC API ==============
+window.PRIMA = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase
+};
+
+// ============== INIT ==============
+function init(){
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
