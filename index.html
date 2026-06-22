@@ -350,5 +350,117 @@ document.addEventListener('click', (e) => {
 
 window.HUB = { setTheme };
 </script>
+<!-- Feedback Button -->
+<div id="feedback-fab" style="position:fixed;bottom:2rem;right:2rem;z-index:90;background:transparent;border:1px solid var(--border-bright);color:var(--text-dim);padding:0.5rem 1rem;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;transition:all 0.2s;">Feedback</div>
+
+<!-- Feedback Modal -->
+<div id="feedback-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;justify-content:center;align-items:center;backdrop-filter:blur(5px);">
+  <div style="background:var(--panel-solid);border:1px solid var(--cyan);padding:2rem;max-width:500px;width:90%;border-radius:8px;position:relative;">
+    <span id="close-feedback" style="position:absolute;top:1rem;right:1rem;cursor:pointer;color:var(--text-dim);font-size:1.2rem;">&times;</span>
+    <h3 style="font-family:var(--display);color:var(--cyan);margin-bottom:1.5rem;letter-spacing:0.1em;">// Transmit Feedback</h3>
+    
+    <div style="display:grid;gap:1.5rem;">
+      <!-- Q1: Issues -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label style="font-size:0.85rem;">Any issues or bugs?</label>
+          <div>
+            <button class="fb-yn" data-q="issue" data-a="yes">Yes</button>
+            <button class="fb-yn" data-q="issue" data-a="no">No</button>
+          </div>
+        </div>
+        <textarea id="fb-issue" style="display:none;width:100%;margin-top:0.5rem;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.75rem;border-radius:4px;font-family:var(--mono);font-size:0.8rem;" placeholder="Describe the issue..."></textarea>
+      </div>
+
+      <!-- Q2: Features -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label style="font-size:0.85rem;">Any features you want added?</label>
+          <div>
+            <button class="fb-yn" data-q="feature" data-a="yes">Yes</button>
+            <button class="fb-yn" data-q="feature" data-a="no">No</button>
+          </div>
+        </div>
+        <textarea id="fb-feature" style="display:none;width:100%;margin-top:0.5rem;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.75rem;border-radius:4px;font-family:var(--mono);font-size:0.8rem;" placeholder="Describe the feature..."></textarea>
+      </div>
+
+      <!-- Q3: Courses -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label style="font-size:0.85rem;">Any courses you want to learn?</label>
+          <div>
+            <button class="fb-yn" data-q="course" data-a="yes">Yes</button>
+            <button class="fb-yn" data-q="course" data-a="no">No</button>
+          </div>
+        </div>
+        <textarea id="fb-course" style="display:none;width:100%;margin-top:0.5rem;background:var(--void);border:1px solid var(--border);color:var(--text);padding:0.75rem;border-radius:4px;font-family:var(--mono);font-size:0.8rem;" placeholder="Describe the course..."></textarea>
+      </div>
+    </div>
+
+    <button id="submit-feedback" style="width:100%;margin-top:1.5rem;background:var(--cyan);color:var(--void);border:none;padding:0.75rem;font-family:var(--mono);font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px;letter-spacing:0.1em;">Submit to GitHub</button>
+  </div>
+</div>
+
+<style>
+.fb-yn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 0.2rem 0.6rem; border-radius: 2px; cursor: pointer; font-family: var(--mono); font-size: 0.7rem; margin-left: 0.5rem; }
+.fb-yn.selected { background: var(--cyan); color: var(--void); border-color: var(--cyan); }
+</style>
+
+<script>
+(function(){
+  const fab = document.getElementById('feedback-fab');
+  const modal = document.getElementById('feedback-modal');
+  const closeBtn = document.getElementById('close-feedback');
+  const submitBtn = document.getElementById('submit-feedback');
+  
+  // REPLACE THESE WITH YOUR ACTUAL GITHUB DETAILS
+  const GH_USER = 'YOUR_GITHUB_USERNAME'; 
+  const GH_REPO = 'YOUR_REPO_NAME';
+
+  // Show modal
+  fab.onclick = () => { modal.style.display = 'flex'; };
+  closeBtn.onclick = () => { modal.style.display = 'none'; };
+
+  // Handle Yes/No toggles
+  document.querySelectorAll('.fb-yn').forEach(btn => {
+    btn.onclick = () => {
+      const q = btn.dataset.q;
+      const a = btn.dataset.a;
+      // Reset buttons in group
+      document.querySelectorAll(`.fb-yn[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      
+      const textarea = document.getElementById('fb-' + q);
+      if(a === 'yes'){ textarea.style.display = 'block'; }
+      else { textarea.style.display = 'none'; textarea.value = ''; }
+    };
+  });
+
+  // Submit to GitHub
+  submitBtn.onclick = () => {
+    let issueBody = "## Feedback Submission\n\n";
+    let hasContent = false;
+
+    const issueText = document.getElementById('fb-issue').value.trim();
+    const featureText = document.getElementById('fb-feature').value.trim();
+    const courseText = document.getElementById('fb-course').value.trim();
+
+    if(issueText){ issueBody += `### Issues\n${issueText}\n\n`; hasContent = true; }
+    if(featureText){ issueBody += `### Feature Requests\n${featureText}\n\n`; hasContent = true; }
+    if(courseText){ issueBody += `### Course Requests\n${courseText}\n\n`; hasContent = true; }
+
+    if(!hasContent){
+      alert("Please provide some feedback first!");
+      return;
+    }
+
+    const title = "Feedback: " + (issueText ? "Issue reported" : featureText ? "Feature requested" : "Course requested");
+    const url = `https://github.com/${GH_USER}/${GH_REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(issueBody)}`;
+    
+    window.open(url, '_blank');
+    modal.style.display = 'none';
+  };
+})();
+</script>
 </body>
 </html>
