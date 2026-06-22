@@ -7,29 +7,49 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 <style>
   :root {
-    --void: #050810; --panel: rgba(15,10,26,0.7); 
-    --cyan: #00D9FF; --magenta: #FF2D9C; --green: #00FFA3; --amber: #FFB800;
-    --text: #E6E6FA; --text-dim: #7A6E94;
-    --display: 'Segoe UI', Helvetica, sans-serif;
+    --void: #050810; --panel: rgba(15,10,26,0.7); --panel-solid: #140E24;
+    --cyan: #00D9FF; --magenta: #FF2D9C; --green: #00FFA3; --amber: #FFB800; --red: #FF3355;
+    --text: #E6E6FA; --text-dim: #7A6E94; --text-faint: #4A4060;
+    --border: rgba(157,78,221,0.2); --border-bright: rgba(157,78,221,0.5);
+    --display: 'Chakra Petch', sans-serif; --mono: 'JetBrains Mono', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%),
                 radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%),
                 var(--void);
-    color: var(--text); font-family: var(--display); min-height: 100vh; padding: 2rem;
+    color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem;
   }
   header { text-align: center; margin-bottom: 2rem; }
-  h1 { font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
+  h1 { font-family: var(--display); font-size: 3rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 20px rgba(0,217,255,0.4); margin-bottom: 0.5rem; }
   .sub { color: var(--text-dim); font-size: 0.9rem; letter-spacing: 0.3em; text-transform: uppercase; }
   
-  .global-stats { max-width: 800px; margin: 0 auto 3rem; text-align: center; background: var(--panel); border: 1px solid var(--magenta); padding: 2rem; border-radius: 8px; box-shadow: 0 0 30px rgba(255,45,156,0.1); }
-  .global-label { font-size: 0.8rem; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; }
-  .global-value { font-size: 3rem; font-weight: 700; color: var(--cyan); text-shadow: 0 0 15px rgba(0,217,255,0.5); }
-  .global-sub { font-size: 0.9rem; color: var(--green); margin-top: 0.5rem; }
+  .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; }
+  @media(max-width: 800px) { .hub-grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; position: relative; backdrop-filter: blur(8px); border-radius: 4px; }
+  .panel::before { content:''; position:absolute; top:-1px; left:-1px; width:18px; height:18px; border-top:1px solid var(--cyan); border-left:1px solid var(--cyan); }
+  .panel::after { content:''; position:absolute; bottom:-1px; right:-1px; width:18px; height:18px; border-bottom:1px solid var(--cyan); border-right:1px solid var(--cyan); }
+  .panel-label { font-size: 0.6rem; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 1rem; }
+
+  .global-stats { text-align: center; }
+  .global-value { font-family: var(--display); font-size: 3.5rem; font-weight: 700; color: var(--cyan); text-shadow: 0 0 15px rgba(0,217,255,0.5); line-height: 1; }
+  .global-sub { font-size: 0.85rem; color: var(--green); margin-top: 0.5rem; letter-spacing: 0.1em; }
+
+  .profile-card { text-align: center; }
+  .profile-title { font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: var(--magenta); letter-spacing: 0.1em; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,45,156,0.4); }
+  .profile-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
   
+  .radar-wrap { display: flex; align-items: center; justify-content: center; padding: 1rem 0; }
+  .radar-svg { width: 100%; max-width: 300px; height: auto; }
+  .radar-axis { stroke: rgba(157,78,221,0.15); stroke-width: 1; }
+  .radar-ring { fill: none; stroke: rgba(157,78,221,0.08); stroke-width: 1; }
+  .radar-poly { fill: rgba(0,217,255,0.15); stroke: var(--cyan); stroke-width: 2; filter: drop-shadow(0 0 8px rgba(0,217,255,0.5)); transition: all 0.8s ease; }
+  .radar-label { font-family: var(--display); font-size: 10px; fill: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+  .radar-label.active { fill: var(--cyan); }
+
   .domain-section { max-width: 1000px; margin: 0 auto 3rem; }
-  .domain-title { font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
+  .domain-title { font-family: var(--display); font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
   
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
   
@@ -42,10 +62,12 @@
   a:hover { transform: translateY(-4px); border-color: var(--cyan); box-shadow: 0 10px 30px rgba(0,217,255,0.1); }
   
   .app-header { display: flex; justify-content: space-between; align-items: center; }
-  .app-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
-  .app-level { font-size: 0.8rem; font-weight: 700; color: var(--amber); border: 1px solid var(--amber); padding: 0.2rem 0.5rem; border-radius: 2px; }
+  .app-title { font-family: var(--display); font-size: 1.4rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
+  .app-level { font-size: 0.75rem; font-weight: 700; color: var(--amber); border: 1px solid var(--amber); padding: 0.2rem 0.5rem; border-radius: 2px; font-family: var(--mono); }
   .app-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; flex: 1; }
-  .app-tag { font-size: 0.7rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; }
+  .app-tag { font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; display: flex; justify-content: space-between; }
+  .maturity-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+  .maturity-fill { height: 100%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); transition: width 0.8s; }
   
   .locked { opacity: 0.3; pointer-events: none; }
   
@@ -58,10 +80,30 @@
     <div class="sub">Interactive Training Simulators</div>
   </header>
 
-  <div class="global-stats" id="globalStats">
-    <div class="global-label">// Global Operator Level</div>
-    <div class="global-value" id="globalLevel">1</div>
-    <div class="global-sub" id="globalXp">0 Total XP</div>
+  <div class="hub-grid">
+    <div class="panel global-stats">
+      <div class="panel-label">// Global Operator Level</div>
+      <div class="global-value" id="globalLevel">1</div>
+      <div class="global-sub" id="globalXp">0 Total XP</div>
+    </div>
+    <div class="panel profile-card">
+      <div class="panel-label">// Operator Profile</div>
+      <div class="profile-title" id="profTitle">UNRANKED</div>
+      <div class="profile-desc" id="profDesc">Begin training in any discipline to determine your cognitive profile.</div>
+    </div>
+  </div>
+
+  <div class="hub-grid">
+    <div class="panel">
+      <div class="panel-label">// Global Mastery Matrix</div>
+      <div class="radar-wrap">
+        <svg class="radar-svg" viewBox="-130 -130 260 260" id="hubRadarSvg"></svg>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-label">// Discipline Breakdown</div>
+      <div id="masteryList" style="display:grid; gap:1rem;"></div>
+    </div>
   </div>
 
   <div class="domain-section">
@@ -81,44 +123,172 @@
 
 <script>
 const APPS = [
-  { id: 'prima', name: 'PRIMA', domain: 'engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
-  { id: 'nash', name: 'NASH', domain: 'strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v1', href: 'nash.html' },
-  { id: 'oracle', name: 'ORACLE', domain: 'ai', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v1', href: 'oracle.html' }
+  { id: 'prima', name: 'PRIMA', domain: 'engineering', axisName: 'Engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
+  { id: 'nash', name: 'NASH', domain: 'strategy', axisName: 'Strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v1', href: 'nash.html' },
+  { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v1', href: 'oracle.html' }
 ];
 
 function getLevel(xp) { return Math.floor(Math.sqrt(xp/100)) + 1; }
+function getMaturity(interval) { return Math.min(100, Math.log(interval + 1) / Math.log(30) * 100); }
 
 let totalXP = 0;
+let appData = [];
 
 APPS.forEach(app => {
   const savedData = localStorage.getItem(app.storageKey);
   let xp = 0;
   let level = 1;
+  let maturity = 0;
+  
   if (savedData) {
     try {
       const parsed = JSON.parse(savedData);
       xp = parsed.xp || 0;
       level = getLevel(xp);
       totalXP += xp;
+      
+      if (parsed.cards) {
+        let totalMat = 0;
+        let count = 0;
+        Object.values(parsed.cards).forEach(c => {
+          totalMat += getMaturity(c.interval);
+          count++;
+        });
+        maturity = count > 0 ? Math.round(totalMat / count) : 0;
+      }
     } catch(e) {}
   }
   
+  appData.push({ ...app, xp, level, maturity });
+});
+
+// Render App Cards
+appData.forEach(app => {
   const grid = document.getElementById(app.domain + '-grid');
   const card = document.createElement('a');
   card.href = app.href;
   card.innerHTML = `
     <div class="app-header">
       <div class="app-title">${app.name}</div>
-      <div class="app-level">LVL ${level}</div>
+      <div class="app-level">LVL ${app.level}</div>
     </div>
     <div class="app-desc">${app.desc}</div>
-    <div class="app-tag">${app.tag} · ${xp} XP</div>
+    <div class="app-tag">
+      <span>${app.tag}</span>
+      <span>${app.xp} XP</span>
+    </div>
+    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>
   `;
   grid.appendChild(card);
 });
 
+// Render Global Stats
 document.getElementById('globalLevel').textContent = getLevel(totalXP);
 document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
+
+// Render Hub Radar
+function drawHubRadar() {
+  const svg = document.getElementById('hubRadarSvg');
+  svg.innerHTML = '';
+  const n = appData.length;
+  const R = 95;
+  
+  // Rings
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  // Axes
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  // Mastery Polygon
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * (appData[i].maturity / 100);
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  // Labels
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = appData[i].axisName;
+    if(appData[i].maturity > 50) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+drawHubRadar();
+
+// Render Mastery List
+const masteryList = document.getElementById('masteryList');
+appData.forEach(app => {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid; grid-template-columns:100px 1fr 40px; gap:1rem; align-items:center; font-size:0.85rem;';
+  const cls = app.maturity < 30 ? 'var(--red)' : (app.maturity < 70 ? 'var(--amber)' : 'var(--cyan)');
+  row.innerHTML = `
+    <span style="color:var(--text-dim); font-family:var(--display); font-size:0.8rem;">${app.axisName}</span>
+    <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
+      <div style="height:100%; width:${app.maturity}%; background:${cls}; box-shadow:0 0 6px ${cls}; transition:width 0.8s;"></div>
+    </div>
+    <span style="color:var(--text-dim); text-align:right; font-family:var(--display);">${app.maturity}%</span>
+  `;
+  masteryList.appendChild(row);
+});
+
+// Calculate Robust Operator Profile
+let maturities = appData.map(a => a.maturity);
+let minMat = Math.min(...maturities);
+let maxMat = Math.max(...maturities);
+let avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length;
+let diff = maxMat - minMat;
+
+let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
+
+if (totalXP > 0) {
+  if (avgMat < 15) {
+    profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape, but remains unbalanced. Keep pushing.' };
+  } else if (maxMat > 75 && minMat < 20) {
+    profile = { title: 'ULTRA-SPECIALIST', desc: 'You have achieved deep mastery in one domain while neglecting the others. A laser focus, but vulnerable to blind spots. Diversify your training.' };
+  } else if (avgMat > 75 && diff < 20) {
+    profile = { title: 'RENAISSANCE OPERATOR', desc: 'You are a true Centaur. Highly balanced and deeply mastered across all disciplines. The ultimate competitive moat.' };
+  } else if (avgMat > 40 && diff < 30) {
+    profile = { title: 'POLYMATH', desc: 'You are building a robust latticework. Your mastery is balanced and growing across multiple domains. Continue the ascent.' };
+  } else if (diff > 40) {
+    profile = { title: 'FRAGMENTED THINKER', desc: 'Your mastery is highly imbalanced. You have spikes of brilliance but deep valleys. Shore up your weaknesses to unlock synthesis.' };
+  } else {
+    profile = { title: 'OPERATOR', desc: 'You are progressing steadily. Continue pushing the boundaries of your mastery across all axes.' };
+  }
+}
+
+document.getElementById('profTitle').textContent = profile.title;
+document.getElementById('profDesc').textContent = profile.desc;
+
 </script>
 </body>
 </html>
