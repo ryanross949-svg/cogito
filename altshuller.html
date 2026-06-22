@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // ALTSHULLER v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">ALTSHULLER</div><div class="boot-sub">Cogito // TRIZ Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">ALTSHULLER</div><div class="brand-tag">INVENTIVE ALGORITHM</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="ALTSHULLER.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="ALTSHULLER.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="ALTSHULLER.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="ALTSHULLER.setTheme('light')">Light</button><button class="theme-option" onclick="ALTSHULLER.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Invention</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="ALTSHULLER.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of inventive problem solving. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: INVENTION</h1><p class="section-sub">A cumulative scenario. Apply TRIZ to invent a new product.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About ALTSHULLER</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>ALTSHULLER is a cognitive training simulator designed to install the inventive thinking patterns of TRIZ (Theory of Inventive Problem Solving). It turns the "magic" of creativity into a hard, algorithmic science.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Invention require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>CONTRADICT</strong> — Physical vs Technical contradictions, breaking trade-offs</li>
+          <li><strong>IFR</strong> — Ideal Final Result, systems evolving to disappear</li>
+          <li><strong>RESOLVE</strong> — Separation principles (Space, Time, Condition)</li>
+          <li><strong>PRINCIPLES</strong> — The 40 Inventive Principles (Segmentation, Asymmetry)</li>
+          <li><strong>DYNAMISM</strong> — Increasing flexibility and controllability</li>
+          <li><strong>MATR</strong> — The Contradiction Matrix and 39 parameters</li>
+          <li><strong>EVOLUTION</strong> — Trends of technical system evolution (S-curves)</li>
+          <li><strong>SUBSTANCE</strong> — Su-Field modeling (Substance-Field analysis)</li>
+          <li><strong>NATURE</strong> — Using natural resources and effects</li>
+          <li><strong>INVENT</strong> — ARIZ (Algorithm of Inventive Problem Solving)</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'CONTRADICT', title:'The Contradiction', summary:'Identifying contradictions and breaking trade-offs.', lesson:{ title:'The Architecture of Innovation', body: 'Genrich Altshuller analyzed thousands of patents and discovered that true innovation only occurs when a contradiction is resolved. If you make a car heavier for safety, it becomes slower (a trade-off). True innovation makes it safer AND lighter.\n\n## Technical vs Physical Contradictions\n\nA Technical Contradiction is a trade-off between two parameters (e.g., strength vs weight). A Physical Contradiction is when one part requires opposite states (e.g., the needle of a syringe must be sharp to pierce skin, but dull to avoid pain once inside).\n\n## The TRIZ Philosophy\n\nDo not accept trade-offs. If you are compromising, you are not innovating. You must resolve the contradiction by separating the opposing requirements in space, time, or condition.\n\n## The Method\n\n1. **Identify the trade-off.** What gets worse when you improve the desired parameter?\n2. **Formulate the contradiction.** "The X must be [A] to achieve Y, but must be [not-A] to achieve Z."\n3. **Do not compromise.** Look for a separation principle.', takeaways:['True innovation requires resolving contradictions, not making trade-offs.','Technical Contradiction: trade-off between two parameters.','Physical Contradiction: one part requires opposite states.','Do not accept compromise. Separate the opposing requirements.','Identify the contradiction before looking for a solution.'] } },
+  { id:'m2', codename:'IFR', title:'The Ideal Final Result', summary:'Systems evolve to deliver function without existing.', lesson:{ title:'The Architecture of Ideality', body: 'The Ideal Final Result (IFR) is the theoretical endpoint of system evolution. A system becomes more ideal as it performs its function with less mass, less size, less energy, and less cost.\n\n## The Ultimate IFR\n\nThe ultimate IFR is when the system disappears entirely, but the function is still performed. "The system performs its function without existing."\n\nExamples: The eraser evolved from a separate block to a metal ferrule holding it on a pencil, to a graphite pencil that erases by friction. The function (erasing) remains, but the part (separate eraser) disappeared.\n\n## The Method\n\n1. **Define the function.** What is the system actually doing? (A drill does not make holes; it transfers rotational energy to displace material).\n2. **Ask the IFR question.** "How can the system perform this function by itself, without adding new parts?"\n3. **Work backwards.** The IFR is unreachable, but it points the direction of innovation.', takeaways:['IFR: The system performs its function without existing.','Ideality increases as function stays constant and mass/cost decreases.','Define the primary function, not the tool.','Ask: "How can the system do this by itself?"','The IFR is a compass direction, not a destination.'] } },
+  { id:'m3', codename:'RESOLVE', title:'Separation Principles', summary:'Resolving physical contradictions in space, time, and condition.', lesson:{ title:'The Architecture of Resolution', body: 'When you face a Physical Contradiction (a part must be both A and not-A), you resolve it by separating the opposing requirements.\n\n## Separation in Space\n\nThe needle of a syringe is sharp outside the skin to pierce, but smooth inside the vein to avoid damaging it. The requirement (sharp vs smooth) is separated by location.\n\n## Separation in Time\n\nA traffic light is red to stop traffic, green to allow it. The requirement (stop vs go) is separated by time.\n\n## Separation in Condition\n\nA thermometer measures temperature, but the mercury must expand to do so. The requirement (solid/stable vs liquid/expanding) is separated by condition (temperature changes state).\n\n## Separation in System Level\n\nThe whole system is A, but the parts are not-A. A bicycle chain is rigid (to transfer force) as a system, but flexible (to bend around gears) as individual links.\n\n## The Method\n\n1. **Formulate the Physical Contradiction.** Part X must be A to do Y, and not-A to do Z.\n2. **Ask: Can we separate in Space?**\n3. **Ask: Can we separate in Time?**\n4. **Ask: Can we separate by Condition?**', takeaways:['Resolve Physical Contradictions by separating opposing requirements.','Separation in Space: A here, not-A there.','Separation in Time: A now, not-A later.','Separation in Condition: A under X, not-A under Y.','Separation in System Level: Whole is A, parts are not-A.'] } },
+  { id:'m4', codename:'PRINCIPLES', title:'The 40 Principles', summary:'Segmentation, asymmetry, local quality, and more.', lesson:{ title:'The Architecture of Invention', body: 'Altshuller extracted 40 Inventive Principles from patents. These are the most common ways inventors have resolved contradictions.\n\n## Principle 1: Segmentation\n\nDivide an object into independent parts. Make an object sectional (Lego bricks). Increase the degree of fragmentation (liquid vs powder).\nExample: Instead of one large radiator, use many small fins to increase surface area for cooling.\n\n## Principle 2: Taking Out\n\nSeparate the interfering part or property from the object.\nExample: Put a noisy compressor outside the building, and pipe the cold air in. The function (cooling) stays, the nuisance (noise) is separated.\n\n## Principle 3: Local Quality\n\nMake each part of an object function in conditions most suitable for its operation.\nExample: A pencil with an eraser. A tool with different hardness at the edge vs the handle.\n\n## The Method\n\n1. **Identify the contradiction.**\n2. **Consult the 40 Principles.**\n3. **Apply the principle as a prompt.** "How can I segment this?" "What can I take out?"', takeaways:['40 Inventive Principles are the most common resolution patterns.','Segmentation: Divide into parts, make sectional, or fragment.','Taking Out: Separate the interfering part from the function.','Local Quality: Optimize each part for its local condition.','Use principles as creative prompts to resolve contradictions.'] } },
+  { id:'m5', codename:'DYNAMISM', title:'Increasing Dynamism', summary:'Rigid to flexible to fluid to field.', lesson:{ title:'The Architecture of Flexibility', body: 'Technical systems evolve from rigid to dynamic. A rigid system cannot adapt; a dynamic system can.\n\n## The Evolution Path\n\n1. **Rigid:** A solid shaft.\n2. **Hinged:** A universal joint.\n3. **Flexible:** A flexible cable.\n4. **Fluid/Field:** A magnetic field transmitting torque.\n\nAs systems become more dynamic, they require less material and adapt to more conditions.\n\n## Examples\n\n- Fixed flashlight -> Flashlight with swivel head.\n- Rigid bicycle frame -> Suspension frame.\n- Solid mirror -> Adjustable mirror -> Liquid mirror -> Digital mirror (field).\n\n## The Method\n\n1. **Identify a rigid element.**\n2. **Ask: Can it be hinged?**\n3. **Ask: Can it be flexible?**\n4. **Ask: Can it be replaced by a fluid or field?**', takeaways:['Systems evolve from rigid to dynamic.','Evolution path: Rigid -> Hinged -> Flexible -> Fluid -> Field.','Dynamic systems adapt to more conditions with less material.','Look for rigid parts and ask how they can flex.','Replace physical links with fields (magnetic, optical) for ultimate dynamism.'] } },
+  { id:'m6', codename:'MATR', title:'The Contradiction Matrix', summary:'Mapping 39 parameters to 40 principles.', lesson:{ title:'The Architecture of the Matrix', body: 'The Contradiction Matrix is a 39x39 grid. It maps the 39 standard engineering parameters against each other to suggest which of the 40 Inventive Principles are most likely to resolve the contradiction.\n\n## The 39 Parameters\n\nThese include things like: Weight of moving object, Length, Area, Volume, Speed, Force, Temperature, Reliability, Manufacturability.\n\n## How to Use It\n\n1. **Identify what you want to improve.** (e.g., Speed - Parameter 9)\n2. **Identify what gets worse.** (e.g., Force/Power - Parameter 10)\n3. **Look up the intersection** in the matrix.\n4. **The cell gives you 3-4 principles** most likely to resolve this specific trade-off.\n\n## The Insight\n\nYou do not need to guess. Someone has likely solved this exact trade-off before, and the matrix tells you how.', takeaways:['The Matrix maps 39 parameters against each other.','It suggests which of the 40 Principles to use for a specific trade-off.','Step 1: What to improve. Step 2: What gets worse. Step 3: Look up.','It turns brainstorming into a directed search.','You do not need to guess; the pattern already exists.'] } },
+  { id:'m7', codename:'EVOLUTION', title:'Trends of Evolution', summary:'S-curves, coordination, and increasing interactions.', lesson:{ title:'The Architecture of Trends', body: 'Technical systems evolve according to predictable trends, not random chance.\n\n## S-Curves\n\nA system starts as an invention (slow improvement), enters a growth phase (rapid optimization), reaches maturity (diminishing returns), and declines. Understanding where your product is on the S-curve tells you whether to optimize or re-invent.\n\n## Trend: Coordination of Parts\n\nParts must be coordinated in frequency, rhythm, and action. A printer head moving while the paper moves at a mismatched speed causes jitter. They must be synchronized.\n\n## Trend: Increasing Interactions\n\nSystems evolve to have more interactions between parts. A simple wheel evolved to a wheel with brakes, then suspension, then traction control, then regenerative braking.\n\n## The Method\n\n1. **Plot your product on the S-curve.** Are you optimizing or re-inventing?\n2. **Check coordination.** Are parts out of sync?\n3. **Look for missing interactions.** What could be linked that isn\'t?', takeaways:['Systems evolve along predictable S-curves (Invention, Growth, Maturity, Decline).','Where are you on the curve? Optimize in growth; re-invent in maturity.','Trend: Parts must coordinate in frequency and action.','Trend: Systems increase the number of interactions between parts.','Predict the next stage of evolution rather than waiting for it.'] } },
+  { id:'m8', codename:'SUBSTANCE', title:'Su-Field Modeling', summary:'Substance-Field analysis and adding fields.', lesson:{ title:'The Architecture of Fields', body: 'A Su-Field (Substance-Field) model is a minimal functional model of a technical system. It consists of a Substance (object), a Field (energy), and an interaction.\n\n## The Triangle\n\nS1 (Tool) acts on S2 (Product) via F (Field). Example: A hammer (S1) drives a nail (S2) via mechanical force (F).\n\n## Incomplete Su-Field\n\nIf you have S2 (the nail) but no S1 or F, the system is incomplete. You need to add the missing element.\n\n## Destructive/Ineffective\n\nIf the hammer is too soft, the action is ineffective. TRIZ provides 76 standard solutions to fix Su-Field models.\n\n## Standard Solution 1: Add a Field\n\nIf you cannot break a rock with a hammer (mechanical field), add a thermal field (heat it) or a chemical field (acid).\n\n## The Method\n\n1. **Model the system as S1, S2, F.**\n2. **Is it incomplete?** Add the missing element.\n3. **Is it ineffective?** Change or add a field.', takeaways:['Su-Field models a system as Substance (Tool), Substance (Product), and Field (Energy).','Incomplete models need a missing element added.','Ineffective models need a field change or addition.','If mechanical force fails, try thermal, chemical, or magnetic fields.','Visualizing the triangle reveals where the system is broken.'] } },
+  { id:'m9', codename:'NATURE', title:'Natural Resources', summary:'Using existing fields, substances, and effects.', lesson:{ title:'The Architecture of the Environment', body: 'Innovators often introduce new substances or energy to solve a problem. TRIZ says: use what is already there.\n\n## Existing Fields\n\nGravity, atmospheric pressure, earth magnetism, solar radiation, thermal gradients. Before adding a motor, ask if gravity can do the work.\n\n## Existing Substances\n\nAir, water, waste. Can you use the water you are pumping out of a mine to power a hydraulic drill?\n\n## Geometric Effects\n\nA sphere distributes stress evenly. A parabola focuses light. A spiral increases surface area.\n\n## Phase Transitions\n\nWater turning to steam expands 1600x. This is a massive energy source used in steam engines and sterilization.\n\n## The Method\n\n1. **Identify the problem.** (I need to move liquid up).\n2. **Look at the environment.** (Is there a thermal gradient? Gravity?).\n3. **Use a natural effect.** (Capillary action, convection, siphon).', takeaways:['Use existing resources: gravity, magnetism, air, water, waste.','Do not add new parts if the environment can provide the function.','Leverage geometric effects (spheres, spirals, parabolas).','Use phase transitions (water to steam) for massive energy.','Ask: "What is already here that I can use?"'] } },
+  { id:'m10', codename:'INVENT', title:'ARIZ', summary:'Algorithm of Inventive Problem Solving.', lesson:{ title:'The Architecture of ARIZ', body: 'ARIZ (Algorithm of Inventive Problem Solving) is the ultimate TRIZ tool. It is a step-by-step process for solving impossible problems that cannot be solved by the 40 principles alone.\n\n## The Mini-Problem\n\nARIZ starts by formulating the "mini-problem": "Everything remains as is, but the harmful effect disappears."\n\n## The Zones of Conflict\n\nIdentify exactly where and when the conflict happens. Narrow it down to the smallest space and time.\n\n## The X-Element\n\nIntroduce an "X-element" - an undefined resource that must resolve the conflict without adding cost. You define what it must do, then search for it.\n\n## Smart Little People\n\nImagine microscopic people inside the system. How would they fix the problem? (e.g., little people holding the paint to the brush).\n\n## The Method\n\n1. **Formulate the mini-problem.** (Change nothing, remove harm).\n2. **Define the zone of conflict.** (Where/when does it happen?).\n3. **Define the X-element.** (What must it do?).\n4. **Use Smart Little People.** (Visualize the microscopic solution).', takeaways:['ARIZ is the step-by-step algorithm for impossible problems.','Step 1: Formulate the mini-problem. (Keep everything, remove harm).','Step 2: Define the zone of conflict (smallest space/time).','Step 3: Define the X-element (what must it do?).','Step 4: Use Smart Little People to visualize the solution.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is a Technical Contradiction?',back:'A trade-off between two parameters. Improving one causes the other to worsen (e.g., strength vs weight).'},
+  {id:'c2',moduleId:'m1',core:true,category:'concept',front:'What is a Physical Contradiction?',back:'When one part requires opposite states (e.g., a needle must be sharp to pierce, but dull to avoid pain).'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What is the TRIZ philosophy on trade-offs?',back:'Do not accept them. True innovation resolves the contradiction without compromise.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'How do you formulate a Physical Contradiction?',back:'"The X must be [A] to achieve Y, but must be [not-A] to achieve Z."'},
+  {id:'c5',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "If you are compromising, you are..."',back:'"...not innovating."'},
+  {id:'c6',moduleId:'m1',core:false,category:'concept',front:'True innovation only occurs when what is resolved?',back:'A contradiction.'},
+  {id:'c7',moduleId:'m1',core:false,category:'application',front:'Car is heavy for safety, but light for speed. What is this?',back:'A Technical Contradiction (trade-off between parameters).'},
+  {id:'c8',moduleId:'m1',core:false,category:'application',front:'Umbrella must be large to cover, but small to carry. What is this?',back:'A Physical Contradiction (one part requires opposite states).'},
+  {id:'c9',moduleId:'m1',core:false,category:'concept',front:'What is the first step of TRIZ problem solving?',back:'Identify the contradiction before looking for a solution.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is the difference between a trade-off and a contradiction?',back:'A trade-off accepts the compromise. A contradiction demands a resolution.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'A cup must be hot to keep coffee warm, but cool to hold. What type of contradiction?',back:'Physical Contradiction.'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Do not accept..."',back:'"...trade-offs."'},
+  
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is the Ideal Final Result (IFR)?',back:'The system performs its function without existing.'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'How does a system become more ideal?',back:'It performs its function with less mass, less size, less energy, and less cost.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is the Ultimate IFR?',back:'The system disappears entirely, but the function is still performed.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'A drill does not make holes. What does it do?',back:'It transfers rotational energy to displace material. (Define the function, not the tool).'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'How did the eraser evolve toward IFR?',back:'From a separate block -> attached to pencil -> graphite pencil that erases by friction (tool disappeared).'},
+  {id:'c18',moduleId:'m2',core:false,category:'quote',front:'Complete the IFR question: "How can the system perform this function..."',back:'"...by itself, without adding new parts?"'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'Is the IFR a destination or a compass?',back:'A compass direction. It is unreachable but points the way.'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'A seatbelt restricts movement to save lives, but restricts comfort. What is the IFR?',back:'The seatbelt protects without existing (e.g., active safety systems that prevent crashes).'},
+  {id:'c21',moduleId:'m2',core:false,category:'concept',front:'What is the primary function of an umbrella?',back:'To deflect rain. (The stick and fabric are just implementations).'},
+  {id:'c22',moduleId:'m2',core:false,category:'application',front:'How can a car be more ideal?',back:'Make it lighter (less mass) while maintaining safety and speed.'},
+  {id:'c23',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Ideality increases as function stays constant and..."',back:'"...mass/cost decreases."'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'Why define the primary function rather than the tool?',back:'Because the tool is often an imperfect implementation of the function. Defining the function opens new paths.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'How do you resolve a Physical Contradiction?',back:'By separating the opposing requirements in Space, Time, or Condition.'},
+  {id:'c26',moduleId:'m3',core:true,category:'concept',front:'What is Separation in Space?',back:'The part is A in one location, and not-A in another. (e.g., syringe needle: sharp outside, smooth inside).'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'What is Separation in Time?',back:'The part is A at one time, and not-A at another. (e.g., traffic light: red then green).'},
+  {id:'c28',moduleId:'m3',core:false,category:'concept',front:'What is Separation by Condition?',back:'The part is A under condition X, and not-A under condition Y. (e.g., mercury changes state with temperature).'},
+  {id:'c29',moduleId:'m3',core:false,category:'application',front:'A bicycle chain is rigid to transfer force, but flexible to bend. What separation is this?',back:'Separation in System Level (Whole is rigid, parts are flexible).'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'A windshield must be transparent to see, but opaque to block UV. What separation?',back:'Separation by Condition (transparent to visible light, opaque to UV).'},
+  {id:'c31',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Resolve Physical Contradictions by..."',back:'"...separating opposing requirements."'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'What is Separation in System Level?',back:'The whole system has property A, but the components have property not-A.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'A coffee cup must be hot to keep coffee warm, but cool to hold. Resolve it.',back:'Separation in Space: A handle that stays cool while the cup stays hot.'},
+  {id:'c34',moduleId:'m3',core:false,category:'application',front:'A tent must be waterproof for rain, but breathable for sweat. Resolve it.',back:'Separation by Condition: Gore-Tex (waterproof to liquid, breathable to vapor).'},
+  {id:'c35',moduleId:'m3',core:false,category:'concept',front:'Why is compromise not allowed in TRIZ?',back:'Because compromise means you failed to separate the contradiction.'},
+  {id:'c36',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "A here, not-A there" describes...',back:'"...Separation in Space."'},
+  
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What are the 40 Inventive Principles?',back:'The most common ways inventors have resolved contradictions, extracted from patents.'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'What is Principle 1: Segmentation?',back:'Divide an object into independent parts. Make it sectional or increase fragmentation.'},
+  {id:'c39',moduleId:'m4',core:false,category:'application',front:'Example of Segmentation?',back:'Instead of one large radiator, use many small fins to increase surface area for cooling.'},
+  {id:'c40',moduleId:'m4',core:false,category:'concept',front:'What is Principle 2: Taking Out?',back:'Separate the interfering part or property from the object.'},
+  {id:'c41',moduleId:'m4',core:false,category:'application',front:'Example of Taking Out?',back:'Put a noisy compressor outside the building, pipe the cold air in. (Function stays, nuisance leaves).'},
+  {id:'c42',moduleId:'m4',core:false,category:'concept',front:'What is Principle 3: Local Quality?',back:'Make each part of an object function in conditions most suitable for its operation.'},
+  {id:'c43',moduleId:'m4',core:false,category:'application',front:'Example of Local Quality?',back:'A pencil with an eraser. A tool with different hardness at the edge vs the handle.'},
+  {id:'c44',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Divide an object into independent parts" is...',back:'"...Segmentation."'},
+  {id:'c45',moduleId:'m4',core:false,category:'concept',front:'How do you use the 40 Principles?',back:'As creative prompts. "How can I segment this?" "What can I take out?"'},
+  {id:'c46',moduleId:'m4',core:false,category:'application',front:'A ship hull is smooth to reduce drag, but rough to prevent barnacles. What principle?',back:'Local Quality (or Porous Materials / Dynamism).'},
+  {id:'c47',moduleId:'m4',core:false,category:'concept',front:'Where did Altshuller find the 40 Principles?',back:'By analyzing thousands of patents.'},
+  {id:'c48',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Separate the interfering part from the function" is...',back:'"...Taking Out."'},
+  
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'How do technical systems evolve regarding rigidity?',back:'From rigid to dynamic (flexible).'},
+  {id:'c50',moduleId:'m5',core:true,category:'concept',front:'What is the evolution path of dynamism?',back:'Rigid -> Hinged -> Flexible -> Fluid -> Field.'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'Example of increasing dynamism?',back:'Fixed flashlight -> Flashlight with swivel head. Solid shaft -> Universal joint -> Flexible cable.'},
+  {id:'c52',moduleId:'m5',core:false,category:'concept',front:'Why do systems become more dynamic?',back:'Dynamic systems adapt to more conditions with less material.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'How to apply increasing dynamism?',back:'Identify a rigid element. Ask: Can it be hinged? Flexible? Replaced by a fluid or field?'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'A solid mirror -> adjustable mirror -> liquid mirror. What trend?',back:'Increasing Dynamism.'},
+  {id:'c55',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Replace physical links with..."',back:'"...fields (magnetic, optical)."'},
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'What is the ultimate dynamism?',back:'Replacing physical parts with fields (e.g., magnetic torque instead of a shaft).'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'A rigid bicycle frame evolves to...?',back:'A suspension frame (hinged/flexible).'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'What is the benefit of moving from Rigid to Hinged?',back:'It allows angular adjustment and shock absorption.'},
+  {id:'c59',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Systems evolve from rigid to..."',back:'"...dynamic."'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'A fixed gear train -> magnetic coupling. What evolution?',back:'Rigid -> Field.'},
+  
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the Contradiction Matrix?',back:'A 39x39 grid mapping parameters to suggest which of the 40 Principles to use.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'How many standard engineering parameters are in the Matrix?',back:'39 (e.g., weight, speed, force, temperature).'},
+  {id:'c63',moduleId:'m6',core:false,category:'application',front:'How do you use the Matrix?',back:'1. Identify what to improve. 2. Identify what gets worse. 3. Look up the intersection.'},
+  {id:'c64',moduleId:'m6',core:false,category:'concept',front:'What does the Matrix cell contain?',back:'3-4 Inventive Principles most likely to resolve that specific trade-off.'},
+  {id:'c65',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "You do not need to guess;..."',back:'"...the pattern already exists."'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'What is the insight behind the Matrix?',back:'Someone has likely solved this exact trade-off before; the matrix tells you how.'},
+  {id:'c67',moduleId:'m6',core:false,category:'application',front:'You want to improve Speed (9), but Force (10) gets worse. What do you do?',back:'Look up the intersection of 9 and 10 in the Matrix.'},
+  {id:'c68',moduleId:'m6',core:false,category:'concept',front:'What does the Matrix turn brainstorming into?',back:'A directed search.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "The Matrix maps..."',back:'"...parameters against each other."'},
+  {id:'c70',moduleId:'m6',core:false,category:'application',front:'If you improve "Reliability", what might get worse?',back:'Complexity or Manufacturability (other parameters).'},
+  {id:'c71',moduleId:'m6',core:false,category:'concept',front:'Who created the Contradiction Matrix?',back:'Genrich Altshuller.'},
+  {id:'c72',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "The Matrix tells you..."',back:'"...how to resolve this specific trade-off."'},
+  
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is an S-Curve in technical evolution?',back:'The lifecycle: Invention -> Growth -> Maturity -> Decline.'},
+  {id:'c74',moduleId:'m7',core:true,category:'concept',front:'What is the trend of Coordination of Parts?',back:'Parts must be coordinated in frequency, rhythm, and action to avoid jitter.'},
+  {id:'c75',moduleId:'m7',core:false,category:'application',front:'How do you use S-Curves?',back:'Plot your product. If in Growth, optimize. If in Maturity, re-invent.'},
+  {id:'c76',moduleId:'m7',core:false,category:'concept',front:'What is the trend of Increasing Interactions?',back:'Systems evolve to have more interactions between parts (e.g., wheel -> brake -> suspension -> traction control).'},
+  {id:'c77',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Systems evolve along predictable..."',back:'"...S-curves."'},
+  {id:'c78',moduleId:'m7',core:false,category:'concept',front:'What happens in the Maturity phase?',back:'Diminishing returns. Optimization yields less and less improvement.'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'A printer head moves while paper moves at a mismatched speed. What trend is violated?',back:'Coordination of Parts.'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'When should you re-invent rather than optimize?',back:'When the product is in the Maturity phase of the S-curve.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Parts must be coordinated in..."',back:'"...frequency, rhythm, and action."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What does increasing interactions mean?',back:'Linking previously separate parts or functions.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'A simple wheel evolved to have brakes and suspension. What trend?',back:'Increasing Interactions.'},
+  {id:'c84',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Predict the next stage of..."',back:'"...evolution rather than waiting for it."'},
+  
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is a Su-Field model?',back:'A minimal model: Substance (Tool) acts on Substance (Product) via Field (Energy).'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'What are the 3 elements of a Su-Field?',back:'S1 (Tool), S2 (Product), F (Field).'},
+  {id:'c87',moduleId:'m8',core:false,category:'application',front:'Example of Su-Field?',back:'A hammer (S1) drives a nail (S2) via mechanical force (F).'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What is an Incomplete Su-Field?',back:'When S1, S2, or F is missing. The system cannot function.'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'How do you fix an Incomplete Su-Field?',back:'Add the missing element.'},
+  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'What is a Destructive/Ineffective Su-Field?',back:'When the field is present but insufficient (e.g., hammer too soft).'},
+  {id:'c91',moduleId:'m8',core:false,category:'application',front:'Standard Solution: If you cannot break a rock with a hammer (mechanical), what do you do?',back:'Add a Field (e.g., thermal: heat it; chemical: acid).'},
+  {id:'c92',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "If mechanical force fails, try..."',back:'"...thermal, chemical, or magnetic fields."'},
+  {id:'c93',moduleId:'m8',core:false,category:'concept',front:'How many standard solutions does TRIZ provide for Su-Field models?',back:'76.'},
+  {id:'c94',moduleId:'m8',core:false,category:'application',front:'Visualizing the S1-S2-F triangle reveals what?',back:'Where the system is broken.'},
+  {id:'c95',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Substance (Tool), Substance (Product), and..."',back:'"...Field (Energy)."'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'Why use Su-Field modeling?',back:'It reduces complex systems to their fundamental functional interactions.'},
+  
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What does TRIZ say about introducing new substances/energy?',back:'Do not. Use what is already there.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What are Existing Fields?',back:'Gravity, atmospheric pressure, earth magnetism, solar radiation, thermal gradients.'},
+  {id:'c99',moduleId:'m9',core:false,category:'application',front:'Example of using an Existing Substance?',back:'Using water pumped out of a mine to power a hydraulic drill.'},
+  {id:'c100',moduleId:'m9',core:false,category:'concept',front:'What are Geometric Effects?',back:'A sphere distributes stress. A parabola focuses light. A spiral increases surface area.'},
+  {id:'c101',moduleId:'m9',core:false,category:'application',front:'Example of a Phase Transition?',back:'Water turning to steam expands 1600x. (Used in steam engines/sterilization).'},
+  {id:'c102',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Do not add new parts if..."',back:'"...the environment can provide the function."'},
+  {id:'c103',moduleId:'m9',core:false,category:'application',front:'How to apply Natural Resources?',back:'1. Identify problem. 2. Look at environment (gravity, water). 3. Use a natural effect (siphon, convection).'},
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'What are Existing Substances?',back:'Air, water, waste.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Ask: What is already here that..."',back:'"...I can use?"'},
+  {id:'c106',moduleId:'m9',core:false,category:'application',front:'Before adding a motor to move liquid up, what should you ask?',back:'Can gravity or a thermal gradient (convection) do it?'},
+  {id:'c107',moduleId:'m9',core:false,category:'concept',front:'Why use natural resources?',back:'They are free, already present, and do not add complexity.'},
+  {id:'c108',moduleId:'m9',core:false,category:'application',front:'A parabola is used in a satellite dish. What geometric effect is this?',back:'Focusing light/radio waves.'},
+  
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is ARIZ?',back:'Algorithm of Inventive Problem Solving. A step-by-step process for impossible problems.'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'What is the Mini-Problem in ARIZ?',back:'"Everything remains as is, but the harmful effect disappears."'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'What are the Zones of Conflict?',back:'The exact smallest space and time where the conflict happens.'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'What is the X-Element?',back:'An undefined resource that must resolve the conflict without adding cost. You define what it must do, then search for it.'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'What is the Smart Little People method?',back:'Imagine microscopic people inside the system. How would they fix the problem?'},
+  {id:'c114',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Keep everything, remove harm" describes the...',back:'"...Mini-Problem."'},
+  {id:'c115',moduleId:'m10',core:false,category:'application',front:'How do you use the X-Element?',back:'1. Define what it must do. 2. Search existing resources to fill that role.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'Why narrow the Zone of Conflict?',back:'Because the smaller the space/time, the easier it is to find a resource to solve it.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Visualize the microscopic solution" is...',back:'"...Smart Little People."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'When do you use ARIZ instead of the 40 Principles?',back:'When the problem is impossible to solve with direct principles and needs deep contradiction modeling.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'Example of Smart Little People?',back:'Little people holding the paint to the brush so it doesn\'t drip.'},
+  {id:'c120',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "ARIZ is the step-by-step algorithm for..."',back:'"...impossible problems."'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: The Trade-off', difficulty:1, reward:50, timeLimit:45, body:'You make a car heavier for safety, but it becomes slower. What is this?', options:['A Physical Contradiction','A Technical Contradiction (trade-off)','An Ideal Final Result','A Separation Principle'], correct:1, explanation:'A trade-off between two parameters (safety/weight vs speed) is a Technical Contradiction. TRIZ says do not accept this; resolve it.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Opposite', difficulty:2, reward:100, timeLimit:60, body:'A needle must be sharp to pierce skin, but dull to avoid pain inside. What is this?', options:['A Technical Contradiction','A Physical Contradiction (one part requires opposite states)','A trade-off','A natural resource'], correct:1, explanation:'When one part requires opposite states, it is a Physical Contradiction. It must be resolved by separation.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The TRIZ Rule', difficulty:3, reward:200, timeLimit:90, body:'Your boss says "We need to compromise between strength and weight." What is the TRIZ response?', options:['Accept the compromise.','Do not accept trade-offs. Resolve the contradiction.','Find a cheaper material.','Reduce the weight limit.'], correct:1, explanation:'TRIZ philosophy: If you are compromising, you are not innovating. Look for a separation principle to resolve it.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Formulation', difficulty:4, reward:500, timeLimit:120, body:'Formulate the Physical Contradiction for an umbrella (large to cover, small to carry).', options:['"The umbrella is large."','"The umbrella must be large to cover, but small to carry."','"The umbrella is heavy."','"The umbrella must be waterproof."'], correct:1, explanation:'"X must be [A] to achieve Y, but must be [not-A] to achieve Z." This formulation guides the search for separation.' },
+  
+  { id:'p5', moduleId:'m2', title:'Q1: The Function', difficulty:1, reward:50, timeLimit:45, body:'What is the primary function of a drill?', options:['To make holes','To transfer rotational energy to displace material','To spin fast','To hold drill bits'], correct:1, explanation:'Defining the function (energy transfer), not the tool (making holes), opens new paths to the IFR.' },
+  { id:'p6', moduleId:'m2', title:'Q2: The IFR', difficulty:2, reward:100, timeLimit:60, body:'What is the Ideal Final Result (IFR)?', options:['The system is as cheap as possible.','The system performs its function without existing.','The system is very fast.','The system uses solar power.'], correct:1, explanation:'The ultimate IFR is when the system disappears entirely, but the function is still performed.' },
+  { id:'p7', moduleId:'m2', title:'Q3: The Eraser', difficulty:3, reward:200, timeLimit:90, body:'How did the eraser evolve toward IFR?', options:['It got bigger.','It became a separate block.','It attached to the pencil, then was replaced by graphite friction (tool disappeared).','It became electric.'], correct:2, explanation:'From separate block -> attached to pencil -> graphite pencil. The function (erasing) remains, the part (separate eraser) disappeared.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Compass', difficulty:4, reward:500, timeLimit:120, body:'Why is the IFR called a "compass direction" rather than a destination?', options:['Because it involves magnets.','Because it is unreachable but points the way innovation should go.','Because it is theoretical physics.','Because it changes over time.'], correct:1, explanation:'You will never reach a system with zero mass, but striving toward it reduces mass and cost. It directs the search.' },
+  
+  { id:'p9', moduleId:'m3', title:'Q1: Separation', difficulty:1, reward:50, timeLimit:45, body:'How do you resolve a Physical Contradiction?', options:['By compromising.','By separating the opposing requirements in Space, Time, or Condition.','By increasing cost.','By ignoring it.'], correct:1, explanation:'Separation is the core resolution mechanism. Do not compromise; separate.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Space vs Time', difficulty:2, reward:100, timeLimit:60, body:'A traffic light is red to stop, green to go. What separation is this?', options:['Separation in Space','Separation in Time','Separation by Condition','Separation in System Level'], correct:1, explanation:'The requirement (stop vs go) is separated by time. A now, not-A later.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Syringe', difficulty:3, reward:200, timeLimit:90, body:'A syringe needle is sharp outside the skin, but smooth inside. What separation is this?', options:['Separation in Space','Separation in Time','Separation by Condition','Separation in System Level'], correct:0, explanation:'The requirement (sharp vs smooth) is separated by location. A here, not-A there.' },
+  { id:'p12', moduleId:'m3', title:'Q4: The Chain', difficulty:4, reward:500, timeLimit:120, body:'A bicycle chain is rigid to transfer force, but flexible to bend. What separation is this?', options:['Separation in Space','Separation in Time','Separation by Condition','Separation in System Level (Whole vs Parts)'], correct:3, explanation:'The whole system is rigid, but the individual parts (links) are flexible. This is System Level separation.' },
+  
+  { id:'p13', moduleId:'m4', title:'Q1: Segmentation', difficulty:1, reward:50, timeLimit:45, body:'Instead of one large radiator, use many small fins. What principle?', options:['Taking Out','Segmentation','Local Quality','Dynamism'], correct:1, explanation:'Segmentation: Divide an object into independent parts to increase surface area.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Taking Out', difficulty:2, reward:100, timeLimit:60, body:'Put a noisy compressor outside, pipe cold air in. What principle?', options:['Segmentation','Taking Out','Local Quality','Dynamism'], correct:1, explanation:'Taking Out: Separate the interfering part (noise) from the function (cooling).' },
+  { id:'p15', moduleId:'m4', title:'Q3: Local Quality', difficulty:3, reward:200, timeLimit:90, body:'A tool has different hardness at the edge vs the handle. What principle?', options:['Segmentation','Taking Out','Local Quality','Dynamism'], correct:2, explanation:'Local Quality: Make each part function in conditions most suitable for its operation.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The 40', difficulty:4, reward:500, timeLimit:120, body:'Where did Altshuller find the 40 Inventive Principles?', options:['In a dream.','By analyzing thousands of patents.','From Aristotle.','In quantum mechanics.'], correct:1, explanation:'They are empirical patterns extracted from the patent database. Innovation has structure.' },
+  
+  { id:'p17', moduleId:'m5', title:'Q1: Evolution Path', difficulty:1, reward:50, timeLimit:45, body:'What is the evolution path of dynamism?', options:['Rigid -> Hinged -> Flexible -> Fluid -> Field','Field -> Fluid -> Flexible','Heavy -> Light','Solid -> Liquid'], correct:0, explanation:'Systems evolve from rigid to dynamic, ultimately replacing physical links with fields.' },
+  { id:'p18', moduleId:'m5', title:'Q2: The Flashlight', difficulty:2, reward:100, timeLimit:60, body:'A fixed flashlight evolves into one with a swivel head. What trend?', options:['Segmentation','Increasing Dynamism','Local Quality','Taking Out'], correct:1, explanation:'Moving from Rigid to Hinged is the first step of Increasing Dynamism.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Ultimate Dynamism', difficulty:3, reward:200, timeLimit:90, body:'What is the ultimate dynamism (end of the evolution path)?', options:['A liquid system','A flexible system','Replacing physical parts with fields (magnetic, optical)','A very small system'], correct:2, explanation:'Replacing physical parts with fields allows infinite flexibility and zero mass.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Why Dynamic?', difficulty:4, reward:500, timeLimit:120, body:'Why do systems become more dynamic?', options:['It is cheaper.','They adapt to more conditions with less material.','It is a law of nature.','It looks better.'], correct:1, explanation:'Dynamic systems adapt to more conditions with less material, increasing ideality.' },
+  
+  { id:'p21', moduleId:'m6', title:'Q1: The Matrix', difficulty:1, reward:50, timeLimit:45, body:'What is the Contradiction Matrix?', options:['A 39x39 grid mapping parameters to principles','A table of elements','A list of 40 principles','A math formula'], correct:0, explanation:'It maps 39 standard parameters against each other to suggest which principles to use.' },
+  { id:'p22', moduleId:'m6', title:'Q2: How to Use', difficulty:2, reward:100, timeLimit:60, body:'How do you use the Matrix?', options:['Guess randomly.','1. Identify what to improve. 2. What gets worse. 3. Look up intersection.','Read all 40 principles.','Build a prototype.'], correct:1, explanation:'It turns brainstorming into a directed search. The cell gives you the most likely principles.' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Insight', difficulty:3, reward:200, timeLimit:90, body:'What is the insight behind the Matrix?', options:['Innovation is random.','Someone has likely solved this exact trade-off before; the matrix tells you how.','You must be a genius to invent.','All problems are unique.'], correct:1, explanation:'Patterns repeat. The matrix leverages the collective invention of thousands of patents.' },
+  { id:'p24', moduleId:'m6', title:'Q4: The Cell', difficulty:4, reward:500, timeLimit:120, body:'What does a Matrix cell contain?', options:['A single solution.','3-4 Inventive Principles most likely to resolve that specific trade-off.','A math equation.','A list of materials.'], correct:1, explanation:'It gives you directed prompts, not exact answers. You still have to apply the principle.' },
+  
+  { id:'p25', moduleId:'m7', title:'Q1: S-Curve', difficulty:1, reward:50, timeLimit:45, body:'What is an S-Curve in technical evolution?', options:['A curved road','The lifecycle: Invention -> Growth -> Maturity -> Decline','A mathematical curve','A trend line'], correct:1, explanation:'Systems evolve along predictable S-curves. Knowing where you are dictates strategy.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Coordination', difficulty:2, reward:100, timeLimit:60, body:'A printer head moves while paper moves at a mismatched speed. What trend is violated?', options:['Increasing Interactions','Coordination of Parts','S-Curve','Dynamism'], correct:1, explanation:'Parts must be coordinated in frequency, rhythm, and action to avoid jitter.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Strategy', difficulty:3, reward:200, timeLimit:90, body:'Your product is in the Maturity phase (diminishing returns). What should you do?', options:['Optimize harder.','Re-invent the system (start a new S-curve).','Abandon the project.','Copy competitors.'], correct:1, explanation:'In Maturity, optimization yields little. You must re-invent to jump to a new S-curve.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Interactions', difficulty:4, reward:500, timeLimit:120, body:'A simple wheel evolved to have brakes, then suspension, then traction control. What trend?', options:['Coordination of Parts','Increasing Dynamism','Increasing Interactions','Local Quality'], correct:2, explanation:'Systems evolve to have more interactions between parts. Linking previously separate functions.' },
+  
+  { id:'p29', moduleId:'m8', title:'Q1: Su-Field', difficulty:1, reward:50, timeLimit:45, body:'What are the 3 elements of a Su-Field model?', options:['S1 (Tool), S2 (Product), F (Field)','Mass, Energy, Time','Input, Process, Output','Strength, Weight, Speed'], correct:0, explanation:'Substance (Tool) acts on Substance (Product) via Field (Energy).' },
+  { id:'p30', moduleId:'m8', title:'Q2: Incomplete', difficulty:2, reward:100, timeLimit:60, body:'You have S2 (the nail) but no S1 or F. What is this?', options:['An Ideal Final Result','An Incomplete Su-Field','A contradiction','A natural resource'], correct:1, explanation:'The system is incomplete. You must add the missing element (hammer/mechanical force) to function.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Ineffective', difficulty:3, reward:200, timeLimit:90, body:'A hammer (S1) is too soft to break a rock (S2) via mechanical force (F). What do you do?', options:['Add a Field (e.g., thermal: heat it; chemical: acid)','Buy a bigger hammer','Give up','Use a different S2'], correct:0, explanation:'If the current field is ineffective, change or add a field. Try thermal or chemical.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Purpose', difficulty:4, reward:500, timeLimit:120, body:'Why use Su-Field modeling?', options:['It reduces complex systems to their fundamental functional interactions.','It is required by law.','It looks impressive.','It calculates cost.'], correct:0, explanation:'It reduces complexity to a triangle, revealing exactly where the system is broken.' },
+  
+  { id:'p33', moduleId:'m9', title:'Q1: Existing Fields', difficulty:1, reward:50, timeLimit:45, body:'Which of these is an "Existing Field" in TRIZ?', options:['A newly built motor','Gravity','A purchased battery','A custom chemical'], correct:1, explanation:'Use what is already there: gravity, atmospheric pressure, earth magnetism, solar radiation.' },
+  { id:'p34', moduleId:'m9', title:'Q2: Existing Substances', difficulty:2, reward:100, timeLimit:60, body:'You need to power a drill in a mine. What Existing Substance can you use?', options:['Imported diesel','The water you are already pumping out of the mine (hydraulic power)','A new battery','A long extension cord'], correct:1, explanation:'Use existing substances: air, water, waste. The pumped water can power the drill.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Phase Transition', difficulty:3, reward:200, timeLimit:90, body:'Water turning to steam expands 1600x. What is this an example of?', options:['A geometric effect','A natural resource','A phase transition (massive energy source)','An S-curve'], correct:2, explanation:'Phase transitions (water to steam) provide massive energy. Used in steam engines and sterilization.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Rule', difficulty:4, reward:500, timeLimit:120, body:'TRIZ says: Do not add new substances/energy. What should you do?', options:['Use what is already there','Buy the cheapest option','Invent a new material','Stop innovating'], correct:0, explanation:'Do not add new parts if the environment can provide the function. Use existing fields and substances.' },
+  
+  { id:'p37', moduleId:'m10', title:'Q1: ARIZ', difficulty:1, reward:50, timeLimit:45, body:'What is ARIZ?', options:['A type of patent','Algorithm of Inventive Problem Solving','A Russian name','A material'], correct:1, explanation:'ARIZ is the step-by-step algorithm for solving impossible problems that defy the 40 principles.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Mini-Problem', difficulty:2, reward:100, timeLimit:60, body:'What is the Mini-Problem in ARIZ?', options:['"Everything remains as is, but the harmful effect disappears."','"Make it smaller."','"Reduce cost by 10%."','"Ignore the problem."'], correct:0, explanation:'The Mini-Problem defines the goal: keep everything, remove harm. It prevents scope creep.' },
+  { id:'p39', moduleId:'m10', title:'Q3: X-Element', difficulty:3, reward:200, timeLimit:90, body:'What is the X-Element?', options:['A new expensive material','An undefined resource that must resolve the conflict without adding cost','A type of field','A mathematical variable'], correct:1, explanation:'You define what the X-element must do, then search existing resources to fill that role.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Smart Little People', difficulty:4, reward:500, timeLimit:120, body:'What is the Smart Little People method?', options:['Hire small engineers.','Imagine microscopic people inside the system fixing the problem.','A children\'s book','A statistical method'], correct:1, explanation:'Visualize microscopic people (e.g., holding paint to a brush so it doesn\'t drip) to solve the problem.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Hot Cup', scenario:'You are designing a coffee cup. It must be hot to keep coffee warm, but cool to hold. A competitor used a handle (separation in space). You want to beat them. What is the TRIZ approach?', options:['Accept the trade-off and use a handle.','Formulate the Physical Contradiction: "The cup wall must be hot inside to retain heat, but cool outside to hold." Do not compromise.','Make the cup thicker (worsens heat retention).','Use cheaper plastic.'], correct:1, explanation:'Do not jump to solutions. First, formulate the Physical Contradiction. This guides you to separation principles (e.g., condition: thermochromic materials, or air gaps).' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The IFR', scenario:'The cup still needs to keep coffee hot. What is the Ideal Final Result?', options:['A cup with perfect insulation.','The cup disappears, but the coffee stays hot (e.g., a self-heating container that dissolves).','A metal thermos.','A very large cup.'], correct:1, explanation:'IFR: The system performs its function without existing. The cup disappears, but the function (keeping coffee hot) remains.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Separation', scenario:'You decide the cup wall must be hot inside, cool outside. Which separation principle applies?', options:['Separation in Time','Separation in Space (e.g., an air gap between walls)','Separation by Condition','Separation in System Level'], correct:1, explanation:'Separation in Space: A here (inside), not-A there (outside). A double-walled cup with a vacuum gap achieves this.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: Principle', scenario:'You want to make the cup lighter without losing strength. Which 40 Principle helps?', options:['Segmentation (make it in pieces)','Local Quality (different material in different zones)','Taking Out (remove material where it isn\'t needed)','Dynamism'], correct:2, explanation:'Taking Out: Remove the interfering part (excess material) while keeping the function (structure). Think corrugated cardboard.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: Dynamism', scenario:'The cup must be rigid to hold liquid, but collapsible to carry. What trend applies?', options:['Increasing Dynamism (Rigid -> Hinged -> Flexible)','Segmentation','Local Quality','S-Curve'], correct:0, explanation:'Increasing Dynamism. Evolve from a rigid cup to a hinged/foldable cup, or a flexible silicone cup.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Matrix', scenario:'You want to improve "Shape" (Parameter 12) but "Manufacturability" (Parameter 32) gets worse. What do you do?', options:['Guess a solution.','Look up the 12x32 intersection in the Contradiction Matrix for suggested principles.','Compromise on shape.','Read all 40 principles.'], correct:1, explanation:'Use the Matrix. It maps 39 parameters to suggest the most likely principles for this exact trade-off.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: Evolution', scenario:'Your cup product is in the Maturity phase. Competitors are copying you. What do you do?', options:['Optimize the current cup (diminishing returns).','Re-invent the cup (start a new S-curve, e.g., edible cups).','Lower the price.','Abandon the market.'], correct:1, explanation:'In Maturity, optimization yields little. Re-invent to jump to a new S-curve. Edible cups or self-heating cups are new curves.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: Su-Field', scenario:'The cup (S1) holds coffee (S2) via mechanical force (F). But the coffee cools (harmful effect). How do you model this?', options:['It is an Ideal System.','It is an Ineffective Su-Field. Add a Field (e.g., thermal: chemical heater).','Remove S2.','Change S1 to glass.'], correct:1, explanation:'The mechanical holding is fine, but thermal retention is ineffective. Add a thermal field (e.g., exothermic chemical pad) to the model.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: Nature', scenario:'You need to cool the coffee faster before drinking. What Existing Resource can you use?', options:['Import ice.','The ambient air (convection) or the cup\'s own evaporation (phase transition).','A refrigerator.','A fan.'], correct:1, explanation:'Use existing fields/substances. Evaporation cools (phase transition). Air convection cools. Do not add new parts.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: ARIZ', scenario:'You face an impossible problem: The cup must dissolve instantly in water (eco-friendly) but survive hot coffee. What is the ARIZ Mini-Problem?', options:['"Make it out of sugar."','"Everything remains as is, but the harmful effect (dissolving in coffee) disappears."','"Use a new plastic."','"Accept the trade-off."'], correct:1, explanation:'Mini-Problem: Keep everything (dissolves in water), remove harm (dissolves in coffee). Define the X-element that separates the conditions.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Contradiction Hunt', body:'Find a product you use. Identify a Technical Contradiction (trade-off). Do not accept it. Formulate the Physical Contradiction.' },
+  { id:'rw2', title:'The IFR Question', body:'Pick a tool. Define its primary function. Ask: "How can it perform this by itself, without existing?"' },
+  { id:'rw3', title:'The Space/Time Split', body:'Find a part requiring opposite states. Can you separate them in Space or Time?' },
+  { id:'rw4', title:'Segmentation', body:'Take a rigid object. How could you segment it to make it more adaptable?' },
+  { id:'rw5', title:'Taking Out', body:'Find a nuisance in a system (noise, heat). Can you take it out while keeping the function?' },
+  { id:'rw6', title:'Dynamism', body:'Find a rigid part. How could it be hinged, flexible, or replaced by a field?' },
+  { id:'rw7', title:'The Matrix', body:'Next time you face a trade-off, use the 39 parameters. Look up the intersection in the Matrix.' },
+  { id:'rw8', title:'S-Curve', body:'Plot your product or skill on the S-curve. Are you optimizing or re-inventing?' },
+  { id:'rw9', title:'Su-Field', body:'Model a system as S1, S2, F. Is it incomplete or ineffective? Add a field.' },
+  { id:'rw10', title:'Nature', body:'Before adding a motor or battery, ask: Can gravity, air, or water do the work?' },
+  { id:'rw11', title:'The Mini-Problem', body:'Face a complex problem. Formulate the mini-problem: "Keep everything, remove harm."' },
+  { id:'rw12', title:'Smart Little People', body:'Visualize microscopic people inside the system. How would they fix it?' },
+  { id:'rw13', title:'Local Quality', body:'Find a uniform object. How could you make each part suit its local condition?' },
+  { id:'rw14', title:'Increasing Interactions', body:'Find two separate parts. How could they interact to improve the system?' },
+  { id:'rw15', title:'Phase Transition', body:'How could you use water turning to steam (or ice melting) to solve a problem?' },
+  { id:'rw16', title:'The X-Element', body:'Define an X-element for a problem. What must it do? Search existing resources.' },
+  { id:'rw17', title:'Zone of Conflict', body:'Narrow a problem to the smallest space and time. Where exactly does the conflict happen?' },
+  { id:'rw18', title:'No Compromise', body:'Catch yourself compromising today. Stop. Look for a separation principle.' },
+  { id:'rw19', title:'The Function', body:'Stop thinking about the tool. Define the function. "It transfers energy," not "it makes holes."' },
+  { id:'rw20', title:'The Compass', body:'Use the IFR as a compass. What is the direction of ideality for your project?' },
+  { id:'rw21', title:'Existing Field', body:'Identify a task requiring energy. Can gravity or atmospheric pressure provide it?' },
+  { id:'rw22', title:'Existing Substance', body:'Identify a waste product. Can it be used as a resource for another function?' },
+  { id:'rw23', title:'Coordination', body:'Find two parts out of sync. How can you coordinate their rhythm?' },
+  { id:'rw24', title:'Re-invent', body:'If you are in maturity, stop optimizing. Brainstorm a radical re-invention.' },
+  { id:'rw25', title:'The Triangle', body:'Draw the Su-Field triangle for a problem. Is it broken?' },
+  { id:'rw26', title:'Geometric Effect', body:'Use a sphere, parabola, or spiral to solve a mechanical problem.' },
+  { id:'rw27', title:'Separation by Condition', body:'Find a part that must be A and not-A. Can a condition (temperature, light) trigger the change?' },
+  { id:'rw28', title:'System Level', body:'Find a rigid system. Can the parts be flexible while the whole remains rigid?' },
+  { id:'rw29', title:'Directed Search', body:'Do not brainstorm randomly. Use the 40 Principles as prompts.' },
+  { id:'rw30', title:'The Harm', body:'Identify a harmful effect. How can it disappear without changing anything else?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your inventive profile.' },
+  { threshold: 500, title: 'APPRENTICE', desc: 'You see contradictions where others see compromise.' },
+  { threshold: 1500, title: 'INVENTOR', desc: 'You apply the 40 principles to resolve trade-offs.' },
+  { threshold: 3000, title: 'ARCHITECT', desc: 'You model systems with Su-Field and aim for the IFR.' },
+  { threshold: 6000, title: 'TRIZ MASTER', desc: 'You algorithmically solve impossible problems using ARIZ.' }
+];
+
+const STORAGE_KEY = 'altshuller-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// INVENTION ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Invention. You now possess the complete TRIZ architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Creativity is not magic; it is an algorithm. By identifying contradictions, separating them in space/time/condition, and leveraging the 40 principles, you can invent on demand. The Ideal Final Result is your compass. ARIZ is your algorithm. You are now an Inventor.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Invention: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your inventive architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="ALTSHULLER.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="ALTSHULLER.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="ALTSHULLER.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="ALTSHULLER.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="ALTSHULLER.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="ALTSHULLER.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="ALTSHULLER.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="ALTSHULLER.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'INVENTED' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each inventive axis to design a new product. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="ALTSHULLER.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="ALTSHULLER.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="ALTSHULLER.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'invention: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="ALTSHULLER.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="ALTSHULLER.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="ALTSHULLER.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="ALTSHULLER.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="ALTSHULLER.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="ALTSHULLER.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="ALTSHULLER.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="ALTSHULLER.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="ALTSHULLER.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="ALTSHULLER.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="ALTSHULLER.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="ALTSHULLER.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="ALTSHULLER.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="ALTSHULLER.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="ALTSHULLER.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="ALTSHULLER.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="ALTSHULLER.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="ALTSHULLER.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'altshuller_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing inventive architecture v1.0...', 'Loading TRIZ kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Invention...', 'ALTSHULLER online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.ALTSHULLER = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
