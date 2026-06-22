@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // CHOMSKY v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗣️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08050F; --void-2:#0F0A1A; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24;
+  --cyan:#FF2D9C; --cyan-dim:#B388D9; --magenta:#00D9FF; --amber:#FFB300; --green:#00FFA3; --red:#FF3355;
+  --text:#E6E6FA; --text-dim:#7A6E94; --text-faint:#4A4060;
+  --border:rgba(0,217,255,0.2); --border-bright:rgba(0,217,255,0.5);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(8,5,15,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(8,5,15,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">CHOMSKY</div><div class="boot-sub">Cogito // Syntax & Structure Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">CHOMSKY</div><div class="brand-tag">UNIVERSAL GRAMMAR</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="CHOMSKY.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="CHOMSKY.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="CHOMSKY.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="CHOMSKY.setTheme('light')">Light</button><button class="theme-option" onclick="CHOMSKY.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Tower of Babel</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Language is the OS of human thought. Train your syntax.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="CHOMSKY.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of linguistic architecture. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: TOWER OF BABEL</h1><p class="section-sub">A cumulative scenario. Construct an artificial language and interface.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About CHOMSKY</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>CHOMSKY is a cognitive training simulator designed to install the linguistic and structural thinking patterns used by Noam Chomsky and cognitive scientists. It trains you to parse syntax, understand recursion, and see how meaning is constructed from finite rules.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>Spaced Repetition (SM-2), Active Recall, Interleaving, and Elaboration applied to linguistic structures.</p>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>RECURSE</strong> — The infinite use of finite means</li>
+          <li><strong>SYNTAX</strong> — Phrase structure and trees</li>
+          <li><strong>UNIGRAM</strong> — Universal Grammar and innateness</li>
+          <li><strong>SEMANT</strong> — Compositionality and meaning</li>
+          <li><strong>PRAGMAT</strong> — Context, implicature, and Grice</li>
+          <li><strong>MORPH</strong> — Morphemes and word formation</li>
+          <li><strong>PHONOL</strong> — Sound patterns and phonemes</li>
+          <li><strong>COGNIT</strong> — Language and thought (Sapir-Whorf)</li>
+          <li><strong>NEURO</strong> — The brain\'s language centers</li>
+          <li><strong>ACQUIRE</strong> — How children learn language</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'RECURSE', title:'Infinite Use of Finite Means', summary:'Recursion in language and thought.', lesson:{ title:'The Generative Engine', body: 'Language is infinite, but the brain is finite. How do we generate infinite sentences from finite resources? The answer is recursion.\n\n## The Core Mechanism\n\nRecursion is the ability to embed a structure within itself. "The man [who saw the dog [that chased the cat]] ran." We can nest clauses infinitely (though we lose track after 2-3 levels).\n\n## Chomsky\'s Insight\n\nNoam Chomsky argued that recursion is the core of human language. It is what allows us to talk about things that don\'t exist, things that happened in the past, and things that might happen. It is the boundary between human and animal communication.\n\n## The Method\n\n1. **Identify the base case:** What is the simplest form?\n2. **Identify the recursive rule:** How does it embed within itself?\n3. **Recognize the limits:** Working memory limits us to ~3 levels of embedding in real-time processing.', takeaways:['Language is infinite; the brain is finite.','Recursion allows embedding structures within themselves.','"The infinite use of finite means" is the definition of language.','Working memory limits real-time recursion to ~3 levels.','Recursion is the boundary between human and animal communication.'] } },
+  { id:'m2', codename:'SYNTAX', title:'Trees and Hierarchies', summary:'Phrase structure rules and structural ambiguity.', lesson:{ title:'The Architecture of Trees', body: 'Language is not linear; it is hierarchical. "The dog bit the man" is not [The] [dog] [bit] [the] [man]. It is [[The dog] [bit [the man]]].\n\n## Structural Ambiguity\n\n"I saw the man with the telescope." Did you use a telescope to see him, or did you see a man holding a telescope? The words are identical, but the trees are different.\n\n## The Method\n\n1. **Don\'t read linearly:** Group words into phrases (Noun Phrases, Verb Phrases).\n2. **Draw the tree:** Visualize the hierarchy.\n3. **Find the ambiguity:** If a sentence has two meanings, it has two trees.', takeaways:['Language is hierarchical, not linear.','Phrases (NP, VP) are the building blocks.','Structural ambiguity arises from multiple valid tree structures.','Parse sentences into trees to understand meaning.','Linear reading misses the underlying architecture.'] } },
+  { id:'m3', codename:'UNIGRAM', title:'Universal Grammar', summary:'Innate linguistic capacity and the poverty of the stimulus.', lesson:{ title:'The Architecture of Innateness', body: 'Children learn language too fast and too well to be merely imitating. They say things they\'ve never heard ("I eated it"). They must be born with a template.\n\n## The Poverty of the Stimulus\n\nThe input a child receives is imperfect (fragmented, grammatically incorrect, finite). Yet, they output a perfect, infinite grammar. The stimulus is too poor to explain the output.\n\n## Universal Grammar (UG)\n\nChomsky posited that all humans share a Universal Grammar—an innate blueprint for language. We don\'t learn the rules; we set parameters based on the environment we are exposed to.\n\n## The Method\n\n1. **Distinguish acquisition from learning.** Acquisition is subconscious; learning is conscious.\n2. **Look for the underlying logic.** Even "mistakes" (goed instead of went) show rule-application, not imitation.', takeaways:['Children acquire language too fast for pure imitation.','The Poverty of the Stimulus: input is too poor to explain output.','Universal Grammar: humans are born with a language template.','Errors like "goed" prove rule application, not imitation.','Acquisition is subconscious; learning is conscious.'] } },
+  { id:'m4', codename:'SEMANT', title:'Compositionality', summary:'How meaning is built from parts.', lesson:{ title:'The Architecture of Meaning', body: 'Frege\'s Principle of Compositionality: The meaning of a complex expression is determined by the meanings of its constituent parts and their syntactic structure.\n\n## The Method\n\n1. **Break it down:** What are the atomic units of meaning?\n2. **Combine:** How do they interact syntactically to form new meaning?\n3. **Check for idioms:** "Kick the bucket" breaks compositionality. The whole is not the sum of its parts.', takeaways:['Compositionality: Meaning = Parts + Structure.','The whole is determined by the parts and how they combine.','Idioms break compositionality (e.g., "kick the bucket").','Semantics requires understanding the syntax that builds it.','Meaning is computed, not just looked up in a dictionary.'] } },
+  { id:'m5', codename:'PRAGMAT', title:'Context and Intent', summary:'Grice\'s maxims, implicature, and speech acts.', lesson:{ title:'The Architecture of Intent', body: 'Semantics is what a sentence means. Pragmatics is what a speaker means. "Can you pass the salt?" is semantically a question about ability, but pragmatically a request.\n\n## Grice\'s Maxims\n\nPaul Grice proposed we cooperate in conversation:\n1. **Quantity:** Be as informative as required, no more.\n2. **Quality:** Be truthful.\n3. **Relation:** Be relevant.\n4. **Manner:** Be clear.\n\nWhen we break these maxims, we create "implicature"—meaning beyond the words. "He is a soldier" (implied: brave, disciplined).\n\n## The Method\n\n1. **Parse the literal meaning (Semantics).**\n2. **Determine the intent (Pragmatics).**\n3. **Calculate the implicature:** What is unsaid but understood?', takeaways:['Semantics = sentence meaning. Pragmatics = speaker meaning.','Grice\'s Maxims: Quantity, Quality, Relation, Manner.','Breaking maxims creates implicature (unsaid meaning).','Speech acts: Saying "Can you..." is often a request, not a question.','Always calculate what is unsaid but understood.'] } },
+  { id:'m6', codename:'MORPH', title:'Morphemes and Rules', summary:'Word formation, inflection, and derivation.', lesson:{ title:'The Architecture of Words', body: 'Words are not atoms. They are built from morphemes—the smallest units of meaning. "Un-break-able" has three morphemes.\n\n## Inflection vs. Derivation\n\n- **Inflection:** Changes grammar, not meaning (dog -> dogs).\n- **Derivation:** Changes meaning/class (teach -> teacher).\n\n## The Method\n\n1. **Decompose words into morphemes.**\n2. **Identify if the change is grammatical (inflection) or meaningful (derivation).**', takeaways:['Morphemes are the smallest units of meaning.','Words are built from roots, prefixes, and suffixes.','Inflection changes grammar (dog -> dogs).','Derivation changes meaning/class (teach -> teacher).','Decompose words to understand their architecture.'] } },
+  { id:'m7', codename:'PHONOL', title:'Sound Patterns', summary:'Phonemes, distinctive features, and minimal pairs.', lesson:{ title:'The Architecture of Sound', body: 'Phonology is the sound system of language. A phoneme (like /p/) is not a sound itself, but a category of sounds that speakers treat as identical.\n\n## Minimal Pairs\n\n"Pat" and "Bat" are minimal pairs. They differ by one phoneme (/p/ vs /b/). This proves those phonemes are "distinctive" in English.\n\n## The Method\n\n1. **Find minimal pairs:** If changing one sound changes the meaning, those sounds are distinct phonemes in that language.\n2. **Recognize allophones:** If changing a sound doesn\'t change meaning (like the aspirated /p/ in "pat" vs unaspirated /p/ in "spat"), they are allophones of the same phoneme.', takeaways:['Phonemes are mental categories of sound, not physical sounds.','Minimal pairs prove sounds are distinctive in a language.','Allophones are variations of the same phoneme (don\'t change meaning).','Phonology is the rule system governing sound combinations.','Sound patterns are governed by rules, not random.'] } },
+  { id:'m8', codename:'COGNIT', title:'Language and Thought', summary:'Linguistic relativity and the Sapir-Whorf hypothesis.', lesson:{ title:'The Architecture of Cognition', body: 'Does language shape thought? The Sapir-Whorf hypothesis (Linguistic Relativity) suggests it does, weakly.\n\n## The Strong vs. Weak Version\n\n- **Strong (Determinism):** Language determines thought. (Largely rejected).\n- **Weak (Relativity):** Language influences thought. (Supported).\n\n## Examples\n\nLanguages with obligatory future tense ("It will rain") cause speakers to save less money than languages that use present tense for future ("It rains tomorrow"). Language shapes habits.\n\n## The Method\n\n1. **Observe obligatory categories in a language.** (Gender, tense, evidentiality).\n2. **Test if those categories bias cognition.**', takeaways:['The Sapir-Whorf hypothesis: Language influences thought.','Strong version (determinism) is rejected; weak version (relativity) is supported.','Obligatory categories (like tense) bias cognition and habits.','Language is a tool for thought, not just communication.','Vocabulary limits what you can think about clearly.'] } },
+  { id:'m9', codename:'NEURO', title:'Broca\'s and Wernicke\'s', summary:'The brain\'s language centers and aphasias.', lesson:{ title:'The Architecture of the Brain', body: 'Language lives in specific brain regions. Damage to these areas causes specific aphasias (language deficits).\n\n## Broca\'s Area\n\nLocated in the frontal lobe. Responsible for syntax and production. Damage results in Broca\'s aphasia: halting, agrammatic speech ("Dog... bite... man"). Comprehension remains intact.\n\n## Wernicke\'s Area\n\nLocated in the temporal lobe. Responsible for semantics and comprehension. Damage results in Wernicke\'s aphasia: fluent but meaningless speech ("The wugging splat went blomely"). Comprehension is destroyed.\n\n## The Method\n\n1. **Separate syntax (Broca) from semantics (Wernicke).**\n2. **Observe double dissociations:** You can lose one while keeping the other.', takeaways:['Broca\'s area: Syntax and production (frontal lobe).','Wernicke\'s area: Semantics and comprehension (temporal lobe).','Broca\'s aphasia: Halting, agrammatic speech; intact comprehension.','Wernicke\'s aphasia: Fluent, meaningless speech; destroyed comprehension.','Syntax and semantics are biologically separable.'] } },
+  { id:'m10', codename:'ACQUIRE', title:'First Language Acquisition', summary:'The critical period and stages of learning.', lesson:{ title:'The Architecture of Acquisition', body: 'Children pass through universal stages of language acquisition, regardless of culture.\n\n## The Stages\n\n1. **Babbling (6-8mo):** All phonemes.\n2. **One-word (12mo):** "Mama".\n3. **Two-word (18mo):** "Mommy go".\n4. **Telegraphic (2-3yr):** "Mommy go store". Missing function words.\n5. **Complex (4yr+):** Full recursion.\n\n## The Critical Period\n\nIf a child is not exposed to language before puberty, they will never fully acquire it. The brain loses its plasticity for language. (e.g., Genie the feral child).\n\n## The Method\n\n1. **Recognize that acquisition is stage-gated.**\n2. **Respect the critical period.** It closes.', takeaways:['Children pass through universal stages of acquisition.','Babbling -> One-word -> Two-word -> Telegraphic -> Complex.','The Critical Period: puberty closes the window for native acquisition.','Over-regularization ("goed") shows rule application.','Acquisition is biological; it unfolds on a schedule.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is recursion?',back:'The ability to embed a structure within itself, allowing infinite generation from finite means.'},
+  {id:'c2',moduleId:'m1',core:true,category:'quote',front:'Complete the principle: "Language is the infinite use of..."',back:'"...finite means." (von Humboldt/Chomsky)'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What limits real-time recursion to ~3 levels?',back:'Working memory. We lose track of the subject in center-embedded clauses.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'"The rat that the cat that the dog chased killed ate the malt." Why is this hard?',back:'It has 3 levels of center-embedding, exceeding working memory limits.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What distinguishes human from animal communication?',back:'Recursion. Animals can signal, but cannot embed structures infinitely.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'Base case vs. Recursive rule. Which is "S -> NP VP"?',back:'The recursive rule. It defines how a Sentence is built. The base case is the terminal symbols (words).'},
+  {id:'c7',moduleId:'m1',core:false,category:'concept',front:'What is the generative capacity of a grammar?',back:'Its ability to produce an infinite number of valid sentences.'},
+  {id:'c8',moduleId:'m1',core:false,category:'quote',front:'Complete: "The hard part is step 1: identify the..."',back:'"...base case." (or assumption).'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'"I know a man who knows a man who knows a man." What is this?',back:'Right-branching recursion. It is easier to process than center-embedding because it doesn\'t interrupt the main clause.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'Why is language infinite?',back:'Because rules can apply to their own output. (S -> S and S).'},
+  {id:'c11',moduleId:'m1',core:false,category:'concept',front:'What is a generative grammar?',back:'A finite set of rules that generates all and only the valid sentences of a language.'},
+  {id:'c12',moduleId:'m1',core:false,category:'application',front:'"The dog that bit the cat ran." Identify the embedded clause.',back:'"that bit the cat". It is a relative clause embedded in the NP "The dog".'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'Is language linear or hierarchical?',back:'Hierarchical. Words group into phrases, which group into clauses.'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'What is structural ambiguity?',back:'When a single sentence has two meanings because it can be parsed into two different trees.'},
+  {id:'c15',moduleId:'m2',core:false,category:'application',front:'"I saw the man with the telescope." How many trees?',back:'Two. (1) I used a telescope. (2) The man had a telescope.'},
+  {id:'c16',moduleId:'m2',core:false,category:'concept',front:'What are the primary building blocks of syntax?',back:'Phrases. Specifically Noun Phrases (NP) and Verb Phrases (VP).'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'"Flying planes can be dangerous." What is ambiguous?',back:'Is "flying planes" an action you do, or planes that are flying?'},
+  {id:'c18',moduleId:'m2',core:false,category:'concept',front:'Why read linearly miss?',back:'Because linear reading ignores the hierarchy. "The man" is a unit, not two separate words.'},
+  {id:'c19',moduleId:'m2',core:false,category:'application',front:'"The old man the boat." Why is this confusing?',back:'Garden path sentence. We initially parse "The old man" as NP, but "man" is actually the verb.'},
+  {id:'c20',moduleId:'m2',core:false,category:'quote',front:'Complete: "If a sentence has two meanings, it has two..."',back:'"...trees."'},
+  {id:'c21',moduleId:'m2',core:false,category:'concept',front:'What is a syntax tree?',back:'A visual representation of the hierarchical structure of a sentence.'},
+  {id:'c22',moduleId:'m2',core:false,category:'application',front:'"Colorless green ideas sleep furiously." What does this prove?',back:'That syntax is independent of semantics. It is grammatically correct but meaningless.'},
+  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'What is a garden path sentence?',back:'A sentence that temporarily misleads the parser into choosing the wrong structure.'},
+  {id:'c24',moduleId:'m2',core:false,category:'application',front:'"The horse raced past the barn fell." Why confusing?',back:'We parse "raced" as the main verb, but it\'s part of a reduced relative clause ("The horse [that was raced past the barn] fell").'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is Universal Grammar (UG)?',back:'The innate biological blueprint for language that all humans are born with.'},
+  {id:'c26',moduleId:'m3',core:true,category:'concept',front:'What is the Poverty of the Stimulus?',back:'The argument that the input children receive is too poor/finite to explain the perfect/infinite grammar they output.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'Acquisition vs. Learning?',back:'Acquisition is subconscious and biological. Learning is conscious and instructional.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'A child says "I eated it." What does this prove?',back:'They are not imitating; they are applying a rule (add -ed for past tense).'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'How are language rules "set" according to UG?',back:'Through parameters. The environment triggers a switch (e.g., head-first vs head-last).'},
+  {id:'c30',moduleId:'m3',core:false,category:'quote',front:'Complete: "Errors like \'goed\' prove..."',back:'"...rule application, not imitation."'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'Why do children learn language too fast?',back:'They aren\'t building from scratch; they are tweaking an innate template.'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'Creole languages form when...?',back:'Pidgins (basic contact languages) are learned by children, who instinctively inject complex grammar (UG) into them.'},
+  {id:'c33',moduleId:'m3',core:false,category:'concept',front:'Is language an instinct or a cultural invention?',back:'An instinct. It develops biologically without conscious effort.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'What are parameters in UG?',back:'Binary switches (e.g., pro-drop: yes/no) set by exposure.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'Spanish drops subjects ("Llueve" = "It rains"). English doesn\'t. What parameter is this?',back:'The Pro-drop parameter. Spanish is [+pro-drop], English is [-pro-drop].'},
+  {id:'c36',moduleId:'m3',core:false,category:'quote',front:'Complete: "The stimulus is too poor to explain..."',back:'"...the output."'}, 
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'Frege\'s Principle of Compositionality?',back:'The meaning of a complex expression is determined by its parts and their syntactic structure.'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'What breaks compositionality?',back:'Idioms. "Kick the bucket" means "die", which cannot be derived from "kick" + "bucket".'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'Meaning = ? + ?',back:'Meaning = Parts + Structure.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'"The cat chased the mouse." vs "The mouse chased the cat." Why different?',back:'Same parts, different structure (word order). Different meaning.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is semantics?',back:'The literal, truth-conditional meaning of a sentence.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'Why is "Colorless green ideas sleep furiously" semantically anomalous?',back:'It violates selectional restrictions (ideas can\'t be green or sleep).'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is the meaning of "the"?',back:'It has no standalone meaning, but contributes definiteness to the NP.'},
+  {id:'c44',moduleId:'m4',core:false,category:'quote',front:'Complete: "The whole is determined by the parts and..."',back:'"...how they combine."'},
+  {id:'c45',moduleId:'m4',core:false,category:'concept',front:'What is truth-conditional semantics?',back:'The idea that to know the meaning of a sentence is to know the conditions under which it is true.'},
+  {id:'c46',moduleId:'m4',core:false,category:'application',front:'"The king of France is bald." What is the semantic problem?',back:'Presupposition failure. There is no king of France, so the sentence is neither true nor false.'},
+  {id:'c47',moduleId:'m4',core:false,category:'concept',front:'What are atomic units of meaning?',back:'Morphemes and words.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'How is meaning computed?',back:'It is computed syntactically, not just looked up in a dictionary.'}, 
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'Semantics vs. Pragmatics?',back:'Semantics = sentence meaning. Pragmatics = speaker intent in context.'},
+  {id:'c50',moduleId:'m5',core:true,category:'concept',front:'Grice\'s 4 Maxims?',back:'Quantity, Quality, Relation, Manner.'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'"Can you pass the salt?" Semantic vs Pragmatic meaning?',back:'Semantic: Question about ability. Pragmatic: Request for salt.'},
+  {id:'c52',moduleId:'m5',core:false,category:'concept',front:'What is implicature?',back:'Meaning implied by breaking a maxim, not stated literally.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'"He is a soldier." (Implicature: He is brave). Which maxim is used?',back:'Relation/Quantity. The speaker chooses a specific category, implying relevant traits.'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'What is a speech act?',back:'An utterance that performs an action (e.g., "I promise" = the act of promising).'},
+  {id:'c55',moduleId:'m5',core:false,category:'quote',front:'Complete: "Breaking maxims creates..."',back:'"...implicature (unsaid meaning)."'},
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'Maxim of Quantity?',back:'Be as informative as required, no more, no less.'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'"Some of the students passed." Implicature?',back:'Not all of them passed. (Quantity).'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'Maxim of Quality?',back:'Be truthful. Do not say what you believe to be false.'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'"The wugging splat went blomely." This violates which maxim?',back:'Manner (be clear, avoid obscurity).'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'What is "calculating the unsaid"?',back:'Pragmatic inference. Determining intent based on context and maxims.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is a morpheme?',back:'The smallest unit of meaning in a language.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'Inflection vs. Derivation?',back:'Inflection changes grammar (dog->dogs). Derivation changes meaning/class (teach->teacher).'},
+  {id:'c63',moduleId:'m6',core:false,category:'application',front:'"Un-break-able" has how many morphemes?',back:'Three: un- (not), break (root), -able (capable of).'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'"Dogs" -> /dog/ + /s/. What type is /s/?',back:'Inflectional (plural).'},
+  {id:'c65',moduleId:'m6',core:false,category:'application',front:'"Teacher" -> /teach/ + /er/. What type is /er/?',back:'Derivational (changes verb to noun).'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'Are words atoms?',back:'No. They are built from smaller meaningful units (morphemes).'},
+  {id:'c67',moduleId:'m6',core:false,category:'quote',front:'Complete: "Inflection changes grammar, not..."',back:'"...meaning."'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'"Walked" -> /walk/ + /ed/. Inflection or derivation?',back:'Inflection (past tense).'},
+  {id:'c69',moduleId:'m6',core:false,category:'concept',front:'What is a free morpheme?',back:'A morpheme that can stand alone as a word (e.g., "dog").'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What is a bound morpheme?',back:'A morpheme that must be attached to a root (e.g., "-s", "un-").'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'"Happiness" -> /happy/ + /ness/. Inflection or derivation?',back:'Derivation (changes adjective to noun).'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'Why decompose words?',back:'To understand their underlying architecture and rules of formation.'}, 
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is a phoneme?',back:'A mental category of sound that speakers treat as identical. It is not a physical sound.'},
+  {id:'c74',moduleId:'m7',core:true,category:'concept',front:'What is a minimal pair?',back:'Two words that differ by exactly one phoneme, changing meaning (e.g., pat/bat).'},
+  {id:'c75',moduleId:'m7',core:false,category:'application',front:'"Pat" vs "Bat". What does this prove?',back:'/p/ and /b/ are distinct phonemes in English.'},
+  {id:'c76',moduleId:'m7',core:false,category:'concept',front:'What are allophones?',back:'Variations of the same phoneme that don\'t change meaning (e.g., aspirated vs unaspirated /p/).'},
+  {id:'c77',moduleId:'m7',core:false,category:'application',front:'"Pat" (aspirated p) vs "Spat" (unaspirated p). Are these different phonemes?',back:'No. They are allophones of /p/. Meaning doesn\'t change.'},
+  {id:'c78',moduleId:'m7',core:false,category:'concept',front:'Is phonology about physical sounds?',back:'No. It is about the rule system governing mental sound categories.'},
+  {id:'c79',moduleId:'m7',core:false,category:'quote',front:'Complete: "Phonemes are mental categories of sound, not..."',back:'"...physical sounds."'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'What is distinctive features theory?',back:'The idea that phonemes are bundles of binary features (e.g., +voicing, -nasal).'},
+  {id:'c81',moduleId:'m7',core:false,category:'application',front:'In English, "ng" (/ŋ/) never starts a word. What is this?',back:'A phonotactic constraint. A rule governing sound combinations.'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is phonotactics?',back:'The rules determining which sound sequences are allowed in a language.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'"Blick" is not a word, but is valid. "Bnick" is invalid. Why?',back:'Phonotactic constraint. /bn/ is not an allowed onset in English.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'Sound patterns are...',back:'...governed by rules, not random.'}, 
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is the Sapir-Whorf hypothesis?',back:'The idea that language influences (weak) or determines (strong) thought.'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'Strong vs. Weak version?',back:'Strong (Determinism) is rejected. Weak (Relativity) is supported.'},
+  {id:'c87',moduleId:'m8',core:false,category:'application',front:'Languages with obligatory future tense save less money. Why?',back:' obligatory future tense makes the future feel more distant, reducing urgency to save.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What are obligatory categories?',back:'Grammatical features a language forces you to mark (e.g., gender, tense, evidentiality).'},
+  {id:'c89',moduleId:'m8',core:false,category:'quote',front:'Complete: "Language is a tool for thought, not just..."',back:'"...communication."'},
+  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'Does vocabulary limit thought?',back:'Yes. If you lack the word for a concept, it is harder to think about it clearly.'},
+  {id:'c91',moduleId:'m8',core:false,category:'application',front:'Pirahã lacks numbers above 2. What is the cognitive effect?',back:'They struggle with exact counting above 2. Language shapes numerical cognition.'},
+  {id:'c92',moduleId:'m8',core:false,category:'concept',front:'What is linguistic relativity?',back:'The weak Sapir-Whorf hypothesis. Language biases cognition and habits.'},
+  {id:'c93',moduleId:'m8',core:false,category:'application',front:'Russian has distinct words for light blue (goluboy) and dark blue (siniy). Effect?',back:'Russians distinguish shades of blue faster than English speakers.'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'Is language a tool for thought?',back:'Yes. The structure of your language biases your cognitive pathways.'},
+  {id:'c95',moduleId:'m8',core:false,category:'application',front:'Gendered nouns (e.g., "bridge" is feminine in German, masculine in Spanish). Effect?',back:'Speakers describe bridges with gendered stereotypes (beautiful vs strong).'},
+  {id:'c96',moduleId:'m8',core:false,category:'quote',front:'Complete: "Obligatory categories bias..."',back:'"...cognition and habits."'}, 
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What does Broca\'s area control?',back:'Syntax and production. Located in the frontal lobe.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What does Wernicke\'s area control?',back:'Semantics and comprehension. Located in the temporal lobe.'},
+  {id:'c99',moduleId:'m9',core:false,category:'application',front:'"Dog... bite... man." (Comprehension intact). What is this?',back:'Broca\'s aphasia. Halting, agrammatic speech.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'"The wugging splat went blomely." (Fluent but meaningless). What is this?',back:'Wernicke\'s aphasia. Fluent, meaningless speech; destroyed comprehension.'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'What is a double dissociation?',back:'When you can lose function A while keeping B, and vice versa. Proves they are separate.'},
+  {id:'c102',moduleId:'m9',core:false,category:'quote',front:'Complete: "Syntax and semantics are biologically..."',back:'"...separable."'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'Where is Broca\'s area?',back:'The frontal lobe (inferior frontal gyrus).'},
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'Where is Wernicke\'s area?',back:'The temporal lobe (superior temporal gyrus).'},
+  {id:'c105',moduleId:'m9',core:false,category:'application',front:'Patient understands but cannot speak grammatically. Damaged area?',back:'Broca\'s area.'},
+  {id:'c106',moduleId:'m9',core:false,category:'application',front:'Patient speaks fluently but uses nonsense words. Damaged area?',back:'Wernicke\'s area.'},
+  {id:'c107',moduleId:'m9',core:false,category:'concept',front:'Are syntax and semantics independent?',back:'Yes. Brain lesions prove you can have one without the other.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'What is aphasia?',back:'A language deficit caused by brain damage.'}, 
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the Critical Period?',back:'The window before puberty during which language must be acquired to achieve native fluency.'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'Stages of acquisition?',back:'Babbling -> One-word -> Two-word -> Telegraphic -> Complex.'},
+  {id:'c111',moduleId:'m10',core:false,category:'application',front:'"Mommy go store." What stage is this?',back:'Telegraphic. Missing function words (to, the), but core meaning is intact.'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'What is over-regularization?',back:'Applying a rule where it doesn\'t belong (e.g., "goed" instead of "went"). Shows rule application.'},
+  {id:'c113',moduleId:'m10',core:false,category:'quote',front:'Complete: "Acquisition is biological; it unfolds on a..."',back:'"...schedule."'},
+  {id:'c114',moduleId:'m10',core:false,category:'concept',front:'Does acquisition depend on culture?',back:'No. The stages are universal across all human cultures.'},
+  {id:'c115',moduleId:'m10',core:false,category:'application',front:'Genie (feral child) learned some words after puberty, but no grammar. Why?',back:'The Critical Period had closed. Grammar requires biological plasticity.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'Is acquisition stage-gated?',back:'Yes. Children must pass through stages in a specific order.'},
+  {id:'c117',moduleId:'m10',core:false,category:'application',front:'A baby says "mama" at 12 months. What stage?',back:'One-word (holophrastic) stage.'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is babbling?',back:'The 6-8 month stage where babies produce all phonemes, even those not in their environment.'},
+  {id:'c119',moduleId:'m10',core:false,category:'concept',front:'Why does the Critical Period close?',back:'Brain plasticity decreases after puberty. The neural pathways for language solidify.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What proves acquisition is biological?',back:'The universal schedule and the closure of the Critical Period.'}
+];
+
+const ARENA = [
+  // M1: RECURSE (4 questions: 1 per difficulty)
+  { id:'p1', moduleId:'m1', title:'Q1: The Boundary', difficulty:1, reward:50, timeLimit:45, body:'What distinguishes human language from animal communication systems?', options:['Volume','Recursion','Regional dialects','Vocabulary size'], correct:1, explanation:'Recursion allows infinite generation from finite means. Animals can signal, but cannot embed structures infinitely.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Center-Embedding', difficulty:2, reward:100, timeLimit:60, body:'"The rat that the cat that the dog chased killed ate the malt." Why is this hard to read?', options:['It is ungrammatical','It has 3 levels of center-embedding, exceeding working memory limits','It uses archaic words','The meaning is unclear'], correct:1, explanation:'Center-embedding interrupts the main clause. After 2-3 levels, working memory fails to hold the subject and verb together.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Right vs Center', difficulty:3, reward:200, timeLimit:90, body:'"I know a man who knows a man who knows a man." This is easier than 3-level center-embedding. Why?', options:['It is shorter','It is right-branching. It doesn\'t interrupt the main clause, so working memory isn\'t overwhelmed.','It uses common words','It has no recursion'], correct:1, explanation:'Right-branching recursion adds to the end. Center-embedding interrupts the middle, forcing you to hold incomplete structures in memory.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Generative Rule', difficulty:4, reward:500, timeLimit:120, body:'You are designing an AI grammar. Which rule demonstrates recursion?', options:['S -> NP VP','S -> S and S','N -> "dog"','V -> "run"'], correct:1, explanation:'"S -> S and S" is recursive because the output (S) contains the input (S). This allows infinite generation.' },
+
+  // M2: SYNTAX (4 questions)
+  { id:'p5', moduleId:'m2', title:'Q1: Structural Ambiguity', difficulty:1, reward:50, timeLimit:45, body:'"I saw the man with the telescope." How many valid meanings does this sentence have?', options:['1','2','3','0 (it is ungrammatical)'], correct:1, explanation:'Two meanings: (1) I used a telescope to see him. (2) I saw a man holding a telescope. Two meanings = two trees.' },
+  { id:'p6', moduleId:'m2', title:'Q2: The Architecture', difficulty:2, reward:100, timeLimit:60, body:'Is language linear or hierarchical?', options:['Linear (word by word)','Hierarchical (grouped into phrases)','Both depending on context','Neither'], correct:1, explanation:'Language is hierarchical. Words group into Noun Phrases (NP) and Verb Phrases (VP), which form clauses. Linear reading misses the structure.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Garden Path', difficulty:3, reward:200, timeLimit:90, body:'"The old man the boat." Why is this confusing?', options:['"Old" is misspelled','Garden path: We initially parse "The old man" as NP, but "man" is actually the verb','It lacks a verb','It is too short'], correct:1, explanation:'A garden path sentence. The parser commits to the wrong structure initially ("The old man"), then has to re-parse when "man" is revealed as the verb.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Independence', difficulty:4, reward:500, timeLimit:120, body:'"Colorless green ideas sleep furiously." What does this sentence prove?', options:['That semantics is more important than syntax','That syntax is independent of semantics. It is grammatically correct but meaningless.','That Chomsky was a poet','That adjectives must precede nouns'], correct:1, explanation:'It proves syntax and semantics are separate systems. The sentence is perfectly grammatical (follows all rules) but semantically anomalous.' },
+
+  // M3: UNIGRAM (4 questions)
+  { id:'p9', moduleId:'m3', title:'Q1: The Stimulus', difficulty:1, reward:50, timeLimit:45, body:'What is the Poverty of the Stimulus argument?', options:['Children don\'t get enough input to explain their perfect output.','Parents don\'t talk enough','Schools are underfunded','Language is too hard'], correct:0, explanation:'The input children receive is imperfect and finite. Yet, they output a perfect, infinite grammar. The stimulus is too poor to explain the output.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Template', difficulty:2, reward:100, timeLimit:60, body:'What is Universal Grammar (UG)?', options:['A grammar book used in schools','The innate biological blueprint for language all humans share','A specific language like English','A set of vocabulary words'], correct:1, explanation:'Chomsky posited that humans are born with a UG. We don\'t learn the rules from scratch; we set parameters based on environment.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Error', difficulty:3, reward:200, timeLimit:90, body:'A child says "I eated it." What does this prove?', options:['They are imitating their parents','They are applying a rule (add -ed for past tense), not imitating','They have a learning disability','They need more vocabulary'], correct:1, explanation:'Over-regularization. The child has never heard "eated", so they aren\'t imitating. They are applying the past-tense rule.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Acquisition vs Learning', difficulty:4, reward:500, timeLimit:120, body:'What distinguishes language acquisition from language learning?', options:['Age','Acquisition is subconscious/biological; learning is conscious/instructional','Intelligence','Motivation'], correct:1, explanation:'Acquisition (childhood) is subconscious and biological. Learning (adult classroom) is conscious and instructional. Adults can learn, but rarely acquire native fluency.' },
+
+  // M4: SEMANT (4 questions)
+  { id:'p13', moduleId:'m4', title:'Q1: Compositionality', difficulty:1, reward:50, timeLimit:45, body:'Frege\'s Principle of Compositionality states that meaning is determined by...', options:['Context','Parts and their syntactic structure','The dictionary','The speaker'], correct:1, explanation:'Meaning = Parts + Structure. The whole is determined by the parts and how they combine syntactically.' },
+  { id:'p14', moduleId:'m4', title:'Q2: The Exception', difficulty:2, reward:100, timeLimit:60, body:'"Kick the bucket" means "die". What does this break?', options:['Syntax','Compositionality. The whole is not the sum of its parts.','Grammar','Semantics entirely'], correct:1, explanation:'Idioms break compositionality. You cannot derive "die" from "kick" + "bucket". The whole must be memorized.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Selectional Restrictions', difficulty:3, reward:200, timeLimit:90, body:'"Colorless green ideas sleep furiously." Why is this semantically anomalous?', options:['It violates syntax','It violates selectional restrictions (ideas can\'t be green or sleep)','It is too long','It uses rare words'], correct:1, explanation:'Selectional restrictions: verbs require certain types of subjects/objects. "Sleep" requires an animate subject. "Ideas" is inanimate.' },
+  { id:'p16', moduleId:'m4', title:'Q4: Presupposition', difficulty:4, reward:500, timeLimit:120, body:'"The king of France is bald." What is the semantic problem?', options:['There is no king of France, so the sentence is neither true nor false','It is ungrammatical','"Bald" is subjective','It is an idiom'], correct:0, explanation:'Presupposition failure. The sentence presupposes there is a king of France. Since there isn\'t, the sentence lacks a truth value.' },
+
+  // M5: PRAGMAT (4 questions)
+  { id:'p17', moduleId:'m5', title:'Q1: The Distinction', difficulty:1, reward:50, timeLimit:45, body:'Semantics is to sentence meaning as Pragmatics is to...', options:['Word meaning','Speaker intent in context','Grammar','Phonetics'], correct:1, explanation:'Semantics = literal meaning. Pragmatics = what the speaker means in context.' },
+  { id:'p18', moduleId:'m5', title:'Q2: The Maxims', difficulty:2, reward:100, timeLimit:60, body:'Which is NOT one of Grice\'s 4 Maxims?', options:['Quantity','Quality','Relation','Politeness'], correct:3, explanation:'The maxims are Quantity, Quality, Relation, and Manner. Politeness is a separate theory (Brown & Levinson).' },
+  { id:'p19', moduleId:'m5', title:'Q3: The Act', difficulty:3, reward:200, timeLimit:90, body:'"Can you pass the salt?" Semantically a question about ability. Pragmatically a...?', options:['Threat','Request for salt','Insult','Greeting'], correct:1, explanation:'A speech act. The literal form is a question, but the pragmatic function is a request.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Implicature', difficulty:4, reward:500, timeLimit:120, body:'"Some of the students passed." What is the implicature?', options:['All passed','Not all passed','None passed','The speaker is unsure'], correct:1, explanation:'By saying "some" (Quantity maxim), the speaker implies "not all". If all had passed, they would have said "all".' },
+
+  // M6: MORPH (4 questions)
+  { id:'p21', moduleId:'m6', title:'Q1: The Unit', difficulty:1, reward:50, timeLimit:45, body:'What is a morpheme?', back:'The smallest unit of meaning.', options:['A word','The smallest unit of meaning','A sound','A sentence'], correct:1, explanation:'Morphemes are the smallest units of meaning. Words are built from them.' },
+  { id:'p22', moduleId:'m6', title:'Q2: Inflection', difficulty:2, reward:100, timeLimit:60, body:'"Dog -> Dogs". What type of morpheme is "-s"?', options:['Derivational','Inflectional (changes grammar, not meaning)','Free','Irregular'], correct:1, explanation:'Inflectional. It marks plural (grammar) but doesn\'t change the core meaning of "dog".' },
+  { id:'p23', moduleId:'m6', title:'Q3: Derivation', difficulty:3, reward:200, timeLimit:90, body:'"Teach -> Teacher". What type of morpheme is "-er"?', options:['Inflectional','Derivational (changes meaning/class: verb to noun)','Free','Irregular'], correct:1, explanation:'Derivational. It changes the word class (verb to noun) and creates a new meaning.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Decomposition', difficulty:4, reward:500, timeLimit:120, body:'"Unbreakable" has how many morphemes?', options:['1','2','3','4'], correct:2, explanation:'Three: un- (not), break (root), -able (capable of). Decomposing reveals the architecture.' },
+
+  // M7: PHONOL (4 questions)
+  { id:'p25', moduleId:'m7', title:'Q1: The Category', difficulty:1, reward:50, timeLimit:45, body:'What is a phoneme?', options:['A physical sound','A mental category of sound','A letter','A syllable'], correct:1, explanation:'A phoneme is a mental category. Speakers treat all sounds in that category as "the same".' },
+  { id:'p26', moduleId:'m7', title:'Q2: The Pair', difficulty:2, reward:100, timeLimit:60, body:'"Pat" vs "Bat". What does this minimal pair prove?', options:['/p/ and /b/ are allophones','/p/ and /b/ are distinct phonemes in English','English has no /b/','"Pat" is not a word'], correct:1, explanation:'Changing one sound changes the meaning. Therefore, /p/ and /b/ are distinct phonemes.' },
+  { id:'p27', moduleId:'m7', title:'Q3: The Variation', difficulty:3, reward:200, timeLimit:90, body:'"Pat" (aspirated p) vs "Spat" (unaspirated p). Are these different phonemes?', options:['Yes','No. They are allophones of /p/. Meaning doesn\'t change.','They are different languages','It depends on dialect'], correct:1, explanation:'Allophones. They are physical variations of the same mental phoneme /p/. Meaning doesn\'t change, so they aren\'t distinct phonemes.' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Constraint', difficulty:4, reward:500, timeLimit:120, body:'In English, "ng" (/ŋ/) never starts a word. What is this?', options:['A phoneme','A phonotactic constraint','An allophone','A morpheme'], correct:1, explanation:'Phonotactics. Rules governing which sound sequences are allowed. /ŋ/ can end a word ("sing") but cannot start one.' },
+
+  // M8: COGNIT (4 questions)
+  { id:'p29', moduleId:'m8', title:'Q1: The Hypothesis', difficulty:1, reward:50, timeLimit:45, body:'What is the Sapir-Whorf hypothesis?', options:['Language determines thought (strong)','Language influences thought (weak)','Both strong and weak are accepted','It is about grammar'], correct:1, explanation:'The weak version (relativity) is supported: language influences thought. The strong version (determinism) is rejected.' },
+  { id:'p30', moduleId:'m8', title:'Q2: The Savings', difficulty:2, reward:100, timeLimit:60, body:'Languages with obligatory future tense save less money. Why?', options:['They are poorer','Obligatory future tense makes the future feel more distant, reducing urgency','They don\'t understand math','They have fewer banks'], correct:1, explanation:'Language shapes habits. Marking future tense explicitly creates psychological distance, reducing the urgency to save.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Obligatory Categories', difficulty:3, reward:200, timeLimit:90, body:'What are obligatory categories?', options:['Words you must say','Grammatical features a language forces you to mark (e.g., gender, tense)','Politeness levels','Sentence structures'], correct:1, explanation:'Features the language forces you to encode. English forces tense. Spanish forces gender. These bias cognition.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Limit', difficulty:4, reward:500, timeLimit:120, body:'Does vocabulary limit thought?', options:['No, thought is independent','Yes. If you lack the word for a concept, it is harder to think about it clearly.','Only in children','Only in science'], correct:1, explanation:'Language is a tool for thought. Without precise vocabulary, you cannot clearly conceptualize or manipulate complex ideas.' },
+
+  // M9: NEURO (4 questions)
+  { id:'p33', moduleId:'m9', title:'Q1: The Center', difficulty:1, reward:50, timeLimit:45, body:'What does Broca\'s area control?', options:['Semantics','Syntax and production','Hearing','Memory'], correct:1, explanation:'Broca\'s area (frontal lobe) is responsible for syntax and speech production.' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Deficit', difficulty:2, reward:100, timeLimit:60, body:'"Dog... bite... man." (Comprehension intact). What is this?', options:['Wernicke\'s aphasia','Broca\'s aphasia','Dyslexia','Memory loss'], correct:1, explanation:'Broca\'s aphasia. Halting, agrammatic speech. The patient knows what they want to say but cannot produce the syntax.' },
+  { id:'p35', moduleId:'m9', title:'Q3: The Double Dissociation', difficulty:3, reward:200, timeLimit:90, body:'What does a "double dissociation" prove in neuroscience?', options:['That two functions are linked','That two functions are biologically separable (you can lose one, keep the other)','That the brain is holistic','That language is innate'], correct:1, explanation:'If Patient A loses Syntax but keeps Semantics (Broca), and Patient B loses Semantics but keeps Syntax (Wernicke), the two are separable.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Lesion', difficulty:4, reward:500, timeLimit:120, body:'Patient speaks fluently but uses nonsense words ("The wugging splat went blomely"). Damaged area?', options:['Broca\'s area','Wernicke\'s area','Cerebellum','Hippocampus'], correct:1, explanation:'Wernicke\'s aphasia. Fluent, meaningless speech. Comprehension is destroyed because Wernicke\'s area (semantics) is damaged.' },
+
+  // M10: ACQUIRE (4 questions)
+  { id:'p37', moduleId:'m10', title:'Q1: The Window', difficulty:1, reward:50, timeLimit:45, body:'What is the Critical Period?', options:['Time before birth','The window before puberty for native language acquisition','Time in school','The first year'], correct:1, explanation:'Before puberty, the brain has plasticity for language. After puberty, acquiring native fluency is nearly impossible.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Stages', difficulty:2, reward:100, timeLimit:60, body:'"Mommy go store." What stage is this?', options:['Babbling','One-word','Two-word','Telegraphic'], correct:3, explanation:'Telegraphic. Missing function words (to, the), but core meaning (nouns/verbs) is intact.' },
+  { id:'p39', moduleId:'m10', title:'Q3: The Rule', difficulty:3, reward:200, timeLimit:90, body:'What is over-regularization?', options:['Applying a rule where it doesn\'t belong ("goed")','Imitating perfectly','Using adult grammar','Speaking too fast'], correct:0, explanation:'Applying a grammatical rule to an exception. "Goed" proves the child has acquired the rule, not just memorized words.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Proof', difficulty:4, reward:500, timeLimit:120, body:'Genie (feral child) was isolated until age 13. She learned words but no grammar. What does this prove?', options:['Grammar requires explicit teaching','The Critical Period closes. Native grammar requires biological plasticity.','She was intellectually disabled','Language is cultural'], correct:1, explanation:'The Critical Period had closed. Genie acquired vocabulary (semantic) but not syntax (grammatical rules). Biology gates grammar.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Lexicon', scenario:'You are building an artificial language (ArtLang) for an AI. The first step is defining the vocabulary. Do you need an infinite list of words?', options:['Yes, to generate infinite sentences','No. Language is the infinite use of finite means. You need a finite lexicon and recursive rules.','Yes, because humans have infinite memory','No, you only need 100 words'], correct:1, explanation:'Language is generative. You do not need infinite words; you need a finite lexicon and recursive rules to combine them infinitely.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Parser', scenario:'Your AI reads "I saw the man with the telescope" and gets confused. It thinks you used a telescope, but you meant the man had one. What is the solution?', options:['Add more vocabulary','Implement syntax trees. The sentence has two valid structures (trees). The AI must use context to select the correct tree.','Tell the AI to ignore the sentence','Rewrite the sentence'], correct:1, explanation:'Structural ambiguity. The AI needs a parser that builds hierarchical trees, not just reads linearly. Then it can use context to disambiguate.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Blueprint', scenario:'You want the AI to learn language like a human child, fast and perfectly. Should you program every rule explicitly?', options:['Yes, rules are necessary','No. Use a Universal Grammar architecture with parameters. Expose it to data and let it "set" the switches.','Yes, feed it a dictionary','No, just use brute force statistics'], correct:1, explanation:'Poverty of the stimulus. If the AI relies only on input, it will fail. It needs an innate blueprint (UG) with parameters that are set by exposure.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Meaning', scenario:'The AI says "The AI is sleeping." It is grammatically correct but nonsensical. What is violated?', options:['Syntax','Compositionality','Selectional restrictions. "Sleep" requires an animate subject.','Phonology'], correct:2, explanation:'Selectional restrictions. The verb "sleep" has semantic requirements (animate subject). The AI must check these, not just syntax.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Intent', scenario:'A user says "Can you close the window?" The AI responds "Yes" and does nothing. What failed?', options:['Syntax','Semantics','Pragmatics. The AI missed the speech act (request) and answered the literal question (ability).','Phonology'], correct:2, explanation:'The AI parsed semantics (question about ability) but missed pragmatics (speaker intent = request). It must calculate the unsaid meaning.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Words', scenario:'The AI encounters "unhappiness" and doesn\'t know it. Should it look it up in a dictionary?', options:['Yes','No. It should decompose it into morphemes: un- + happy + -ness, and compute the meaning.','Ask the user','Ignore it'], correct:1, explanation:'Compositionality. Words are built from morphemes. By decomposing, the AI can understand novel words without a dictionary.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Sounds', scenario:'The AI hears "pat" and "bat" as identical. How do you fix this?', options:['Increase microphone quality','Teach it minimal pairs. /p/ and /b/ are distinct phonemes that change meaning.','Tell it to read lips','Use a different language'], correct:1, explanation:'Phonemes are mental categories. The AI must learn that /p/ and /b/ are distinctive in English by training on minimal pairs.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Thought', scenario:'You want the AI to think about time like a human. You give it an obligatory future tense. What will happen?', options:['Nothing','It will save less money (metaphorically). Obligatory categories bias cognition.','It will become confused','It will only speak English'], correct:1, explanation:'Linguistic relativity. The structure of the language you give the AI will bias its cognitive pathways. Obligatory future tense creates distance.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Architecture', scenario:'You want to separate the AI\'s syntax module from its semantics module. Why?', options:['To make it faster','Double dissociation. If syntax breaks, semantics should still work (and vice versa). This mirrors the brain (Broca/Wernicke).','To save memory','Because they are the same thing'], correct:1, explanation:'Modularity. The brain separates syntax (Broca) and semantics (Wernicke). Your AI should too, so a failure in one doesn\'t crash the other.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Child', scenario:'You want the AI to learn a new language perfectly. What is the constraint?', options:['It must be online','The Critical Period. It must acquire it during the "plastic" phase of training, not later fine-tuning.','It needs a teacher','It must be English'], correct:1, explanation:'Biological acquisition is stage-gated. The AI must acquire the language in its initial training phase (Critical Period). Fine-tuning later is "learning", not "acquisition".' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Embed', body:'Write a sentence with 2 levels of center-embedding. Notice how hard it is to read.' },
+  { id:'rw2', title:'The Ambiguity', body:'Find a structurally ambiguous sentence in a news article. Draw (or visualize) the two trees.' },
+  { id:'rw3', title:'The Error', body:'Listen to a child speak. Identify over-regularization (e.g., "goed"). Recognize it as rule application.' },
+  { id:'rw4', title:'The Idiom', body:'Use an idiom ("kick the bucket"). Recognize that it breaks compositionality.' },
+  { id:'rw5', title:'The Implicature', body:'In a conversation, break a Gricean maxim subtly. Observe if the other person calculates the implicature.' },
+  { id:'rw6', title:'The Morpheme', body:'Decompose 5 complex words into morphemes (e.g., "un-believ-able"). Identify inflection vs derivation.' },
+  { id:'rw7', title:'The Minimal Pair', body:'Find a minimal pair in your language. Prove two sounds are distinct phonemes.' },
+  { id:'rw8', title:'The Tense', body:'Notice how your language marks time. Does it have obligatory future tense? How might this bias your habits?' },
+  { id:'rw9', title:'The Lesion', body:'Observe someone searching for a word ("tip of the tongue"). That\'s a semantic retrieval issue (Wernicke), not a syntax issue (Broca).' },
+  { id:'rw10', title:'The Stage', body:'Watch a baby babble. Recognize this as the universal first stage of acquisition, independent of culture.' },
+  { id:'rw11', title:'The Recursion', body:'"I think that..." -> "I think that you know that..." Add 3 more levels. Feel the memory limit.' },
+  { id:'rw12', title:'The Tree', body:'Parse a long sentence into NP and VP. Don\'t read linearly; group the phrases.' },
+  { id:'rw13', title:'The UG', body:'Reflect: Did you learn grammar by imitation, or did you acquire it biologically? Look for evidence of UG in your own speech.' },
+  { id:'rw14', title:'The Composition', body:'Take a sentence. Change the word order. Observe how meaning changes (or becomes nonsense).' },
+  { id:'rw15', title:'The Speech Act', body:'Say "It\'s cold in here" to someone. Observe if they interpret it pragmatically (close the window) or semantically (agree).' },
+  { id:'rw16', title:'The Root', body:'Find a Latin or Greek root in an English word. Trace the morphology.' },
+  { id:'rw17', title:'The Allophone', body:'Say "pat" and "spat". Feel the aspiration difference. Recognize they are allophones of /p/.' },
+  { id:'rw18', title:'The Obligation', body:'Identify an obligatory category in your language (e.g., gender in Spanish). Does it bias how you think about objects?' },
+  { id:'rw19', title:'The Modular', body:'Stutter or stumble over words. Notice that your syntax (Broca) might be fine, but articulation fails. Modularity in action.' },
+  { id:'rw20', title:'The Critical', body:'Try to learn a completely new grammar rule. Notice it is harder than when you were a child. The Critical Period has closed.' },
+  { id:'rw21', title:'The Garden Path', body:'Read "The complex houses married and single soldiers and their families." Did you get garden-pathed?' },
+  { id:'rw22', title:'The Presupposition', body:'Say "The capital of France is Paris." What is presupposed? (That France has a capital).' },
+  { id:'rw23', title:'The Quantity', body:'In an email, say "Some of the tasks are done." Recognize the implicature: not all are done.' },
+  { id:'rw24', title:'The Bound', body:'List 5 bound morphemes (-s, -ed, -ing). They have no meaning alone.' },
+  { id:'rw25', title:'The Phonotactics', body:'Try to say "Bnick". You can\'t (in English). Phonotactic constraints are real.' },
+  { id:'rw26', title:'The Relativity', body:'Does your language have words for colors that another lacks? How does this affect your perception?' },
+  { id:'rw27', title:'The Wernicke', body:'Listen to someone speaking fluently but saying nothing meaningful. Is it Wernicke\'s aphasia or just politics?' },
+  { id:'rw28', title:'The Telegraphic', body:'Write a tweet omitting all function words (to, the, a). This is telegraphic speech.' },
+  { id:'rw29', title:'The Over-Regular', body:'Catch yourself saying "foots" or "mouses" in a rush. That\'s your internal rule overriding memory.' },
+  { id:'rw30', title:'The OS', body:'Reflect: Language is the OS of human thought. Training syntax trains your thinking.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your linguistic profile.' },
+  { threshold: 500, title: 'LEXICOGRAPHER', desc: 'You see words as built structures, not atoms.' },
+  { threshold: 1500, title: 'SYNTACTICIAN', desc: 'You parse sentences into trees instinctively.' },
+  { threshold: 3000, title: 'LINGUIST', desc: 'You separate semantics from pragmatics with precision.' },
+  { threshold: 6000, title: 'COGNITIVE ARCHITECT', desc: 'You understand how language shapes thought. You build meaning from nothing.' }
+];
+
+const STORAGE_KEY = 'chomsky-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// TOWER OF BABEL COMPLETE</h2>';
+      html += '<p>You have completed all 10 axes and successfully constructed the Tower of Babel. You now possess the complete linguistic architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Language is not just communication; it is the operating system of human thought. By mastering syntax, recursion, and pragmatics, you have learned to construct crystal-clear arguments and spot manipulation in real-time. You do not just speak language; you engineer it. You are now a Cognitive Architect.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Tower of Babel: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your linguistic architecture to the scenario.';
+    missionBtn.textContent = 'Open Project ->';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete - +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete - +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="CHOMSKY.show(\'modules\')"> <- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="CHOMSKY.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="CHOMSKY.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="CHOMSKY.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>'; }
+    html += '<button class="btn secondary mt-1" onclick="CHOMSKY.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="CHOMSKY.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="CHOMSKY.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>Checked Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="CHOMSKY.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'TOWER COMPLETE' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each linguistic axis to the ArtLang scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="CHOMSKY.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="CHOMSKY.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="CHOMSKY.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'babel: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="CHOMSKY.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="CHOMSKY.show(\'dashboard\')">View Final Report -></button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="CHOMSKY.show(\'modules\')">Continue Training -></button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="CHOMSKY.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="CHOMSKY.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="CHOMSKY.show(\'arena\')">Arena -></button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="CHOMSKY.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="CHOMSKY.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="CHOMSKY.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="CHOMSKY.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="CHOMSKY.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="CHOMSKY.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="CHOMSKY.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="CHOMSKY.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="CHOMSKY.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="CHOMSKY.show(\'arena\')">Back to Arena -></button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="CHOMSKY.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="CHOMSKY.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'chomsky_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading syntax kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Tower of Babel...', 'CHOMSKY online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.CHOMSKY = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  // Track activity for Hub Heatmap
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
