@@ -1,1 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // PRIGOGINE v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
 
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">PRIGOGINE</div><div class="boot-sub">Cogito // Complexity & Thermodynamics Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">PRIGOGINE</div><div class="brand-tag">DISSIPATIVE STRUCTURES</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="PRIGOGINE.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="PRIGOGINE.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="PRIGOGINE.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="PRIGOGINE.setTheme('light')">Light</button><button class="theme-option" onclick="PRIGOGINE.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Negentropy</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="PRIGOGINE.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of dissipative structures. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: NEGENTROPY</h1><p class="section-sub">A cumulative scenario. Apply complexity science to scale a startup.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About PRIGOGINE</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>PRIGOGINE is a cognitive training simulator designed to install the strategic thinking patterns used by Ilya Prigogine and complexity scientists. It trains you to understand how complex order emerges not despite entropy, but because of it, through the dissipation of energy.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Negentropy require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>CHAOS</strong> — Order Out of Chaos (Far-from-equilibrium)</li>
+          <li><strong>DISSIPATION</strong> — Energy throughput & Entropy export</li>
+          <li><strong>FLUCTUATIONS</strong> — Randomness leading to phase transitions</li>
+          <li><strong>BIFURCATION</strong> — Points of no return / choice</li>
+          <li><strong>AUTOCATALYSIS</strong> — Positive feedback & self-reinforcing loops</li>
+          <li><strong>SYMMETRY</strong> — Symmetry breaking & pattern formation</li>
+          <li><strong>ATTRACTORS</strong> — Strange attractors & system basins</li>
+          <li><strong>CRITICALITY</strong> — Edge of chaos & power laws</li>
+          <li><strong>EMERGENCE</strong> — Macro-behavior from micro-rules</li>
+          <li><strong>DISSIPATIVE</strong> — Life as a dissipative structure</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'CHAOS', title:'Order Out of Chaos', summary:'Far-from-equilibrium systems spontaneously reorganize.', lesson:{ title:'The Architecture of Emergence', body: 'The 2nd Law of Thermodynamics states that in a closed system, entropy (disorder) always increases. Yet the universe is full of complex, highly ordered structures: galaxies, stars, planets, life, and civilizations. How is this possible without violating the 2nd Law?\n\n## The Breakthrough\n\nIlya Prigogine discovered that systems held far from thermodynamic equilibrium do not merely decay into chaos. Instead, they spontaneously reorganize into higher, more complex states of order. He called these "dissipative structures."\n\n## The Benard Cell\n\nImagine heating a pan of oil. At low heat, heat moves via conduction (random molecular motion). As you increase the heat (pushing it far from equilibrium), at a critical temperature, the random motion spontaneously organizes into perfect hexagonal convection cells. Millions of molecules move in lockstep. Order emerges from chaos.\n\n## The Condition\n\nThis order does not violate the 2nd Law because the system is open. It imports high-quality energy (heat) and exports low-quality energy (waste heat). The local order (the cells) is paid for by increased global entropy. Order is not the opposite of entropy; it is a byproduct of dissipating it.\n\n## The Method\n\n1. **Identify if the system is closed or open.** Closed systems decay.\n2. **Find the energy source.** What is being imported?\n3. **Find the entropy sink.** What is being exported?\n4. **Look for emergent order.** When pushed far enough, structure will form.', takeaways:['Far-from-equilibrium systems spontaneously form complex order.','Order does not violate the 2nd Law if the system is open.','Dissipative structures import energy and export entropy.','The Benard cell is the canonical example of order from chaos.','Look for the energy source and entropy sink to find emergent order.'] } },
+  { id:'m2', codename:'DISSIPATION', title:'Energy Throughput', summary:'Structures exist to dissipate energy gradients.', lesson:{ title:'The Architecture of Flow', body: 'A dissipative structure is, fundamentally, a mechanism for accelerating the dissipation of an energy gradient. A hurricane does not exist despite the temperature difference between the ocean and the upper atmosphere; it exists *because* of it. The hurricane is natures way of dissipating that gradient faster.\n\n## Maximum Entropy Production (MEP)\n\nSome physicists argue that the universe selects for structures that dissipate energy the fastest. A flat pan of hot oil cools slowly via conduction. The Benard convection cells cool it much faster. Nature "prefers" the cells because they are more efficient entropy producers.\n\n## The Living Engine\n\nLife is a dissipative structure. You eat food (high-quality chemical energy) and excrete waste (low-quality heat). Your body exists to accelerate the dissipation of the chemical energy stored in plants and animals. A forest is an entropy engine, converting solar photons into infrared heat far faster than bare rock ever could.\n\n## The Method\n\n1. **Identify the gradient.** What is the high-quality energy source?\n2. **Identify the structure.** What has emerged to dissipate it?\n3. **Maximize throughput.** The more energy a structure can process, the more complex it can become.', takeaways:['Dissipative structures exist to accelerate the dissipation of energy gradients.','Hurricanes and life are mechanisms for dissipating energy faster.','Maximum Entropy Production (MEP): nature selects for structures that dissipate energy fastest.','A forest is an entropy engine converting solar photons to heat.','The more energy a structure can process, the more complex it can become.'] } },
+  { id:'m3', codename:'FLUCTUATIONS', title:'Fluctuations', summary:'Random noise that drives systems past critical thresholds.', lesson:{ title:'The Architecture of Noise', body: 'In a stable system, fluctuations (random noise) are damped. A small wave in a calm pond dissipates. But in a system held far from equilibrium, fluctuations can be amplified. A small wave can grow into a tsunami.\n\n## The Critical Point\n\nAs a system is pushed further from equilibrium, it approaches a critical point. At this point, the system becomes exquisitely sensitive to small perturbations. A tiny fluctuation—a single mutation, a single dissident, a single pixel—can cascade through the system and trigger a macroscopic phase transition.\n\n## The Role of Noise\n\nIn classical physics, noise is the enemy of order. In complexity science, noise is the engine of evolution. Without random mutations, life would never advance. Without random market fluctuations, prices would never find equilibrium. Noise pushes the system to explore its state space, eventually finding new, more stable dissipative structures.\n\n## The Method\n\n1. **Identify if the system is near a critical point.** Is it stable or sensitive?\n2. **If stable:** Ignore the noise. It will damp out.\n3. **If critical:** Watch the noise closely. A small fluctuation will determine the future.\n4. **If you want innovation:** Increase the noise (mutation rate) to force exploration.', takeaways:['In stable systems, fluctuations (noise) are damped.','Far from equilibrium, fluctuations can be amplified into macroscopic changes.','At critical points, systems become exquisitely sensitive to small perturbations.','Noise is the engine of evolution, pushing systems to explore new structures.','Increase noise (mutation rate) to force innovation; decrease it for stability.'] } },
+  { id:'m4', codename:'BIFURCATION', title:'Bifurcation Points', summary:'Moments where the system must choose a path.', lesson:{ title:'The Architecture of Choice', body: 'When a system is pushed past a critical point, it reaches a bifurcation. The system cannot remain in its current state, and it must "choose" between two or more new states. The choice is often irreversible.\n\n## The Tipping Point\n\nImagine a ball resting in a valley. As you tilt the landscape (pushing the system far from equilibrium), the ball stays in the valley. But at a certain angle, the valley disappears. The ball must roll left or right. Once it rolls, returning to the original state requires reversing the tilt entirely.\n\n## Path Dependence\n\nThe direction the ball rolls is often determined by a microscopic fluctuation—a tiny breeze or an imperfection in the ground. This means the future of the system is fundamentally unpredictable at the bifurcation point, even if the macroscopic forces are known. History matters.\n\n## The Method\n\n1. **Identify if you are at a bifurcation point.** Is the current state becoming unstable?\n2. **Map the possible futures.** What are the new stable states?\n3. **Recognize irreversibility.** Once you commit, the path back is closed.\n4. **Accept unpredictability.** The outcome is determined by noise, not just force.', takeaways:['A bifurcation is a point where a system must choose between two or more new states.','The choice is often irreversible; you cannot easily return to the previous state.','The direction taken is often determined by a microscopic fluctuation (noise).','History matters: the future depends on the path taken, not just the current state.','At bifurcation points, accept fundamental unpredictability.'] } },
+  { id:'m5', codename:'AUTOCATALYSIS', title:'Autocatalysis', summary:'Positive feedback loops and hypercycles.', lesson:{ title:'The Architecture of Self-Reinforcement', body: 'An autocatalytic reaction is one where the product of the reaction is also a catalyst for the reaction. A + B -> 2A. The more A there is, the faster A is produced. This is positive feedback.\n\n## The Hypercycle\n\nManfred Eigen proposed the "hypercycle" to explain the origin of life. Molecule A catalyzes B, B catalyzes C, C catalyzes A. This closed loop of positive feedback allows the system to grow exponentially and resist perturbations. Once a hypercycle forms, it is very hard to break.\n\n## Network Effects\n\nIn business, network effects are autocatalytic. More users make the product more valuable, which attracts more users. The more cars Uber has, the faster the pickup time, the more riders it attracts, which attracts more drivers. This is why monopolies form in digital markets: the autocatalytic loop accelerates until it captures the entire space.\n\n## The Method\n\n1. **Look for A -> 2A loops.** Where does growth cause more growth?\n2. **If you want to build a structure:** Engineer an autocatalytic loop.\n3. **If you want to break a structure:** Break the loop. Do not attack the structure directly.', takeaways:['Autocatalysis: the product of a reaction catalyzes the reaction itself (A -> 2A).','Positive feedback loops cause exponential growth.','Hypercycles (closed loops of catalysis) are resistant to perturbation.','Network effects in business are autocatalytic loops.','To build or break a structure, engineer or break the loop, dont attack the structure directly.'] } },
+  { id:'m6', codename:'SYMMETRY', title:'Symmetry Breaking', summary:'How uniform states become patterned.', lesson:{ title:'The Architecture of Pattern', body: 'A dissipative structure often begins in a perfectly symmetric state. The Benard cell starts as a uniform layer of hot oil. Yet, at the critical point, this symmetry is spontaneously broken. The oil organizes into distinct hexagonal cells. Why does the uniform state become patterned?\n\n## The Instability\n\nThe uniform state becomes unstable. A tiny fluctuation (one spot slightly hotter than another) is amplified by convection. The symmetry breaks. The system reorganizes into a lower-symmetry, higher-complexity state.\n\n## Morphogenesis\n\nAlan Turing (of computer science fame) proposed that animal coat patterns (zebra stripes, leopard spots) form via this mechanism. Two chemicals (an activator and an inhibitor) diffuse at different rates. A random fluctuation is amplified by the activator and suppressed by the inhibitor. Symmetry breaks, and stripes form.\n\n## The Method\n\n1. **Identify the activator and inhibitor.** What amplifies the pattern? What suppresses it?\n2. **Look for diffusion differences.** If the activator acts fast but locally, and the inhibitor acts slow but globally, patterns emerge.\n3. **Embrace the initial asymmetry.** The pattern is seeded by noise.', takeaways:['Dissipative structures often begin in a symmetric state and spontaneously break symmetry.','Symmetry breaking is how uniform states become patterned.','Activators amplify patterns; inhibitors suppress them.','Different diffusion rates of activator/inhibitor create patterns (Turing patterns).','The initial symmetry break is seeded by random noise.'] } },
+  { id:'m7', codename:'ATTRACTORS', title:'Strange Attractors', summary:'System trajectories and basins of attraction.', lesson:{ title:'The Architecture of Trajectory', body: 'In classical physics, a system goes from point A to point B. In complexity science, systems move through "state space." An attractor is a region of state space that the system tends to settle into, no matter where it starts.\n\n## The Lorenz Attractor\n\nEdward Lorenz discovered that weather systems, while chaotic, are not entirely random. They are confined to a specific shape in state space, now called the Lorenz Attractor (shaped like a butterfly). The system never visits the same point twice, but it never leaves the attractor.\n\n## Basins of Attraction\n\nImagine a landscape with valleys. If you drop a ball, it rolls to the bottom of the nearest valley. That valley is an attractor. The region that drains into that valley is its "basin of attraction." If you perturb the system (kick the ball out), it will eventually settle back into the same valley—unless you kick it over a ridge into another basin.\n\n## The Method\n\n1. **Identify the attractors.** What are the stable states the system settles into?\n2. **Identify the basins.** What conditions lead to each attractor?\n3. **To change the system:** Do not try to control the trajectory. Alter the landscape so the system flows into a new basin.', takeaways:['Systems move through state space and tend to settle into attractors.','Strange attractors (like Lorenz) are chaotic but bounded: never the same point twice, but never leaving the shape.','A basin of attraction is the region that drains into an attractor.','To change a complex system, do not control the trajectory. Alter the landscape so the system flows into a new basin.'] } },
+  { id:'m8', codename:'CRITICALITY', title:'Self-Organized Criticality', summary:'Systems tuning themselves to the edge of chaos.', lesson:{ title:'The Architecture of the Edge', body: 'Per Bak introduced the concept of Self-Organized Criticality (SOC). A system naturally tunes itself to the critical point, the edge of chaos, without any external tuning.\n\n## The Sandpile Model\n\nDrop grains of sand one by one onto a table. The pile grows steeper. At the critical angle, adding one more grain causes an avalanche. The avalanche redistributes the sand, lowering the slope. But as you keep adding grains, the pile rebuilds to the critical angle. The system is always hovering at the critical point.\n\n## Power Laws\n\nIn a critical system, the size of events follows a power law. There are many small avalanches, few medium ones, and very rare massive ones. Earthquakes (Richter scale), stock market crashes, and internet virality all follow power laws, suggesting they operate at criticality.\n\n## Why Criticality?\n\nThe edge of chaos is the optimal point for information processing. Too ordered = static. Too chaotic = noise. At the critical point, a system can transmit information across all scales. Brains operate at criticality. Ecosystems operate at criticality.\n\n## The Method\n\n1. **Look for power laws.** If event sizes follow a power law, the system is likely critical.\n2. **To optimize computation/evolution:** Tune the system to the edge of chaos.\n3. **Beware:** Critical systems are prone to cascading failures (avalanches).', takeaways:['Self-Organized Criticality (SOC): systems tune themselves to the edge of chaos.','The sandpile model: adding grains causes avalanches, keeping the pile at the critical angle.','Event sizes in critical systems follow power laws (many small, few large).','The edge of chaos is optimal for information processing and evolution.','Critical systems are prone to cascading failures (avalanches).'] } },
+  { id:'m9', codename:'EMERGENCE', title:'Emergence', summary:'Macro-behavior from micro-rules.', lesson:{ title:'The Architecture of the Whole', body: 'Emergence is the hallmark of complexity. The whole exhibits properties that the parts do not. A single water molecule is not "wet." Wetness is an emergent property of billions of molecules interacting.\n\n## Stigmergy\n\nHow do termites build massive, ventilated mounds with arches and chimneys? There is no architect. No termite has a blueprint. They use "stigmergy": indirect coordination through the environment. A termite drops a pheromone-laced mud ball. Another termite smells it and is triggered to drop its ball next to the first. The mound emerges from simple local rules.\n\n## The Game of Life\n\nConway\'s Game of Life: a grid of cells that are alive or dead. Rules: 1) A dead cell with 3 live neighbors becomes alive. 2) A live cell with 2-3 live neighbors stays alive. 3) Otherwise, it dies. From these 3 rules, emerge "gliders," "blinkers," and self-replicating structures. Complexity for free.\n\n## The Method\n\n1. **Do not look for a central controller.** Complex systems are usually decentralized.\n2. **Find the local rules.** How do individual agents interact?\n3. **Look for stigmergy.** How are they coordinating through the environment?\n4. **Accept that the macro-behavior cannot be easily predicted from the micro-rules.**', takeaways:['Emergence: the whole exhibits properties the parts do not (wetness).','Complex systems are usually decentralized; there is no central controller.','Stigmergy: agents coordinate indirectly through the environment (termites).','Simple local rules can generate massive global complexity (Game of Life).','Macro-behavior cannot be easily predicted from micro-rules.'] } },
+  { id:'m10', codename:'DISSIPATIVE', title:'Life & Economy', summary:'Biosphere and markets as dissipative structures.', lesson:{ title:'The Architecture of the Biosphere', body: 'Life is the ultimate dissipative structure. The Earth imports high-quality solar photons and exports low-quality infrared radiation. The biosphere exists to accelerate this gradient. A forest captures photons far more efficiently than bare rock, converting them into chemical bonds and eventually heat.\n\n## The Economy as an Engine\n\nThe human economy is also a dissipative structure. It imports energy (fossil fuels, solar, nuclear) and raw materials, and exports waste and heat. The complexity of civilization (supply chains, cities, internet) is a direct measure of the energy throughput.\n\n## The Limits to Growth\n\nA dissipative structure can only grow as long as its energy source grows and its entropy sink can absorb the waste. If the energy source peaks (peak oil) or the sink saturates (climate change), the structure must either find a new source/sink or undergo a phase transition (collapse) to a lower-energy state.\n\n## The Method\n\n1. **View your business as an entropy engine.** What energy are you importing? What waste are you exporting?\n2. **Growth requires increasing throughput.** You cannot grow complexity without growing energy.\n3. **Identify the limiting factor.** Is it the source (capital/talent) or the sink (market capacity/waste removal)?\n4. **When the source peaks, prepare for a phase transition.** Do not assume linear extrapolation.', takeaways:['Life and the economy are ultimate dissipative structures.','Complexity is a direct measure of energy throughput.','Growth requires increasing energy import and entropy export.','Limits to growth are set by energy sources (peak oil) and entropy sinks (climate change).','When throughput peaks, prepare for a phase transition, not linear decline.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is a dissipative structure?',back:'A system held far from thermodynamic equilibrium that spontaneously forms complex order by importing energy and exporting entropy.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'How do dissipative structures avoid violating the 2nd Law of Thermodynamics?',back:'They are open systems. They import high-quality energy and export low-quality energy (entropy). Local order is paid for by global disorder.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What is the Benard cell?',back:'A classic example of order from chaos. When oil is heated to a critical temperature, random conduction spontaneously organizes into perfect hexagonal convection cells.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'What are the 4 steps to identify a dissipative structure?',back:'1. Is it open or closed? 2. Find the energy source. 3. Find the entropy sink. 4. Look for emergent order.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'Does order violate the 2nd Law?',back:'No. The 2nd Law applies to closed systems. Open systems can decrease local entropy by increasing global entropy.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'A hurricane is a dissipative structure. What is its energy source?',back:'The temperature gradient between the warm ocean surface and the cool upper atmosphere.'},
+  {id:'c7',moduleId:'m1',core:false,category:'concept',front:'What condition is required for order to emerge from chaos?',back:'The system must be held far from thermodynamic equilibrium.'},
+  {id:'c8',moduleId:'m1',core:false,category:'application',front:'A closed system will always...',back:'...decay into maximum entropy (disorder).' },
+  {id:'c9',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Order is not the opposite of entropy; it is a..."',back:'"...byproduct of dissipating it."'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What did Ilya Prigogine discover?',back:'That systems far from equilibrium spontaneously reorganize into higher, more complex states of order.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'A company is a dissipative structure. What is its "energy"?',back:'Capital, talent, and revenue. It imports these to maintain internal order.'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'Why do dissipative structures form?',back:'They are more efficient at dissipating energy gradients than the unstructured background.'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is Maximum Entropy Production (MEP)?',back:'The theory that nature selects for structures that dissipate energy the fastest.'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'Why do hurricanes exist?',back:'They are natures way of dissipating the temperature gradient between the ocean and atmosphere faster.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is an energy gradient?',back:'A difference in energy quality or concentration between two points (e.g., hot vs cold, high vs low pressure).'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'How does life act as an entropy engine?',back:'Life imports high-quality chemical/solar energy and exports low-quality heat, accelerating dissipation.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'Does a forest cool the planet or warm it?',back:'It cools it. A forest converts solar photons into chemical bonds and eventually heat, dissipating the gradient far faster than bare rock.'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'What is the relationship between energy throughput and complexity?',back:'The more energy a structure can process, the more complex it can become.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'What does a dissipative structure fundamentally do?',back:'It accelerates the dissipation of an energy gradient.'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'A flat pan of oil cools slowly. Benard cells cool it faster. What does MEP say about this?',back:'Nature "prefers" the Benard cells because they are more efficient entropy producers.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "A dissipative structure exists..."',back:'"...because of the energy gradient, not despite it."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'What is the "waste" of a biological dissipative structure?',back:'Low-quality heat (infrared radiation).'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'To increase the complexity of a system, what must you increase?',back:'Energy throughput.'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'Why is a star a dissipative structure?',back:'It exists to dissipate the gravitational gradient by fusing hydrogen into helium and radiating heat.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is a fluctuation in complexity science?',back:'A random perturbation or noise in the system.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'How are fluctuations treated in stable vs critical systems?',back:'In stable systems, they are damped. In critical systems, they are amplified into macroscopic changes.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'What is the role of noise in evolution?',back:'It is the engine. Without random mutations (noise), life would never advance.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'You want to force innovation in a company. What should you do to the "noise"?',back:'Increase it. Encourage random experiments (mutations) to force exploration of new structures.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'What happens to a system as it approaches a critical point?',back:'It becomes exquisitely sensitive to small perturbations.'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'A tiny mutation causes a species to diverge. What principle is this?',back:'A fluctuation amplified at a critical point.'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'In classical physics, noise is the enemy of order. In complexity, it is...',back:'...the engine of evolution and exploration.'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'If a system is stable, should you worry about small fluctuations?',back:'No. They will damp out.'},
+  {id:'c33',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "In stable systems, fluctuations are..."',back:'"...damped."'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'Why do stock markets fluctuate?',back:'They are far-from-equilibrium systems where microscopic fluctuations (trades) are amplified.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'A single dissident sparks a revolution. What is this an example of?',back:'A fluctuation at a critical point triggering a phase transition.'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'What is "state space exploration"?',back:'Noise pushing a system to try new configurations until it finds a stable one.'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is a bifurcation point?',back:'A critical threshold where a system must choose between two or more new states.'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'Is the choice at a bifurcation point usually reversible?',back:'No. Once the system commits to a path, returning to the original state requires reversing the forces entirely.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'What determines the direction a system takes at a bifurcation?',back:'Often a microscopic fluctuation (noise), making it fundamentally unpredictable.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'You push a system past a critical point. Can you predict the exact outcome?',back:'No. The macroscopic forces are known, but the outcome is determined by noise.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is path dependence?',back:'The future of a system depends on the historical path taken, not just the current state.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'A company pivots to a new market. Why is this a bifurcation?',back:'They cannot easily return to the old market. The path is irreversible.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is the "ball in a valley" analogy?',back:'A stable state. Tilting the landscape (pushing far from equilibrium) eventually makes the valley disappear, forcing the ball to roll left or right.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'Why do revolutions happen suddenly?',back:'The system reaches a bifurcation point where a small spark (fluctuation) triggers a rapid phase transition.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "At bifurcation points, accept..."',back:'"...fundamental unpredictability."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'Does history matter in complexity science?',back:'Yes. Path dependence means the sequence of events dictates the final state.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'You are at a bifurcation. What should you map?',back:'The possible future stable states (attractors).'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'A bifurcation is also known as a...',back:'...tipping point or critical threshold.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is an autocatalytic reaction?',back:'A reaction where the product is also a catalyst (A + B -> 2A). The more A there is, the faster A is produced.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'How are network effects related to autocatalysis?',back:'They are autocatalytic loops. More users make the product more valuable, attracting more users.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is a hypercycle?',back:'A closed loop of catalysis (A->B->C->A) proposed by Manfred Eigen to explain the origin of life.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'Why are hypercycles resistant to perturbation?',back:'The circular feedback makes the system self-reinforcing and hard to break.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'What kind of growth does an autocatalytic loop produce?',back:'Exponential growth.'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'How do you break an autocatalytic business loop?',back:'Break the loop (e.g., sever the connection between users). Do not attack the structure directly.'},
+  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'In an autocatalytic reaction, what is the catalyst?',back:'The product of the reaction itself.'},
+  {id:'c56',moduleId:'m5',core:false,category:'application',front:'Uber: more drivers -> faster pickups -> more riders -> more drivers. What is this?',back:'An autocatalytic loop (network effect).'},
+  {id:'c57',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "To build a structure, engineer..."',back:'"...an autocatalytic loop."'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'Why do digital monopolies form?',back:'Because autocatalytic loops accelerate until they capture the entire market.'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'You want to build a platform. What must you ensure?',back:'That growth causes more growth (the loop closes).'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'Autocatalysis is an example of what kind of feedback?',back:'Positive feedback.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is symmetry breaking?',back:'When a system in a perfectly symmetric state spontaneously organizes into a lower-symmetry, patterned state.'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'How do Turing patterns (zebra stripes) form?',back:'An activator (amplifies pattern) and inhibitor (suppresses pattern) diffuse at different rates, breaking symmetry.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'In pattern formation, what is an activator?',back:'A chemical or agent that amplifies a local pattern.'},
+  {id:'c64',moduleId:'m6',core:false,category:'concept',front:'In pattern formation, what is an inhibitor?',back:'A chemical or agent that suppresses the pattern globally.'},
+  {id:'c65',moduleId:'m6',core:false,category:'application',front:'Why do Benard cells form hexagons and not random blobs?',back:'Because the activator (heat) and inhibitor (viscosity/cooling) interact to create the most efficient packing shape.'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'What seeds the initial symmetry break?',back:'A random fluctuation (noise).'},
+  {id:'c67',moduleId:'m6',core:false,category:'application',front:'A uniform market suddenly splits into niches. What is this?',back:'Symmetry breaking.'},
+  {id:'c68',moduleId:'m6',core:false,category:'concept',front:'For patterns to form, how must the activator and inhibitor diffuse?',back:'The activator must act fast and locally; the inhibitor must act slow and globally.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Symmetry breaking is how uniform states become..."',back:'"...patterned."'},
+  {id:'c70',moduleId:'m6',core:false,category:'application',front:'A city has a uniform population but suddenly forms distinct ethnic neighborhoods. What principle?',back:'Symmetry breaking (activator: people prefer similar neighbors; inhibitor: housing costs).'},
+  {id:'c71',moduleId:'m6',core:false,category:'concept',front:'Does a symmetric state tend to be stable far from equilibrium?',back:'No. It becomes unstable and breaks.'},
+  {id:'c72',moduleId:'m6',core:false,category:'application',front:'How did Alan Turing contribute to complexity science?',back:'He proposed the activator-inhibitor model of morphogenesis (pattern formation).'}, 
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is an attractor?',back:'A region of state space that a system tends to settle into, no matter where it starts.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'How do you change a complex system according to attractor theory?',back:'Do not control the trajectory. Alter the landscape so the system flows into a new basin.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is a "basin of attraction"?',back:'The region of state space that drains into a specific attractor.'},
+  {id:'c76',moduleId:'m7',core:false,category:'concept',front:'What is a strange attractor?',back:'A chaotic but bounded attractor (e.g., Lorenz). The system never visits the same point twice but never leaves the shape.'},
+  {id:'c77',moduleId:'m7',core:false,category:'application',front:'A company is stuck in a failing strategy. How do you change it?',back:'Alter the landscape (incentives/structure) so the new strategy becomes a deeper attractor.'},
+  {id:'c78',moduleId:'m7',core:false,category:'concept',front:'In classical physics, a system goes from point A to point B. In complexity...',back:'...systems move through state space and settle into attractors.'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'You perturb a system (kick the ball out of the valley). What happens?',back:'It will settle back into the same valley, unless you kicked it over a ridge into another basin.'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'What is the Lorenz Attractor shaped like?',back:'A butterfly.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "To change a complex system, alter the..."',back:'"...landscape."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'Is a strange attractor random?',back:'No. It is deterministic but chaotic. It is bounded but never repeats.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'A market has two dominant players (stable states). What are these?',back:'Attractors.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'Why is controlling a complex system trajectory impossible?',back:'Because the system is sensitive to initial conditions (chaos). You must shape the attractors.'},
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is Self-Organized Criticality (SOC)?',back:'When a system naturally tunes itself to the critical point (edge of chaos) without external tuning.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What is the sandpile model?',back:'Dropping grains on a table. The pile builds to a critical angle, then avalanches. It self-organizes to criticality.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'What is a power law?',back:'A statistical relationship where small events are common, medium are rare, and massive are very rare (e.g., 1/f noise).'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'Earthquakes follow a power law. What does this imply?',back:'The Earth\'s crust operates at self-organized criticality.'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'Why do systems tune to the edge of chaos?',back:'It is the optimal point for information processing and evolution.'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'What is the danger of critical systems?',back:'They are prone to cascading failures (avalanches).'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'Do brains operate at criticality?',back:'Yes. It balances order (rigid thinking) and chaos (noise) for optimal computation.'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'Stock market crashes follow power laws. What does this mean?',back:'Markets operate at criticality; massive crashes are inevitable, not anomalous.'},
+  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "The edge of chaos is optimal for..."',back:'"...information processing."'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'In a critical system, can you predict the size of the next event?',back:'No. You know the distribution (power law), but not the specific event.'},
+  {id:'c95',moduleId:'m8',core:false,category:'application',front:'How do you identify if a system is critical?',back:'Look for power laws in event sizes.'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'Who introduced Self-Organized Criticality?',back:'Per Bak.'},
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is emergence?',back:'When the whole exhibits properties that the parts do not (e.g., wetness).'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'How do termites build complex mounds?',back:'Stigmergy: indirect coordination through the environment. A pheromone triggers the next termite to act.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'What is stigmergy?',back:'Indirect coordination between agents via modifications to their environment.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'In a complex system, should you look for a central controller?',back:'No. Complex systems are usually decentralized.'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'What is Conway\'s Game of Life?',back:'A cellular automaton with 3 simple rules that generates massive complexity.'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'Can you predict the macro-behavior of a complex system from its micro-rules?',back:'Not easily. Simulation is often required.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'Is a single water molecule "wet"?',back:'No. Wetness is an emergent property of many molecules.'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'How do ants find the shortest path to food?',back:'Stigmergy. They leave pheromone trails. Shorter paths get reinforced faster.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Complexity for..."',back:'"...free." (Simple rules generate complex behavior)'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is a "glider" in the Game of Life?',back:'An emergent structure that moves across the grid.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Traffic jams form backward even without an accident. What is this?',back:'Emergent behavior from local braking rules.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'Why are emergent properties irreducible?',back:'You cannot understand them by studying the parts in isolation.'},
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'Is the economy a dissipative structure?',back:'Yes. It imports energy/raw materials and exports waste/heat.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What limits the growth of a dissipative structure?',back:'The energy source (throughput) and the entropy sink (waste absorption).'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'What is the relationship between complexity and energy throughput?',back:'Complexity is a direct measure of energy throughput.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'What happens when an energy source peaks (e.g., peak oil)?',back:'The structure must find a new source or undergo a phase transition (collapse).'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'Why is the Earth a dissipative structure?',back:'It imports solar photons and exports infrared radiation.'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'Climate change is a failure of what?',back:'The entropy sink (atmosphere) saturating with waste heat/gases.'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'Can civilization grow without increasing energy throughput?',back:'No. Growth requires increasing energy import.'},
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'A business scales. What must scale with it?',back:'Energy (capital/talent) import and waste (debt/burnout) export.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "When throughput peaks, prepare for a..."',back:'"...phase transition."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is the "waste" of a city?',back:'Heat, sewage, pollution, traffic.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'A startup burns cash (energy) to maintain order. What happens if the cash runs out?',back:'The structure collapses (phase transition to a lower-energy state).'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'Life is the ultimate dissipative structure because...',back:'...it maximizes the rate of entropy production on Earth.'}
+];
+
+const ARENA = [
+  // MODULE 1: CHAOS
+  { id:'p1', moduleId:'m1', title:'Q1: 2nd Law', difficulty:1, reward:50, timeLimit:45, body:'The 2nd Law of Thermodynamics states that entropy always increases. Yet complex order (life) exists. How?', options:['The 2nd Law is wrong.','Life is a closed system.','Life is an open system that imports energy and exports entropy.','Order violates physics.'], correct:2, explanation:'The 2nd Law applies to closed systems. Open systems like life can decrease local entropy by increasing global entropy.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Benard Cells', difficulty:2, reward:100, timeLimit:60, body:'You heat oil in a pan. At a critical temperature, random conduction turns into perfect hexagonal convection cells. What is this?', options:['A violation of thermodynamics','A dissipative structure (order from chaos)','Magic','Linear growth'], correct:1, explanation:'This is the Benard cell, the canonical example of a dissipative structure. The system, pushed far from equilibrium, spontaneously forms order.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Identifying Structures', difficulty:3, reward:200, timeLimit:90, body:'Which of the following is NOT a dissipative structure?', options:['A hurricane','A living cell','A crystal in a sealed jar','A star'], correct:2, explanation:'A crystal in a sealed jar is a closed system near equilibrium. It does not import energy to maintain structure. The others do.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Method', difficulty:4, reward:500, timeLimit:120, body:'You are analyzing a city. What is the correct first step to apply complexity science?', options:['Find the mayor (controller)','Find the energy source (capital/food) and entropy sink (waste/heat)','Measure the size','Count the population'], correct:1, explanation:'A dissipative structure is defined by its throughput. Find what it imports (energy) and what it exports (entropy) to understand its order.' },
+
+  // MODULE 2: DISSIPATION
+  { id:'p5', moduleId:'m2', title:'Q1: Purpose of Structure', difficulty:1, reward:50, timeLimit:45, body:'Why do hurricanes exist?', options:['To destroy coastal cities','To dissipate the temperature gradient between ocean and atmosphere','Because of the Coriolis effect','Random weather'], correct:1, explanation:'Hurricanes are dissipative structures. They exist to accelerate the dissipation of the energy gradient. They are entropy engines.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Maximum Entropy Production', difficulty:2, reward:100, timeLimit:60, body:'What does Maximum Entropy Production (MEP) suggest?', options:['Systems minimize entropy','Nature selects for structures that dissipate energy the fastest','Energy is conserved','Entropy is constant'], correct:1, explanation:'MEP suggests the universe "prefers" structures that are most efficient at producing entropy (dissipating gradients).' },
+  { id:'p7', moduleId:'m2', title:'Q3: Forests', difficulty:3, reward:200, timeLimit:90, body:'A forest is a dissipative structure. What does it do better than bare rock?', options:['Looks nicer','Provides habitat','Dissipates solar photons into heat faster','Prevents erosion'], correct:2, explanation:'A forest captures solar energy and converts it to chemical bonds and heat, dissipating the gradient far more efficiently than bare rock.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Business Throughput', difficulty:4, reward:500, timeLimit:120, body:'Your startup wants to increase its complexity (more features, more users). What must increase?', options:['Office space','Energy throughput (capital/talent)','Employee happiness','Marketing spend'], correct:1, explanation:'Complexity is a direct measure of energy throughput. You cannot grow complexity without growing the energy/capital flowing through the system.' },
+
+  // MODULE 3: FLUCTUATIONS
+  { id:'p9', moduleId:'m3', title:'Q1: Noise', difficulty:1, reward:50, timeLimit:45, body:'In a stable system, what happens to random fluctuations (noise)?', options:['They grow exponentially','They are damped and disappear','They cause revolutions','They trigger avalanches'], correct:1, explanation:'In stable systems near equilibrium, fluctuations are damped. A small wave in a calm pond dissipates.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Critical Sensitivity', difficulty:2, reward:100, timeLimit:60, body:'What happens to fluctuations as a system approaches a critical point?', options:['They are ignored','They become irrelevant','They are amplified into macroscopic changes','They stop'], correct:2, explanation:'At critical points, systems become exquisitely sensitive. A tiny fluctuation can cascade and trigger a phase transition.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Engine', difficulty:3, reward:200, timeLimit:90, body:'In classical physics, noise is the enemy of order. In complexity science, what is it?', options:['The enemy of order','The engine of evolution','Irrelevant','A sign of instability'], correct:1, explanation:'Noise pushes the system to explore its state space. Without random mutations (noise), life would never advance.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Innovation Strategy', difficulty:4, reward:500, timeLimit:120, body:'Your company is stagnant. You want to force innovation. What should you do to the "noise"?', options:['Decrease it (enforce strict rules)','Increase it (encourage random experiments)','Ignore it','Outsource it'], correct:1, explanation:'To force exploration of new structures, increase the mutation rate (noise). Allow random experiments. Decrease it for stability.' },
+
+  // MODULE 4: BIFURCATION
+  { id:'p13', moduleId:'m4', title:'Q1: The Tipping Point', difficulty:1, reward:50, timeLimit:45, body:'What is a bifurcation point?', options:['A point where the system splits into two','A point where the system must choose a new state','A point of maximum stability','A type of feedback loop'], correct:1, explanation:'A bifurcation is a critical threshold where the current state becomes unstable, and the system must "choose" between new states.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Reversibility', difficulty:2, reward:100, timeLimit:60, body:'A system passes a bifurcation point and commits to a new state. Is this usually reversible?', options:['Yes, easily','No, it is often irreversible','Only with external force','It depends on the temperature'], correct:1, explanation:'Once the system rolls into a new valley, returning requires reversing the tilt entirely. The path is often closed.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Unpredictability', difficulty:3, reward:200, timeLimit:90, body:'Why is the outcome of a bifurcation fundamentally unpredictable?', options:['Because the math is too hard','Because it is determined by microscopic fluctuations (noise)','Because computers are slow','Because of quantum mechanics'], correct:1, explanation:'The macroscopic forces are known, but the final direction is often determined by a microscopic breeze. History matters.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Pivot', difficulty:4, reward:500, timeLimit:120, body:'Your startup pivots to a new market. Why is this a bifurcation?', options:['It is not; pivots are easy','You cannot easily return to the old market. The path is irreversible','It requires a new logo','It is a linear change'], correct:1, explanation:'Pivoting means abandoning the old attractor. The resources, brand, and codebase left behind cannot be easily rebuilt. Path dependence.' },
+
+  // MODULE 5: AUTOCATALYSIS
+  { id:'p17', moduleId:'m5', title:'Q1: The Loop', difficulty:1, reward:50, timeLimit:45, body:'What is an autocatalytic reaction?', options:['A reaction that stops itself','A reaction where the product catalyzes the reaction (A -> 2A)','A reaction that requires no energy','A linear reaction'], correct:1, explanation:'The product is also the catalyst. The more A there is, the faster A is produced. Positive feedback.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Network Effects', difficulty:2, reward:100, timeLimit:60, body:'How are network effects related to autocatalysis?', options:['They are the opposite','They are unrelated','They are autocatalytic loops (more users -> more value -> more users)','They only apply to chemistry'], correct:2, explanation:'Network effects are business autocatalysis. The structure reinforces its own growth.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Breaking the Loop', difficulty:3, reward:200, timeLimit:90, body:'You want to break a competitor\'s monopoly (autocatalytic loop). What is the correct strategy?', options:['Attack the structure directly','Break the loop (sever the connection between users)','Lower your prices','Sue them'], correct:1, explanation:'Do not attack the structure. Break the loop. If the feedback cycle is broken, the structure will collapse on its own.' },
+  { id:'p20', moduleId:'m5', title:'Q4: The Hypercycle', difficulty:4, reward:500, timeLimit:120, body:'What is a hypercycle?', options:['A very fast bicycle','A closed loop of catalysis (A->B->C->A)','A type of oscillation','A linear supply chain'], correct:1, explanation:'Proposed by Eigen to explain the origin of life. A closed loop of catalysis is self-reinforcing and resistant to perturbation.' },
+
+  // MODULE 6: SYMMETRY
+  { id:'p21', moduleId:'m6', title:'Q1: Pattern Formation', difficulty:1, reward:50, timeLimit:45, body:'What is symmetry breaking?', options:['Making things symmetric','When a uniform state spontaneously becomes patterned','Destroying patterns','A type of feedback'], correct:1, explanation:'A symmetric state becomes unstable, and the system reorganizes into a lower-symmetry, patterned state (e.g., Benard hexagons).' },
+  { id:'p22', moduleId:'m6', title:'Q2: Turing Patterns', difficulty:2, reward:100, timeLimit:60, body:'How do Turing patterns (zebra stripes) form?', options:['Random chance','An activator and inhibitor diffuse at different rates','DNA programming','God painted them'], correct:1, explanation:'An activator amplifies locally; an inhibitor suppresses globally. Their different diffusion rates break symmetry.' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Seed', difficulty:3, reward:200, timeLimit:90, body:'What seeds the initial symmetry break?', options:['A central controller','A random fluctuation (noise)','A genetic mutation','Temperature'], correct:1, explanation:'The macroscopic forces create the instability, but the specific pattern is seeded by a microscopic random fluctuation.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Market Niches', difficulty:4, reward:500, timeLimit:120, body:'A uniform market suddenly splits into distinct niches. What complexity principle is this?', options:['Autocatalysis','Symmetry breaking','Criticality','Dissipation'], correct:1, explanation:'The uniform state (one product for everyone) becomes unstable. The market reorganizes into lower-symmetry niches.' },
+
+  // MODULE 7: ATTRACTORS
+  { id:'p25', moduleId:'m7', title:'Q1: The Valley', difficulty:1, reward:50, timeLimit:45, body:'What is an attractor?', options:['A type of magnet','A region of state space a system settles into','A central controller','A type of noise'], correct:1, explanation:'Like a ball rolling into a valley, an attractor is a stable state the system tends to reach, no matter where it starts.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Strange Attractor', difficulty:2, reward:100, timeLimit:60, body:'What is a strange attractor?', options:['An alien','A chaotic but bounded attractor (never same point twice, never leaves shape)','A random walk','A linear trend'], correct:1, explanation:'The Lorenz attractor (butterfly) is strange. It is deterministic but chaotic. Bounded but never repeating.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Changing Systems', difficulty:3, reward:200, timeLimit:90, body:'According to attractor theory, how do you change a complex system?', options:['Control the trajectory precisely','Alter the landscape so the system flows into a new basin','Force it at gunpoint','Wait for it to change'], correct:1, explanation:'You cannot control the trajectory (chaos). You must alter the landscape (incentives/structure) so the new state becomes the deepest valley.' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Pivot', difficulty:4, reward:500, timeLimit:120, body:'A company is stuck in a failing strategy (attractor). What is the most effective intervention?', options:['Micromanage employees','Alter incentives so the new strategy becomes a deeper attractor','Fire the CEO','Hire consultants'], correct:1, explanation:'The failing strategy is the current valley. To move the ball, you must change the landscape (incentives) so the new strategy is the lowest point.' },
+
+  // MODULE 8: CRITICALITY
+  { id:'p29', moduleId:'m8', title:'Q1: The Sandpile', difficulty:1, reward:50, timeLimit:45, body:'What is Self-Organized Criticality (SOC)?', options:['A system that organizes itself to be perfectly stable','A system that tunes itself to the edge of chaos','A system that avoids avalanches','A type of crystal'], correct:1, explanation:'Systems like sandpiles naturally build to the critical angle, then avalanche. They self-organize to the edge of chaos.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Power Laws', difficulty:2, reward:100, timeLimit:60, body:'In a critical system, what distribution do event sizes follow?', options:['Normal (bell curve)','Uniform','Power law (many small, few massive)','Random'], correct:2, explanation:'Power laws are the signature of criticality. Earthquakes, crashes, and avalanches follow power laws.' },
+  { id:'p31', moduleId:'m8', title:'Q3: The Edge', difficulty:3, reward:200, timeLimit:90, body:'Why do brains and ecosystems operate at criticality?', options:['To conserve energy','It is the optimal point for information processing','To avoid change','Because of evolution'], correct:1, explanation:'Too ordered = static. Too chaotic = noise. The edge of chaos maximizes information transfer and computation.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Danger', difficulty:4, reward:500, timeLimit:120, body:'What is the inherent danger of critical systems?', options:['They are too slow','They are prone to cascading failures (avalanches)','They cannot process information','They waste energy'], correct:1, explanation:'Because they are at the edge of chaos, a small perturbation can trigger a system-wide avalanche. This is why markets crash.' },
+
+  // MODULE 9: EMERGENCE
+  { id:'p33', moduleId:'m9', title:'Q1: The Whole', difficulty:1, reward:50, timeLimit:45, body:'What is emergence?', options:['When things appear suddenly','When the whole exhibits properties the parts do not','When a leader takes charge','A type of symmetry'], correct:1, explanation:'Wetness is emergent. A single water molecule is not wet. The property arises from interaction.' },
+  { id:'p34', moduleId:'m9', title:'Q2: Termites', difficulty:2, reward:100, timeLimit:60, body:'How do termites build complex mounds without a blueprint?', options:['Telepathy','Stigmergy (indirect coordination via pheromones)','A queen gives orders','Trial and error'], correct:1, explanation:'Stigmergy. A termite drops a mud ball with pheromone. Another termite is triggered to drop its ball next to it. The mound emerges.' },
+  { id:'p35', moduleId:'m9', title:'Q3: The Controller', difficulty:3, reward:200, timeLimit:90, body:'In a complex system (e.g., traffic, economy), should you look for a central controller?', options:['Yes, always','No, complex systems are usually decentralized','Only in emergencies','Only in biology'], correct:1, explanation:'Complex systems are usually decentralized. Traffic jams form backward without an accident. The economy has no CEO.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Prediction', difficulty:4, reward:500, timeLimit:120, body:'Can you easily predict the macro-behavior of a complex system from its micro-rules?', options:['Yes, with enough math','No, simulation is often required','Only in physics','Only with AI'], correct:1, explanation:'The Game of Life has 3 rules, but you cannot predict the gliders without running the simulation. Complexity is irreducible.' },
+
+  // MODULE 10: DISSIPATIVE
+  { id:'p37', moduleId:'m10', title:'Q1: The Economy', difficulty:1, reward:50, timeLimit:45, body:'Is the human economy a dissipative structure?', options:['No, it is artificial','Yes, it imports energy/materials and exports waste/heat','Only the financial part','Only the agricultural part'], correct:1, explanation:'The economy is an entropy engine. It imports high-quality energy and exports low-quality waste. Complexity = throughput.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Limits to Growth', difficulty:2, reward:100, timeLimit:60, body:'What ultimately limits the growth of a dissipative structure (like civilization)?', options:['Lack of innovation','The energy source and the entropy sink','Government regulation','Population size'], correct:1, explanation:'Growth requires increasing throughput. If the energy source peaks (peak oil) or the sink saturates (climate change), growth stops.' },
+  { id:'p39', moduleId:'m10', title:'Q3: The Phase Transition', difficulty:3, reward:200, timeLimit:90, body:'What happens when an energy source peaks and the system cannot find a new one?', options:['It keeps growing linearly','It undergoes a phase transition (collapse) to a lower-energy state','It becomes more complex','It stabilizes'], correct:1, explanation:'Without increasing throughput, the complex structure cannot be maintained. It collapses to a lower, simpler state.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Startup', difficulty:4, reward:500, timeLimit:120, body:'A startup burns cash (energy) to maintain order. What happens if the cash runs out?', options:['It pivots','It collapses (phase transition)','It becomes profitable','It stagnates'], correct:1, explanation:'The startup is a dissipative structure. Without energy (cash) throughput, the internal order (employees/code) cannot be maintained. It collapses.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Closed System', scenario:'Your startup is failing. The team is isolated, burning out, and ideas are stagnant. What is the complexity diagnosis?', options:['Hire better people.','You are a closed system. You need to import new energy (ideas/talent) and export entropy (firing/toxins).','Raise more money.','Work harder.'], correct:1, explanation:'A closed system decays. You must open the system: import high-quality energy (new talent/ideas) and export entropy (let go of failing projects).' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: Scaling Throughput', scenario:'You want to double the complexity of your product (features). What must you do?', options:['Double the engineers','Double the energy throughput (capital/compute/talent)','Halve the team','Outsource'], correct:1, explanation:'Complexity is a measure of throughput. You cannot 2x complexity without 2x energy. Hire more, spend more on compute.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Innovation Engine', scenario:'Your product is stagnant. You need radical innovation. What should you do to the "noise"?', options:['Decrease it (strict processes)','Increase it (hackathons, random experiments)','Ignore it','Outsource it'], correct:1, explanation:'To force exploration of new structures, increase the mutation rate (noise). Allow random experiments. Decrease it for stability.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Pivot', scenario:'Your current market is dying. You pivot to a new one. Why is this dangerous?', options:['It is not dangerous','It is a bifurcation. The path is irreversible. If it fails, you cannot return to the old market.','It is reversible','It is linear'], correct:1, explanation:'Pivoting is a bifurcation. You abandon the old attractor. The resources and brand left behind cannot be rebuilt. Path dependence.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: Network Effects', scenario:'You want to build a monopoly. What must you engineer?', options:['A great product','An autocatalytic loop (growth causes more growth)','A patent','A monopoly'], correct:1, explanation:'Network effects are autocatalysis. The more users, the more valuable. Engineer the loop so growth reinforces itself.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: Market Niches', scenario:'You have one uniform product for everyone. Competition is eating your margins. What should you do?', options:['Lower prices','Break symmetry. Split the product into distinct niches.','Raise prices','Advertise more'], correct:1, explanation:'The uniform state is unstable. Break symmetry: create tailored products for different niches. This is how markets evolve.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: Culture Change', scenario:'Your company culture is toxic (a bad attractor). How do you change it?', options:['Fire everyone','Alter the landscape (incentives) so the new culture is the deepest valley','Write a memo','Hire a consultant'], correct:1, explanation:'You cannot control trajectories. Alter the landscape (promotions, bonuses, meetings) so the desired culture becomes the strongest attractor.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Crash', scenario:'Your system is highly optimized and efficient. Why is it fragile?', options:['It is not fragile, it is efficient','It operates at criticality. A small perturbation can cause a cascading failure.','It lacks innovation','It is too slow'], correct:1, explanation:'Highly optimized systems sit at the edge of chaos. They are efficient but prone to avalanches. Build in slack for robustness.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: Decentralization', scenario:'You are scaling globally. The central HQ is a bottleneck. What should you do?', options:['Hire more HQ staff','Use stigmergy. Set simple local rules and let teams coordinate via the environment.','Slow down','Centralize more'], correct:1, explanation:'Complex systems are decentralized. Use stigmergy: set simple rules and let teams coordinate indirectly through shared tools/docs.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Burn Rate', scenario:'Your startup burns $1M/month to maintain its complex structure. You have $5M left. What happens if you dont raise more?', options:['You become profitable','The structure collapses (phase transition) to a lower-energy state','You stagnate','You pivot'], correct:1, explanation:'A dissipative structure requires continuous energy. Without it, the order cannot be maintained. It collapses to a simpler state.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Open System', body:'Identify a system in your life (body, team, project). Is it open or closed? If closed, how can you open it to import energy and export entropy?' },
+  { id:'rw2', title:'The Entropy Engine', body:'Look at your business. What is the high-quality energy you import? What is the low-quality waste you export?' },
+  { id:'rw3', title:'The Mutation Rate', body:'Are you stagnant? Increase the noise. Try 3 random experiments this week to force exploration.' },
+  { id:'rw4', title:'The Bifurcation', body:'Identify a decision you are avoiding. Recognize it as a bifurcation. The path is irreversible. Map the possible futures.' },
+  { id:'rw5', title:'The Loop', body:'Find an autocatalytic loop in your business. Where does growth cause more growth? How can you strengthen it?' },
+  { id:'rw6', title:'The Pattern', body:'Look at a uniform market. How could you break symmetry to create a pattern (niches)?' },
+  { id:'rw7', title:'The Attractor', body:'What is the current "attractor" (stable state) of your team? Alter the landscape (incentives) to shift it.' },
+  { id:'rw8', title:'The Edge', body:'Are you too ordered (static) or too chaotic (noisy)? Tune yourself to the edge of chaos for optimal performance.' },
+  { id:'rw9', title:'The Stigmergy', body:'Stop micromanaging. Set simple local rules and let your team coordinate through a shared environment (Kanban board, Slack).' },
+  { id:'rw10', title:'The Throughput', body:'You want to grow complexity. What energy must you import to sustain it?' },
+  { id:'rw11', title:'The Valley', body:'Visualize your current state as a ball in a valley. What "tilt" (force) is needed to push it over the ridge to a new state?' },
+  { id:'rw12', title:'The Noise', body:'Next time you see a random fluctuation, do not damp it. Amplify it. See where it leads.' },
+  { id:'rw13', title:'The Irreversible', body:'Accept that some choices cannot be undone. Do not waste energy trying to reverse them. Move forward.' },
+  { id:'rw14', title:'The Catalyst', body:'Find a process where the output catalyzes the next iteration. Engineer an autocatalytic loop.' },
+  { id:'rw15', title:'The Niches', body:'Stop trying to be everything to everyone. Break symmetry. Pick a niche.' },
+  { id:'rw16', title:'The Landscape', body:'To change behavior, do not control the person. Change the landscape (incentives) they operate in.' },
+  { id:'rw17', title:'The Avalanche', body:'Recognize that critical systems crash. Build in slack (redundancy) to prevent cascading failures.' },
+  { id:'rw18', title:'The Whole', body:'Look at a team. The team\'s behavior is emergent. Do not study individuals; study interactions.' },
+  { id:'rw19', title:'The Burn', body:'Your startup burns cash. What happens when it runs out? Plan the phase transition.' },
+  { id:'rw20', title:'The Gradient', body:'Find an energy gradient in your market. Build a structure to dissipate it faster.' },
+  { id:'rw21', title:'The Open vs Closed', body:'Is your industry open (innovating) or closed (stagnant)? Open systems grow complex; closed decay.' },
+  { id:'rw22', title:'The MEP', body:'Are you the most efficient entropy producer in your niche? If not, nature will select against you.' },
+  { id:'rw23', title:'The Critical Point', body:'Are you near a tipping point? Small changes now have massive consequences.' },
+  { id:'rw24', title:'The Path', body:'History matters. Your current state is a result of past bifurcations. Do not assume you can easily reverse them.' },
+  { id:'rw25', title:'The Monopoly', body:'Network effects are autocatalysis. Build the loop, and the monopoly forms itself.' },
+  { id:'rw26', title:'The Symmetry Break', body:'A uniform strategy is unstable. Expect it to spontaneously split.' },
+  { id:'rw27', title:'The Basin', body:'Which basin of attraction are you in? Is it the one you want?' },
+  { id:'rw28', title:'The Power Law', body:'Do your failures follow a power law? Expect rare, massive crashes.' },
+  { id:'rw29', title:'The Stigmergy', body:'Drop a pheromone (documentation). Let others build on it. Complexity emerges.' },
+  { id:'rw30', title:'The Energy Source', body:'Civilization is a dissipative structure. What is your personal energy source? What is your waste?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your complexity profile.' },
+  { threshold: 500, title: 'SYNERGIST', desc: 'You see systems as open flows of energy and entropy.' },
+  { threshold: 1500, title: 'CATALYST', desc: 'You engineer autocatalytic loops and symmetry breaking.' },
+  { threshold: 3000, title: 'ARCHITECT', desc: 'You shape attractor landscapes and tune systems to criticality.' },
+  { threshold: 6000, title: 'PRIGOGINE OPERATOR', desc: 'You apply thermodynamics and complexity to build enduring structures.' }
+];
+
+const STORAGE_KEY = 'prigogine-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// NEGENTROPY ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Negentropy. You now possess the complete architecture of complexity.</p>';
+      html += '<p><strong>The Secret:</strong> Order is not the absence of chaos; it is the product of dissipating it. By importing energy, exporting entropy, and tuning your systems to the edge of chaos, you become an architect of emergence. You build structures that endure not by resisting the 2nd Law, but by riding it. You are now a Prigogine Operator.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Negentropy: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your complexity architecture to the scenario.';
+    missionBtn.textContent = 'Open Project ->';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="PRIGOGINE.show(\'modules\')"> <- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="PRIGOGINE.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="PRIGOGINE.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="PRIGOGINE.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>'; }
+    html += '<button class="btn secondary mt-1" onclick="PRIGOGINE.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="PRIGOGINE.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="PRIGOGINE.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>Checked Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="PRIGOGINE.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'NEGENTROPY' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each complexity axis to the startup scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="PRIGOGINE.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="PRIGOGINE.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="PRIGOGINE.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'negentropy: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="PRIGOGINE.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="PRIGOGINE.show(\'dashboard\')">View Final Report -></button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="PRIGOGINE.show(\'modules\')">Continue Training -></button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="PRIGOGINE.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="PRIGOGINE.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="PRIGOGINE.show(\'arena\')">Arena -></button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="PRIGOGINE.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="PRIGOGINE.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="PRIGOGINE.rateDrill(1)">Again<span class="interval"><1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="PRIGOGINE.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="PRIGOGINE.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="PRIGOGINE.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="PRIGOGINE.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="PRIGOGINE.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="PRIGOGINE.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="PRIGOGINE.show(\'arena\')">Back to Arena -></button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="PRIGOGINE.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="PRIGOGINE.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'prigogine_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading thermodynamics kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Negentropy...', 'PRIGOGINE online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.PRIGOGINE = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  // Track activity for Hub Heatmap
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
