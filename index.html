@@ -86,9 +86,21 @@
   .fb-text { display:none; width:100%; margin-top:0.5rem; background:var(--void); border:1px solid var(--border); color:var(--text); padding:0.75rem; border-radius:4px; font-family:var(--mono); font-size:0.8rem; resize:vertical; }
   .submit-btn { width:100%; margin-top:1.5rem; background:var(--cyan); color:var(--void); border:none; padding:0.75rem; font-family:var(--mono); font-weight:700; text-transform:uppercase; cursor:pointer; border-radius:4px; letter-spacing:0.1em; }
   @media(max-width: 600px) { h1 { font-size: 2.2rem; } body { padding: 1rem; } }
+  #particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
+  .shop-tile { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.75rem 0.4rem; text-align: center; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .shop-tile:hover { border-color: var(--cyan); }
+  .shop-tile.locked { opacity: 0.4; cursor: not-allowed; }
+  .shop-tile.equipped { border-color: var(--green); background: rgba(0,255,163,0.05); box-shadow: 0 0 10px rgba(0,255,163,0.1); }
+  .shop-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+  .shop-name { font-size: 0.62rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+  .shop-status { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+  .shop-tile.equipped .shop-status { color: var(--green); }
 </style>
 </head>
 <body>
+  <canvas id="particles"></canvas>
+  <script src="cogito-bg.js"></script>
   <header>
     <h1>Cogito</h1>
     <div class="sub">Interactive Training Simulators</div>
@@ -129,9 +141,15 @@
   </div>
 
   <div class="hub-grid">
-    <div class="panel">
-      <div class="panel-label">// Activity Heatmap (Last 150 Days)</div>
-      <div class="heatmap-grid" id="heatmapGrid"></div>
+    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+      <div class="panel">
+        <div class="panel-label">// Activity Heatmap (Last 150 Days)</div>
+        <div class="heatmap-grid" id="heatmapGrid"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-label">// Background Shop</div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
     </div>
     <div class="panel">
       <div class="panel-label">// Achievements</div>
@@ -454,6 +472,33 @@ function renderAchievements() {
   });
 }
 renderAchievements();
+
+// ============== BACKGROUND SHOP ==============
+const BACKGROUNDS = [
+  { id: 'constellation', name: 'Constellation', level: 1,  icon: '🌌' },
+  { id: 'starfield',     name: 'Starfield',     level: 5,  icon: '✨' },
+  { id: 'nebula',        name: 'Nebula Drift',  level: 10, icon: '🌫️' },
+  { id: 'synthwave',     name: 'Synthwave',     level: 20, icon: '🌇' },
+  { id: 'matrix',        name: 'Matrix Rain',   level: 25, icon: '🟩' }
+];
+function renderShop() {
+  const grid = document.getElementById('shopGrid');
+  if (!grid) return;
+  const lvl = getLevel(totalXP);
+  const equipped = localStorage.getItem('cogito-bg') || 'constellation';
+  grid.innerHTML = '';
+  BACKGROUNDS.forEach(bg => {
+    const unlocked = lvl >= bg.level;
+    const isEq = equipped === bg.id;
+    const tile = document.createElement('div');
+    tile.className = 'shop-tile' + (unlocked ? '' : ' locked') + (isEq ? ' equipped' : '');
+    tile.innerHTML = `<span class="shop-icon">${unlocked ? bg.icon : '🔒'}</span><div class="shop-name">${bg.name}</div><div class="shop-status">${isEq ? 'Equipped' : (unlocked ? 'Equip' : 'Lvl ' + bg.level)}</div>`;
+    if (unlocked && !isEq) tile.onclick = () => { localStorage.setItem('cogito-bg', bg.id); if (window.applyBackground) window.applyBackground(bg.id); renderShop(); };
+    grid.appendChild(tile);
+  });
+}
+renderShop();
+if (window.initBackground) window.initBackground();
 
 let maturities = disciplineStats().map(d => d.maturity);
 let minMat = Math.min(...maturities), maxMat = Math.max(...maturities), avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length, diff = maxMat - minMat;
