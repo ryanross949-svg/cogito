@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // MAYNARD SMITH v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00FF7F; --cyan-dim:#008F44; --magenta:#FF2D9C; --amber:#FFB800; --green:#00D9FF; --red:#FF3355;
+  --text:#E0FFEC; --text-dim:#6B8F7C; --text-faint:#3A5947;
+  --border:rgba(0,255,127,0.15); --border-bright:rgba(0,255,127,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000000; --void-2:#0A0A0A; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --void-2:#2A0A2A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --void-2:#F5F0E0; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --void-2:#3B4252; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background: radial-gradient(ellipse at 20% 10%,rgba(0,255,127,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%), var(--void); min-height:100vh; position:relative; font-size:14px; line-height:1.6; transition: background 0.3s, color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,127,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,127,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,255,127,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,255,127,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,255,127,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem; color:var(--text-dim); background:transparent; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em; cursor:pointer; text-transform:uppercase; font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute; right:0; top:120%; background:var(--panel-solid); border:1px solid var(--border-bright); border-radius:4px; display:none; flex-direction:column; z-index:100; min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem; font-size:0.7rem; color:var(--text-dim); cursor:pointer; border:none; background:none; text-align:left; font-family:var(--mono); text-transform:uppercase;}
+.theme-option:hover{background:var(--panel); color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;}
+.mission{background:linear-gradient(135deg,rgba(0,255,127,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,255,127,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,255,127,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,127,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,255,127,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,255,127,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,255,127,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,255,127,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,127,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,217,255,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container, .project-container{max-width:900px;margin:0 auto;}
+.arena-hud, .project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,255,127,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,217,255,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,102,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,255,127,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,255,127,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,255,127,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,102,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,217,255,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,255,127,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,127,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(255,45,156,0.05), rgba(0,255,127,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display); font-size:1.1rem; color:var(--cyan); margin-top:2rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); letter-spacing:0.1em;}
+.arena-row{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); padding:1rem 1.5rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s; border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright); transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex; align-items:center; gap:1rem; flex:1;}
+.arena-num{font-family:var(--display); color:var(--cyan-dim); font-size:0.85rem; width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem; font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem; border-radius:2px; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15); color:var(--green); border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15); color:var(--amber); border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15); color:var(--magenta); border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15); color:var(--red); border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot">
+  <div class="boot-logo">MAYNARD</div>
+  <div class="boot-sub">Cogito // Evolutionary Architecture v1.0</div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div><div class="brand">MAYNARD</div><div class="brand-tag">EVOLUTIONARY ARCHITECTURE</div></div>
+      <a href="index.html" class="hub-link">← COGITO</a>
+    </div>
+    <div class="stats-strip">
+      <div class="theme-dropdown">
+        <button class="theme-btn" id="themeBtn">Theme</button>
+        <div class="theme-menu" id="themeMenu">
+          <button class="theme-option" onclick="MAYNARD.setTheme('quantum')">Quantum</button>
+          <button class="theme-option" onclick="MAYNARD.setTheme('matrix')">Matrix</button>
+          <button class="theme-option" onclick="MAYNARD.setTheme('cyberpunk')">Cyberpunk</button>
+          <button class="theme-option" onclick="MAYNARD.setTheme('light')">Light</button>
+          <button class="theme-option" onclick="MAYNARD.setTheme('nord')">Nord</button>
+        </div>
+      </div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
+      <div class="stat-pill">XP <b id="topXp">0</b></div>
+      <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
+      <div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+    <div class="nav-item" data-view="project">Project DARWIN</div>
+    <div class="nav-item" data-view="drills">Drills</div>
+    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="stats">Stats</div>
+    <div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1>
+      <p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission">
+          <div class="panel-label">// Next Mission</div>
+          <h2 id="missionTitle">Initialize Training</h2>
+          <p id="missionBody">Loading evolutionary architecture...</p>
+          <div class="flex gap-1" style="flex-wrap:wrap">
+            <button class="btn" id="missionBtn">Begin →</button>
+            <button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">// Daily Output</div>
+          <div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div>
+          <div class="big-stat-sub">cards reviewed today</div>
+          <div class="mt-2" style="display:grid;gap:0.4rem">
+            <div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div>
+            <div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div>
+            <div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// Daily Real-World Mission</div>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
+          <button class="btn secondary" id="rtBtn" onclick="MAYNARD.completeRTMission()">Mark Complete · +25 XP</button>
+        </div>
+        <div class="profile-card">
+          <div class="panel-label">// Operator Profile</div>
+          <div class="profile-title" id="profTitle">UNRANKED</div>
+          <div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div>
+        </div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel">
+        <div class="panel-label">// Ten-Axis Mastery</div>
+        <div class="dash-grid" style="margin:0">
+          <div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div>
+          <div class="mastery-list" id="masteryList"></div>
+        </div>
+      </div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of evolutionary game theory. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: DARWIN</h1><p class="section-sub">A cumulative scenario. Engineer a stable evolutionary ecosystem.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats"><h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p><div class="stats-grid"><div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div><div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div><div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div><div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div></div><div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div><div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div><div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div><div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div></section>
+    <section class="view" id="view-about"><h1 class="section-title">About MAYNARD</h1><p class="section-sub">Methodology and design principles.</p><div class="about-content"><p>MAYNARD SMITH is a cognitive training simulator designed to install the strategic thinking patterns used in evolutionary game theory. It is the missing link between NASH (Strategy) and DARWIN (Evolution).</p><h2>// Core Pedagogy</h2><p>The system uses four evidence-based learning mechanisms, applied in concert:</p><ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project DARWIN require applying concepts to novel scenarios.</li></ul><h2>// The Ten Axes</h2><ul><li><strong>ESS</strong> — Evolutionarily Stable Strategies</li><li><strong>HAWK</strong> — Hawk-Dove Game</li><li><strong>FREQ</strong> — Frequency-Dependent Selection</li><li><strong>FITNESS</strong> — Direct & Inclusive Fitness</li><li><strong>MUTATE</strong> — Mutations and Invasion</li><li><strong>REPLICATOR</strong> — Replicator Dynamics</li><li><strong>KIN</strong> — Kin Selection & Hamilton's Rule</li><li><strong>SEX</strong> — Sexual Selection & Fisher's Principle</li><li><strong>COOP</strong> — Reciprocal Altruism & Tit-for-Tat</li><li><strong>EVOLVE</strong> — Coevolution & Niche Construction</li></ul></div></section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'ESS', title:'Evolutionarily Stable Strategies', summary:'Why populations settle into unbreakable equilibria.', lesson:{ title:'The Architecture of Stability', body: 'In classical game theory, a Nash Equilibrium is a state where no player can benefit by unilaterally changing strategy. In evolution, the bar is higher: a strategy must be resistant to invasion by mutants.\n\n## The ESS Definition\n\nA strategy S is an Evolutionarily Stable Strategy if, when the entire population adopts S, any mutant strategy T cannot invade. This means the fitness of S against T is greater than the fitness of T against T.\n\nIf E(S, T) > E(T, T), then S is strictly an ESS. If E(S, T) = E(T, T), then S is a weak ESS (the mutant doesn\'t die out, but it doesn\'t take over).\n\n## Why ESS is not "Optimal"\n\nAn ESS is not necessarily the strategy that maximizes the average fitness of the population. It is simply the strategy that cannot be beaten by a rare alternative. Evolution does not find the global maximum; it finds the local uninvadable state.\n\n## The Example\n\nImagine a population where everyone cooperates. A "cheater" mutant (who defects but still receives benefits) will have higher fitness and invade. Pure cooperation is NOT an ESS. The ESS is often a mixed strategy or a conditional strategy (like Tit-for-Tat).', takeaways:['ESS is a strategy that cannot be invaded by a mutating alternative.','It is a stricter condition than Nash Equilibrium.','ESS requires E(S, T) > E(T, T).','ESS is about local uninvadability, not global optimality.','Evolution finds uninvadable states, not perfect ones.'] } },
+  { id:'m2', codename:'HAWK', title:'Hawk-Dove Game', summary:'The cost of conflict vs. the value of resources.', lesson:{ title:'The Architecture of Conflict', body: 'The Hawk-Dove game is the foundational model of animal conflict.\n\n## The Strategies\n\n- **Hawk:** Aggressive. Always fights for the resource. If it meets another Hawk, they fight; winner takes the resource, loser is injured.\n- **Dove:** Passive. Displays but never fights. If it meets a Hawk, it retreats. If it meets a Dove, they split the resource.\n\n## The Payoffs\n\nLet V = Value of resource, C = Cost of injury.\n- Hawk vs Hawk: (V-C)/2 (average payoff of 50% win, 50% injury).\n- Hawk vs Dove: V (Hawk takes it all).\n- Dove vs Hawk: 0 (Dove retreats).\n- Dove vs Dove: V/2 (They split).\n\n## The ESS\n\nIf V > C: Being a Hawk is always better. The ESS is 100% Hawk. But the average payoff is (V-C)/2, which is less than if everyone were Doves (V/2). Evolution leads to a worse outcome for the species.\n\nIf V < C: Fighting is too costly. The ESS is a mixed strategy: proportion `p = V/C` of Hawks, and `1-p` of Doves. The population settles into a polymorphic equilibrium where the average payoff is `(V/2) - (V^2 / 4C)`.\n\n## The Bourgeois Strategy\n\nA better ESS is "Bourgeois": Play Hawk if you own the territory, Dove if you are the intruder. This avoids costly fights (because one always retreats) and is an ESS because a pure Hawk or pure Dove mutant cannot do better.', takeaways:['Hawk fights, Dove retreats or splits.','If V > C (Value > Cost), 100% Hawk is the ESS (a tragic equilibrium).','If V < C (Cost > Value), a mixed ESS exists (proportion p=V/C Hawks).','The Bourgeois strategy (respect ownership) is a highly efficient ESS.','Evolution can lead to worse outcomes for the species than cooperation would.'] } },
+  { id:'m3', codename:'FREQ', title:'Frequency-Dependent Selection', summary:'Fitness changes based on population ratios.', lesson:{ title:'The Architecture of Rarity', body: 'In standard genetics, a "good" gene always has high fitness. In evolutionary game theory, fitness is frequency-dependent: your payoff depends on who you interact with, which depends on the population composition.\n\n## Negative Frequency Dependence\n\nThe most common form: a strategy is more successful when it is RARE.\n\nExample: "Handedness" in predators. If most predators attack from the left, prey evolve to defend the left. A mutant predator that attacks from the right will have massive success (high fitness). But as right-attackers become common, prey defend the right, and left-attackers become rare and successful again.\n\nThis creates a stable polymorphism (a mixed ESS) where multiple strategies coexist at equilibrium.\n\n## The Rock-Paper-Scissors Dynamic\n\nIn some systems (like the side-blotched lizard), we see a 3-strategy cycle: Orange (aggressive) beats Blue (cooperative), Blue beats Yellow (sneaky), Yellow beats Orange. The populations cycle endlessly without ever settling into a stable ESS.\n\n## The Method\n\n1. **Identify the payoffs** against all possible opponents.\n2. **Determine if fitness increases or decreases with frequency.**\n3. **Find the equilibrium frequency** where all strategies have equal fitness.', takeaways:['Fitness is not absolute; it depends on population frequency.','Negative frequency dependence: rare strategies have an advantage.','This creates stable polymorphisms (mixed ESS).','Example: Pathogen-host arms races (rare pathogen strains succeed until immunity catches up).','Equilibrium occurs when all strategies have equal fitness.'] } },
+  { id:'m4', codename:'FITNESS', title:'Inclusive Fitness', summary:'Direct vs. indirect fitness. Genes, not individuals.', lesson:{ title:'The Architecture of Survival', body: 'Evolution is often misunderstood as "survival of the fittest individual." The correct unit of selection is the gene. An individual\'s fitness is not just their own reproductive success (direct fitness), but also the reproductive success of their relatives (indirect fitness), weighted by relatedness.\n\n## Hamilton\'s Rule\n\nAn altruistic act (costing C to the actor, benefit B to the recipient) will evolve if:\n> r * B > C\n\nWhere `r` is the coefficient of relatedness (1.0 for identical twins, 0.5 for siblings/children, 0.25 for nephews, 0.125 for cousins).\n\n## The Logic\n\nIf you die saving 2 siblings (B=2, C=1, r=0.5), your genetic contribution is 0.5 * 2 = 1.0. You lost your life (1.0 copy of your genes) but saved 1.0 copy on average. It is an evolutionary wash. If you save 3 siblings (0.5 * 3 = 1.5), the altruistic gene spreads.\n\n## Kin Selection\n\nThis explains why eusocial insects (ants, bees) have sterile worker castes. The workers are more related to their sisters (0.75) than they would be to their own offspring (0.5). It is genetically more profitable to raise queens than to reproduce themselves.\n\n## The Greenbeard Effect\n\nA theoretical gene that produces a visible trait (green beard) and causes altruism toward others with green beards. This is gene-level recognition, bypassing kinship. (Docker beetles exhibit a primitive version of this).', takeaways:['The unit of selection is the gene, not the individual.','Inclusive Fitness = Direct Fitness + Indirect Fitness (weighted by relatedness).','Hamilton\'s Rule: rB > C for altruism to evolve.','Explains sterile castes in eusocial insects (workers help sisters).','The Greenbeard Effect is gene-level recognition, bypassing kinship.'] } },
+  { id:'m5', codename:'MUTATE', title:'Mutations and Invasion', summary:'How rare mutants test the stability of a population.', lesson:{ title:'The Architecture of Invasion', body: 'An ESS is defined by its resistance to mutation. But mutations are the engine of evolution. Without them, the game never changes.\n\n## The Invasion Process\n\n1. A new mutant strategy T appears in a population playing S.\n2. The mutant is rare. It mostly interacts with S.\n3. If E(T, S) > E(S, S), the mutant\'s fitness is higher than the average. It grows.\n4. If E(T, S) < E(S, S), the mutant dies out. S remains the ESS.\n\n## The Fitness Landscape\n\nImagine a landscape where height = fitness. A population sits on a peak (ESS). A mutation is a step in a random direction. If all surrounding steps are downhill (lower fitness), the population is stuck on a local optimum.\n\nFor the population to move to a higher peak, it must cross a "valley" of lower fitness. This is rare in large populations but possible in small, isolated populations (genetic drift).\n\n## Adaptive Dynamics\n\nThis field studies how traits evolve over time under mutation and selection. It shows that populations can evolve toward "Evolutionary Branching Points" where a single strategy splits into two divergent strategies (speciation).\n\n## The Method\n\n1. **Define the resident strategy** (S) and its fitness.\n2. **Introduce a mutant** (T) with a slightly different trait.\n3. **Calculate invasion fitness** (fitness of T in the S population).\n4. **If positive, T invades.** Repeat.', takeaways:['Mutations are the random variations that test population stability.','Invasion requires the mutant to outcompete the resident when rare.','Populations often get stuck on local fitness peaks (local optima).','Crossing a fitness valley requires drift or a large mutation.','Adaptive dynamics studies how traits evolve and branch over time.'] } },
+  { id:'m6', codename:'REPLICATOR', title:'Replicator Dynamics', summary:'The differential equations of strategy evolution.', lesson:{ title:'The Architecture of Change', body: 'Replicator dynamics is the mathematical engine of evolutionary game theory. It describes how the frequencies of strategies change over time.\n\n## The Equation\n\ndx_i / dt = x_i * [ E(S_i, x) - E(x, x) ]\n\nWhere:\n- `x_i` is the frequency of strategy `i`.\n- `E(S_i, x)` is the fitness of strategy `i` in the current population `x`.\n- `E(x, x)` is the average fitness of the population.\n\n## The Logic\n\nIf a strategy\'s fitness is higher than average, it grows. If lower, it shrinks. This is natural selection encoded as a differential equation.\n\n## Equilibria\n\nA point where `dx_i / dt = 0` for all `i` is a fixed point. Every ESS is a stable fixed point (if you perturb it, the dynamics push you back). However, not all fixed points are ESS. Some are unstable (if perturbed, the population runs away).\n\n## The Method\n\n1. **Define the payoff matrix.**\n2. **Write the replicator equations** for each strategy.\n3. **Find fixed points** (set derivatives to 0).\n4. **Analyze stability** (do perturbations grow or shrink?).', takeaways:['Replicator dynamics describe how strategy frequencies change over time.','If a strategy\'s fitness > average, it grows; if < average, it shrinks.','Every ESS is a stable fixed point of the dynamics.','Not all fixed points are ESS; some are unstable.','It is natural selection encoded as a differential equation.'] } },
+  { id:'m7', codename:'KIN', title:'Kin Selection', summary:'Cooperation among relatives. Blood is thicker than water.', lesson:{ title:'The Architecture of Family', body: 'Kin selection is the evolutionary strategy that favors the reproductive success of an organism\'s relatives, even at a cost to the organism\'s own survival or reproduction.\n\n## The Logic\n\nBecause relatives share genes, helping a relative is indirectly helping your own genes. A gene for altruism can spread if it causes an organism to help relatives enough to offset the cost to itself.\n\n## Eusociality\n\nThe extreme example is eusociality in Hymenoptera (ants, bees, wasps). Workers are sterile. How did this evolve?\n\nDue to haplodiploidy, female worker bees share 75% of their genes with their sisters (daughters of the queen) but only 50% with their own offspring. It is genetically more profitable to raise sisters than to reproduce.\n\n## The "Nepotism" Prediction\n\nKin selection theory predicts that altruism should scale with relatedness. You should be more altruistic to siblings (0.5) than cousins (0.125). This is observed in humans and animals.\n\n## The Warning\n\nKin selection explains cooperation within families, but fails to explain cooperation between non-relatives. For that, we need Reciprocal Altruism (COOP) or Group Selection.', takeaways:['Kin selection favors helping relatives because they share genes.','It explains sterile worker castes in eusocial insects (haplodiploidy).','Altruism should scale with relatedness (r).','It explains cooperation within families but not between strangers.','It is driven by Hamilton\'s Rule (rB > C).'] } },
+  { id:'m8', codename:'SEX', title:'Sexual Selection', summary:'Runaway selection and the logic of costly displays.', lesson:{ title:'The Architecture of Desire', body: 'Sexual selection is a mode of natural selection where members of one biological sex choose mates of the other sex to mate with (intersexual selection), and compete with members of the same sex for access to members of the opposite sex (intrasexual selection).\n\n## Fisherian Runaway\n\nRonald Fisher proposed that female preference and male traits can co-evolve in a positive feedback loop. If females prefer long tails, males with long tails mate more. The sons inherit long tails; the daughters inherit the preference. The trait and the preference amplify each other until the cost of the trait (predation, energy) balances the mating benefit.\n\nThis explains the peacock\'s tail: it is a costly, maladaptive trait for survival, but highly adaptive for mating.\n\n## The Handicap Principle\n\nAmotz Zahavi suggested that costly signals are honest because only high-quality males can afford them. A peacock with a huge tail is saying "I am so strong and parasite-free that I can survive even with this massive handicap."\n\n## Fisher\'s Principle (1:1 Sex Ratio)\n\nWhy are sexes born in roughly 1:1 ratios? If males are rare, each male has more children, so parents who have males have more grandchildren. The gene for having males spreads. The equilibrium is exactly 1:1.', takeaways:['Sexual selection favors traits that increase mating success, even if costly to survival.','Fisherian Runaway: Female preference and male traits co-evolve in a feedback loop.','The Handicap Principle: Costly signals are honest signals of quality.','Fisher\'s Principle explains the 1:1 sex ratio as an ESS.','It is driven by mate choice and competition for mates.'] } },
+  { id:'m9', codename:'COOP', title:'Reciprocal Altruism', summary:'Cooperation among non-relatives. You scratch my back...', lesson:{ title:'The Architecture of Reciprocity', body: 'Kin selection explains cooperation in families. But humans and other animals cooperate with strangers. How? Reciprocal altruism.\n\n## The Prisoner\'s Dilemma\n\nIn a single encounter, defection dominates (it is a Nash Equilibrium). But if interactions are repeated, cooperation can evolve.\n\n## Tit-for-Tat\n\nRobert Axelrod\'s famous computer tournament pitted strategies against each other in iterated Prisoner\'s Dilemma. The winner was Tit-for-Tat (TFT):\n1. Cooperate on the first move.\n2. On subsequent moves, do what your opponent did on the previous move.\n\nTFT is nice (never defects first), retaliatory (punishes defection), forgiving (returns to cooperation), and clear (easy to understand).\n\n## The ESS Condition\n\nTFT is an ESS against pure defection IF the probability of future interaction (`w`) is high enough: `w > (T-R)/(R-S)` where T=Temptation, R=Reward, S=Sucker.\n\nIf the shadow of the future is large, cooperation is stable.\n\n## The Greenbeard Effect (Revisited)\n\nIn the absence of kinship, cooperation requires recognition. If you can identify other cooperators (greenbeards), you can cooperate with them and defect against others. This is "indirect reciprocity" based on reputation.', takeaways:['Reciprocal altruism explains cooperation between non-relatives.','It requires repeated interactions (shadow of the future).','Tit-for-Tat: Cooperate first, then copy opponent. Nice, retaliatory, forgiving.','TFT is an ESS if the probability of future interaction is high.','Reputation (indirect reciprocity) enables cooperation in large groups.'] } },
+  { id:'m10', codename:'EVOLVE', title:'Coevolution & Niche', summary:'Organisms shape their environment and each other.', lesson:{ title:'The Architecture of Ecosystems', body: 'Organisms do not just adapt to a static environment; they actively shape it. This is niche construction.\n\n## Niche Construction\n\nBeavers build dams, creating ponds. Earthworms aerate and enrich soil. Humans build cities and farms. These activities alter the selective pressures for the organism itself and for others.\n\nThis creates a feedback loop: Organism -> Environment -> Selection -> Organism.\n\n## Coevolution\n\nWhen two or more species affect each other\'s evolution, we have coevolution.\n\n- **Predator-Prey Arms Races:** Faster cheetahs select for faster gazelles, which select for faster cheetahs.\n- **Host-Pathogen Arms Races:** Immune systems and viruses constantly adapt.\n- **Mutualism:** Bees and flowers co-evolve to maximize efficiency.\n\n## The Red Queen Hypothesis\n\n"It takes all the running you can do, to keep in the same place." In coevolutionary arms races, you must constantly adapt just to maintain your current fitness relative to your competitors or parasites. Stagnation means extinction.\n\n## The Method\n\n1. **Identify the interacting species or traits.**\n2. **Map the feedback loops** (A affects B, B affects A).\n3. **Look for stable equilibria** or runaway dynamics.\n4. **Recognize that organisms engineer their own selective pressures.**', takeaways:['Niche construction: Organisms actively shape their environment.','Coevolution: Species evolve in response to each other (arms races, mutualism).','The Red Queen Hypothesis: You must constantly adapt just to survive.','Feedback loops: Organism -> Environment -> Selection -> Organism.','Evolution is not passive adaptation; it is ecosystem engineering.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,front:'What is an Evolutionarily Stable Strategy (ESS)?',back:'A strategy that, when adopted by a whole population, cannot be invaded by a rare mutant strategy.'},
+  {id:'c2',moduleId:'m1',core:true,front:'ESS condition (formula)?',back:'E(S, T) > E(T, T). The fitness of the resident (S) against the mutant (T) must exceed the mutant against itself.'},
+  {id:'c3',moduleId:'m1',core:false,front:'Is an ESS necessarily the globally optimal strategy?',back:'No. ESS is about local uninvadability. It can be a suboptimal equilibrium that the population is stuck in.'},
+  {id:'c4',moduleId:'m1',core:false,front:'ESS vs Nash Equilibrium',back:'ESS is a stricter condition. Every ESS is a Nash Equilibrium, but not every Nash Equilibrium is an ESS.'},
+  {id:'c5',moduleId:'m1',core:false,front:'Weak ESS definition',back:'E(S, T) = E(T, T) AND E(S, S) > E(T, S). The mutant doesn\'t die out, but it cannot take over.'},
+  {id:'c6',moduleId:'m1',core:false,front:'Why is pure cooperation rarely an ESS?',back:'Because a "cheater" mutant (who defects but receives benefits) will have higher fitness and invade.'},
+  {id:'c7',moduleId:'m1',core:false,front:'What does it mean for a strategy to "invade"?',back:'A mutant strategy invades if its fitness is higher than the resident strategy, allowing it to grow in frequency.'},
+  {id:'c8',moduleId:'m1',core:false,front:'Does evolution find the global maximum?',back:'No. Evolution finds local uninvadable states (ESS), which may be local optima, not global maxima.'},
+  {id:'c9',moduleId:'m1',core:false,front:'What is the "unit of selection" in ESS theory?',back:'The strategy (phenotype), not the individual. Individuals are temporary carriers of strategies.'},
+  {id:'c10',moduleId:'m1',core:false,front:'Can a mixed strategy be an ESS?',back:'Yes. If the mixed strategy cannot be beaten by any pure strategy mutant, it is a mixed ESS.'},
+  {id:'c11',moduleId:'m1',core:false,front:'What happens if a mutant has equal fitness to the resident?',back:'It is a neutral drift. The mutant may persist or die out randomly, but it doesn\'t take over.'},
+  {id:'c12',moduleId:'m1',core:false,front:'Who coined the term ESS?',back:'John Maynard Smith and George R. Price (1973).'},
+  
+  {id:'c13',moduleId:'m2',core:true,front:'In Hawk-Dove, what does a Hawk do?',back:'Aggressive. Always fights. If it meets another Hawk, they fight; winner takes resource, loser is injured.'},
+  {id:'c14',moduleId:'m2',core:true,front:'In Hawk-Dove, if V > C (Value > Cost), what is the ESS?',back:'100% Hawk. Fighting is always worth it. The population ends up in a wasteful equilibrium.'},
+  {id:'c15',moduleId:'m2',core:false,front:'In Hawk-Dove, if V < C (Cost > Value), what is the ESS?',back:'A mixed strategy: proportion p = V/C of Hawks, 1-p of Doves.'},
+  {id:'c16',moduleId:'m2',core:false,front:'Why is 100% Hawk a "tragic" equilibrium when V < C?',back:'Average payoff is (V-C)/2, which is less than if everyone were Doves (V/2). But Doves cannot invade.'},
+  {id:'c17',moduleId:'m2',core:false,front:'What is the Bourgeois strategy?',back:'Play Hawk if you own the territory, Dove if you are the intruder. (Respect ownership).'},
+  {id:'c18',moduleId:'m2',core:false,front:'Why is Bourgeois an efficient ESS?',back:'It avoids costly fights (the intruder always retreats) and cannot be invaded by pure Hawk or Dove.'},
+  {id:'c19',moduleId:'m2',core:false,front:'What is V in Hawk-Dove?',back:'The Value of the resource.'},
+  {id:'c20',moduleId:'m2',core:false,front:'What is C in Hawk-Dove?',back:'The Cost of injury from fighting.'},
+  {id:'c21',moduleId:'m2',core:false,front:'Payoff for Hawk vs Dove?',back:'V. The Hawk takes the resource without a fight.'},
+  {id:'c22',moduleId:'m2',core:false,front:'Payoff for Dove vs Dove?',back:'V/2. They display and split the resource.'},
+  {id:'c23',moduleId:'m2',core:false,front:'Payoff for Dove vs Hawk?',back:'0. The Dove retreats without injury but loses the resource.'},
+  {id:'c24',moduleId:'m2',core:false,front:'Payoff for Hawk vs Hawk?',back:'(V-C)/2. Average of winning (V) and losing (-C).'},
+  
+  {id:'c25',moduleId:'m3',core:true,front:'What is frequency-dependent selection?',back:'When the fitness of a strategy depends on its frequency (or the frequency of other strategies) in the population.'},
+  {id:'c26',moduleId:'m3',core:true,front:'What is negative frequency dependence?',back:'A strategy is more successful when it is RARE. This creates stable polymorphisms.'},
+  {id:'c27',moduleId:'m3',core:false,front:'Example of negative frequency dependence?',back:'Pathogen arms races. A rare pathogen strain succeeds until host immunity catches up, then a new rare strain succeeds.'},
+  {id:'c28',moduleId:'m3',core:false,front:'What is a polymorphism?',back:'The coexistence of two or more distinct strategies (phenotypes) in a population.'},
+  {id:'c29',moduleId:'m3',core:false,front:'What is the Rock-Paper-Scissors dynamic?',back:'A 3-strategy cycle where A beats B, B beats C, C beats A. Populations cycle endlessly without a stable ESS.'},
+  {id:'c30',moduleId:'m3',core:false,front:'When does a polymorphic equilibrium occur?',back:'When all strategies have equal fitness at a specific frequency ratio.'},
+  {id:'c31',moduleId:'m3',core:false,front:'What is positive frequency dependence?',back:'A strategy is more successful when it is COMMON. Leads to fixation (one strategy takes over).'},
+  {id:'c32',moduleId:'m3',core:false,front:'Example of positive frequency dependence?',back:'Network effects (e.g., a language is more useful the more people speak it).'},
+  {id:'c33',moduleId:'m3',core:false,front:'Side-blotched lizards exhibit what dynamic?',back:'Rock-Paper-Scissors. Orange (aggressive) beats Blue (cooperative), Blue beats Yellow (sneaky), Yellow beats Orange.'},
+  {id:'c34',moduleId:'m3',core:false,front:'Does frequency dependence apply to business?',back:'Yes. "First mover advantage" is positive frequency dependence. "Niche strategy" is negative.'},
+  {id:'c35',moduleId:'m3',core:false,front:'What happens at a stable polymorphic equilibrium?',back:'If perturbed, the dynamics push the population back to the equilibrium ratio.'},
+  {id:'c36',moduleId:'m3',core:false,front:'What happens at an unstable equilibrium?',back:'If perturbed, the population runs away to fixation of one strategy.'},
+  
+  {id:'c37',moduleId:'m4',core:true,front:'What is Hamilton\'s Rule?',back:'rB > C. Altruism evolves if relatedness (r) * benefit to recipient (B) > cost to actor (C).'},
+  {id:'c38',moduleId:'m4',core:true,front:'What is inclusive fitness?',back:'Direct fitness (own offspring) + Indirect fitness (relatives\' offspring, weighted by relatedness).'},
+  {id:'c39',moduleId:'m4',core:false,front:'Coefficient of relatedness (r) for siblings?',back:'0.5. You share 50% of your genes with a full sibling.'},
+  {id:'c40',moduleId:'m4',core:false,front:'Coefficient of relatedness (r) for cousins?',back:'0.125. You share 12.5% of your genes with a first cousin.'},
+  {id:'c41',moduleId:'m4',core:false,front:'Why are worker bees sterile?',back:'Haplodiploidy. Workers share 75% of genes with sisters, but only 50% with own offspring. Raising sisters is genetically more profitable.'},
+  {id:'c42',moduleId:'m4',core:false,front:'What is the Greenbeard Effect?',back:'A gene that produces a visible trait and causes altruism toward others with that trait. Gene-level recognition.'},
+  {id:'c43',moduleId:'m4',core:false,front:'What is the unit of selection in kin selection?',back:'The gene, not the individual. "The Selfish Gene" concept.'},
+  {id:'c44',moduleId:'m4',core:false,front:'If you save 2 siblings at the cost of your life (r=0.5, B=2, C=1), is it an ESS?',back:'It is a wash. 0.5 * 2 = 1.0. You lose 1.0 (your life) and save 1.0 copies on average. The gene is neutral.'},
+  {id:'c45',moduleId:'m4',core:false,front:'If you save 3 siblings (r=0.5, B=3, C=1), does the altruistic gene spread?',back:'Yes. 0.5 * 3 = 1.5 > 1.0 (cost). The gene increases in frequency.'},
+  {id:'c46',moduleId:'m4',core:false,front:'Does kin selection explain cooperation between strangers?',back:'No. It only explains cooperation among relatives. Strangers require reciprocal altruism.'},
+  {id:'c47',moduleId:'m4',core:false,front:'What is r for identical twins?',back:'1.0. They are genetically identical.'},
+  {id:'c48',moduleId:'m4',core:false,front:'What is r for nephews/nieces?',back:'0.25. You share 25% of your genes.'},
+  
+  {id:'c49',moduleId:'m5',core:true,front:'What is required for a mutant to invade a population?',back:'E(T, S) > E(S, S). The mutant\'s fitness against the resident must exceed the resident\'s average fitness.'},
+  {id:'c50',moduleId:'m5',core:true,front:'What is a fitness landscape?',back:'A visual representation where height = fitness. Peaks are local optima (ESS), valleys are low fitness.'},
+  {id:'c51',moduleId:'m5',core:false,front:'Why do populations get stuck on local optima?',back:'Because any single mutation (step) leads downhill. You cannot cross a valley to reach a higher peak.'},
+  {id:'c52',moduleId:'m5',core:false,front:'How can a population cross a fitness valley?',back:'Through genetic drift (in small populations) or a large, rare mutation.'},
+  {id:'c53',moduleId:'m5',core:false,front:'What is invasion fitness?',back:'The fitness of a rare mutant strategy in a population dominated by the resident strategy.'},
+  {id:'c54',moduleId:'m5',core:false,front:'What is adaptive dynamics?',back:'A framework studying how traits evolve over time under mutation and selection, often leading to branching (speciation).'},
+  {id:'c55',moduleId:'m5',core:false,front:'What is an Evolutionary Branching Point?',back:'A point where a single strategy splits into two divergent strategies (speciation).'},
+  {id:'c56',moduleId:'m5',core:false,front:'Do mutations happen by necessity?',back:'No, they are random. But in large populations, all possible mutations occur, so the "possibility" space is explored.'},
+  {id:'c57',moduleId:'m5',core:false,front:'What is genetic drift?',back:'Random fluctuations in gene frequencies, especially in small populations. Can cross fitness valleys.'},
+  {id:'c58',moduleId:'m5',core:false,front:'Is a high mutation rate always good?',back:'No. It can push populations off stable peaks (error catastrophe) or introduce too many deleterious mutations.'},
+  {id:'c59',moduleId:'m5',core:false,front:'What is the "Survival of the Flattest" effect?',back:'Populations on lower but wider fitness peaks (robust) outcompete those on higher but narrow peaks (fragile) under high mutation rates.'},
+  {id:'c60',moduleId:'m5',core:false,front:'What is a mutation-selection balance?',back:'The equilibrium where the rate of deleterious mutation equals the rate of selection removing them.'},
+  
+  {id:'c61',moduleId:'m6',core:true,front:'What is the Replicator Equation?',back:'dx_i/dt = x_i * [ E(S_i, x) - E(x, x) ]. Strategy grows if fitness > average.'},
+  {id:'c62',moduleId:'m6',core:true,front:'What does dx_i/dt = 0 mean?',back:'It is a fixed point. The frequency of strategy i is not changing.'},
+  {id:'c63',moduleId:'m6',core:false,front:'Is every fixed point an ESS?',back:'No. Every ESS is a stable fixed point, but fixed points can be unstable (neutrally stable or repelling).'},
+  {id:'c64',moduleId:'m6',core:false,front:'What is a stable fixed point?',back:'If perturbed, the dynamics push the population back to the point.'},
+  {id:'c65',moduleId:'m6',core:false,front:'What is an unstable fixed point?',back:'If perturbed, the dynamics push the population away. (Like a ball on top of a hill).'},
+  {id:'c66',moduleId:'m6',core:false,front:'What does x_i represent?',back:'The frequency (proportion) of strategy i in the population.'},
+  {id:'c67',moduleId:'m6',core:false,front:'What does E(S_i, x) represent?',back:'The expected fitness of strategy i when interacting with the current population mix x.'},
+  {id:'c68',moduleId:'m6',core:false,front:'What does E(x, x) represent?',back:'The average fitness of the entire population.'},
+  {id:'c69',moduleId:'m6',core:false,front:'What happens if a strategy\'s fitness is below average?',back:'Its frequency shrinks (dx_i/dt < 0).'},
+  {id:'c70',moduleId:'m6',core:false,front:'What happens if a strategy\'s fitness is above average?',back:'Its frequency grows (dx_i/dt > 0).'},
+  {id:'c71',moduleId:'m6',core:false,front:'Is replicator dynamics deterministic?',back:'Yes, it assumes infinite populations and continuous time.'},
+  {id:'c72',moduleId:'m6',core:false,front:'What is the limit cycle?',back:'A trajectory where populations cycle endlessly (e.g., Rock-Paper-Scissors) without settling.'},
+  
+  {id:'c73',moduleId:'m7',core:true,front:'What is kin selection?',back:'Evolutionary strategy favoring reproductive success of relatives, even at a cost to the organism.'},
+  {id:'c74',moduleId:'m7',core:true,front:'Why does kin selection work?',back:'Because relatives share genes. Helping relatives is indirectly helping your own genes.'},
+  {id:'c75',moduleId:'m7',core:false,front:'What is haplodiploidy?',back:'A sex-determination system where males are haploid (from unfertilized eggs) and females are diploid. Results in sisters sharing 75% of genes.'},
+  {id:'c76',moduleId:'m7',core:false,front:'How does haplodiploidy explain eusociality?',back:'Workers (females) share 75% with sisters but only 50% with offspring. Raising sisters is genetically more profitable.'},
+  {id:'c77',moduleId:'m7',core:false,front:'Prediction of kin selection theory?',back:'Altruism should scale with relatedness. You help siblings more than cousins.'},
+  {id:'c78',moduleId:'m7',core:false,front:'Does kin selection explain human cooperation?',back:'Only within families. Human cooperation with strangers requires cultural group selection or reciprocal altruism.'},
+  {id:'c79',moduleId:'m7',core:false,front:'What is "nepotism" in biology?',back:'Favoring relatives over non-relatives, predicted by kin selection.'},
+  {id:'c80',moduleId:'m7',core:false,front:'What is the coefficient of relatedness (r)?',back:'The probability that two individuals share a gene due to common ancestry.'},
+  {id:'c81',moduleId:'m7',core:false,front:'Can kin selection occur without recognition?',back:'Yes, if interactions are localized. If you only interact with neighbors, they are likely kin.'},
+  {id:'c82',moduleId:'m7',core:false,front:'What is "greenbeard" recognition?',back:'A gene produces a visible trait and altruism toward that trait. Bypasses kinship (e.g., slime molds).'},
+  {id:'c83',moduleId:'m7',core:false,front:'What is the "Selfish Gene" view?',back:'Organisms are vehicles for genes. Genes act to maximize their own replication, which can look like altruism.'},
+  {id:'c84',moduleId:'m7',core:false,front:'Is kin selection a form of group selection?',back:'No. It is gene-level selection. Groups don\'t matter; gene frequencies do.'},
+  
+  {id:'c85',moduleId:'m8',core:true,front:'What is sexual selection?',back:'Selection for traits that increase mating success, even if they decrease survival.'},
+  {id:'c86',moduleId:'m8',core:true,front:'What is Fisherian Runaway?',back:'A feedback loop where female preference and male traits co-evolve until the cost of the trait balances the mating benefit.'},
+  {id:'c87',moduleId:'m8',core:false,front:'Example of Fisherian Runaway?',back:'The peacock\'s tail. Costly to survival, but highly attractive to peahens.'},
+  {id:'c88',moduleId:'m8',core:false,front:'What is the Handicap Principle?',back:'Costly signals are honest signals of quality. Only high-quality males can afford massive handicaps.'},
+  {id:'c89',moduleId:'m8',core:false,front:'Fisher\'s Principle (Sex Ratio)?',back:'The 1:1 sex ratio is an ESS. If one sex is rare, parents having that sex have more grandchildren.'},
+  {id:'c90',moduleId:'m8',core:false,front:'Intersexual vs Intrasexual selection?',back:'Intersexual: Mate choice (females choosing). Intrasexual: Competition (males fighting).'},
+  {id:'c91',moduleId:'m8',core:false,front:'Why are males usually the "showy" sex?',back:'Bateman\'s Principle. Females invest more in gametes, so they are the choosy sex. Males compete.'},
+  {id:'c92',moduleId:'m8',core:false,front:'What is a "lekk"?',back:'A gathering of males for competitive mating display.'},
+  {id:'c93',moduleId:'m8',core:false,front:'Can sexual selection lead to extinction?',back:'Yes. If the trait becomes too costly (e.g., Irish Elk antlers), it can drive the species extinct.'},
+  {id:'c94',moduleId:'m8',core:false,front:'What is "good genes" hypothesis?',back:'Females choose elaborate traits because they signal parasite resistance or genetic quality.'},
+  {id:'c95',moduleId:'m8',core:false,front:'What is "sensory bias"?',back:'Females prefer traits that exploit pre-existing sensory systems (e.g., water mites attracted to vibrations).'},
+  {id:'c96',moduleId:'m8',core:false,front:'Is sexual selection an ESS?',back:'Yes, the equilibrium ratio of traits and preferences is usually a stable ESS.'},
+  
+  {id:'c97',moduleId:'m9',core:true,front:'What is reciprocal altruism?',back:'Cooperation between non-relatives based on repeated interactions. "You scratch my back, I\'ll scratch yours."'},
+  {id:'c98',moduleId:'m9',core:true,front:'What is Tit-for-Tat (TFT)?',back:'1. Cooperate first. 2. Copy opponent\'s last move. Nice, retaliatory, forgiving, clear.'},
+  {id:'c99',moduleId:'m9',core:false,front:'Why is TFT successful?',back:'It never defects first (nice), punishes defection (retaliatory), returns to cooperation (forgiving).'},
+  {id:'c100',moduleId:'m9',core:false,front:'Condition for TFT to be an ESS?',back:'The probability of future interaction (w) must be high: w > (T-R)/(R-S).'},
+  {id:'c101',moduleId:'m9',core:false,front:'What is the "shadow of the future"?',back:'The probability of future interaction. If high, cooperation is stable.'},
+  {id:'c102',moduleId:'m9',core:false,front:'What happens if w = 0 (one-shot game)?',back:'Defection is the only ESS. (Prisoner\'s Dilemma).'},
+  {id:'c103',moduleId:'m9',core:false,front:'What is indirect reciprocity?',back:'Cooperation based on reputation. "I help you, and someone else helps me because I have a good reputation."'},
+  {id:'c104',moduleId:'m9',core:false,front:'What is "Generous Tit-for-Tat"?',back:'Cooperate first. If opponent defects, defect with probability < 1 (forgive occasionally). Handles noise.'},
+  {id:'c105',moduleId:'m9',core:false,front:'Why does TFT fail with noise/errors?',back:'Two TFT players will enter a death spiral of mutual retaliation if one accidentally defects.'},
+  {id:'c106',moduleId:'m9',core:false,front:'Can reciprocal altruism exist in non-humans?',back:'Yes. Vampire bats share blood with bats that shared with them previously.'},
+  {id:'c107',moduleId:'m9',core:false,front:'What is the "Greenbeard" effect in reciprocity?',back:'Recognition of cooperators. If you can identify other cooperators, you can cooperate and defect against defectors.'},
+  {id:'c108',moduleId:'m9',core:false,front:'Does reciprocal altruism require cognition?',back:'Requires memory (to track who helped) and recognition. High cognition (humans) enables complex networks.'},
+  
+  {id:'c109',moduleId:'m10',core:true,front:'What is niche construction?',back:'When organisms actively shape their environment, altering selective pressures for themselves and others.'},
+  {id:'c110',moduleId:'m10',core:true,front:'What is coevolution?',back:'When two or more species affect each other\'s evolution (e.g., predator-prey, host-pathogen, mutualism).'},
+  {id:'c111',moduleId:'m10',core:false,front:'Example of niche construction?',back:'Beavers building dams, earthworms enriching soil, humans building cities.'},
+  {id:'c112',moduleId:'m10',core:false,front:'What is the Red Queen Hypothesis?',back:'"It takes all the running you can do to keep in the same place." Constant adaptation is needed just to survive coevolutionary arms races.'},
+  {id:'c113',moduleId:'m10',core:false,front:'Example of Red Queen?',back:'Host-pathogen arms races. Pathogens evolve faster, so hosts must constantly evolve new defenses.'},
+  {id:'c114',moduleId:'m10',core:false,front:'Feedback loop in niche construction?',back:'Organism -> Environment -> Selection -> Organism.'},
+  {id:'c115',moduleId:'m10',core:false,front:'What is an arms race?',back:'A coevolutionary dynamic where traits escalate (e.g., faster predator, faster prey).'},
+  {id:'c116',moduleId:'m10',core:false,front:'Mutualism vs Parasitism?',back:'Mutualism: Both benefit. Parasitism: One benefits, one is harmed.'},
+  {id:'c117',moduleId:'m10',core:false,front:'Does evolution optimize the ecosystem?',back:'No. It optimizes local fitness. Ecosystems are emergent, not designed.'},
+  {id:'c118',moduleId:'m10',core:false,front:'What is "ecological inheritance"?',back:'When modified environments are passed down (e.g., a beaver pond persists for generations).'},
+  {id:'c119',moduleId:'m10',core:false,front:'Are humans niche constructors?',back:'Yes, massively. Agriculture, cities, and climate change are forms of niche construction.'},
+  {id:'c120',moduleId:'m10',core:false,front:'What is the "extended phenotype"?',back:'Dawkins\' idea that genes influence the world beyond the body (beaver dams, bird nests).'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: ESS Definition', difficulty:1, reward:50, timeLimit:60, body:'What is the defining feature of an Evolutionarily Stable Strategy (ESS)?', options:['It is the strategy that maximizes the average fitness of the population.','It cannot be invaded by a rare mutant strategy.','It is the strategy that is morally superior.','It is the strategy that wins every fight.'], correct:1, explanation:'An ESS is defined by its resistance to invasion. If a mutant strategy cannot grow when rare, the resident is an ESS.' },
+  { id:'p2', moduleId:'m1', title:'Q2: ESS vs Nash', difficulty:1, reward:50, timeLimit:45, body:'What is the relationship between ESS and Nash Equilibrium?', options:['They are the same thing.','ESS is a stricter condition. Every ESS is a Nash Equilibrium, but not vice versa.','Nash is stricter. Every Nash is an ESS, but not vice versa.','They are unrelated.'], correct:1, explanation:'ESS requires stability against invasion. Nash only requires no unilateral deviation. ESS implies Nash.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Optimal?', difficulty:1, reward:50, timeLimit:45, body:'Is an ESS necessarily the globally optimal strategy for the population?', options:['Yes, evolution finds the global maximum.','No. ESS is about local uninvadability. The population can be stuck in a suboptimal equilibrium.','Yes, if given enough time.','No, ESS is always worse than cooperation.'], correct:1, explanation:'Evolution finds local uninvadable states (ESS). It cannot cross fitness valleys to reach higher peaks.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Math', difficulty:2, reward:100, timeLimit:60, body:'What is the mathematical condition for a strategy S to be a strict ESS against mutant T?', options:['E(S, S) > E(T, S)','E(S, T) > E(T, T)','E(S, T) > E(T, T) AND E(S, S) > E(T, S)','E(S, T) = E(T, T)'], correct:1, explanation:'Strict ESS requires the resident S against mutant T to beat the mutant against itself. If E(S,T)=E(T,T), then S must beat T against itself: E(S,S)>E(T,S).' },
+  
+  { id:'p5', moduleId:'m2', title:'Q1: Hawk vs Dove', difficulty:1, reward:50, timeLimit:45, body:'In the Hawk-Dove game, if V > C (Value > Cost), what is the ESS?', options:['100% Dove','Mixed Strategy (V/C)','100% Hawk','Bourgeois'], correct:2, explanation:'If the value of the resource exceeds the cost of injury, fighting is always worth it. The ESS is 100% Hawk, even though it is a wasteful equilibrium.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Tragic Equilibrium', difficulty:1, reward:50, timeLimit:45, body:'If V < C and the population is 100% Hawk, what is the average payoff?', options:['V','V/2','(V-C)/2','0'], correct:2, explanation:'Hawk vs Hawk yields (V-C)/2 on average. This is less than if everyone were Doves (V/2), but Doves cannot invade. A tragic equilibrium.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Mixed ESS', difficulty:1, reward:50, timeLimit:45, body:'If V < C, what is the mixed ESS frequency of Hawks?', options:['p = V/C','p = C/V','p = 0.5','p = V'], correct:0, explanation:'The proportion of Hawks is p = V/C. If V=5 and C=10, p=0.5. 50% Hawks, 50% Doves.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Bourgeois', difficulty:2, reward:100, timeLimit:60, body:'Why is the "Bourgeois" strategy (play Hawk if owner, Dove if intruder) an efficient ESS?', options:['It maximizes average fitness.','It avoids costly fights because the intruder always retreats.','It is the only moral strategy.','It encourages sharing.'], correct:1, explanation:'Bourgeois avoids fights (intruder retreats) and is uninvadable by pure Hawk or Dove. It is a highly efficient ESS.' },
+
+  { id:'p9', moduleId:'m3', title:'Q1: Freq Dep', difficulty:1, reward:50, timeLimit:45, body:'What does "frequency-dependent selection" mean?', options:['Fitness is absolute and unchanging.','Fitness depends on the frequency of strategies in the population.','Frequency is determined by fitness.','Selection happens at a constant frequency.'], correct:1, explanation:'Fitness is not absolute; it depends on who you interact with, which depends on population composition.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Negative Freq', difficulty:1, reward:50, timeLimit:45, body:'In negative frequency dependence, when is a strategy most successful?', options:['When it is common.','When it is rare.','It doesn\'t matter.','When it is exactly 50%.'], correct:1, explanation:'A strategy is more successful when rare. This creates stable polymorphisms (mixed ESS).' },
+  { id:'p11', moduleId:'m3', title:'Q3: Example', difficulty:1, reward:50, timeLimit:45, body:'Which is an example of negative frequency dependence?', options:['Network effects (more users = better).','Pathogen arms races (rare strain succeeds until immunity catches up).','Gravity.','Metabolic rate.'], correct:1, explanation:'A rare pathogen strain succeeds until hosts develop immunity, then a new rare strain succeeds. The rare strategy always wins.' },
+  { id:'p12', moduleId:'m3', title:'Q4: RPS', difficulty:2, reward:100, timeLimit:60, body:'What happens in a Rock-Paper-Scissors dynamic?', options:['One strategy eventually wins.','The population cycles endlessly without a stable ESS.','The population goes extinct.','It reaches a Nash Equilibrium.'], correct:1, explanation:'A beats B, B beats C, C beats A. Populations cycle endlessly. There is no stable ESS.' },
+
+  { id:'p13', moduleId:'m4', title:'Q1: Hamilton', difficulty:1, reward:50, timeLimit:45, body:'State Hamilton\'s Rule.', options:['rB < C','rB > C','r = B/C','B = rC'], correct:1, explanation:'Altruism evolves if relatedness (r) * benefit to recipient (B) > cost to actor (C).' },
+  { id:'p14', moduleId:'m4', title:'Q2: Siblings', difficulty:1, reward:50, timeLimit:45, body:'What is the coefficient of relatedness (r) for full siblings?', options:['1.0','0.5','0.25','0.125'], correct:1, explanation:'You share 50% of your genes with a full sibling. r = 0.5.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Inclusive Fitness', difficulty:1, reward:50, timeLimit:45, body:'What is inclusive fitness?', options:['Direct fitness only.','Indirect fitness only.','Direct + Indirect fitness.','The fitness of the species.'], correct:2, explanation:'Inclusive fitness = Direct (own offspring) + Indirect (relatives\' offspring, weighted by relatedness).' },
+  { id:'p16', moduleId:'m4', title:'Q4: Bees', difficulty:2, reward:100, timeLimit:60, body:'Why are worker bees sterile?', options:['They are forced by the queen.','Haplodiploidy: Workers share 75% with sisters, 50% with offspring. Raising sisters is more profitable.','They lack reproductive organs.','They are altruistic.'], correct:1, explanation:'Due to haplodiploidy, sisters share 75% of genes. It is genetically more profitable to raise sisters than own offspring.' },
+
+  { id:'p17', moduleId:'m5', title:'Q1: Invasion', difficulty:1, reward:50, timeLimit:45, body:'What is required for a mutant strategy to invade a population?', options:['E(T, S) > E(S, S)','E(S, S) > E(T, S)','E(T, T) > E(S, T)','The mutant must be stronger.'], correct:0, explanation:'The mutant (T) must have higher fitness against the resident (S) than the resident has against itself.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Fitness Landscape', difficulty:1, reward:50, timeLimit:45, body:'What is a fitness landscape?', options:['A map of food sources.','A visual where height = fitness. Peaks are optima, valleys are low fitness.','The physical environment.','The genome.'], correct:1, explanation:'A landscape where height represents fitness. Populations climb peaks (local optima/ESS).' },
+  { id:'p19', moduleId:'m5', title:'Q3: Stuck', difficulty:1, reward:50, timeLimit:45, body:'Why do populations get stuck on local optima?', options:['Because they are lazy.','Because any single mutation (step) leads downhill. You cannot cross a valley.','Because mutations are rare.','Because the environment changes.'], correct:1, explanation:'To reach a higher peak, you must cross a fitness valley (lower fitness). Single mutations cannot do this.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Drift', difficulty:2, reward:100, timeLimit:60, body:'How can a population cross a fitness valley?', options:['By trying harder.','Through genetic drift (random fluctuations in small populations).','By consensus.','They never can.'], correct:1, explanation:'In small populations, random drift can push a population off a peak and across a valley to a higher peak.' },
+
+  { id:'p21', moduleId:'m6', title:'Q1: Equation', difficulty:1, reward:50, timeLimit:45, body:'What does the Replicator Equation describe?', options:['How genes mutate.','How strategy frequencies change over time based on fitness.','How populations grow.','How environments change.'], correct:1, explanation:'dx_i/dt = x_i * [fitness - average]. Strategies grow if their fitness is above average.' },
+  { id:'p22', moduleId:'m6', title:'Q2: Fixed Point', difficulty:1, reward:50, timeLimit:45, body:'What does dx_i/dt = 0 mean?', options:['Extinction.','The population is at a fixed point (not changing).','Infinite growth.','Mutation rate is zero.'], correct:1, explanation:'It is a fixed point. The frequency of the strategy is not changing over time.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Above Average', difficulty:1, reward:50, timeLimit:45, body:'What happens if a strategy\'s fitness is above the population average?', options:['It grows (dx/dt > 0).','It shrinks (dx/dt < 0).','It stays the same.','It mutates.'], correct:0, explanation:'If fitness > average, the replicator equation yields a positive growth rate. The strategy spreads.' },
+  { id:'p24', moduleId:'m6', title:'Q4: ESS Stability', difficulty:2, reward:100, timeLimit:60, body:'Is every fixed point of the replicator dynamics an ESS?', options:['Yes.','No. Every ESS is a stable fixed point, but fixed points can be unstable.','No, ESS are never fixed points.','Only in infinite populations.'], correct:1, explanation:'ESS are stable fixed points. But fixed points can also be unstable (repellers) or neutral cycles.' },
+
+  { id:'p25', moduleId:'m7', title:'Q1: Kin Selection', difficulty:1, reward:50, timeLimit:45, body:'What is kin selection?', back:'Selection favoring relatives, even at a cost to the actor.', options:['Selection for the strongest individual.','Selection favoring relatives, even at a cost to the actor.','Selection for the largest group.','Selection for cooperation.'], correct:1, explanation:'Kin selection favors relatives because they share genes. Helping relatives is indirectly helping your own genes.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Logic', difficulty:1, reward:50, timeLimit:45, body:'Why does kin selection work?', options:['Because relatives are nice.','Because relatives share genes. Helping relatives is indirectly helping your genes.','Because of group selection.','Because of reciprocal altruism.'], correct:1, explanation:'The unit of selection is the gene. Relatives share genes. Helping relatives spreads shared genes.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Prediction', difficulty:1, reward:50, timeLimit:45, body:'What does kin selection theory predict about altruism?', options:['Altruism is random.','Altruism should scale with relatedness (help siblings > cousins).','Altruism is unlimited.','Altruism only exists in humans.'], correct:1, explanation:'Altruism should scale with relatedness. You should be more altruistic to siblings (r=0.5) than cousins (r=0.125).' },
+  { id:'p28', moduleId:'m7', title:'Q4: Strangers', difficulty:2, reward:100, timeLimit:60, body:'Does kin selection explain human cooperation with strangers?', options:['Yes, because we are all related.','No. It only explains cooperation within families. Strangers require reciprocal altruism.','Yes, because of culture.','No, humans are purely selfish.'], correct:1, explanation:'Kin selection only explains cooperation among relatives. Cooperation with strangers requires other mechanisms (reciprocal altruism, reputation).' },
+
+  { id:'p29', moduleId:'m8', title:'Q1: Sexual Selection', difficulty:1, reward:50, timeLimit:45, body:'What is sexual selection?', options:['Selection for survival.','Selection for traits that increase mating success, even if costly to survival.','Selection for reproduction.','Selection for sex.'], correct:1, explanation:'Sexual selection favors traits that help get mates, even if they decrease survival (e.g., peacock tails).' },
+  { id:'p30', moduleId:'m8', title:'Q2: Runaway', difficulty:1, reward:50, timeLimit:45, body:'What is Fisherian Runaway?', options:['When females run away from males.','A feedback loop where female preference and male traits co-evolve until cost balances benefit.','When a population goes extinct.','When a mutation spreads too fast.'], correct:1, explanation:'Females prefer a trait, males evolve it, daughters inherit preference, sons inherit trait. It amplifies until the survival cost equals the mating benefit.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Handicap', difficulty:1, reward:50, timeLimit:45, body:'What does the Handicap Principle state?', options:['Costly signals are honest signals of quality.','Handicaps are bad.','Males with handicaps are sterile.','Females prefer no handicaps.'], correct:0, explanation:'A costly signal (huge tail) is honest because only a high-quality male can survive with it. It proves genetic fitness.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Sex Ratio', difficulty:2, reward:100, timeLimit:60, body:'Why is the 1:1 sex ratio an ESS?', options:['Because it is fair.','If one sex is rare, parents having that sex have more grandchildren. The gene spreads until 1:1.','Because of physics.','Because of culture.'], correct:1, explanation:'Fisher\'s Principle. If males are rare, they have more mating opportunities. Parents having males have more grandchildren. The ratio equilibrates at 1:1.' },
+
+  { id:'p33', moduleId:'m9', title:'Q1: Reciprocal', difficulty:1, reward:50, timeLimit:45, body:'What is reciprocal altruism?', options:['Cooperation among relatives.','Cooperation between non-relatives based on repeated interactions.','Being nice for no reason.','Selfishness disguised as altruism.'], correct:1, explanation:'Cooperation between non-relatives based on repeated interactions. "You scratch my back, I\'ll scratch yours."' },
+  { id:'p34', moduleId:'m9', title:'Q2: TFT', difficulty:1, reward:50, timeLimit:45, body:'What is Tit-for-Tat (TFT)?', options:['Always cooperate.','Always defect.','Cooperate first, then copy opponent\'s last move.','Defect first, then cooperate.'], correct:2, explanation:'1. Cooperate first. 2. Do what your opponent did on the previous move. Nice, retaliatory, forgiving, clear.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Why TFT?', difficulty:1, reward:50, timeLimit:45, body:'Why is TFT successful?', options:['It is aggressive.','It is nice (never defects first), retaliatory (punishes), forgiving (returns to cooperation).','It is random.','It is complex.'], correct:1, explanation:'TFT never starts a fight, but never lets a defection go unpunished. It forgives quickly. This balance makes it robust.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Shadow', difficulty:2, reward:100, timeLimit:60, body:'What is required for TFT to be an ESS against pure defection?', options:['High probability of future interaction (shadow of the future).','Large population.','Small cost.','High benefit.'], correct:0, explanation:'If the probability of future interaction (w) is high enough, the future benefits of cooperation outweigh the immediate gain of defection.' },
+
+  { id:'p37', moduleId:'m10', title:'Q1: Niche', difficulty:1, reward:50, timeLimit:45, body:'What is niche construction?', options:['When organisms adapt to a niche.','When organisms actively shape their environment.','When a niche is destroyed.','When organisms leave a niche.'], correct:1, explanation:'Organisms actively shape their environment (beavers build dams, humans build cities), altering selective pressures.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Coevolution', difficulty:1, reward:50, timeLimit:45, body:'What is coevolution?', options:['When one species evolves.','When two or more species affect each other\'s evolution.','When a species goes extinct.','When a niche is constructed.'], correct:1, explanation:'Coevolution occurs when species evolve in response to each other (e.g., predator-prey, host-pathogen arms races).' },
+  { id:'p39', moduleId:'m10', title:'Q3: Red Queen', difficulty:1, reward:50, timeLimit:45, body:'What does the Red Queen Hypothesis state?', options:['You must constantly adapt just to survive.','The queen always wins.','Evolution is static.','Organisms do not affect their environment.'], correct:0, explanation:'"It takes all the running you can do to keep in the same place." In coevolutionary arms races, constant adaptation is needed just to maintain fitness.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Feedback', difficulty:2, reward:100, timeLimit:60, body:'What is the feedback loop in niche construction?', options:['Organism -> Environment.','Environment -> Organism.','Organism -> Environment -> Selection -> Organism.','Selection -> Organism.'], correct:2, explanation:'Organisms change the environment, which changes selection pressures, which changes the organism. A continuous feedback loop.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Trait', scenario:'You are lead architect for Project DARWIN (Synthetic Ecosystem). You must introduce a trait into a synthetic organism. How do you ensure it is an ESS?', options:['Make it the most aggressive trait possible.','Ensure it cannot be invaded by mutant strategies (E(S,T) > E(T,T)).','Make it maximize energy efficiency.','Make it the most cooperative trait.'], correct:1, explanation:'An ESS must be uninvadable. If a mutant strategy T can outcompete the resident S, the system will destabilize. You must verify the math.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: Resource Conflict', scenario:'The organisms compete for a synthetic resource (V=10). Injury costs 20 (C=20). What is the stable ESS frequency of the aggressive "Hawk" strategy?', options:['100% Hawk','50% Hawk (V/C = 10/20)','0% Hawk','75% Hawk'], correct:1, explanation:'Since V < C, the ESS is a mixed strategy. p = V/C = 10/20 = 0.5. 50% Hawks, 50% Doves. This minimizes average injury.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Pathogen', scenario:'A synthetic pathogen is introduced. If it is too common, hosts evolve immunity. What dynamic maintains pathogen diversity?', options:['Positive frequency dependence.','Negative frequency dependence. Rare strains succeed until immunity catches up.','Kin selection.','Red Queen.'], correct:1, explanation:'Negative frequency dependence. The rare strain always has an advantage because hosts haven\'t evolved immunity yet. This creates a stable polymorphism.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: Altruism', scenario:'You want worker organisms to sacrifice themselves for the colony. The cost is death (C=1). The benefit to the queen is 3 new workers (B=3). What is the minimum relatedness (r) required?', options:['r > 0.33','r > 0.5','r > 1.0','r > 0.25'], correct:0, explanation:'Hamilton\'s Rule: rB > C. r*3 > 1. r > 1/3 = 0.33. The workers must be related to the queen by at least 33% for the altruism gene to spread.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: Mutation', scenario:'A mutant organism appears that consumes 2x the energy but reproduces 2x as fast. It is currently rare. Will it invade?', options:['No, because it consumes too much.','Yes, if E(T, S) > E(S, S). If its fitness in the current population is higher than average, it invades.','It depends on the environment.','Only if it is related to the residents.'], correct:1, explanation:'Invasion dynamics. The mutant invades if its fitness against the resident exceeds the resident\'s average fitness. Energy consumption matters only insofar as it affects fitness.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: Equilibrium', scenario:'You are modeling the population with replicator dynamics. dx_i/dt = 0 for all strategies. What does this mean?', options:['Extinction.','The system is at a fixed point. Frequencies are not changing.','Mutation has stopped.','The system is unstable.'], correct:1, explanation:'A fixed point. All strategies have equal fitness. The system is at equilibrium (which may or may not be a stable ESS).' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: Sterile Workers', scenario:'You want to engineer a eusocial caste (sterile workers). What genetic mechanism makes this most likely to evolve?', options:['Haplodiploidy (sisters share 75% genes).','High mutation rate.','Reciprocal altruism.','Sexual selection.'], correct:0, explanation:'Haplodiploidy makes sisters more related to each other (0.75) than to their own offspring (0.5). It is genetically more profitable to raise sisters.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: Mating', scenario:'You must design the mating system. Why is a 1:1 sex ratio an ESS?', options:['It maximizes genetic diversity.','If one sex is rare, parents having that sex have more grandchildren.','It is the most efficient.','It is required by physics.'], correct:1, explanation:'Fisher\'s Principle. If males are rare, they have more mating opportunities. Parents having males have more grandchildren. The ratio equilibrates at 1:1.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: Cooperation', scenario:'Two non-related species must cooperate to process waste. What strategy ensures stability in repeated interactions?', options:['Always cooperate.','Tit-for-Tat (cooperate first, then copy).','Always defect.','Hawk-Dove.'], correct:1, explanation:'Tit-for-Tat. It is nice (starts cooperating), retaliatory (punishes defection), and forgiving. It is an ESS if the probability of future interaction is high.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Frontier', scenario:'Project DARWIN is a success. The ecosystem is stable. What principle explains why the organisms must constantly adapt just to maintain their fitness?', options:['Niche Construction.','The Red Queen Hypothesis. Coevolutionary arms races require constant adaptation.','Fisher\'s Principle.','Hamilton\'s Rule.'], correct:1, explanation:'The Red Queen. "It takes all the running you can do to keep in the same place." As species coevolve, they must constantly adapt just to survive.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The ESS Audit', body:'Identify a behavior in your life (e.g., responding to emails). Is it an ESS? What mutant strategy could invade it?' },
+  { id:'rw2', title:'The Hawk-Dove', body:'Observe a conflict today. Was it Hawk vs Hawk (costly fight) or Bourgeois (owner wins)?' },
+  { id:'rw3', title:'The Rarity', body:'Find a trend or strategy that benefits from being rare (e.g., a niche product). Why does rarity help?' },
+  { id:'rw4', title:'The Kin Audit', body:'List 3 altruistic acts you did this week. Were they directed at kin (r > 0) or strangers? Why?' },
+  { id:'rw5', title:'The Mutant', body:'Introduce a small change to your daily routine. Does it invade and spread, or die out? Why?' },
+  { id:'rw6', title:'The Fixed Point', body:'Find a habit or metric that is not changing (dx/dt = 0). Is it a stable ESS or unstable?' },
+  { id:'rw7', title:'The Nepotism', body:'Observe how resources or favors are distributed in a group. Do they scale with relatedness or closeness?' },
+  { id:'rw8', title:'The Signal', body:'Find a costly display (car, clothing, degree). Is it an honest signal (Handicap Principle) or Fisherian Runaway?' },
+  { id:'rw9', title:'The Tit-for-Tat', body:'In a repeated interaction (work, family), try Tit-for-Tat. Cooperate first, then copy. Observe the result.' },
+  { id:'rw10', title:'The Niche', body:'How have you constructed your niche (home, workspace)? How does it alter your selective pressures?' },
+  { id:'rw11', title:'The Red Queen', body:'In your work or industry, are you running just to stay in place? Identify the coevolutionary arms race.' },
+  { id:'rw12', title:'The Tragic Equilibrium', body:'Find a situation where everyone is a "Hawk" and the average payoff is lower than if everyone were "Doves".' },
+  { id:'rw13', title:'The Polymorphism', body:'Observe a market or ecosystem with multiple coexisting strategies. Why hasn\'t one won?' },
+  { id:'rw14', title:'The rB > C', body:'Calculate the cost/benefit of helping a friend move. Is it worth it based on reciprocity (not kinship)?' },
+  { id:'rw15', title:'The Fitness Landscape', body:'Map your skills on a landscape. Are you on a local peak? What valley would you need to cross to reach a higher peak?' },
+  { id:'rw16', title:'The Shadow', body:'In a transaction, assess the "shadow of the future". Is it a one-shot game or repeated? How does this affect cooperation?' },
+  { id:'rw17', title:'The Greenbeard', body:'Identify a "greenbeard" signal (e.g., wearing a specific brand). Does it trigger altruism from others with the same signal?' },
+  { id:'rw18', title:'The Sex Ratio', body:'Why do most species have a 1:1 sex ratio? What happens if one sex becomes rare?' },
+  { id:'rw19', title:'The Bourgeois', body:'Observe property rights. The "owner" usually wins without a fight. Why is this an efficient ESS?' },
+  { id:'rw20', title:'The Invasion', body:'A new habit or tool appears. Calculate its invasion fitness against your current routine.' },
+  { id:'rw21', title:'The Handicap', body:'Wear something slightly costly or uncomfortable today. Does it signal quality or just waste energy?' },
+  { id:'rw22', title:'The Negative Freq', body:'Why is being the "only" provider of a niche service profitable? What happens when others copy you?' },
+  { id:'rw23', title:'The Replicator', body:'Track the frequency of a behavior (e.g., checking phone). Is it above or below average? Is it growing?' },
+  { id:'rw24', title:'The Kin vs Reciprocity', body:'Distinguish between a favor done for family (kin) vs a favor done for a colleague (reciprocity).' },
+  { id:'rw25', title:'The Runaway', body:'Find a trend that is escalating beyond utility (e.g., phone screen sizes). Is it Fisherian Runaway?' },
+  { id:'rw26', title:'The Drift', body:'Introduce a random change into a stable routine. Does it cross a fitness valley?' },
+  { id:'rw27', title:'The Coevolution', body:'Identify an arms race in your industry (features, salaries). Are you running just to stay in place?' },
+  { id:'rw28', title:'The Niche Construction', body:'Clean your desk (niche construction). How does it alter your productivity (selective pressure)?' },
+  { id:'rw29', title:'The TFT Failure', body:'Observe a "death spiral" of retaliation (TFT vs TFT with noise). How could "Generous TFT" fix it?' },
+  { id:'rw30', title:'The Local Optimum', body:'Identify a suboptimal habit you are stuck in. Why can\'t a single mutation (change) fix it?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your evolutionary profile.' },
+  { threshold: 500, title: 'MUTANT', desc: 'You see strategies. The concept of invasion is becoming clear.' },
+  { threshold: 1500, title: 'SELECTOR', desc: 'You calculate payoffs and identify ESS. The math is alive.' },
+  { threshold: 3000, title: 'STRATEGIST', desc: 'You navigate fitness landscapes and frequency dependence.' },
+  { threshold: 6000, title: 'ARCHITECT', desc: 'You design stable ecosystems. Evolution is your tool.' }
+];
+
+const STORAGE_KEY = 'maynard-v1-clean';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){
+    console.error("Failed to load save, resetting.", e);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+  return defaultState();
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){
+  const lvl = level(S.xp);
+  const cur = xpForLevel(lvl);
+  const next = xpForLevel(lvl+1);
+  return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 };
+}
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){
+    toast('LEVEL UP — LVL '+newLvl, 'success');
+    flashCombo('LVL '+newLvl);
+  }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){
+    S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null };
+  }
+  if(!S.daily.rtMissionId){
+    const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length);
+    S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id;
+  }
+}
+
+function unlockNextModule(moduleId){
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if(idx >= 0 && idx < MODULES.length - 1){
+    S.modules[MODULES[idx+1].id].unlocked = true;
+  }
+}
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){
+  let current = PROFILES[0];
+  for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; }
+  return current;
+}
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// ARCHITECTURE UNLOCKED</h2>';
+      html += '<p>You have completed all 10 axes and successfully engineered Project DARWIN. You now possess the complete evolutionary architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Evolution is not a force; it is an algorithm. It optimizes for local uninvadability, not global perfection. By understanding ESS, Hamilton\'s Rule, and the Red Queen, you can predict the behavior of any competitive system, from biology to business. The fittest do not survive; the uninvadable do.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){
+    card.repetitions = 0; card.interval = 0; card.wrong += 1;
+  }else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else {
+      const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8);
+      card.interval = Math.max(1, Math.round(card.interval * factor));
+    }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){
+    card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if(card.ease < 1.3) card.ease = 1.3;
+  }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else {
+    const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8);
+    interval = Math.max(1, Math.round(interval * factor));
+  }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => {
+    if(a.core !== b.core) return a.core ? -1 : 1;
+    return S.cards[a.id].due - S.cards[b.id].due;
+  });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) {
+        const prevPhaseId = PROJECT_PHASES[i-1].id;
+        if (!S.project[prevPhaseId].solved) canUnlock = false;
+      }
+      if (canUnlock) {
+        nextProjectPhase = p;
+        break;
+      }
+    }
+  }
+  
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project DARWIN: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your evolutionary architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary + ' Start with the lesson, then test yourself in the Arena.';
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module. Finish the remaining items to unlock the next axis.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery. The work is never done — only sharpened.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){
+      rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5';
+    } else {
+      rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1';
+    }
+  }
+
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100);
+      totalMaturity += maturity;
+    });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length;
+  const R = 95;
+  
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30));
+      totalMaturity += maturity;
+    });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="MAYNARD.show(\'modules\')"><- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="MAYNARD.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="MAYNARD.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  
+  html += '</div>';
+  
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){
+      html += '<button class="btn success mt-1" onclick="MAYNARD.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>';
+    }
+    html += '<button class="btn secondary mt-1" onclick="MAYNARD.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="MAYNARD.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){
+    html += '<button class="btn" onclick="MAYNARD.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>';
+  }else{
+    html += '<button class="btn secondary" disabled>Checked Read</button>';
+  }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    html += '<button class="btn secondary" onclick="MAYNARD.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>';
+  }
+  html += '</div>';
+  
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    
+    if(moduleProgress(moduleId).completed){
+      unlockNextModule(moduleId);
+      toast('Next axis unlocked', 'success');
+    }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Traits:</span><span class="val">10</span></div>';
+  html += '<div class="hud-stat"><span class="label">Phases:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'STABLE' : 'EVOLVING') + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each evolutionary axis to engineer a stable synthetic ecosystem. Phases unlock sequentially.</p>';
+  
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) {
+      const prevPhaseId = PROJECT_PHASES[i-1].id;
+      if (!S.project[prevPhaseId].solved) {
+        unlocked = false;
+      }
+    }
+    
+    const active = !solved && unlocked;
+    
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="MAYNARD.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info">';
+    html += '<div class="phase-title">' + p.title + '</div>';
+    html += '<div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div>';
+    html += '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  
+  let html = '<div class="lesson-back" onclick="MAYNARD.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div>';
+  html += '</div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="MAYNARD.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'darwin: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="MAYNARD.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){
+      actions.innerHTML = '<button class="btn success" onclick="MAYNARD.show(\'dashboard\')">View Final Report -></button>';
+    }
+    else { actions.innerHTML = '<button class="btn" onclick="MAYNARD.show(\'modules\')">Continue Training -></button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="MAYNARD.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MAYNARD.showProjectPhase(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => {
+    btn.onclick = () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderDrills();
+    };
+  });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="MAYNARD.show(\'arena\')">Arena -></button></div>';
+    return;
+  }
+  
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="MAYNARD.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div>';
+  html += '<div>Axis: <b>' + module.codename + '</b></div>';
+  html += '<div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="MAYNARD.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="MAYNARD.rateDrill(1)">Again<span class="interval"><1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="MAYNARD.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="MAYNARD.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="MAYNARD.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  
+  let html = '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="MAYNARD.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content">';
+      html += '<div class="arena-num">' + String(i+1).padStart(2,'0') + '</div>';
+      html += '<div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div>';
+      html += '<div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div>';
+      html += '</div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  
+  let html = '<div class="lesson-back" onclick="MAYNARD.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div>';
+  html += '</div>';
+  
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="MAYNARD.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){
+      clearInterval(arenaTimer);
+      if(problemState === 'idle'){ answerProblem(-1); }
+    }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){
+          unlockNextModule(p.moduleId);
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
+        }else{
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        }
+      }else{
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+      }
+      flashCombo('+' + p.reward + ' XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    actions.innerHTML = '<button class="btn" onclick="MAYNARD.show(\'arena\')">Back to Arena -></button>';
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="MAYNARD.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MAYNARD.showArenaProblem(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => {
+    if(c.interval >= 21) mature++;
+    else if(c.interval >= 7) young++;
+    else if(c.interval >= 1) learning++;
+    else newCards++;
+  });
+  
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){
+    const correctCount = recent.filter(h => h.correct).length;
+    document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%';
+  }else{ document.getElementById('statRetention').textContent = '--'; }
+  
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(157,78,221,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){
+    log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>';
+  }else{
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 255, 127, ' + p.o + ')';
+      ctx.fill();
+    });
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){
+    if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; }
+  }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){
+    const map = { '1': 1, '2': 3, '3': 4, '4': 5 };
+    if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); }
+  }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); }
+  }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); }
+  }
+});
+
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme);
+  document.getElementById('themeMenu').classList.remove('active');
+}
+
+document.getElementById('themeBtn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('themeMenu').classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.theme-dropdown')) {
+    document.getElementById('themeMenu').classList.remove('active');
+  }
+});
+
+document.getElementById('exportBtn').onclick = () => {
+  const dataStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([dataStr], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'maynard_save.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Save file exported', 'success');
+};
+
+document.getElementById('importBtn').onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      S = JSON.parse(event.target.result);
+      saveState();
+      showView('dashboard');
+      toast('Save file imported successfully', 'success');
+    } catch(err) {
+      toast('Invalid save file', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error');
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { showView(item.dataset.view); });
+});
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = [
+    'Initializing evolutionary architecture v1.0...',
+    'Loading ESS kernel...',
+    'Calibrating SM-2 spaced repetition engine...',
+    'Mounting Pareto priority queue...',
+    'Indexing 10 axes / 120 cards / 40 scenarios...',
+    'Initializing Project DARWIN...',
+    'MAYNARD online.'
+  ];
+  
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      setTimeout(() => {
+        document.getElementById('boot').classList.add('fade');
+        document.getElementById('app').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('boot').style.display = 'none';
+          showView('dashboard');
+        }, 800);
+      }, 300);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.MAYNARD = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  
+  try {
+    let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
+    const todayDate = new Date().toISOString().split('T')[0];
+    if(!act.includes(todayDate)) { 
+      act.push(todayDate); 
+      localStorage.setItem('cogito-activity', JSON.stringify(act)); 
+    }
+  } catch(e) {}
+
+  saveState();
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
