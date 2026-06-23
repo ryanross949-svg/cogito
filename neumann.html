@@ -646,6 +646,77 @@ const CARDS = [
   {id:'c58',moduleId:'m10',core:false,category:'application',front:'What are Gene Regulatory Networks?',back:'Genes turning each other on and off. They form biological logic gates (AND, OR, NOT).'},
   {id:'c59',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Biology is not chemistry. Biology is..."',back:'"...information processing."'},
   {id:'c60',moduleId:'m10',core:false,category:'concept',front:'What copies the DNA blueprint uninterpreted for the next generation?',back:'DNA Polymerase. It is the biological Copy Machine.'}
+  // --- VON NEUMANN: 60 Additional Cards (c61 - c120) ---
+  
+  {id:'c61',moduleId:'m1',core:false,category:'concept',front:'What is the fundamental difference between a Turing Machine and Von Neumann\'s Universal Constructor?',back:'A Turing Machine processes information (computes). The Universal Constructor physically assembles a copy of the hardware (replicates) based on that information.'},
+  {id:'c62',moduleId:'m1',core:false,category:'application',front:'Why did von Neumann move from a "kinematic" model to a "cellular automaton" model for replication?',back:'To abstract away the physical complexities of gears and arms, focusing purely on the logical and mathematical requirements of self-replication.'},
+  {id:'c63',moduleId:'m1',core:false,category:'concept',front:'What is the role of the "supervisory unit" in von Neumann\'s architecture?',back:'It controls the sequence of operations: tell the constructor to build, then tell the copier to copy, then attach the copy.'},
+  {id:'c64',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The description must be copied..."',back:'"...uninterpreted, to avoid infinite regress."'},
+  {id:'c65',moduleId:'m1',core:false,category:'concept',front:'In cellular automata, what is the equivalent of the Universal Constructor?',back:'A configuration of cells that, by applying local rules, can read the state pattern of another region and construct a duplicate of it.'},
+  {id:'c66',moduleId:'m1',core:false,category:'application',front:'How does DNA solve the "infinite regress" problem of self-replication?',back:'DNA polymerase copies the DNA string as raw data (uninterpreted), while ribosomes read it (interpreted) to build proteins.'},
+  
+  {id:'c67',moduleId:'m2',core:false,category:'concept',front:'How was ENIAC programmed before the stored-program concept?',back:'By manually rewiring cables and setting switches. The program was the physical hardware configuration.'},
+  {id:'c68',moduleId:'m2',core:false,category:'application',front:'What was EDVAC\'s major architectural breakthrough?',back:'It was the first electronic computer designed to store programs in memory alongside data (von Neumann architecture).'},
+  {id:'c69',moduleId:'m2',core:false,category:'concept',front:'What is the difference between RISC and CISC?',back:'RISC (Reduced Instruction Set) uses simple, fixed-length instructions executed in one cycle. CISC (Complex Instruction Set) uses complex, variable-length instructions.'},
+  {id:'c70',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Code is just..."',back:'"...data." (Enabled by the stored-program architecture).'},
+  {id:'c71',moduleId:'m2',core:false,category:'concept',front:'What does the Instruction Decoder do in a CPU?',back:'It translates the fetched instruction (opcode) into electrical signals (control signals) that tell the ALU and registers what to do.'},
+  {id:'c72',moduleId:'m2',core:false,category:'application',front:'Why can\'t a Harvard architecture machine easily execute self-modifying code?',back:'Because instructions and data are in separate memory spaces with separate buses. You cannot easily write data to the instruction memory.'},
+  
+  {id:'c73',moduleId:'m3',core:false,category:'concept',front:'In a 2D Cellular Automaton, what is the "Moore neighborhood"?',back:'The 8 cells immediately surrounding a central cell (N, S, E, W, and diagonals).'},
+  {id:'c74',moduleId:'m3',core:false,category:'concept',front:'How does Rule 30 generate randomness?',back:'Its center column of cells over time produces a sequence that is statistically indistinguishable from true randomness, used in Mathematica.'},
+  {id:'c75',moduleId:'m3',core:false,category:'application',front:'What is a "Glider Gun" in Conway\'s Game of Life?',back:'A stationary pattern that periodically emits gliders (moving spaceships), proving that finite automata can generate infinite growth.'},
+  {id:'c76',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Computation is a property of..."',back:'"...systems, not just machines." - Stephen Wolfram.'},
+  {id:'c77',moduleId:'m3',core:false,category:'concept',front:'What is the core thesis of Wolfram\'s "A New Kind of Science"?',back:'That simple computational rules (like CAs) underlie all natural phenomena, potentially replacing traditional math equations.'},
+  {id:'c78',moduleId:'m3',core:false,category:'concept',front:'Why are 1D Cellular Automata (like Rule 110) significant?',back:'They are the simplest possible computational systems proven to be Turing Complete.'},
+  
+  {id:'c79',moduleId:'m4',core:false,category:'concept',front:'What is the Liar\'s Paradox?',back:'"This statement is false." If true, it is false; if false, it is true. A classic example of self-reference breaking logic.'},
+  {id:'c80',moduleId:'m4',core:false,category:'application',front:'What is a "fixed point" in the context of computer programs?',back:'A program that, when run on its own source code, outputs its own source code (a Quine).'},
+  {id:'c81',moduleId:'m4',core:false,category:'concept',front:'What is Kleene\'s Recursion Theorem?',back:'A mathematical proof that in any Turing-complete language, a program can obtain its own description (source code) without external input.'},
+  {id:'c82',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "I am a..."',back:'"...strange loop." - Douglas Hofstadter.'},
+  {id:'c83',moduleId:'m4',core:false,category:'concept',front:'What is the difference between iteration and recursion?',back:'Iteration uses a loop construct (while/for) to repeat. Recursion calls itself with a smaller input until a base case is hit.'},
+  {id:'c84',moduleId:'m4',core:false,category:'application',front:'Why does recursion require a "base case"?',back:'Without a stopping condition, the recursion loops infinitely, causing a stack overflow (running out of memory).'},
+  
+  {id:'c85',moduleId:'m5',core:false,category:'concept',front:'What is the difference between a Mutex and a Semaphore?',back:'A Mutex is binary (lock/unlock) and owned by one thread. A Semaphore uses a counter to allow multiple threads (up to N) to access a resource pool.'},
+  {id:'c86',moduleId:'m5',core:false,category:'application',front:'In the Dining Philosophers problem, how is deadlock prevented?',back:'By forcing philosophers to pick up the lower-numbered fork first, breaking the circular wait condition.'},
+  {id:'c87',moduleId:'m5',core:false,category:'concept',front:'What does it mean for an operation to be "atomic"?',back:'It cannot be interrupted by other threads. It appears to happen instantly, all or nothing.'},
+  {id:'c88',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "The bottleneck is always..."',back:'"...the sequential part." - Gene Amdahl.'},
+  {id:'c89',moduleId:'m5',core:false,category:'concept',front:'How does Gustafson\'s Law differ from Amdahl\'s Law?',back:'Amdahl assumes fixed problem size. Gustafson assumes the problem size scales with processors, meaning speedup is not bounded by the sequential fraction.'},
+  {id:'c90',moduleId:'m5',core:false,category:'application',front:'What is "lock-free" programming?',back:'A concurrency approach where multiple threads operate without locks, using atomic operations (like Compare-And-Swap) to prevent blocking.'},
+  
+  {id:'c91',moduleId:'m6',core:false,category:'concept',front:'What is a "syscall"?',back:'The programmatic way an application requests a service from the operating system kernel (e.g., read file, allocate memory).'},
+  {id:'c92',moduleId:'m6',core:false,category:'concept',front:'In CPU protection rings, what is Ring 0 vs Ring 3?',back:'Ring 0 is Kernel mode (full hardware access). Ring 3 is User mode (restricted). This isolates the OS from bad apps.'},
+  {id:'c93',moduleId:'m6',core:false,category:'application',front:'Why do operating systems use "virtual memory"?',back:'To give each process the illusion of having its own contiguous memory space, isolating processes and allowing the system to use more memory than physically exists (via disk swapping).'},
+  {id:'c94',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "All problems in computer science can be solved by..."',back:'"...another level of indirection." - David Wheeler.'},
+  {id:'c95',moduleId:'m6',core:false,category:'concept',front:'What is the "kernel" of an operating system?',back:'The core layer that has complete control over the hardware. It manages memory, CPU time, and device drivers.'},
+  {id:'c96',moduleId:'m6',core:false,category:'concept',front:'What is the difference between a compiler and an interpreter?',back:'A compiler translates the whole program to machine code before execution. An interpreter reads and executes line-by-line during runtime.'},
+  
+  {id:'c97',moduleId:'m7',core:false,category:'concept',front:'What is a Universal Turing Machine (UTM)?',back:'A Turing Machine that can simulate any other Turing Machine by reading its description from the tape.'},
+  {id:'c98',moduleId:'m7',core:false,category:'concept',front:'What is the Busy Beaver problem?',back:'A mathematical game to find the Turing Machine that prints the most 1s before halting, given a specific number of states. It defines uncomputable growth rates.'},
+  {id:'c99',moduleId:'m7',core:false,category:'concept',front:'What is Kolmogorov Complexity?',back:'The length of the shortest computer program that can generate a specific string. It defines the absolute limit of data compression.'},
+  {id:'c100',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Computers are not omnipotent. They are bounded by..."',back:'"...logic." - Alan Turing.'},
+  {id:'c101',moduleId:'m7',core:false,category:'concept',front:'What is the difference between decidability and computability?',back:'Computability asks if a function can be calculated. Decidability asks if an algorithm can answer a yes/no question (e.g., Halting problem is undecidable).'},
+  {id:'c102',moduleId:'m7',core:false,category:'application',front:'If a problem is NP-Complete, is it Turing Complete?',back:'No. NP-Complete means a solution can be verified quickly but finding it is hard. Turing Complete means it can compute anything. They measure different things.'},
+  
+  {id:'c103',moduleId:'m8',core:false,category:'concept',front:'What is the Chomsky Hierarchy?',back:'A classification of formal languages: Type 3 (Regular), Type 2 (Context-Free), Type 1 (Context-Sensitive), Type 0 (Unrestricted/Recursively Enumerable).'},
+  {id:'c104',moduleId:'m8',core:false,category:'application',front:'What is a Regular Expression (Regex)?',back:'A sequence of characters defining a search pattern. It is parsed by Finite State Machines (Regular Languages).'},
+  {id:'c105',moduleId:'m8',core:false,category:'concept',front:'What is a Context-Free Grammar (CFG)?',back:'A set of recursive rules used to generate strings. Used to define the syntax of programming languages (parsed by PDAs).'},
+  {id:'c106',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Syntax is the shape; semantics is..."',back:'"...the meaning."'},
+  {id:'c107',moduleId:'m8',core:false,category:'concept',front:'What does a Pushdown Automaton use its stack for?',back:'To remember nested context, like matching opening and closing parentheses or XML tags.'},
+  {id:'c108',moduleId:'m8',core:false,category:'concept',front:'What is the difference between a DFA and an NFA?',back:'DFA (Deterministic) has exactly one transition per input. NFA (Non-deterministic) can have multiple. Both are mathematically equivalent.'},
+  
+  {id:'c109',moduleId:'m9',core:false,category:'concept',front:'In Conway\'s Game of Life, what is a "Block"?',back:'A 2x2 square pattern that does not change over time. A "still life".'},
+  {id:'c110',moduleId:'m9',core:false,category:'application',front:'How do bird flocks (Boids) exhibit emergence?',back:'Each bird follows local rules (separation, alignment, cohesion) without a leader, resulting in complex, fluid flocking behavior.'},
+  {id:'c111',moduleId:'m9',core:false,category:'concept',front:'What is a "phase transition" in complex systems?',back:'A sudden change in macroscopic behavior when a parameter crosses a threshold (e.g., water turning to ice, or traffic suddenly jamming).'},
+  {id:'c112',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "More is..."',back:'"...different." - P.W. Anderson.'},
+  {id:'c113',moduleId:'m9',core:false,category:'concept',front:'What are Wolfram\'s 4 Classes of Cellular Automata behavior?',back:'Class 1 (Uniform), Class 2 (Periodic), Class 3 (Chaotic/Random), Class 4 (Complex, capable of universal computation).'},
+  {id:'c114',moduleId:'m9',core:false,category:'application',front:'Why is "Game of Life" a good analogy for neural networks?',back:'Simple local rules (neurons firing based on neighbors) create complex global behavior (pattern recognition, consciousness).'},
+  
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'What is the "genetic code"?',back:'The set of rules mapping RNA codons (groups of 3 nucleotides) to specific amino acids during protein synthesis.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'What is the difference between Transcription and Translation?',back:'Transcription: DNA is copied into mRNA. Translation: Ribosome reads mRNA to build a protein.'},
+  {id:'c117',moduleId:'m10',core:false,category:'concept',front:'What is DNA methylation?',back:'A chemical modification to DNA that turns genes off without changing the genetic sequence. An example of epigenetics (software flags on the hardware code).'},
+  {id:'c118',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Biology is not chemistry. Biology is..."',back:'"...information processing."'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'What is a ribozyme?',back:'An RNA molecule that acts as an enzyme, capable of catalyzing chemical reactions. It proves RNA can be both data and CPU.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What is horizontal gene transfer?',back:'The movement of genetic material between organisms other than vertical transmission (parent to offspring). Used by bacteria to share antibiotic resistance.'}
 ];
 // (Note: To save space and ensure 100% loading reliability, I've included 60 of the most critical flashcards. The app functions perfectly with this set. If you want the full 120, the pattern is identical).
 
