@@ -136,26 +136,8 @@
     </div>
   </div>
 
-  <div class="domain-section">
-    <div class="domain-title">🛡️ Strategy & Economics</div>
-    <div class="grid" id="strategy-grid"></div>
-  </div>
-  <div class="domain-section">
-    <div class="domain-title">⚙️ Engineering & Execution</div>
-    <div class="grid" id="engineering-grid"></div>
-  </div>
-  <div class="domain-section">
-    <div class="domain-title">🧠 AI & Technology</div>
-    <div class="grid" id="ai-grid"></div>
-  </div>
-  <div class="domain-section">
-    <div class="domain-title">🧬 Biology & Evolution</div>
-    <div class="grid" id="biology-grid"></div>
-  </div>
-  <div class="domain-section">
-    <div class="domain-title">📐 Mathematics & Physics</div>
-    <div class="grid" id="math-grid"></div>
-  </div>
+  <!-- Discipline sections are generated from the DISCIPLINES array in the script below -->
+  <div id="disciplineSections"></div>
 
   <button id="feedback-fab">Feedback</button>
   <div id="feedback-modal">
@@ -182,36 +164,59 @@
 
 <script>
 const APPS = [
-  { id: 'prima', name: 'PRIMA', domain: 'engineering', axisName: 'Engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
+  { id: 'prima', name: 'PRIMA', domain: 'systems', axisName: 'Engineering', desc: 'First-principles thinking & execution algorithms modeled after Elon Musk.', tag: '10 Axes · 120 Cards', storageKey: 'prima-v7', href: 'prima.html' },
   { id: 'nash', name: 'NASH', domain: 'strategy', axisName: 'Strategy', desc: 'Game theory, Nash Equilibria, and mechanism design modeled after MIT 14.12.', tag: '10 Axes · 120 Cards', storageKey: 'nash-v7', href: 'nash.html' },
-  { id: 'oracle', name: 'ORACLE', domain: 'ai', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' },
-  { id: 'fermi', name: 'FERMI', domain: 'math', axisName: 'Physics/Math', desc: 'Order-of-magnitude estimation, physics limits, and Fermi problems.', tag: '10 Axes · 120 Cards', storageKey: 'fermi-v1', href: 'fermi.html' },
-  { id: 'darwin', name: 'DARWIN', domain: 'biology', axisName: 'Biology', desc: 'Evolutionary strategy, natural selection, and biological systems.', tag: '10 Axes · 120 Cards', storageKey: 'darwin-v1', href: 'darwin.html' },
-  { id: 'maestro', name: 'MAESTRO', domain: 'engineering', axisName: 'Systems', desc: 'Systems thinking, feedback loops, bottlenecks, and architecture.', tag: '10 Axes &middot; 120 Cards', storageKey: 'maestro-v1', href: 'maestro.html' },
-  { id: 'kafka', name: 'KAFKA', domain: 'ai', axisName: 'Info Theory', desc: 'Signal vs. Noise, Shannon Entropy, and Cryptography.', tag: '10 Axes · 120 Cards', storageKey: 'kafka-v1', href: 'kafka.html' },
-  { id: 'mach', name: 'MACH', domain: 'engineering', axisName: 'Physics/Motion', desc: 'Kinematics, Inertia, Orbital Mechanics, and Relativity.', tag: '10 Axes · 120 Cards', storageKey: 'mach-v1', href: 'mach.html' },
-  { id: 'turing', name: 'TURING', domain: 'ai', axisName: 'Logic/CS', desc: 'Boolean logic, state machines, the Halting Problem, and Big O complexity.', tag: '10 Axes · 120 Cards', storageKey: 'turing-v1', href: 'turing.html' },
-  { id: 'kahneman', name: 'KAHNEMAN', domain: 'strategy', axisName: 'Psychology', desc: 'Cognitive biases, System 1/2 thinking, and debiasing techniques.', tag: '10 Axes · 120 Cards', storageKey: 'kahneman-v1', href: 'kahneman.html' },
-  { id: 'hebb', name: 'HEBB', domain: 'ai', axisName: 'Neuro', desc: 'Neuroplasticity, memory consolidation, and the biological mechanics of learning.', tag: '10 Axes · 120 Cards', storageKey: 'hebb-v1', href: 'hebb.html' },
-  { id: 'lorenz', name: 'LORENZ', domain: 'engineering', axisName: 'Chaos/Physics', desc: 'Chaos theory, the Butterfly Effect, and navigating unpredictability.', tag: '10 Axes · 120 Cards', storageKey: 'lorenz-v1', href: 'lorenz.html' },
+  { id: 'oracle', name: 'ORACLE', domain: 'compute', axisName: 'AI/Tech', desc: 'Prompt engineering, agentic workflows, and human-AI symbiosis.', tag: '10 Axes · 120 Cards', storageKey: 'oracle-v7', href: 'oracle.html' },
+  { id: 'fermi', name: 'FERMI', domain: 'physics', axisName: 'Physics/Math', desc: 'Order-of-magnitude estimation, physics limits, and Fermi problems.', tag: '10 Axes · 120 Cards', storageKey: 'fermi-v1', href: 'fermi.html' },
+  { id: 'darwin', name: 'DARWIN', domain: 'life', axisName: 'Biology', desc: 'Evolutionary strategy, natural selection, and biological systems.', tag: '10 Axes · 120 Cards', storageKey: 'darwin-v1', href: 'darwin.html' },
+  { id: 'maestro', name: 'MAESTRO', domain: 'systems', axisName: 'Systems', desc: 'Systems thinking, feedback loops, bottlenecks, and architecture.', tag: '10 Axes &middot; 120 Cards', storageKey: 'maestro-v1', href: 'maestro.html' },
+  { id: 'kafka', name: 'KAFKA', domain: 'compute', axisName: 'Info Theory', desc: 'Signal vs. Noise, Shannon Entropy, and Cryptography.', tag: '10 Axes · 120 Cards', storageKey: 'kafka-v1', href: 'kafka.html' },
+  { id: 'mach', name: 'MACH', domain: 'physics', axisName: 'Physics/Motion', desc: 'Kinematics, Inertia, Orbital Mechanics, and Relativity.', tag: '10 Axes · 120 Cards', storageKey: 'mach-v1', href: 'mach.html' },
+  { id: 'turing', name: 'TURING', domain: 'compute', axisName: 'Logic/CS', desc: 'Boolean logic, state machines, the Halting Problem, and Big O complexity.', tag: '10 Axes · 120 Cards', storageKey: 'turing-v1', href: 'turing.html' },
+  { id: 'kahneman', name: 'KAHNEMAN', domain: 'mind', axisName: 'Psychology', desc: 'Cognitive biases, System 1/2 thinking, and debiasing techniques.', tag: '10 Axes · 120 Cards', storageKey: 'kahneman-v1', href: 'kahneman.html' },
+  { id: 'hebb', name: 'HEBB', domain: 'mind', axisName: 'Neuro', desc: 'Neuroplasticity, memory consolidation, and the biological mechanics of learning.', tag: '10 Axes · 120 Cards', storageKey: 'hebb-v1', href: 'hebb.html' },
+  { id: 'lorenz', name: 'LORENZ', domain: 'physics', axisName: 'Chaos/Physics', desc: 'Chaos theory, the Butterfly Effect, and navigating unpredictability.', tag: '10 Axes · 120 Cards', storageKey: 'lorenz-v1', href: 'lorenz.html' },
   { id: 'hayek', name: 'HAYEK', domain: 'strategy', axisName: 'Economics', desc: 'Spontaneous order, price signals, and the division of knowledge.', tag: '10 Axes · 120 Cards', storageKey: 'hayek-v1', href: 'hayek.html' },
-  { id: 'gibbon', name: 'GIBBON', domain: 'engineering', axisName: 'Systems', desc: 'Institutional decay, bureaucratic rot, and collapse dynamics.', tag: '10 Axes · 120 Cards', storageKey: 'gibbon-v1', href: 'gibbon.html' },
-  { id: 'diffie', name: 'DIFFIE', domain: 'ai', axisName: 'Crypto/Trust', desc: 'Cryptography, zero-knowledge proofs, and Byzantine fault tolerance.', tag: '10 Axes · 120 Cards', storageKey: 'diffie-v1', href: 'diffie.html' },
-  { id: 'dijkstra', name: 'DIJKSTRA', domain: 'engineering', axisName: 'Algorithms', desc: 'Graph theory, pathfinding, Big-O, and dynamic programming.', tag: '10 Axes · 120 Cards', storageKey: 'dijkstra-v1', href: 'dijkstra.html' },
-  { id: 'popper', name: 'POPPER', domain: 'strategy', axisName: 'Philosophy', desc: 'Falsifiability, paradigm shifts, and the scientific method.', tag: '10 Axes · 120 Cards', storageKey: 'popper-v1', href: 'popper.html' },
-  { id: 'chomsky', name: 'CHOMSKY', domain: 'ai', axisName: 'Linguistics', desc: 'Syntax, recursion, universal grammar, and the architecture of thought.', tag: '10 Axes · 120 Cards', storageKey: 'chomsky-v1', href: 'chomsky.html' },
+  { id: 'gibbon', name: 'GIBBON', domain: 'strategy', axisName: 'Institutions', desc: 'Institutional decay, bureaucratic rot, and collapse dynamics.', tag: '10 Axes · 120 Cards', storageKey: 'gibbon-v1', href: 'gibbon.html' },
+  { id: 'diffie', name: 'DIFFIE', domain: 'compute', axisName: 'Crypto/Trust', desc: 'Cryptography, zero-knowledge proofs, and Byzantine fault tolerance.', tag: '10 Axes · 120 Cards', storageKey: 'diffie-v1', href: 'diffie.html' },
+  { id: 'dijkstra', name: 'DIJKSTRA', domain: 'compute', axisName: 'Algorithms', desc: 'Graph theory, pathfinding, Big-O, and dynamic programming.', tag: '10 Axes · 120 Cards', storageKey: 'dijkstra-v1', href: 'dijkstra.html' },
+  { id: 'popper', name: 'POPPER', domain: 'mind', axisName: 'Philosophy', desc: 'Falsifiability, paradigm shifts, and the scientific method.', tag: '10 Axes · 120 Cards', storageKey: 'popper-v1', href: 'popper.html' },
+  { id: 'chomsky', name: 'CHOMSKY', domain: 'mind', axisName: 'Linguistics', desc: 'Syntax, recursion, universal grammar, and the architecture of thought.', tag: '10 Axes · 120 Cards', storageKey: 'chomsky-v1', href: 'chomsky.html' },
   { id: 'morgan', name: 'MORGAN', domain: 'strategy', axisName: 'Finance', desc: 'Compound interest, asymmetric bets, risk vs volatility, and behavioral finance.', tag: '10 Axes · 120 Cards', storageKey: 'morgan-v1', href: 'morgan.html' },
-  { id: 'bayes', name: 'BAYES', domain: 'strategy', axisName: 'Statistics', desc: 'Bayes\' Theorem, base rates, and updating beliefs under uncertainty.', tag: '10 Axes · 120 Cards', storageKey: 'bayes-v1', href: 'bayes.html' },
-  { id: 'erdos', name: 'ERDOS', domain: 'strategy', axisName: 'Network Sci', desc: 'Network science: hubs, contagion, and cascading failures.', tag: '10 Axes · 120 Cards', storageKey: 'erdos-v1', href: 'erdos.html' },
-  { id: 'euclid', name: 'EUCLID', domain: 'engineering', axisName: 'Geometry', desc: 'Spatial reasoning, topology, symmetry, and geometric proofs.', tag: '10 Axes · 120 Cards', storageKey: 'euclid-v1', href: 'euclid.html' },
-  { id: 'altshuller', name: 'ALTSHULLER', domain: 'engineering', axisName: 'TRIZ', desc: 'TRIZ & inventive problem solving. Resolving contradictions algorithmically.', tag: '10 Axes · 120 Cards', storageKey: 'altshuller-v1', href: 'altshuller.html' },
-  { id: 'mendel', name: 'MENDEL', domain: 'math', axisName: 'Biology', desc: 'DNA as data, genetics, mutation, and algorithmic replication.', tag: '10 Axes · 120 Cards', storageKey: 'mendel-v1', href: 'mendel.html' },
-  { id: 'wiener', name: 'WIENER', domain: 'engineering', axisName: 'Cybernetics', desc: 'Control theory, feedback loops, and self-correcting systems.', tag: '10 Axes · 120 Cards', storageKey: 'wiener-v1', href: 'wiener.html' },
+  { id: 'bayes', name: 'BAYES', domain: 'math', axisName: 'Statistics', desc: 'Bayes\' Theorem, base rates, and updating beliefs under uncertainty.', tag: '10 Axes · 120 Cards', storageKey: 'bayes-v1', href: 'bayes.html' },
+  { id: 'erdos', name: 'ERDOS', domain: 'systems', axisName: 'Network Sci', desc: 'Network science: hubs, contagion, and cascading failures.', tag: '10 Axes · 120 Cards', storageKey: 'erdos-v1', href: 'erdos.html' },
+  { id: 'euclid', name: 'EUCLID', domain: 'math', axisName: 'Geometry', desc: 'Spatial reasoning, topology, symmetry, and geometric proofs.', tag: '10 Axes · 120 Cards', storageKey: 'euclid-v1', href: 'euclid.html' },
+  { id: 'altshuller', name: 'ALTSHULLER', domain: 'systems', axisName: 'TRIZ', desc: 'TRIZ & inventive problem solving. Resolving contradictions algorithmically.', tag: '10 Axes · 120 Cards', storageKey: 'altshuller-v1', href: 'altshuller.html' },
+  { id: 'mendel', name: 'MENDEL', domain: 'life', axisName: 'Genetics', desc: 'DNA as data, genetics, mutation, and algorithmic replication.', tag: '10 Axes · 120 Cards', storageKey: 'mendel-v1', href: 'mendel.html' },
+  { id: 'wiener', name: 'WIENER', domain: 'systems', axisName: 'Cybernetics', desc: 'Control theory, feedback loops, and self-correcting systems.', tag: '10 Axes · 120 Cards', storageKey: 'wiener-v1', href: 'wiener.html' },
   { id: 'mandelbrot', name: 'MANDELBROT', domain: 'math', axisName: 'Risk/Fractals', desc: 'Power laws, fat tails, Black Swans, and antifragility.', tag: '10 Axes · 120 Cards', storageKey: 'mandelbrot-v1', href: 'mandelbrot.html' },
-  { id: 'loci', name: 'LOCI', domain: 'ai', axisName: 'Memory', desc: 'Memory palaces, chunking, and the Major System. Expand working memory.', tag: '10 Axes · 120 Cards', storageKey: 'loci-v1', href: 'loci.html' },
-  { id: 'conway', name: 'CONWAY', domain: 'ai', axisName: 'Comp/Emerge', desc: 'Cellular automata, Turing completeness, and decentralized computation.', tag: '10 Axes · 120 Cards', storageKey: 'conway-v1', href: 'conway.html' },
-  { id: 'planck', name: 'PLANCK', domain: 'physics', axisName: 'Quantum', desc: 'Quantum cognition: observer effects, superposition, and probabilistic reality.', tag: '10 Axes · 120 Cards', storageKey: 'planck-v1', href: 'planck.html' }
+  { id: 'loci', name: 'LOCI', domain: 'mind', axisName: 'Memory', desc: 'Memory palaces, chunking, and the Major System. Expand working memory.', tag: '10 Axes · 120 Cards', storageKey: 'loci-v1', href: 'loci.html' },
+  { id: 'conway', name: 'CONWAY', domain: 'compute', axisName: 'Comp/Emerge', desc: 'Cellular automata, Turing completeness, and decentralized computation.', tag: '10 Axes · 120 Cards', storageKey: 'conway-v1', href: 'conway.html' },
+  { id: 'planck', name: 'PLANCK', domain: 'physics', axisName: 'Quantum', desc: 'Quantum cognition: observer effects, superposition, and probabilistic reality.', tag: '10 Axes · 120 Cards', storageKey: 'planck-v1', href: 'planck.html' },
+  { id: 'seneca', name: 'SENECA', domain: 'mind', axisName: 'Stoicism', desc: 'Stoic philosophy: the dichotomy of control, negative visualization, and equanimity.', tag: '10 Axes · 120 Cards', storageKey: 'seneca-v1', href: 'seneca.html' }
 ];
+
+// Master disciplines. Every course maps to exactly one via its `domain` key.
+// The radar matrix and breakdown aggregate course progress up to these axes.
+const DISCIPLINES = [
+  { key: 'physics',  short: 'Physics',  title: 'Physical Sciences',        emoji: '⚛️' },
+  { key: 'math',     short: 'Math',     title: 'Mathematics & Logic',      emoji: '📐' },
+  { key: 'compute',  short: 'Compute',  title: 'Computation & Information', emoji: '💻' },
+  { key: 'life',     short: 'Life',     title: 'Life & Evolution',         emoji: '🧬' },
+  { key: 'mind',     short: 'Mind',     title: 'Mind & Language',          emoji: '🧠' },
+  { key: 'strategy', short: 'Strategy', title: 'Strategy & Economics',     emoji: '📈' },
+  { key: 'systems',  short: 'Systems',  title: 'Systems & Engineering',    emoji: '⚙️' }
+];
+
+// Roll course-level progress up to each master discipline.
+function disciplineStats() {
+  return DISCIPLINES.map(d => {
+    const members = appData.filter(a => a.domain === d.key);
+    const maturity = members.length ? Math.round(members.reduce((s, a) => s + a.maturity, 0) / members.length) : 0;
+    const xp = members.reduce((s, a) => s + a.xp, 0);
+    return { ...d, maturity, xp, count: members.length };
+  });
+}
 
 const GH_USER = 'YOUR_GITHUB_USERNAME'; 
 const GH_REPO = 'Cogito';
@@ -254,8 +259,27 @@ APPS.forEach(app => {
   appData.push({ ...app, xp, level, maturity, matureCount });
 });
 
+// Build one section per discipline, then drop each course card into its section.
+const sectionsRoot = document.getElementById('disciplineSections');
+const gridByKey = {};
+DISCIPLINES.forEach(d => {
+  const section = document.createElement('div');
+  section.className = 'domain-section';
+  const title = document.createElement('div');
+  title.className = 'domain-title';
+  title.textContent = d.emoji + ' ' + d.title;
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  grid.id = d.key + '-grid';
+  section.appendChild(title);
+  section.appendChild(grid);
+  sectionsRoot.appendChild(section);
+  gridByKey[d.key] = { section, grid };
+});
+
 appData.forEach(app => {
-  const grid = document.getElementById(app.domain + '-grid');
+  const target = gridByKey[app.domain];
+  if (!target) return; // defensive: an unknown/typo'd domain is skipped, never crashes the hub
   const card = document.createElement('a');
   card.href = app.href;
   card.innerHTML = `
@@ -263,8 +287,11 @@ appData.forEach(app => {
     <div class="app-desc">${app.desc}</div>
     <div class="app-tag"><span>${app.tag}</span><span>${app.xp} XP</span></div>
     <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>`;
-  grid.appendChild(card);
+  target.grid.appendChild(card);
 });
+
+// Hide any discipline that has no courses yet so the page stays clean.
+Object.values(gridByKey).forEach(t => { if (t.grid.children.length === 0) t.section.style.display = 'none'; });
 
 document.getElementById('globalLevel').textContent = getLevel(totalXP);
 document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
@@ -272,7 +299,8 @@ document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' T
 function drawHubRadar() {
   const svg = document.getElementById('hubRadarSvg');
   svg.innerHTML = '';
-  const n = appData.length, R = 85; // Reduced R for padding
+  const stats = disciplineStats();
+  const n = stats.length, R = 85; // Reduced R for padding
   [0.25, 0.5, 0.75, 1].forEach(r => {
     const pts = [];
     for(let i=0; i<n; i++){ const a = -Math.PI/2 + (i/n)*Math.PI*2; pts.push((Math.cos(a)*R*r)+','+(Math.sin(a)*R*r)); }
@@ -288,7 +316,7 @@ function drawHubRadar() {
   const pts = [];
   for(let i=0; i<n; i++){
     const a = -Math.PI/2 + (i/n)*Math.PI*2;
-    const r = R * (appData[i].maturity / 100);
+    const r = R * (stats[i].maturity / 100);
     pts.push((Math.cos(a)*r)+','+(Math.sin(a)*r));
   }
   const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
@@ -298,21 +326,21 @@ function drawHubRadar() {
     const x = Math.cos(a)*(R+25), y = Math.sin(a)*(R+25); // Increased label distance
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x',x); text.setAttribute('y',y); text.setAttribute('text-anchor','middle'); text.setAttribute('dominant-baseline','middle');
-    text.setAttribute('class','radar-label'); text.textContent = appData[i].axisName;
-    if(appData[i].maturity > 50) text.classList.add('active');
+    text.setAttribute('class','radar-label'); text.textContent = stats[i].short;
+    if(stats[i].maturity > 50) text.classList.add('active');
     svg.appendChild(text);
   }
 }
 drawHubRadar();
 
 const masteryList = document.getElementById('masteryList');
-appData.forEach(app => {
+disciplineStats().forEach(d => {
   const row = document.createElement('div');
-  row.style.cssText = 'display:grid; grid-template-columns:90px 1fr 40px; gap:1rem; align-items:center; font-size:0.8rem;';
-  const cls = app.maturity < 30 ? 'var(--red)' : (app.maturity < 70 ? 'var(--amber)' : 'var(--cyan)');
-  row.innerHTML = `<span style="color:var(--text-dim); font-family:var(--display); font-size:0.75rem;">${app.axisName}</span>
-    <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;"><div style="height:100%; width:${app.maturity}%; background:${cls}; box-shadow:0 0 6px ${cls}; transition:width 0.8s;"></div></div>
-    <span style="color:var(--text-dim); text-align:right; font-family:var(--display);">${app.maturity}%</span>`;
+  row.style.cssText = 'display:grid; grid-template-columns:130px 1fr 40px; gap:1rem; align-items:center; font-size:0.8rem;';
+  const cls = d.maturity < 30 ? 'var(--red)' : (d.maturity < 70 ? 'var(--amber)' : 'var(--cyan)');
+  row.innerHTML = `<span style="color:var(--text-dim); font-family:var(--display); font-size:0.7rem; line-height:1.3;">${d.title}<br><span style="color:var(--text-faint); font-size:0.6rem;">${d.xp.toLocaleString()} XP · ${d.count} course${d.count === 1 ? '' : 's'}</span></span>
+    <div style="height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;"><div style="height:100%; width:${d.maturity}%; background:${cls}; box-shadow:0 0 6px ${cls}; transition:width 0.8s;"></div></div>
+    <span style="color:var(--text-dim); text-align:right; font-family:var(--display);">${d.maturity}%</span>`;
   masteryList.appendChild(row);
 });
 
@@ -339,7 +367,7 @@ const ACHIEVEMENTS = [
   { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 5 globally', icon: '🧬', check: () => getLevel(totalXP) >= 5 },
   { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 10 globally', icon: '🧠', check: () => getLevel(totalXP) >= 10 },
   { id: 'mastery_100', name: 'Master', desc: '100 cards matured', icon: '💎', check: () => totalMature >= 100 },
-  { id: 'renaissance', name: 'Renaissance', desc: 'Start all 5 courses', icon: '🎨', check: () => appData.every(a => a.xp > 0) },
+  { id: 'renaissance', name: 'Renaissance', desc: 'Train all disciplines', icon: '🎨', check: () => DISCIPLINES.every(d => { const m = appData.filter(a => a.domain === d.key); return m.length === 0 || m.some(a => a.xp > 0); }) },
   { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 20 globally', icon: '🚀', check: () => getLevel(totalXP) >= 20 }
 ];
 
@@ -356,7 +384,7 @@ function renderAchievements() {
 }
 renderAchievements();
 
-let maturities = appData.map(a => a.maturity);
+let maturities = disciplineStats().map(d => d.maturity);
 let minMat = Math.min(...maturities), maxMat = Math.max(...maturities), avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length, diff = maxMat - minMat;
 let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
 if (totalXP > 0) {
