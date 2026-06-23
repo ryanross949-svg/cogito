@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // WITTGENSTEIN v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08050F; --void-2:#0F0A1A; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24;
+  --cyan:#00F5D4; --cyan-dim:#008F7A; --magenta:#9D4EDD; --amber:#FFB300; --green:#00D9FF; --red:#FF3366;
+  --text:#E6E6FA; --text-dim:#7A6E94; --text-faint:#4A4060;
+  --border:rgba(157,78,221,0.2); --border-bright:rgba(157,78,221,0.5);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000000; --void-2:#0A0A0A; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --void-2:#2A0A2A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --void-2:#F5F0E0; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --void-2:#3B4252; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background: radial-gradient(ellipse at 20% 10%,rgba(157,78,221,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(0,245,212,0.06),transparent 50%), var(--void); min-height:100vh; position:relative; font-size:14px; line-height:1.6; transition: background 0.3s, color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(157,78,221,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(157,78,221,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,245,212,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,245,212,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(157,78,221,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(8,5,15,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,245,212,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(8,5,15,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(157,78,221,0.08),rgba(0,245,212,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,245,212,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(157,78,221,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,102,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(157,78,221,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(157,78,221,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,245,212,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,245,212,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(157,78,221,0.05),rgba(0,245,212,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,212,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,217,255,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(157,78,221,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,217,255,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,102,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,245,212,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(157,78,221,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,245,212,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,102,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,217,255,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,245,212,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,212,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(157,78,221,0.05), rgba(0,245,212,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(157,78,221,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(157,78,221,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display); font-size:1.1rem; color:var(--cyan); margin-top:2rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); letter-spacing:0.1em;}
+.arena-row{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); padding:1rem 1.5rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s; border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright); transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex; align-items:center; gap:1rem; flex:1;}
+.arena-num{font-family:var(--display); color:var(--cyan-dim); font-size:0.85rem; width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem; font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem; border-radius:2px; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15); color:var(--green); border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15); color:var(--amber); border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15); color:var(--magenta); border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15); color:var(--red); border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">WITTGENSTEIN</div><div class="boot-sub">Cogito // Language & Logic Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">WITTGENSTEIN</div><div class="brand-tag">LANGUAGE & LOGIC</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="WITTGENSTEIN.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="WITTGENSTEIN.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="WITTGENSTEIN.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="WITTGENSTEIN.setTheme('light')">Light</button><button class="theme-option" onclick="WITTGENSTEIN.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Silence</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="WITTGENSTEIN.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of language and logic. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: SILENCE</h1><p class="section-sub">A cumulative scenario. Navigate a startup communication breakdown using semantic clarity.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About WITTGENSTEIN</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>WITTGENSTEIN is a cognitive training simulator designed to install the semantic clarity used by logicians and philosophers of language. It trains you to recognize when a problem is actually just a confusion of language, and how the words we use constrain the realities we can perceive.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Silence require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>LIMITS</strong> — The limits of language are the limits of thought</li>
+          <li><strong>GAMES</strong> — Meaning as use; forms of life</li>
+          <li><strong>FAMILY</strong> — Family resemblance vs. strict essence</li>
+          <li><strong>RULES</strong> — Rule-following and interpretation</li>
+          <li><strong>PRIVATE</strong> — The private language argument</li>
+          <li><strong>FORM</strong> — Forms of life as the bedrock of meaning</li>
+          <li><strong>SHOWING</strong> — Showing vs. Saying; the inexpressible</li>
+          <li><strong>GRAMMAR</strong> — Grammar as logic, not empirical fact</li>
+          <li><strong>SILENCE</strong> — Ethics, aesthetics, and the mystical</li>
+          <li><strong>THERAPY</strong> — Philosophy as therapy; untangling knots</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'LIMITS', title:'The Limits of Language', summary:'How language acts as a cage for thought.', lesson:{ title:'The Boundary of Thought', body: 'Ludwig Wittgenstein famously opened his Tractatus Logico-Philosophicus with: "The world is all that is the case."\n\nHe believed that language pictures reality. A proposition is true if it corresponds to the facts. But this implies a hard boundary: we can only meaningfully speak about facts.\n\n## The Cage\n\nIf a statement does not correspond to a possible state of affairs in reality, it is literally nonsense (unsinnig). "The cat is on the mat" makes sense. "The color green is angry" does not, because there is no fact that could make it true or false.\n\nThis means our language constrains our thoughts. You cannot think a nonsensical thought; you can only utter words that fail to form a picture.\n\n## The Famous Conclusion\n\nWittgenstein concluded the Tractatus by stating: "Whereof one cannot speak, thereof one must be silent."\n\nIf a question cannot be answered by science or observation, it is not a real question. It is a misuse of language. Ethics, aesthetics, and religion fall into this gap. They are not "false," they are literally unsayable.\n\n## The Method\n\n1. **Identify the proposition.** What is the claim?\n2. **Ask: What fact in reality would make this true or false?**\n3. **If no such fact exists, the proposition is nonsense.** It is a language trap, not a deep philosophical mystery.\n4. **Remain silent on the unsayable.** Do not waste logic on the mystical.', takeaways:['Language pictures reality; propositions correspond to facts.','If a statement has no possible factual verification, it is nonsense (unsinnig).','"Whereof one cannot speak, thereof one must be silent."','Ethics and aesthetics are not false; they are unsayable.','Logic cannot be used to solve mystical problems; it can only dissolve them.'] } },
+  { id:'m2', codename:'GAMES', title:'Language Games', summary:'Meaning is use, not reference.', lesson:{ title:'The Architecture of Use', body: 'In his later work, Philosophical Investigations, Wittgenstein rejected his earlier "picture theory" of language. He realized language does not just describe reality; it does many things.\n\n## Meaning as Use\n\nConsider the word "Game". What is its essence? You might say "played for fun." But professional chess is not fun, it is work. You might say "has winners and losers." But solitaire has no winner in the same sense. You might say "requires skill." But rolling dice requires none.\n\nThere is no single essence. The word "game" works because of overlapping similarities, like a thread made of many fibers. No single fiber runs the whole length, but the thread holds.\n\n## Language Games\n\nLanguage is a toolkit. We use words to command, to joke, to pray, to lie, to describe. The meaning of a word is not its abstract definition, but how it is used in a specific "language game" (Sprachspiel).\n\n"Water!" might mean "I am thirsty" or "Put out the fire" or "This is H2O." The meaning depends on the context of use.\n\n## The Method\n\n1. **Do not ask "What does this word mean?"** (Looking for an essence).\n2. **Ask "How is this word used in this specific context?"**\n3. **Identify the language game being played.** Is it describing, commanding, joking?\n4. **Meaning is the use.**', takeaways:['Words do not have fixed, abstract essences.','Meaning is use (Gebrauch). Context determines meaning.','Language is a toolkit, not a mirror.','A word means different things in different "language games".','Do not look for the essence; look at the use.'] } },
+  { id:'m3', codename:'FAMILY', title:'Family Resemblance', summary:'Overlapping similarities instead of essences.', lesson:{ title:'The Architecture of Categories', body: 'How do we categorize things? Classical logic says everything in a category shares a defining essence. All "birds" have feathers and lay eggs.\n\nBut Wittgenstein pointed out that most natural categories do not work this way. They are held together by "family resemblance."\n\n## The Game of Fibers\n\nThink of a rope. It is made of many short fibers. No single fiber runs the entire length of the rope. Yet the rope is strong. This is how categories work.\n\nItem A shares feature 1 with B. B shares feature 2 with C. C shares feature 3 with D. A and D might share NO features, but they are all in the same category because of the chain.\n\n## "Game" Revisited\n\nBoard games, card games, Olympic games, children\'s ring-around-the-rosie. There is no feature common to ALL of them. But they are connected by overlapping similarities.\n\n## The Trap of Essence\n\nWhen we argue "Is X really a Y?" (e.g., "Is a hotdog a sandwich?"), we are trapped by the illusion of essence. We assume there must be a yes/no answer. But if the category is a family resemblance, the answer is "It shares some traits, but not others."\n\n## The Method\n\n1. **Stop looking for the defining essence.**\n2. **Look for overlapping similarities.**\n3. **Accept blurred edges.** Not everything fits neatly.', takeaways:['Categories are held together by overlapping similarities, not essences.','Like fibers in a rope, no single feature runs through the whole category.','"Family resemblance" explains games, sports, and many concepts.','The question "Is X a Y?" is often a false dilemma.','Accept blurred edges instead of forcing definitions.'] } },
+  { id:'m4', codename:'RULES', title:'Rule-Following', summary:'Interpretation vs. practice. The paradox.', lesson:{ title:'The Architecture of Practice', body: 'How do rules work? If I give you the rule "Add 2", you can continue: 2, 4, 6, 8...\n\nBut what happens at 1000? You say 1002. But how do you know the rule wasn\'t "Add 2 up to 1000, then add 4"? You interpret the rule as "Add 2" because of your training.\n\n## The Paradox\n\nNo course of action could be determined by a rule, because any course of action can be made out to accord with the rule.\n\nIf you say "But I meant add 2!", that is just another interpretation. You cannot bridge the gap between a mental act (meaning) and a public rule.\n\n## Practice over Interpretation\n\nWittgenstein\'s solution: "To obey a rule, to make a report, to give an order... are customs (uses, institutions)."\n\nYou don\'t follow a rule by interpreting it; you follow it by acting. You are trained into a practice. "This is simply what we do."\n\nThe meaning of the rule is not in your head; it is in the public, shared practice of the community.\n\n## The Method\n\n1. **Do not look for the meaning of the rule in someone\'s head.**\n2. **Look at the practice.** How does the community actually apply it?\n3. **Meaning is public.** A private rule is an illusion.', takeaways:['Any action can be interpreted to accord with a rule.','Meaning is not a mental act; it is not "in the head".','Rules are followed through practice and training, not interpretation.','The community\'s shared practice defines correct usage.','"This is simply what we do."'] } },
+  { id:'m5', codename:'PRIVATE', title:'The Private Language Argument', summary:'The Beetle in the Box.', lesson:{ title:'The Architecture of the Inner', body: 'Can you have a private language that only you can understand? A language referring to your private, inner sensations?\n\nWittgenstein said no. This is the Private Language Argument.\n\n## The Beetle in the Box\n\nImagine everyone has a box with something in it. We all call the thing inside a "beetle." No one can look in anyone else\'s box. You only know your own beetle.\n\nIf we talk about "beetles," the word\'s meaning cannot depend on the actual object in the box, because no one else can verify it. The object in the box drops out of consideration. The language game is played with the word "beetle," not the actual insect.\n\n## Pain\n\nWhen you say "I am in pain," you are not naming a private object. You are engaging in a public language game of pain-behavior (groaning, holding your arm, seeking help).\n\nIf you tried to invent a word for a sensation only you feel, you could never be sure you were using it correctly. There would be no public criteria for correctness. A language without public criteria is not a language.\n\n## The Method\n\n1. **Meaning requires public criteria.**\n2. **Do not assume words refer to private, unobservable mental states.**\n3. **Look at the behavior and the language game.**', takeaways:['A purely private language is impossible.','The "Beetle in the Box": the private object drops out of the language game.','"I am in pain" is not naming a private object; it is a public behavior.','Meaning requires public criteria for correctness.','The inner is accessible only through the outer (behavior).'] } },
+  { id:'m6', codename:'FORM', title:'Forms of Life', summary:'The bedrock of meaning and culture.', lesson:{ title:'The Architecture of the Bedrock', body: 'If meaning is use, and use is determined by community practice, where does the practice come from? Wittgenstein calls this a "form of life" (Lebensform).\n\n## The Bedrock\n\n"What has to be accepted, the given, is—so one could say—forms of life."\n\nA form of life is the shared, background culture, biology, and behavior of a community. It is the context that makes language games possible.\n\nIf a lion could speak, we could not understand him, because we do not share his form of life. His instincts, needs, and reactions are alien to us.\n\n## Groundlessness\n\nAt some point, explanations run out. Why do we act the way we do? "Because this is what we do." You cannot justify the form of life from outside it. It is the bedrock.\n\nIf someone refuses to follow the rule of addition, we do not argue; we simply exclude them from our community. There is no logical proof they are wrong; there is only social friction.\n\n## The Method\n\n1. **Recognize that logic rests on unspoken cultural norms.**\n2. **When communication fails, ask if the forms of life are different.**\n3. **Accept that some disagreements are not logical, but biological/cultural.**', takeaways:['Forms of life are the shared background practices that make language possible.','"If a lion could speak, we could not understand him."','Explanations eventually run out; the bedrock is "this is what we do".','Logic rests on culture and biology, not the other way around.','Some disagreements are not logical, but differences in form of life.'] } },
+  { id:'m7', codename:'SHOWING', title:'Showing vs. Saying', summary:'The inexpressible logical form.', lesson:{ title:'The Architecture of the Unsayable', body: 'In the Tractatus, Wittgenstein distinguished between what can be said (propositions about facts) and what can only be shown (the logical structure of the world).\n\n## The Picture\'s Frame\n\nA picture of a room shows you the furniture. But the picture does not "say" it is a picture. The frame is not part of the room. Similarly, language describes the world, but it cannot describe its own logical form. You can only see it.\n\n"Propositions cannot represent logical form: it mirrors itself in the proposition."\n\n## Ethics and Aesthetics\n\nThis is why ethics cannot be stated. "Murder is wrong" is not a fact about the world (murder happens). It is an attitude or a way of seeing the world.\n\nYou cannot say "This is beautiful." You can only point to the painting and say "Look at it this way." The value is shown, not said.\n\n## The Method\n\n1. **Distinguish facts (what can be said) from logic/value (what can only be shown).**\n2. **Do not try to prove ethical or aesthetic claims with facts.**\n3. **Show, do not tell.** Point to the example.', takeaways:['Propositions say facts; logical form can only be shown.','Language cannot describe its own structure; it mirrors it.','Ethics and aesthetics are shown, not said.','Do not try to prove value claims with empirical facts.','"Show, don\'t tell" is a logical necessity, not just a writing tip.'] } },
+  { id:'m8', codename:'GRAMMAR', title:'Grammar as Logic', summary:'Rules of sense, not empirical truth.', lesson:{ title:'The Architecture of Sense', body: 'Grammar is not about what is true or false in the world. It is about what makes sense.\n\n"Caesar is a prime number" is not false; it is nonsensical. It violates the grammar of "prime number" (which applies to integers) and "Caesar" (a person). No fact in the world could make it true.\n\n## Essence is Grammar\n\nWittgenstein said, "Essence is expressed by grammar." The "essence" of a chess piece is not its physical shape (you can play with salt shakers). The essence is the rules of how it moves. The rules are the grammar.\n\nIf you ask "Can the king move two spaces?" you are not asking a physical question. You are asking a grammatical one. The answer is found in the rules of chess, not in the nature of the wooden piece.\n\n## The Method\n\n1. **Do not look for empirical truth in definitions.**\n2. **Grammar dictates what is possible (makes sense).**\n3. **If a sentence is nonsensical, check the grammar, not the facts.**', takeaways:['Grammar defines what makes sense, not what is true.','"Caesar is a prime number" is nonsensical, not false.','Essence is grammar. The rules of chess define the piece, not the wood.','Definitions are rules of usage, not empirical discoveries.','If a debate is about definitions, it is grammatical, not factual.'] } },
+  { id:'m9', codename:'SILENCE', title:'Ethics & Silence', summary:'The mystical and the inexpressible.', lesson:{ title:'The Architecture of Value', body: 'Wittgenstein believed that ethics, aesthetics, and religion are literally unsayable. They are "transcendental."\n\n## Value is Not in the World\n\nThe world is just a collection of facts. "Murder happened" is a fact. "Murder is wrong" is not a fact; it is a value judgment.\n\nIf you had complete knowledge of all facts, you would not find "goodness" or "beauty" hiding among them. Value is not part of the furniture of the world. It is how we view the world.\n\n## The Absolute\n\nEthics tries to speak about absolute value. But language can only speak about relative facts. Therefore, ethical propositions are nonsense (unsinnig). They try to say what can only be shown.\n\nThis does not mean ethics is unimportant. Wittgenstein said it is the most important thing. But it cannot be put into words. It must be lived.\n\n## The Method\n\n1. **Recognize that values are not facts.**\n2. **Do not argue ethics with empirical data.**\n3. **Live the values; show them.**', takeaways:['Value is not a fact in the world; it is a way of viewing the world.','Ethical propositions are unsayable (nonsense), though vitally important.','You will not find "goodness" by observing the physical universe.','Ethics must be shown (lived), not said (argued).','Silence on ethics is respect, not dismissal.'] } },
+  { id:'m10', codename:'THERAPY', title:'Philosophy as Therapy', summary:'Untangling language knots.', lesson:{ title:'The Architecture of Dissolution', body: 'Wittgenstein viewed philosophy not as a body of doctrine, but as a therapeutic activity.\n\n## The Fly-Bottle\n\nPhilosophical problems are not solved by finding new facts. They are dissolved by untangling the language that created them.\n\n"A philosophical problem has the form: \'I don\'t know my way about.\'"\n\nWe get stuck because grammar misleads us. We treat words like "time," "mind," or "self" as if they refer to objects, when they are just tools in language games.\n\nThe goal of philosophy is to "shew the fly the way out of the fly-bottle." Once you see how the language tricked you, the problem vanishes. "Leave everything as it is."\n\n## The Method\n\n1. **When stuck, do not look for a deeper answer.**\n2. **Look at how the words are being used.**\n3. **Identify the grammatical confusion.**\n4. **The problem dissolves, it is not solved.**', takeaways:['Philosophical problems are language tangles, not mysteries.','The goal is to dissolve the problem, not solve it with new facts.','Grammar misleads us into treating tools as objects.','"Shew the fly the way out of the fly-bottle."','Philosophy should leave the world exactly as it is.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the "Picture Theory" of language?',back:'Language pictures reality. A proposition is true if it corresponds to facts. If it does not correspond to a possible fact, it is nonsense.'},
+  {id:'c2',moduleId:'m1',core:true,category:'quote',front:'Complete the quote: "Whereof one cannot speak..."',back:'"...thereof one must be silent."'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What makes a proposition nonsense (unsinnig)?',back:'If there is no possible fact in reality that could make it true or false.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'"The color green is angry." Why is this nonsense?',back:'There is no fact that could verify it. It mixes grammatical categories.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'How does language constrain thought?',back:'You cannot think a nonsensical thought. You can only utter words that fail to form a picture.'},
+  {id:'c6',moduleId:'m1',core:false,category:'concept',front:'Where do ethics and aesthetics fall in the Tractatus?',back:'They are unsayable. They are not false, but literally cannot be expressed in propositional language.'},
+  {id:'c7',moduleId:'m1',core:false,category:'application',front:'Method for identifying nonsense?',back:'1. Identify the proposition. 2. Ask what fact verifies it. 3. If none, it is nonsense.'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'Can logic solve mystical problems?',back:'No. Logic can only dissolve them by showing they are misuse of language.'},
+  {id:'c9',moduleId:'m1',core:false,category:'quote',front:'Complete the quote: "The world is all that is..."',back:'"...the case." (i.e., facts, not objects).'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is a proposition?',back:'A statement that describes a possible state of affairs in reality.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'"Is the soul immortal?" How does the Tractatus view this?',back:'It is nonsense. There is no observable fact that verifies immortality.'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'What is the relationship between language and reality?',back:'Language shares a logical form with reality, allowing it to picture facts.'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is the core of "Meaning as Use"?',back:'The meaning of a word is not its abstract definition, but how it is used in a specific context (language game).'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'"Water!" shouted at a fire vs. in a desert. Difference?',back:'Meaning. At the fire, it means "Put out the fire." In the desert, it means "I am thirsty." Use determines meaning.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is a "Language Game" (Sprachspiel)?',back:'A context in which language is used (commanding, joking, describing, praying).'},
+  {id:'c16',moduleId:'m2',core:false,category:'concept',front:'Why did Wittgenstein reject the Picture Theory?',back:'He realized language does not just describe reality; it does many things (commands, jokes, etc.).'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'How to find the meaning of a word?',back:'Do not ask "What does it mean?" Ask "How is it used?"'},
+  {id:'c18',moduleId:'m2',core:false,category:'concept',front:'Is language a mirror of reality?',back:'No. In the later philosophy, language is a toolkit.'},
+  {id:'c19',moduleId:'m2',core:false,category:'application',front:'"Promise" in a legal contract vs. a playground. Difference?',back:'The language game is different. The consequences and rules of usage differ.'},
+  {id:'c20',moduleId:'m2',core:false,category:'quote',front:'Complete the quote: "For a large class of cases... the meaning of a word is its..."',back:'"...use in the language."'},
+  {id:'c21',moduleId:'m2',core:false,category:'concept',front:'What determines correct usage?',back:'The rules of the specific language game being played.'},
+  {id:'c22',moduleId:'m2',core:false,category:'application',front:'If someone says "I hereby baptize this ship Mr. Jones", what are they doing?',back:'Performing an action, not describing a fact. (Speech Act).'},
+  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'Can a word have one fixed meaning across all contexts?',back:'No. Meaning shifts depending on the language game.'},
+  {id:'c24',moduleId:'m2',core:false,category:'application',front:'"Is X a Y?" (e.g., hotdog sandwich). What is the error?',back:'Assuming words have fixed essences. Meaning depends on the game.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is "Family Resemblance"?',back:'Categories are held together by overlapping similarities, not a single shared essence.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'Why is there no essence of "Game"?',back:'Some are fun, some are work. Some have winners, some don\'t. They overlap but share no single trait.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'The Rope Metaphor for categories?',back:'A rope is made of fibers. No fiber runs the whole length, but the rope holds. Categories work like this.'},
+  {id:'c28',moduleId:'m3',core:false,category:'concept',front:'What is the "Trap of Essence"?',back:'Assuming every category must have a strict defining feature. This causes false dilemmas.'},
+  {id:'c29',moduleId:'m3',core:false,category:'application',front:'"Is a hotdog a sandwich?" How to resolve it?',back:'It shares traits (bread, meat) but not others (typical use). Accept blurred edges.'},
+  {id:'c30',moduleId:'m3',core:false,category:'concept',front:'Do natural categories have strict boundaries?',back:'Usually not. They blur at the edges.'},
+  {id:'c31',moduleId:'m3',core:false,category:'application',front:'Why is classical logic (A is A) insufficient for natural language?',back:'Because words like "game" or "heap" do not have strict borders.'},
+  {id:'c32',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Look for overlapping similarities, not..."',back:'"...essences."'},
+  {id:'c33',moduleId:'m3',core:false,category:'concept',front:'What holds a family resemblance category together?',back:'A chain of similarities where A is like B, B is like C, but A might not be like C.'},
+  {id:'c34',moduleId:'m3',core:false,category:'application',front:'"Is water a fluid?" What kind of question is this?',back:'A grammatical/definitional one, not a factual discovery.'},
+  {id:'c35',moduleId:'m3',core:false,category:'concept',front:'How do we learn categories like "chair"?',back:'By seeing many examples and noting similarities, not by learning a strict definition.'},
+  {id:'c36',moduleId:'m3',core:false,category:'application',front:'"What is art?" What is the error in the question?',back:'Assuming "art" has an essence. It is a family resemblance concept.'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is the Rule-Following Paradox?',back:'No action can be determined by a rule, because any action can be interpreted to accord with the rule.'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'How do we actually follow rules?',back:'Through practice and training, not interpretation. "This is simply what we do."'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'Is meaning a mental act (in the head)?',back:'No. The meaning of a rule is in the public, shared practice of the community.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'"Add 2. 2, 4, 6... 1000?" You say 1002. How do you know?',back:'Because of your training. You cannot prove the rule wasn\'t "add 4 after 1000".'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What defines correct rule-following?',back:'Public criteria. What the community accepts as "according to the rule".'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'If someone calculates 2+2=5, what do we do?',back:'We do not argue logic. We exclude them or correct them based on practice.'},
+  {id:'c43',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "To obey a rule is a..."',back:'"...practice." (or custom/institution).'},
+  {id:'c44',moduleId:'m4',core:false,category:'concept',front:'Can you have a private rule?',back:'No. Without public criteria, you could never know if you are following it correctly.'},
+  {id:'c45',moduleId:'m4',core:false,category:'application',front:'Why is "I meant add 2" not an interpretation?',back:'It is just another rule. You cannot bridge the gap between mental meaning and public rule.'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'Where does the meaning of "red" reside?',back:'In the public language game of how we use the word, not in a private mental image.'},
+  {id:'c47',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "The meaning is not in the head; it is in the..."',back:'"...practice."'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What is the bedrock of rule-following?',back:'Community agreement. "This is simply what we do."'}, 
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is the Private Language Argument?',back:'The argument that a purely private language (referring only to inner sensations) is impossible.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'What is the "Beetle in the Box"?',back:'A thought experiment where everyone has a box with a "beetle" no one else can see. The actual object drops out of the language game.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'Why can\'t you name a private sensation?',back:'Because there would be no public criteria to verify you are using the word correctly.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'"I am in pain." Is this naming a private object?',back:'No. It is engaging in a public language game of pain-behavior (groaning, seeking help).'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'What is required for a language to be meaningful?',back:'Public criteria for correctness.'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'How is the "inner" accessed?',back:'Only through the "outer" (behavior and language).'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'If you write "S" in a diary for a sensation, how do you know it is the same sensation next time?',back:'You cannot know. There is no independent standard. It is a private rule, which is impossible.'},
+  {id:'c56',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "The inner is accessed only through the..."',back:'"...outer."'},
+  {id:'c57',moduleId:'m5',core:false,category:'concept',front:'Does the sensation of pain drop out of consideration?',back:'Yes. The word "pain" is used based on behavior, not the private sensation.'},
+  {id:'c58',moduleId:'m5',core:false,category:'application',front:'Why is "I know I am in pain" strange?',back:'Because it implies doubt where there can be none. "I am in pain" is an expression, not a knowledge claim.'},
+  {id:'c59',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "An \'inner process\' stands in need of..."',back:'"...outward criteria."'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'Can you doubt you are in pain?',back:'No. The language game of "doubting" does not apply here.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is a "Form of Life" (Lebensform)?',back:'The shared, background culture, biology, and behavior of a community that makes language games possible.'},
+  {id:'c62',moduleId:'m6',core:true,category:'quote',front:'Complete the quote: "If a lion could speak..."',back:'"...we could not understand him." (Because we don\'t share his form of life).'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'What is the "bedrock" of meaning?',back:'Forms of life. "What has to be accepted, the given."'},
+  {id:'c64',moduleId:'m6',core:false,category:'concept',front:'Can logic justify a form of life?',back:'No. Logic rests on the form of life. You cannot justify the bedrock from outside.'},
+  {id:'c65',moduleId:'m6',core:false,category:'application',front:'Why do some arguments fail despite perfect logic?',back:'Because the participants do not share the same form of life (background assumptions).'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'If someone refuses to follow addition rules, what do we do?',back:'We do not argue. We exclude them. There is no logical proof they are wrong, only social friction.'},
+  {id:'c67',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Explanations eventually run out; the bedrock is..."',back:'"...this is what we do."'},
+  {id:'c68',moduleId:'m6',core:false,category:'concept',front:'Is logic universal and culture-free?',back:'No. Logic is rooted in our shared human practices and biology.'},
+  {id:'c69',moduleId:'m6',core:false,category:'application',front:'Communicating with an alien species. What is the barrier?',back:'We do not share a form of life. We cannot interpret their language without shared instincts.'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What happens when explanations end?',back:'We hit the bedrock of our form of life. We act.'},
+  {id:'c71',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Logic rests on..."',back:'"...culture and biology."'},
+  {id:'c72',moduleId:'m6',core:false,category:'application',front:'If a society calls "murder" good, can we logically prove them wrong?',back:'Not purely logically. We can only show our form of life recoils from it.'},
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What can be "Said" vs "Shown"?',back:'Facts can be said. Logical form, ethics, and aesthetics can only be shown.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'Why can\'t language describe its own logical form?',back:'Because it would need to step outside itself. The frame is not part of the picture.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'How are ethics expressed?',back:'They are shown (lived, pointed to), not said (stated as facts).'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'"Murder is wrong." Is this a fact?',back:'No. It is an attitude. The fact is "Murder happened."'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'Will complete factual knowledge reveal "goodness"?',back:'No. Value is not part of the furniture of the world.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'How to convey aesthetics?',back:'Show, don\'t tell. Point to the painting and say "Look at it this way."'},
+  {id:'c79',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Value is not in the world; it is..."',back:'"...a way of viewing the world."'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'What does "Propositions cannot represent logical form" mean?',back:'Language mirrors logic; it cannot turn around to describe it.'},
+  {id:'c81',moduleId:'m7',core:false,category:'application',front:'"This music is beautiful." What are you doing?',back:'Expressing an attitude, not stating a fact.'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'Is "Show, don\'t tell" just a writing tip?',back:'No. In Wittgenstein, it is a logical necessity.'},
+  {id:'c83',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Ethics must be shown, not..."',back:'"...said."'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'What is the relationship between fact and value?',back:'They are separate. Facts are sayable; values are shown.'},
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What does "Grammar as Logic" mean?',back:'Grammar defines what makes sense, not what is true. It is the rules of the language game.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'"Caesar is a prime number." Is this false or nonsensical?',back:'Nonsensical. It violates grammar. No fact can make it true.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'"Essence is expressed by..."',back:'Grammar. The rules of chess define the piece, not the wood.'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'"Can the king move two spaces?" What kind of question is this?',back:'Grammatical. The answer is in the rules of chess, not the nature of the wood.'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'Are definitions empirical discoveries?',back:'No. They are rules of usage.'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'If a debate is about definitions, what is it?',back:'Grammatical, not factual. (e.g., "Is a hotdog a sandwich?")'},
+  {id:'c91',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Grammar dictates what is possible, not what is..."',back:'"...true."'},
+  {id:'c92',moduleId:'m8',core:false,category:'concept',front:'What is the difference between empirical truth and grammatical truth?',back:'Empirical: facts of the world. Grammatical: rules of sense.'},
+  {id:'c93',moduleId:'m8',core:false,category:'application',front:'"Time flows." Is this empirical or grammatical?',back:'Grammatical. It is how we use the word "time".'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'Why can\'t we discover the essence of "mind"?',back:'Because the essence is just the grammar of the word "mind"'.'},
+  {id:'c95',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Essence is expressed by..."',back:'"...grammar."'},
+  {id:'c96',moduleId:'m8',core:false,category:'application',front:'If someone says "I have a pain in my soul", how do we respond?',back:'We check the grammar of "soul" and "pain". It may be nonsense.'},
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'Where does value reside?',back:'It is not a fact in the world; it is a way of viewing the world.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'Are ethical propositions sayable?',back:'No. They are unsayable (nonsense), though vitally important.'},
+  {id:'c99',moduleId:'m9',core:false,category:'application',front:'How should ethics be argued?',back:'They cannot be argued with empirical data. They must be lived/shown.'},
+  {id:'c100',moduleId:'m9',core:false,category:'concept',front:'What is the "Absolute" in ethics?',back:'Ethics tries to speak about absolute value, but language only speaks of relative facts.'},
+  {id:'c101',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "You will not find goodness by..."',back:'"...observing the physical universe."'},
+  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'Is silence on ethics a dismissal?',back:'No. It is respect. Ethics is the most important thing, but cannot be put into words.'},
+  {id:'c103',moduleId:'m9',core:false,category:'application',front:'"Murder is wrong." Translate this to a fact.',back:'You cannot. The fact is "Murder happened."'},
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'What is the relationship between facts and values?',back:'Values are how we react to facts. Facts are neutral.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Ethics must be shown, not..."',back:'"...said."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is the mystical?',back:'The feeling that the world exists. This is unsayable.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Why is "Why is there something rather than nothing?" nonsense?',back:'It asks for a factual cause of existence, which is grammatically impossible.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'Is religion a set of facts?',back:'No. It is a form of life, a way of acting and viewing the world.'},
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the goal of philosophy as therapy?',back:'To dissolve problems by untangling language, not solve them with new facts.'},
+  {id:'c110',moduleId:'m10',core:true,category:'quote',front:'Complete the quote: "A philosophical problem has the form..."',back:'"...\'I don\'t know my way about.\'\'"'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'What is the "Fly-Bottle"?',back:'The trap of language. Philosophy shews the fly the way out.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'How do we solve a philosophical problem?',back:'By looking at how words are used and identifying the grammatical confusion.'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'Should philosophy change the world?',back:'No. "Leave everything as it is." It only changes how we see it.'},
+  {id:'c114',moduleId:'m10',core:false,category:'quote',front:'Complete the quote: "Shew the fly the way out of the..."',back:'"...fly-bottle."'},
+  {id:'c115',moduleId:'m10',core:false,category:'application',front:'"What is time?" How does therapy handle this?',back:'It looks at how we use "time" in daily life, dissolving the mystery.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'Why do we get stuck philosophically?',back:'Grammar misleads us into treating tools as objects.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Philosophy should leave the world..."',back:'"...exactly as it is."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'Is philosophy a body of doctrine?',back:'No. It is an activity.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'If someone asks "What is the mind?", what is the error?',back:'Treating "mind" as an object (a noun) rather than a set of capacities (a tool).'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What happens when the fly leaves the bottle?',back:'The problem vanishes. It is not answered, but dissolved.'}
+];
+
+const ARENA = [
+  // MODULE 1: LIMITS
+  { id:'p1', moduleId:'m1', title:'Q1: The Proposition', difficulty:1, reward:50, timeLimit:45, body:'What makes a proposition meaningful according to the Tractatus?', options:['It is logically consistent.','It corresponds to a possible fact in reality.','It is agreed upon by consensus.','It feels right.'], correct:1, explanation:'A proposition is meaningful if it pictures a possible state of affairs. If no fact could verify it, it is nonsense.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Color Green', difficulty:2, reward:100, timeLimit:60, body:'"The color green is angry." Why is this nonsense?', options:['Because colors don\'t have emotions.','Because there is no fact in reality that could verify it. It mixes grammatical categories.','Because it is subjective.','Because green is a wavelength.'], correct:1, explanation:'It is not just false; it is nonsensical. There is no possible fact that makes it true. It violates grammar.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Soul', difficulty:3, reward:200, timeLimit:90, body:'"Is the soul immortal?" How does the Tractatus treat this?', options:['As a true proposition.','As a false proposition.','As nonsense, because there is no observable fact that verifies immortality.','As a matter of faith.'], correct:2, explanation:'Without a possible fact to verify it, the question is unsayable. It is a misuse of language.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Boundary', difficulty:4, reward:500, timeLimit:120, body:'Why must we remain silent on ethics?', options:['Because ethics are subjective.','Because ethical propositions do not correspond to facts in the world. They are unsayable.','Because ethics are dangerous.','Because logic cannot handle complexity.'], correct:1, explanation:'Ethics are not facts. "Murder happened" is a fact. "Murder is wrong" is a value. Values are unsayable.' },
+
+  // MODULE 2: GAMES
+  { id:'p5', moduleId:'m2', title:'Q1: Meaning as Use', difficulty:1, reward:50, timeLimit:45, body:'What determines the meaning of a word?', options:['Its dictionary definition.','How it is used in a specific context (language game).','Its etymology.','The speaker\'s intention.'], correct:1, explanation:'Meaning is use. A word means different things in different language games.' },
+  { id:'p6', moduleId:'m2', title:'Q2: "Water!"', difficulty:2, reward:100, timeLimit:60, body:'"Water!" shouted at a fire vs. in a desert. What is the difference?', options:['The word changes its spelling.','The meaning (use) changes. At the fire: "Put it out." In the desert: "I am thirsty."', 'Nothing, it means H2O both times.','The tone of voice.'], correct:1, explanation:'Context determines use, and use determines meaning. The word is a tool.' },
+  { id:'p7', moduleId:'m2', title:'Q3: The Toolkit', difficulty:3, reward:200, timeLimit:90, body:'Is language a mirror of reality?', options:['Yes, it pictures facts.','No, in the later philosophy, it is a toolkit for many different games.','Only in math.','Only in science.'], correct:1, explanation:'Language does not just describe. It commands, jokes, prays, and lies. It is a toolkit.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Baptism', difficulty:4, reward:500, timeLimit:120, body:'"I hereby baptize this ship Mr. Jones." What is the speaker doing?', options:['Describing a fact.','Performing an action (a speech act).','Lying.','Stating a definition.'], correct:1, explanation:'They are not describing reality; they are enacting a social reality. This is a different language game than describing.' },
+
+  // MODULE 3: FAMILY
+  { id:'p9', moduleId:'m3', title:'Q1: The Essence of Game', difficulty:1, reward:50, timeLimit:45, body:'Why is there no single essence of "Game"?', options:['Because games are complex.','Because some are fun, some are work, some have winners, some don\'t. They overlap but share no single trait.','Because the definition is contested.','Because it is subjective.'], correct:1, explanation:'Categories are held together by overlapping similarities (family resemblance), not a strict essence.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Hotdog', difficulty:2, reward:100, timeLimit:60, body:'"Is a hotdog a sandwich?" What is the error in the question?', options:['It is a factual question about food.','It assumes "sandwich" has a strict essence. It is a family resemblance concept with blurred edges.','It is a matter of taste.','It is a legal question.'], correct:1, explanation:'The question traps us in the illusion of essence. A hotdog shares traits but not others. Accept the blur.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Rope', difficulty:3, reward:200, timeLimit:90, body:'How is a category like a rope?', options:['It is strong.','It is made of fibers. No single fiber runs the whole length, but the rope holds.','It is twisted.','It is made of hemp.'], correct:1, explanation:'Items connect by overlapping similarities (A like B, B like C), but A and C might share nothing.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Classical Logic', difficulty:4, reward:500, timeLimit:120, body:'Why is classical logic (A is A) insufficient for natural language?', options:['Because words are vague.','Because words like "game" or "heap" do not have strict borders. They blur.','Because logic is wrong.','Because humans are irrational.'], correct:1, explanation:'Natural categories blur at the edges. Forcing them into strict definitions causes false dilemmas.' },
+
+  // MODULE 4: RULES
+  { id:'p13', moduleId:'m4', title:'Q1: The Paradox', difficulty:1, reward:50, timeLimit:45, body:'What is the Rule-Following Paradox?', options:['Rules are hard to follow.','Any action can be interpreted to accord with a rule.','Rules are always ambiguous.','Rules change over time.'], correct:1, explanation:'Because any interpretation fits, no action is determined by a rule alone.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Add 2', difficulty:2, reward:100, timeLimit:60, body:'"Add 2. 2, 4, 6... 1000?" You say 1002. How do you know?', options:['Because of logic.','Because of your training and practice. You cannot prove the rule wasn\'t "add 4 after 1000".','Because 1000+2=1002.','Because of intuition.'], correct:1, explanation:'Meaning is not a mental act. It is public practice. "This is simply what we do."'},
+  { id:'p15', moduleId:'m4', title:'Q3: In the Head', difficulty:3, reward:200, timeLimit:90, body:'Is meaning a mental act (in the head)?', options:['Yes, intention determines meaning.','No. The meaning of a rule is in the public, shared practice of the community.','Only in private language.','Sometimes.'], correct:1, explanation:'"I meant add 2" is just another interpretation. Correctness requires public criteria.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Outcast', difficulty:4, reward:500, timeLimit:120, body:'If someone calculates 2+2=5, what do we do?', options:['Prove them wrong with logic.','Exclude them or correct them based on practice. There is no logical proof they are wrong, only social friction.','Argue about definitions.','Ignore them.'], correct:1, explanation:'At the bedrock, explanations end. We act. We do not justify the rules of addition from outside.' },
+
+  // MODULE 5: PRIVATE
+  { id:'p17', moduleId:'m5', title:'Q1: The Private Language', difficulty:1, reward:50, timeLimit:45, body:'Can you have a private language only you understand?', options:['Yes, for your inner sensations.','No. Meaning requires public criteria for correctness.','Only in dreams.','Only in theory.'], correct:1, explanation:'Without public verification, you could never know if you are using the word correctly.' },
+  { id:'p18', moduleId:'m5', title:'Q2: The Beetle', difficulty:2, reward:100, timeLimit:60, body:'What happens to the "beetle" in the box?', options:['It is studied by scientists.','The actual object drops out of consideration. The game is played with the word.','It is shared.','It is named.'], correct:1, explanation:'Because no one else can see it, the private object becomes irrelevant. Meaning is public.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Pain', difficulty:3, reward:200, timeLimit:90, body:'"I am in pain." Is this naming a private object?', options:['Yes, it refers to your inner sensation.','No. It is engaging in a public language game of pain-behavior.','It is a lie.','It is a metaphor.'], correct:1, explanation:'"Pain" is used based on behavior (groaning, holding arm), not the private sensation.' },
+  { id:'p20', moduleId:'m5', title:'Q4: The Diary', difficulty:4, reward:500, timeLimit:120, body:'If you write "S" in a diary for a sensation, how do you know it is the same sensation next time?', options:['By memory.','You cannot know. There is no independent standard. It is a private rule, which is impossible.','By comparing it.','By definition.'], correct:1, explanation:'Without public criteria, there is no standard of correctness. "S" might mean anything or nothing.' },
+
+  // MODULE 6: FORM
+  { id:'p21', moduleId:'m6', title:'Q1: The Lion', difficulty:1, reward:50, timeLimit:45, body:'Why can\'t we understand a speaking lion?', options:['Because we don\'t speak lion.','Because we do not share his form of life (instincts, needs).','Because lions are dumb.','Because the language is too complex.'], correct:1, explanation:'A form of life is the shared background that makes language possible. Without it, words have no anchor.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Bedrock', difficulty:2, reward:100, timeLimit:60, body:'What is the bedrock of meaning?', options:['Logic.','Forms of life. "What has to be accepted, the given."','Definitions.','Physics.'], correct:1, explanation:'Explanations eventually run out. At the bottom is "this is simply what we do."'},
+  { id:'p23', moduleId:'m6', title:'Q3: Justification', difficulty:3, reward:200, timeLimit:90, body:'Can logic justify a form of life?', options:['Yes, logic is universal.','No. Logic rests on the form of life. You cannot justify the bedrock from outside.','Only in science.','Only in math.'], correct:1, explanation:'Logic is a tool used within a form of life. It cannot prove the form of life itself.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Failed Arguments', difficulty:4, reward:500, timeLimit:120, body:'Why do some arguments fail despite perfect logic?', options:['Because one side is stupid.','Because the participants do not share the same form of life (background assumptions).','Because logic is subjective.','Because emotions interfere.'], correct:1, explanation:'If the bedrock assumptions differ, logic cannot bridge the gap. The disagreement is not logical, but cultural.' },
+
+  // MODULE 7: SHOWING
+  { id:'p25', moduleId:'m7', title:'Q1: Said vs Shown', difficulty:1, reward:50, timeLimit:45, body:'What can be "Said"?', options:['Ethics.','Facts (states of affairs).','Logic.','God.'], correct:1, explanation:'Propositions say facts. Logical form, ethics, and aesthetics can only be shown.' },
+  { id:'p26', moduleId:'m7', title:'Q2: The Frame', difficulty:2, reward:100, timeLimit:60, body:'Why can\'t language describe its own logical form?', options:['Because it is too complex.','Because it would need to step outside itself. The frame is not part of the picture.','Because logic is flawed.','Because grammar is wrong.'], correct:1, explanation:'Language mirrors logic; it cannot turn around to describe it.' },
+  { id:'p27', moduleId:'m7', title:'Q3: "Murder is wrong"', difficulty:3, reward:200, timeLimit:90, body:'"Murder is wrong." Is this a fact?', options:['Yes, it is a moral fact.','No. It is an attitude. The fact is "Murder happened."','It depends on the law.','It is a command.'], correct:1, explanation:'Value is not part of the furniture of the world. It is how we view the world.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Aesthetics', difficulty:4, reward:500, timeLimit:120, body:'How do you convey that music is beautiful?', options:['"This music is beautiful." (Saying)','"Look at it this way." (Showing)','"It has good harmony." (Facts)','"I like it." (Preference)'], correct:1, explanation:'You cannot say value. You show it by pointing to the example and inviting a way of seeing.' },
+
+  // MODULE 8: GRAMMAR
+  { id:'p29', moduleId:'m8', title:'Q1: Grammar', difficulty:1, reward:50, timeLimit:45, body:'What does Grammar define?', options:['What is true.','What makes sense.','What is moral.','What is real.'], correct:1, explanation:'Grammar is the rules of the language game. It dictates what is possible (makes sense), not what is true.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Caesar', difficulty:2, reward:100, timeLimit:60, body:'"Caesar is a prime number." Is this false or nonsensical?', options:['False.','Nonsensical. It violates grammar.','True.','Metaphorical.'], correct:1, explanation:'No fact can make it true. It mixes categories. Grammar, not reality, rules it out.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Chess', difficulty:3, reward:200, timeLimit:90, body:'"Can the king move two spaces?" What kind of question is this?', options:['Empirical.','Grammatical. The answer is in the rules of chess, not the nature of the wood.','Physical.','Strategic.'], correct:1, explanation:'Essence is grammar. The rules define the piece, not the material.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Definitions', difficulty:4, reward:500, timeLimit:120, body:'If a debate is about definitions, what is it?', options:['Empirical.','Grammatical. It is about rules of usage, not facts.','Logical.','Subjective.'], correct:1, explanation:'Definitions are rules of usage. Debating them is grammatical, not factual.' },
+
+  // MODULE 9: SILENCE
+  { id:'p33', moduleId:'m9', title:'Q1: Value', difficulty:1, reward:50, timeLimit:45, body:'Where does value reside?', options:['In the facts of the world.','It is a way of viewing the world.','In the brain.','In society.'], correct:1, explanation:'Values are not facts. They are attitudes. "Murder happened" is a fact; "Murder is wrong" is a value.' },
+  { id:'p34', moduleId:'m9', title:'Q2: Sayable', difficulty:2, reward:100, timeLimit:60, body:'Are ethical propositions sayable?', options:['Yes, if they are true.','No. They are unsayable (nonsense), though vitally important.','Only in church.','Only in court.'], correct:1, explanation:'Ethics tries to speak of absolute value, but language only speaks of relative facts.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Arguing Ethics', difficulty:3, reward:200, timeLimit:90, body:'How should ethics be argued?', options:['With empirical data.','They cannot be argued with facts. They must be lived/shown.','With logic.','With scripture.'], correct:1, explanation:'You cannot prove a value with a fact. You show the value by living it.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Mystical', difficulty:4, reward:500, timeLimit:120, body:'What is the "mystical" in Wittgenstein?', options:['A religious experience.','The feeling that the world exists. This is unsayable.','A type of logic.','A cult.'], correct:1, explanation:'Not how the world is, but that it is, is the mystical. This cannot be put into words.' },
+
+  // MODULE 10: THERAPY
+  { id:'p37', moduleId:'m10', title:'Q1: Philosophy', difficulty:1, reward:50, timeLimit:45, body:'What is the goal of philosophy as therapy?', options:['To prove doctrines.','To dissolve problems by untangling language.','To find new facts.','To change the world.'], correct:1, explanation:'Philosophical problems are language tangles. The goal is to dissolve them, not solve them with new facts.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Fly-Bottle', difficulty:2, reward:100, timeLimit:60, body:'What is the "Fly-Bottle"?', options:['A trap for insects.','The trap of language. Philosophy shews the fly the way out.','A logic puzzle.','A type of argument.'], correct:1, explanation:'Grammar misleads us. Once you see how the language tricked you, the problem vanishes.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Change', difficulty:3, reward:200, timeLimit:90, body:'Should philosophy change the world?', options:['Yes, it should make us better.','No. "Leave everything as it is." It only changes how we see it.','Only politics can.','Yes, through science.'], correct:1, explanation:'Philosophy is an activity of clarification, not revolution. It changes our perspective, not reality.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Mind', difficulty:4, reward:500, timeLimit:120, body:'If someone asks "What is the mind?", what is the error?', options:['It is too complex.','Treating "mind" as an object (noun) rather than a set of capacities (tool).','It is unscientific.','It is subjective.'], correct:1, explanation:'Grammar misleads us into reifying concepts. "Mind" is a tool in a language game, not a thing.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Boundary', scenario:'Your startup is debating "What is our core identity?" People are throwing out abstract terms ("We are innovators"). How do you apply Wittgenstein?', options:['Define the terms precisely.','Ask: What fact in reality verifies this? If none, it is nonsense. Focus on verifiable actions.','Hire a consultant.','Take a vote.'], correct:1, explanation:'If a statement does not correspond to a possible fact, it is nonsense. Stop arguing abstractions; look at verifiable behavior.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Toolkit', scenario:'Your marketing team is arguing over the "true meaning" of your brand. How do you resolve it?', options:['Look up the dictionary definition.','Ask: How is the brand actually used by customers? Meaning is use.','Fire the marketing team.','Rebrand entirely.'], correct:1, explanation:'Meaning is use. Don\'t look for an essence; look at how customers interact with the brand (the language game).' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Hotdog', scenario:'Engineering and Product are fighting over whether a new feature is a "bug fix" or a "new feature" (affects billing). How do you handle it?', options:['Force a strict definition.','Recognize it is a family resemblance category with blurred edges. Accept it shares traits of both and negotiate.','Let the CEO decide.','Look at the code.'], correct:1, explanation:'The trap of essence causes the fight. Accept blurred edges and negotiate the usage rather than fighting over essence.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The SOP', scenario:'You wrote a Standard Operating Procedure (SOP). Employees are interpreting it differently. How do you ensure compliance?', options:['Make the SOP longer.','Do not rely on interpretation. Train them through practice. "This is simply what we do."', 'Threaten to fire them.','Hire a lawyer.'], correct:1, explanation:'Rules are followed through practice, not interpretation. Training establishes the shared form of life.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Pain', scenario:'A remote employee says "I feel disconnected" but their metrics are perfect. How do you interpret this?', options:['They are lying.','"Disconnected" is not a private sensation; it is a language game of behavior. Look at their actions, not just the word.','Ignore them.','Send them a gift card.'], correct:1, explanation:'The inner is accessed through the outer. Look at the public criteria (missed meetings, tone) to understand the use of the word.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Acquisition', scenario:'You acquired a company. Their engineering team uses "Agile" but delivers nothing. Why?', options:['They are lazy.','They do not share your form of life. "Agile" means something different in their culture.','They need better tools.','Agile doesn\'t work.'], correct:1, explanation:'Words do not have fixed meaning. Without a shared form of life (practice), the word "Agile" is just noise.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Value', scenario:'You are trying to write a company values document. How do you express "We value quality"?', options:['"Quality is our top priority." (Saying)','"Look at how we reject bad code." (Showing)','"Quality means 0 bugs." (Facts)','"Quality is in our DNA." (Nonsense)'], correct:1, explanation:'Values cannot be said; they must be shown. Live the value; don\'t just write it on a wall.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Grammar', scenario:'A team argues "Is Kubernetes a tool or a platform?" What kind of debate is this?', options:['Empirical (look at the code).','Grammatical (rules of usage). It depends on how you use the words.','Strategic.','Irrelevant.'], correct:1, explanation:'Essence is grammar. The answer is in how you define the words, not in the nature of the software.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Ethics', scenario:'A competitor is copying your product. The team wants to argue "It is unfair." How do you frame it?', options:['"Unfair" is a fact. Prove it with data.','"Unfair" is a value (unsayable). Show your superiority through action, not argument.','Sue them.','Complain to the press.'], correct:1, explanation:'Ethics are shown, not said. Do not argue morality with facts. Out-execute them.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Therapy', scenario:'The team is stuck in an endless debate about "What is the metaverse?" How do you apply philosophical therapy?', options:['Define it precisely.','Dissolve the problem. Look at how the word is actually used. Stop treating it as a mysterious object.','Hire a visionary.','Ignore it.'], correct:1, explanation:'Shew the fly the way out of the fly-bottle. The problem is grammatical confusion. Look at the use, dissolve the mystery.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Proposition', body:'Listen for an abstract claim today ("This is innovative"). Ask: What fact verifies this? If none, dismiss it as nonsense.' },
+  { id:'rw2', title:'The Use', body:'Pick a word you use often. Ask: How is it used in different contexts? (Work vs. home).' },
+  { id:'rw3', title:'The Family', body:'Look at a category (e.g., "furniture"). List items. Notice they share overlapping traits, not one essence.' },
+  { id:'rw4', title:'The Rule', body:'Follow a rule today (driving, cooking). Notice you follow it by practice, not constant interpretation.' },
+  { id:'rw5', title:'The Beetle', body:'Notice when you talk about inner states. Remember: meaning is public behavior, not private objects.' },
+  { id:'rw6', title:'The Lion', body:'Interact with someone from a different background. Notice where shared assumptions (forms of life) are missing.' },
+  { id:'rw7', title:'The Show', body:'Instead of telling someone what to do, show them. "Show, don\'t tell" is a logical necessity.' },
+  { id:'rw8', title:'The Grammar', body:'When you hear a nonsensical statement, check the grammar, not the facts.' },
+  { id:'rw9', title:'The Silence', body:'When tempted to argue ethics with facts, stop. Values are shown, not said.' },
+  { id:'rw10', title:'The Therapy', body:'When stuck on a "deep" question, ask: How are these words actually used? Dissolve the mystery.' },
+  { id:'rw11', title:'The Cage', body:'Notice how the words you use constrain what you can think. Invent a new word to escape.' },
+  { id:'rw12', title:'The Game', body:'Identify a language game you are playing (negotiating, joking). Stick to the rules of that game.' },
+  { id:'rw13', title:'The Edge', body:'Find a category that blurs at the edges (e.g., "art"). Accept the blur.' },
+  { id:'rw14', title:'The Practice', body:'Teach someone a rule by doing it with them, not by giving a manual.' },
+  { id:'rw15', title:'The Public', body:'Express pain or joy today through behavior, not just words.' },
+  { id:'rw16', title:'The Bedrock', body:'When an argument stalls, ask: Are our forms of life different? Stop arguing logic.' },
+  { id:'rw17', title:'The Frame', body:'Notice the logical form of a conversation. It is shown, not said.' },
+  { id:'rw18', title:'The Essence', body:'Ask "What is the essence of X?" Then realize: the essence is just the grammar (rules).'},
+  { id:'rw19', title:'The Value', body:'Observe a value judgment. It is an attitude, not a fact.' },
+  { id:'rw20', title:'The Dissolve', body:'Take a philosophical problem. Untangle the language. Watch the problem vanish.' },
+  { id:'rw21', title:'The Nonsense', body:'Catch yourself saying something unverifiable. Remain silent instead.' },
+  { id:'rw22', title:'The Tool', body:'Treat a word as a tool today, not a mirror of reality.' },
+  { id:'rw23', title:'The Rope', body:'Explain a concept by listing overlapping examples, not a strict definition.' },
+  { id:'rw24', title:'The Training', body:'Do not interpret a rule. Just do it.' },
+  { id:'rw25', title:'The Outer', body:'Judge an "inner" state by outer behavior, not assumed private thoughts.' },
+  { id:'rw26', title:'The Alien', body:'Imagine explaining your job to a lion. Notice the missing form of life.' },
+  { id:'rw27', title:'The Attitude', body:'When you say "This is good", recognize you are expressing an attitude.' },
+  { id:'rw28', title:'The Rules', body:'Debate a definition. Realize it is grammatical, not factual.' },
+  { id:'rw29', title:'The Unsayable', body:'Try to express an ethical value as a fact. Fail.' },
+  { id:'rw30', title:'The Bottle', body:'Help someone out of a fly-bottle by asking "How is that word used?"' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your semantic profile.' },
+  { threshold: 500, title: 'LEXICOGRAPHER', desc: 'You see words as tools, not mirrors.' },
+  { threshold: 1500, title: 'LOGICIAN', desc: 'You identify nonsense and grammatical traps.' },
+  { threshold: 3000, title: 'THERAPIST', desc: 'You dissolve problems by untangling language.' },
+  { threshold: 6000, title: 'SILENT OPERATOR', desc: 'You know whereof you cannot speak, and remain silent.' }
+];
+
+const STORAGE_KEY = 'wittgenstein-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// SILENCE ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Silence. You now possess the complete semantic architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Language is not a mirror of reality; it is a toolkit. The limits of your language are the limits of your world. By recognizing nonsense, untangling grammar, and accepting the bedrock of forms of life, you dissolve problems rather than solving them. You know whereof you cannot speak, and therein you remain silent.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Silence: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your semantic architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="WITTGENSTEIN.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="WITTGENSTEIN.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="WITTGENSTEIN.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="WITTGENSTEIN.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="WITTGENSTEIN.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="WITTGENSTEIN.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="WITTGENSTEIN.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="WITTGENSTEIN.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'SILENCE' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each semantic axis to the startup scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="WITTGENSTEIN.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="WITTGENSTEIN.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="WITTGENSTEIN.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'silence: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="WITTGENSTEIN.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="WITTGENSTEIN.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="WITTGENSTEIN.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="WITTGENSTEIN.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="WITTGENSTEIN.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="WITTGENSTEIN.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="WITTGENSTEIN.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="WITTGENSTEIN.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="WITTGENSTEIN.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="WITTGENSTEIN.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="WITTGENSTEIN.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="WITTGENSTEIN.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="WITTGENSTEIN.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="WITTGENSTEIN.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="WITTGENSTEIN.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="WITTGENSTEIN.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="WITTGENSTEIN.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="WITTGENSTEIN.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(157,78,221,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(157, 78, 221, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 245, 212, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'wittgenstein_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading language kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Silence...', 'WITTGENSTEIN online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.WITTGENSTEIN = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
