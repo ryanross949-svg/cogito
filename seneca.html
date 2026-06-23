@@ -1,7 +1,3 @@
-NEEDS FIXING
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,38 +10,39 @@ NEEDS FIXING
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
-  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
-  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
-  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --void:#0A0805; --void-2:#14100A; --panel:rgba(20,16,10,0.7); --panel-solid:#1A140E;
+  --cyan:#FFD166; --cyan-dim:#B8902A; --magenta:#D4A373; --amber:#E76F51; --green:#06D6A0; --red:#E63946;
+  --text:#F4F1DE; --text-dim:#8B8170; --text-faint:#4A4138;
+  --border:rgba(212,163,115,0.2); --border-bright:rgba(212,163,115,0.5);
   --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
 }
-[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="matrix"] { --void:#000000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
 [data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
 [data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
 [data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
-body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(212,163,115,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(231,111,81,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
 #particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
-body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,163,115,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(212,163,115,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(212,163,115,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
 #boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
 #boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
-.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(255,209,102,0.5);margin-bottom:1rem;position:relative;}
 .boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
 @keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
 .boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
 .boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
 .boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
 @keyframes bootLog{to{opacity:1;}}
-.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(212,163,115,0.1);position:relative;overflow:hidden;}
 .boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
 #app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
 #app.active{display:flex;}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(10,8,5,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
 .topbar-left{display:flex;align-items:center;gap:1rem;}
-.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(255,209,102,0.4);}
 .brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
 .hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
 .hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
@@ -62,7 +59,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
 .stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(10,8,5,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
 .nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
 .nav-item:hover{color:var(--text);}
 .nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
@@ -78,27 +75,27 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
 .panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
 .panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
-.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission{background:linear-gradient(135deg,rgba(212,163,115,0.08),rgba(255,209,102,0.02));border:1px solid var(--border-bright);}
 .mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
 .mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
 .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
-.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(255,209,102,0.5);}
 .btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
-.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.secondary:hover{background:rgba(212,163,115,0.1);color:var(--text);box-shadow:none;}
 .btn.danger{border-color:var(--red);color:var(--red);}
-.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(230,57,70,0.5);}
 .btn.success{border-color:var(--green);color:var(--green);}
-.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(6,214,160,0.5);}
 .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
 .module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
-.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,163,115,0.1);}
 .module-card.locked{opacity:0.35;cursor:not-allowed;}
 .module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
 .module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
 .module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
 .module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
 .module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
-.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress{height:2px;background:rgba(212,163,115,0.1);position:relative;}
 .module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
 .module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
 .lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
@@ -115,8 +112,8 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
 .lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
 .lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
-.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
-.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(255,209,102,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(255,209,102,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
 .takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
 .takeaways ul{list-style:none;margin-left:0;}
 .takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
@@ -134,7 +131,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
 .lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
 .lesson-row.read .status{color:var(--green);}
-.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row{background:linear-gradient(135deg,rgba(212,163,115,0.05),rgba(255,209,102,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
 .problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
 .problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
 .drill-container{max-width:800px;margin:0 auto;}
@@ -154,10 +151,10 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
 .drill-rating.active{display:grid;}
 .rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
-.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(255,209,102,0.05);}
 .rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
-.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
-.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(230,57,70,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(6,214,160,0.05);}
 .drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
 .drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
 .drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
@@ -172,13 +169,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
 .options{display:grid;gap:0.75rem;}
 .option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
-.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(212,163,115,0.03);}
 .option.disabled{cursor:not-allowed;}
-.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
-.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option.correct{border-color:var(--green);background:rgba(6,214,160,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(230,57,70,0.06);}
 .option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
 .option-text{font-size:0.88rem;line-height:1.6;flex:1;}
-.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(255,209,102,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
 @keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
 .outcome.active{display:block;}
 .outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
@@ -194,15 +191,15 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .mastery-list{display:grid;gap:0.85rem;}
 .mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
 .mastery-name{color:var(--text);letter-spacing:0.05em;}
-.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-bar{height:4px;background:rgba(212,163,115,0.1);position:relative;border-radius:2px;}
 .mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
 .mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
 .mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
 .mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
-#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(255,209,102,0.3);text-transform:uppercase;border-radius:2px;}
 #toast.show{transform:translateX(-50%) translateY(0);}
-#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
-#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(230,57,70,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(6,214,160,0.3);}
 .about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
 .about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
 .about-content p{margin-bottom:1rem;color:var(--text);}
@@ -218,7 +215,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .radar-svg{width:100%;max-width:340px;height:auto;}
 .radar-axis{stroke:var(--border);stroke-width:1;}
 .radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
-.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-poly{fill:rgba(255,209,102,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
 .radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
 .radar-label.active{fill:var(--cyan);}
 .flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
@@ -228,24 +225,24 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .text-sm{font-size:0.78rem;}
 .text-xs{font-size:0.65rem;}
 .center{text-align:center;}
-.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar{height:4px;background:rgba(230,57,70,0.2);position:relative;overflow:hidden;border-radius:2px;}
 .danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
 .filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
 .filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
 .filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
-.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
-.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
-.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(255,209,102,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(212,163,115,0.05),rgba(255,209,102,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(212,163,115,0.4);}
 .profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
-.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
-.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel{background:linear-gradient(135deg,rgba(230,57,70,0.1),rgba(231,111,81,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(231,111,81,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(231,111,81,0.3);}
 .secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
 .phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
 .phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
 .phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
 .phase-row.locked{opacity:0.4;cursor:not-allowed;}
 .phase-row.solved{border-left:3px solid var(--green);}
-.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(212,163,115,0.1);}
 .phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
 .phase-info{flex:1;}
 .phase-title{font-size:0.95rem;font-weight:500;}
@@ -262,16 +259,16 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 .arena-info{flex:1;}
 .arena-title-text{font-size:0.9rem;font-weight:500;}
 .diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
-.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
-.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
-.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
-.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+.diff-1{background:rgba(6,214,160,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(231,111,81,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(212,163,115,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(230,57,70,0.15);color:var(--red);border:1px solid var(--red);}
 @media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
 </style>
 </head>
 <body>
 <canvas id="particles"></canvas>
-<div id="boot"><div class="boot-logo">SENECA</div><div class="boot-sub">Cogito // Stoic Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="boot"><div class="boot-logo">SENECA</div><div class="boot-sub">Cogito // Stoic Decision Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
 <div id="app">
   <header class="topbar">
     <div class="topbar-left"><div><div class="brand">SENECA</div><div class="brand-tag">PRACTICAL ETHICS</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
@@ -298,7 +295,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
     </section>
     <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of Stoic decision-making. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
-    <section class="view" id="view-project"><h1 class="section-title">Project: INNER CITADEL</h1><p class="section-sub">A cumulative scenario. Apply Stoic frameworks to modern stress and leadership.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: INNER CITADEL</h1><p class="section-sub">A cumulative scenario. Apply Stoic philosophy to survive a startup crisis.</p><div class="project-container" id="projectContainer"></div></section>
     <section class="view" id="view-module"><div id="moduleDetail"></div></section>
     <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
     <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
@@ -319,22 +316,22 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <section class="view" id="view-about">
       <h1 class="section-title">About SENECA</h1><p class="section-sub">Methodology and design principles.</p>
       <div class="about-content">
-        <p>SENECA is a cognitive training simulator designed to install the decision-making frameworks of Stoic philosophy. It transforms ancient wisdom into actionable mental models for modern stress, risk, and leadership.</p>
+        <p>SENECA is a cognitive training simulator designed to install the decision-making frameworks of Stoic philosophy. It turns ancient wisdom into actionable mental models for modern stress, risk, and leadership.</p>
         <h2>// Core Pedagogy</h2>
         <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
         <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Inner Citadel require applying concepts to novel scenarios.</li></ul>
         <h2>// The Ten Axes</h2>
         <ul>
           <li><strong>CONTROL</strong> — The Dichotomy of Control (Epictetus)</li>
-          <li><strong>VISION</strong> — Negative Visualization (Premeditatio Malorum)</li>
-          <li><strong>FATI</strong> — Amor Fati (Loving what happens)</li>
-          <li><strong>RISK</strong> — Asymmetry of Risk & Antifragility</li>
-          <li><strong>IMPULSE</strong> — The Space Between Stimulus and Response</li>
-          <li><strong>PERCEPT</strong> — Objective Representation (Phantasiai)</li>
-          <li><strong>TIME</strong> — Memento Mori & The Shortness of Life</li>
+          <li><strong>VIEW</strong> — Cognitive Distancing and Objective Impression</li>
+          <li><strong>VOLATILE</strong> — Negative Visualization (Premeditatio Malorum)</li>
+          <li><strong>FATE</strong> — Amor Fati (Loving what happens)</li>
+          <li><strong>MORTAL</strong> — Memento Mori (Remember you must die)</li>
           <li><strong>VIRTUE</strong> — The Four Cardinal Virtues</li>
-          <li><strong>WEALTH</strong> — The View from Above & Detachment</li>
-          <li><strong>ACTION</strong> — The Stoic Reserve Clause</li>
+          <li><strong>TIME</strong> — Presence and Anti-Distraction</li>
+          <li><strong>RISK</strong> — Asymmetry of Risk and Anti-Fragility</li>
+          <li><strong>EMOTION</strong> — Passions vs. Protopassions</li>
+          <li><strong>CITADEL</strong> — The Inner Fortress (Marcus Aurelius)</li>
         </ul>
       </div>
     </section>
@@ -348,254 +345,274 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 'use strict';
 
 const MODULES = [
-  { id:'m1', codename:'CONTROL', title:'The Dichotomy of Control', summary:'Separating what you can control from what you can\'t.', lesson:{ title:'The Architecture of Agency', body: 'Epictetus opened his Enchiridion with the most powerful distinction in psychology: Some things are up to us (eph hemin), and some things are not.\n\n## What is Up to Us?\n\nOur judgments, our impulses, our desires, and our aversions. In modern terms: our opinions, our goals, and our reactions.\n\n## What is Not Up to Us?\n\nOur body, our reputation, our property, our job. In modern terms: the market, the weather, other people\'s opinions, and the past.\n\n## The Trap\n\nMost human misery comes from trying to control the uncontrollable, or neglecting the controllable. If you stake your happiness on your reputation (uncontrollable), you will be anxious. If you focus on your integrity (controllable), you will be invincible.\n\n## The Method\n\n1. **Identify the stressor:** What is causing the anxiety?\n2. **Classify:** Is this up to me, or not up to me?\n3. **Act:** If up to you, take action. If not up to you, accept it and focus on your response.', takeaways:['Some things are up to us; most are not.','We control our judgments, impulses, and desires.','We do not control the market, weather, or other people.','Anxiety comes from trying to control the uncontrollable.','Happiness comes from focusing exclusively on what you control.'] } },
-  { id:'m2', codename:'VISION', title:'Negative Visualization', summary:'Premeditatio Malorum: imagining loss to reduce its shock.', lesson:{ title:'The Architecture of Resilience', body: 'Seneca recommended a daily exercise: Premeditatio Malorum (the premeditation of evils). Spend a few moments imagining that you have lost your job, your health, or your loved ones.\n\n## Why Would You Do This?\n\nIt sounds depressing. But the Stoics understood a psychological truth: we adapt to good things quickly (hedonic adaptation). We take our health, wealth, and family for granted. By imagining their loss, you reset your baseline. You feel gratitude for what you have.\n\nSecond, it inoculates you. If the worst happens, you have already rehearsed it. The shock is reduced. You are not paralyzed; you are ready.\n\n## The Method\n\n1. **Pick a asset:** Your job, your health, a relationship.\n2. **Visualize the loss:** Spend 2 minutes vividly imagining it is gone.\n3. **Return to the present:** Realize you still have it. Feel the relief and gratitude.\n4. **Plan:** If it did happen, what would your first 3 steps be?', takeaways:['Premeditatio Malorum: imagine loss to build resilience.','It counters hedonic adaptation by resetting your baseline.','It inoculates you against the shock of bad news.','It generates gratitude for what you currently have.','Rehearse the worst-case scenario so you are never paralyzed.'] } },
-  { id:'m3', codename:'FATI', title:'Amor Fati', summary:'Loving what happens, not just enduring it.', lesson:{ title:'The Architecture of Acceptance', body: ' Nietzsche popularized it, but the roots are Stoic. Amor Fati means not just tolerating what happens, but embracing it.\n\n## The Barrier\n\nWhen something bad happens, our instinct is to say: "Why me?" or "This shouldn\'t be happening." This is the mind arguing with reality. As Byron Katie says, "When you argue with reality, you lose, but only 100% of the time."\n\n## The Stoic Shift\n\nInstead of fighting the event, accept it as a necessary part of the whole. The event is data. It is the raw material for your virtue.\n\nMarcus Aurelius: "A blazing fire takes anything you throw on it and makes it fuel."\n\n## The Method\n\n1. **Acknowledge the event:** "This happened."\n2. **Drop the judgment:** "It is bad."\n3. **Reframe:** "This is an opportunity to practice patience/courage/resilience."\n4. **Act:** Move forward with the new reality.', takeaways:['Amor Fati: love what happens, don\'t just endure it.','Arguing with reality guarantees suffering.','Events are neutral data; your judgment makes them "bad."\nA fire turns everything thrown into it into fuel.\nEvery obstacle is an opportunity to practice virtue.'] } },
-  { id:'m4', codename:'RISK', title:'Asymmetry of Risk', summary:'Antifragility and surviving the tail risk.', lesson:{ title:'The Architecture of Survival', body: 'The Stoics were the original risk managers. Nassim Taleb\'s concept of "Antifragility"—systems that gain from disorder—is deeply Stoic.\n\n## The asymmetry\n\nA fragile system breaks under stress (a glass). A robust system stays the same (a rock). An antifragile system gets stronger (a muscle, or a Stoic mind).\n\nIf you have nothing to lose, you are free. If you have everything to lose, you are a slave to fate. The Stoic reduces their downside so that no single event can destroy them.\n\n## The Method\n\n1. **Identify tail risks:** What is the worst-case scenario?\n2. **De-risk:** Can you survive it? If not, change your setup.\n3. **Barbell strategy:** Keep 90% of your assets safe, risk 10% on high-upside bets.\n4. **Embrace small stressors:** Fasting, cold showers, hard workouts. These vaccinate you against larger shocks.', takeaways:['Fragile breaks; Robust stays same; Antifragile gets stronger.','Reduce downside so no single event can destroy you.','The Barbell Strategy: 90% safe, 10% high-risk.','Embrace small stressors (fasting, cold) to vaccinate against large shocks.','If you have nothing to lose, you are invincible.'] } },
-  { id:'m5', codename:'IMPULSE', title:'The Space Between', summary:'The gap between stimulus and response.', lesson:{ title:'The Architecture of Choice', body: 'Viktor Frankl, a Holocaust survivor and psychiatrist, wrote: "Between stimulus and response there is a space. In that space is our power to choose our response."\n\n## The Neural Trap\n\nWhen something happens, the amygdala fires instantly (fight or flight). If you react immediately, you are an animal. You are running old programming.\n\n## The Stoic Pause\n\nEpictetus advised: "Don\'t let the force of an impression carry you away."\n\nWhen you feel anger or fear, do not act. Wait. Take a breath. The emotion will peak and subside. In that pause, you regain your agency. You can choose a response aligned with your values, not your impulses.\n\n## The Method\n\n1. **Feel the emotion:** Do not suppress it. Acknowledge the anger/fear.\n2. **Do not act:** The 10-second rule. Wait.\n3. **Observe:** Watch the emotion fade.\n4. **Choose:** Now decide how to act, rather than react.', takeaways:['Between stimulus and response, there is a space.','The amygdala reacts instantly; the prefrontal cortex needs time.','Never act on the first wave of anger or fear.','The 10-second rule: wait before responding to a trigger.','You are not your emotions; you are the observer of them.'] } },
-  { id:'m6', codename:'PERCEPT', title:'Objective Representation', summary:'Stripping away judgments to see reality.', lesson:{ title:'The Architecture of Clarity', body: 'Marcus Aurelius constantly practiced "bare representation" (phantasiai). He would strip away the emotional narrative from an event to see the objective reality.\n\n## The Method\n\nIf you hear "This is bad," ask: What is it actually?\n\nExample: "My boss yelled at me."\n\nBare representation: "A human made sounds with their vocal cords in my direction."\n\nExample: "I lost my job."\n\nBare representation: "A company stopped transferring numbers into my bank account."\n\n## Why It Works\n\nThe pain is not in the event; it is in the story you tell yourself about the event. By reducing it to physics and math, you remove the sting. You see it as a neutral fact, which you can then deal with rationally.\n\n## The Discipline\n\nWhen you feel overwhelmed by a situation, ask: "What is actually happening, without the adjectives?"', takeaways:['Phantasiai: strip away the narrative to see objective reality.','The pain is in the story, not the event.','"My boss yelled at me" becomes "A human made sounds."\nAdjectives create suffering; nouns and verbs create clarity.','Ask: "What is actually happening, without the judgment?"'] } },
-  { id:'m7', codename:'TIME', title:'Memento Mori', summary:'Remember you must die. Act accordingly.', lesson:{ title:'The Architecture of Urgency', body: 'Memento Mori: Remember you must die.\n\nThis is not morbid; it is the ultimate prioritization tool. Seneca wrote: "You do not have a scarcity of time, you have a scarcity of attention."\n\n## The Illusion of Time\n\nWe act as if we have infinite time. We procrastinate, hold grudges, and worry about trivialities. Death is the reminder that time is finite and uncertain.\n\n## The Clarifying Lens\n\nIf you knew you had 6 months to live, what would you stop doing? What would you start? Who would you call?\n\nMemento Mori forces you to drop the unimportant. It aligns your daily actions with your deepest values.\n\n## The Method\n\n1. **Morning meditation:** "I may not survive today. I will act with virtue."\n2. **Evening reflection:** "Did I live today as if it were my last?"\n3. **The Deathbed Test:** When facing a decision, ask: "Will this matter on my deathbed?" If no, do not worry about it.', takeaways:['Memento Mori: Remember you must die.','Death is the ultimate prioritization tool.','We have a scarcity of attention, not time.','If you knew you had 6 months, what would you stop doing?','The Deathbed Test filters out trivial anxieties.'] } },
-  { id:'m8', codename:'VIRTUE', title:'The Four Virtues', summary:'Wisdom, Courage, Justice, Temperance.', lesson:{ title:'The Architecture of Character', body: 'The Stoics believed that Virtue (Arete) is the only true good. Everything else (wealth, health) is "preferred indifferent."\n\nThe Four Cardinal Virtues:\n\n1. **Wisdom (Phronesis):** Knowing what is good, bad, and indifferent.\n2. **Courage (Andreia):** Enduring hardship for the right reason.\n3. **Justice (Dikaiosyne):** Treating others fairly.\n4. **Temperance (Sophrosyne):** Doing things in the right measure.\n\n## The Method\n\nWhen making a decision, run it through the 4 filters:\n- Is this wise? (Does it align with reality?)\n- Does this require courage? (Am I avoiding fear?)\n- Is this just? (Am I harming others?)\n- Is this temperate? (Am I overindulging?)\n\nIf a decision passes all four, act without hesitation.', takeaways:['Virtue is the only true good; everything else is preferred indifferent.','The 4 Virtues: Wisdom, Courage, Justice, Temperance.','Wisdom = knowing what is good/bad. Courage = enduring hardship.','Justice = fairness. Temperance = moderation.','Filter every decision through the 4 virtues.'] } },
-  { id:'m9', codename:'WEALTH', title:'The View from Above', summary:'Detachment from externals and status.', lesson:{ title:'The Architecture of Detachment', body: 'The Stoic Sage is wealthy even in poverty, because true wealth is wanting what you already have.\n\n## The View from Above\n\nMarcus Aurelius would imagine himself floating above the Earth. From up there, armies look like ants, mansions look like specks, and empires look like dust. This "View from Above" shrinks the ego and puts your problems in cosmic perspective.\n\n## The True Nature of Wealth\n\nWealth is not having lots of money. Wealth is not needing lots of money. If your desires are zero, your wealth is infinite.\n\nSeneca, a wealthy man, would practice living in poverty periodically to remind himself that he could survive without his wealth. "Set aside a few days to eat the cheapest food, wear the coarsest clothes, and ask yourself: Is this the condition I feared?"\n\n## The Method\n\n1. **Practice periodic poverty:** Fast, sleep on the floor, spend a day without spending money.\n2. **Reduce desires:** Do not buy things to impress people you don\'t like.\n3. **Zoom out:** Use the View from Above when you feel stressed about status.', takeaways:['Wealth is wanting what you already have.','The View from Above shrinks the ego and puts problems in perspective.','Seneca practiced periodic poverty to inoculate against fear of loss.','If your desires are zero, your wealth is infinite.','Do not buy things to impress people you don\'t like.'] } },
-  { id:'m10', codename:'ACTION', title:'The Reserve Clause', summary:'Doing your best, detached from the outcome.', lesson:{ title:'The Architecture of Effort', body: 'The Stoic Reserve Clause (Syllabari): "I will do X, provided nothing prevents me."\n\n## The Trap of Attachment\n\nWhen you attach your happiness to the outcome, you suffer. You can control your effort, but not the result.\n\n## The Syllabari\n\n"I will start a company, fate permitting."\n"I will ask her out, fate permitting."\n"I will run a marathon, fate permitting."\n\nYou give 100% to the process. You accept 0% responsibility for the outcome. You do everything in your power, and then you accept whatever happens.\n\n## The Method\n\n1. **Identify the goal:** What do you want to achieve?\n2. **Focus on the process:** What can you control? (Your effort, strategy, consistency).\n3. **Add the clause:** "Fate permitting."\n4. **Accept the result:** Whether you succeed or fail, you maintained your virtue. You are whole.', takeaways:['The Reserve Clause: "I will do X, fate permitting."\nYou control the process, not the outcome.','Attach your effort to the goal, not your happiness.','Do 100% of what is in your power, accept the rest.','Success is acting virtuously, not achieving the external goal.'] } }
+  { id:'m1', codename:'CONTROL', title:'The Dichotomy of Control', summary:'Separating what you can control from what you cannot.', lesson:{ title:'The Architecture of Agency', body: 'Epictetus began his Enchiridion with the most fundamental distinction in Stoicism: Some things are up to us, and some things are not.\n\n## What is Up to Us?\n\nOur judgments, our intentions, our desires, and our aversions. In short, our internal mental state and our will.\n\n## What is Not Up to Us?\n\nOur body, our possessions, our reputation, our job, and the actions of others. Anything external to our mind.\n\n## The Trap\n\nMost human misery comes from trying to control the uncontrollable, or neglecting to control what is entirely within our power. If you tie your happiness to your reputation (not up to you), you are a slave to the opinions of others. If you tie your happiness to your integrity (up to you), you are invincible.\n\n> "Make the best use of what is in your power, and take the rest as it happens." - Epictetus\n\n## The Method\n\n1. **Identify the event.**\n2. **Categorize:** Is this up to me (internal) or not up to me (external)?\n3. **If External:** Accept it as reality. Do not wish it away. Do not attach your emotion to it.\n4. **If Internal:** Take absolute responsibility. Optimize your response.', takeaways:['Some things are up to us (internal), some are not (external).','Internal = judgments, intentions, desires. External = body, wealth, reputation.','Misery comes from trying to control the uncontrollable.','Happiness must be tied to internal virtue, not external outcomes.','If it is external, accept it. If it is internal, own it.'] } },
+  { id:'m2', codename:'VIEW', title:'Cognitive Distancing', summary:'The gap between event and reaction. Objective impression.', lesson:{ title:'The Architecture of the Gap', body: 'You cannot control the events that happen to you, but you can control how you interpret them. Between stimulus and response, there is a space. In that space lies your freedom.\n\n## The Objective Impression\n\nWhen something happens, do not immediately add a value judgment ("This is terrible!"). Instead, view it objectively. "My flight is canceled." Not "My flight is canceled and my day is ruined."\n\n> "Don\'t let the force of the impression carry you away." - Epictetus\n\nYou feel the initial shock (the protopassion), but you do not have to assent to the judgment that it is bad.\n\n## The Method\n\n1. **Event occurs.**\n2. **Pause.** Do not react immediately.\n3. **Strip the judgment:** Remove adjectives like "bad," "unfair," or "disaster."\n4. **View objectively:** "The stock dropped 20%." Not "I am ruined."\n5. **Choose your response.**', takeaways:['Between stimulus and response, there is a space. That is your freedom.','Do not add value judgments to objective events.','Strip adjectives ("bad," "unfair") to see the event as it is.','You feel the initial shock, but you do not have to assent to the narrative.','Objective impression prevents emotional hijacking.'] } },
+  { id:'m3', codename:'VOLATILE', title:'Negative Visualization', summary:'Premeditatio Malorum. Pre-rehearsing loss to reduce shock.', lesson:{ title:'The Architecture of Preparation', body: 'We spend our lives trying to avoid thinking about bad things. The Stoics did the opposite. They deliberately visualized losing everything they loved.\n\n## Premeditatio Malorum\n\nSeneca advised: "Set aside a certain number of days, during which you shall be content with the scantiest fare... saying to yourself, \'Is this the condition that I feared?\'"\n\nBy rehearsing loss, you accomplish two things:\n1. You reduce the shock if it actually happens.\n2. You increase your gratitude for what you currently have.\n\n## The Asymmetry of Loss\n\nWe overestimate the pain of loss. Daniel Kahneman\'s loss aversion proves we feel losses twice as much as gains. But Seneca knew that the anticipation of loss is often worse than the loss itself.\n\n## The Method\n\n1. **Identify a fear:** Losing your job, a relationship ending.\n2. **Visualize it vividly.** What does the day after look like?\n3. **Realize you would survive.** You have the inner citadel.\n4. **Return to the present with gratitude.** You still have it today.', takeaways:['Premeditatio Malorum: pre-rehearsing bad events.','Anticipation of loss is usually worse than the loss itself.','Rehearsing loss reduces shock and increases present gratitude.','Loss aversion makes us fear loss 2x more than we value gain.','Visualize losing what you have to appreciate it today.'] } },
+  { id:'m4', codename:'FATE', title:'Amor Fati', summary:'Loving what happens. Not just tolerating, but embracing.', lesson:{ title:'The Architecture of Acceptance', body: 'Acceptance is passive. Amor Fati (love of fate) is active. It is not just tolerating what happens; it is embracing it as necessary.\n\n> "Accept the things to which fate binds you, and love the people with whom fate brings you together." - Marcus Aurelius\n\n## The Dog and the Cart\n\nChrysippus used the analogy of a dog tied to a moving cart. The dog can either run with the cart (willingly following fate) or be dragged behind it (resisting fate). Either way, the cart moves. Your choice is only whether you go willingly or painfully.\n\n## The Method\n\n1. **Identify an unchangeable reality.** (The cart\'s path).\n2. **Stop wishing it were different.** Resistance is futile.\n3. **Embrace it.** Ask: "How can I use this?"\n4. **Love it.** It is part of the whole. If you love the whole, you must love the part.', takeaways:['Amor Fati: Love of fate. Active embrace, not passive tolerance.','The dog and the cart: You are dragged either way. Choose to run willingly.','Stop wishing reality were different. Resistance is suffering.','Ask "How can I use this?" rather than "Why me?"','Embrace events as necessary parts of the whole.'] } },
+  { id:'m5', codename:'MORTAL', title:'Memento Mori', summary:'Remember you must die. Clarifying priorities.', lesson:{ title:'The Architecture of Urgency', body: 'You are going to die. Everyone you know is going to die. This is not a morbid thought; it is the ultimate clarifier.\n\n> "You could leave life right now. Let that determine what you do and say and think." - Marcus Aurelius\n\n## The Finite Resource\n\nTime is the only non-renewable resource. Yet we waste it as if it were infinite. We obsess over money (which can be earned back) and squander time (which cannot).\n\n## The View from Above\n\nWhen you zoom out to cosmic scale, your anxieties shrink. The empire you are building is a speck. The insult you received is meaningless.\n\n## The Method\n\n1. **Memento Mori:** Remind yourself daily that you will die.\n2. **Audit your time:** Are you spending it on what matters?\n3. **Act now:** If today were your last, would you do what you are about to do?\n4. **Release trivial anxieties:** In the face of death, most fears are absurd.', takeaways:['Memento Mori: Remember you will die.','Death is the ultimate clarifier of priorities.','Time is the only non-renewable resource. Stop wasting it.','Zoom out to cosmic scale to shrink trivial anxieties.','If today were your last, would you still do what you are doing?'] } },
+  { id:'m6', codename:'VIRTUE', title:'The Cardinal Virtues', summary:'Wisdom, Courage, Justice, Temperance.', lesson:{ title:'The Architecture of Character', body: 'For the Stoics, virtue (arete) is the only true good. Wealth, health, and status are "preferred indifferents"—nice to have, but not necessary for a good life. Vice is the only true evil.\n\n## The Four Virtues\n\n1. **Wisdom (Phronesis):** Knowing what is good, bad, and indifferent.\n2. **Courage (Andreia):** Enduring hardship and facing fear for the right reasons.\n3. **Justice (Dikaiosyne):** Treating others fairly and contributing to the common good.\n4. **Temperance (Sophrosyne):** Self-control, moderation, and discipline.\n\n## The Internal Scorecard\n\nWarren Buffett talks about the Internal vs. External Scorecard. The Stoic lives entirely by the internal scorecard. Did I act with virtue? If yes, I succeeded, regardless of the outcome.\n\n## The Method\n\n1. **Face a decision.**\n2. **Filter through the virtues:** Is this wise? Courageous? Just? Temperate?\n3. **If yes:** Do it. The outcome does not matter.\n4. **If no:** Do not do it, no matter the reward.', takeaways:['Virtue is the only true good. Everything else is indifferent.','Wisdom, Courage, Justice, Temperance.','Live by the Internal Scorecard (Did I act well?), not the External (Did I win?).','Wealth and status are preferred indifferents, not necessities.','Filter every decision through the four virtues.'] } },
+  { id:'m7', codename:'TIME', title:'The Present Moment', summary:'Presence, anti-distraction, and the shortness of life.', lesson:{ title:'The Architecture of Presence', body: 'Seneca wrote "On the Shortness of Life." His core argument was not that life is too short, but that we waste too much of it.\n\n## The Engagement Gap\n\nWe are rarely present. We are ruminating on the past (which is gone) or anxiously anticipating the future (which does not exist). The only time you have is *now*.\n\n## The Trap of "Someday"\n\n> "You are arranging what lies in Fortune\'s control, and abandoning what lies in yours... You are living as if you were destined to live forever." - Seneca\n\nWe delay living until we retire, until we are rich, until we are famous. The Stoic refuses to wait. \n\n## The Method\n\n1. **Notice when you are mentally time-traveling.**\n2. **Anchor to the present.** What are you doing *right now*?\n3. **Engage fully.** Do one thing at a time.\n4. **Refuse to wait.** If you want to read, read now. If you want to be present with your family, do it now.', takeaways:['Life is not too short; we waste too much of it.','We live in the past (regret) or future (anxiety). The present is all we have.','The trap of "someday": Delaying life for future conditions.','Do one thing at a time. Multitasking is divided attention.','If you want to do something, do it now. Tomorrow is not guaranteed.'] } },
+  { id:'m8', codename:'RISK', title:'Asymmetry of Risk', summary:'Anti-fragility, bounded downside, unlimited upside.', lesson:{ title:'The Architecture of Antifragility', body: 'Nassim Taleb combined Stoicism with risk theory to create Anti-fragility. A fragile thing breaks under stress (a glass). A robust thing stays the same (a rock). An anti-fragile thing gets *stronger* from stress (a muscle, a stoic).\n\n## The Stoic Optionality\n\nThe Stoic removes themselves from the fragility of external outcomes. If you lose your wealth, you are content. If you gain it, you are content. You have optionality; you win either way.\n\n## Bounded Downside\n\nIn risk-taking, look for asymmetric bets: small, fixed downside (you can only lose what you invested) and unlimited upside.\n\nThe Stoic core ensures your downside is always bounded. Your character cannot be bankrupted by a market crash.\n\n## The Method\n\n1. **Identify the worst-case scenario.**\n2. **Ensure it is survivable.** (Bounded downside).\n3. **Take the risk.** The upside is unbounded.\n4. **React to the outcome with equanimity.** If you lose, you practice poverty. If you win, you practice temperance.', takeaways:['Anti-fragility: Getting stronger from stress.','Fragile breaks; Robust stays same; Anti-fragile improves.','Stoicism creates optionality: You win whether you gain or lose.','Look for asymmetric bets: bounded downside, unlimited upside.','Your character cannot be bankrupted by external events.'] } },
+  { id:'m9', codename:'EMOTION', title:'Passions vs Protopassions', summary:'The initial reaction is involuntary; the passion is chosen.', lesson:{ title:'The Architecture of Feeling', body: 'Stoics are often stereotyped as emotionless robots. This is false. They distinguished between the initial, involuntary physical reaction (protopassion) and the chosen, sustained emotion (passion).\n\n## The Protopassion\n\nYou see a bear. Your heart rate spikes. You feel fear. This is the protopassion. It is biological, instantaneous, and involuntary. Even a Sage feels it.\n\n## The Passion\n\nThe passion is what comes next. It is the assent to the feeling. "This bear is a threat to my life, and it is terrible that I am threatened."\n\nThe Stoic refuses to give assent. They feel the fear, acknowledge it, but do not add the judgment that it is "terrible." They then calmly decide what to do (back away slowly).\n\n## The Method\n\n1. **Feel the protopassion.** Do not suppress it.\n2. **Pause.** Do not immediately assent.\n3. **Strip the judgment.** "I feel anger" not "I am angry because they are wrong."\n4. **Choose the response.**', takeaways:['Protopassion: Initial, involuntary biological reaction (e.g., heart rate spiking).','Passion: The chosen, sustained emotion based on assent to a judgment.','Stoics feel protopassions; they just refuse to assent to passions.','Acknowledge the feeling, but do not add the narrative.','Feel the fear, but do not agree that the threat is terrible.'] } },
+  { id:'m10', codename:'CITADEL', title:'The Inner Citadel', summary:'The mind as an invincible fortress.', lesson:{ title:'The Architecture of Invincibility', body: 'Marcus Aurelius used the metaphor of the mind as a fortress that cannot be breached from the outside, only surrendered from within.\n\n> "If you are pained by external things, it is not they that disturb you, but your own judgment of them. And it is in your power to wipe out this judgment now." - Marcus Aurelius\n\n## The Unbreachable Mind\n\nNo one can make you angry without your consent. No one can insult you without your consent. The insult does not come from the words; it comes from your judgment that they are insulting.\n\n## The View from Above\n\nZoom out. See yourself as a small part of a vast, rational universe. Your personal slights and losses are insignificant. This cosmic perspective shrinks the ego and its vulnerabilities.\n\n## The Final Synthesis\n\nTo achieve the Inner Citadel:\n1. Master the Dichotomy of Control.\n2. Maintain the Gap between event and response.\n3. Practice Negative Visualization.\n4. Embrace Fate (Amor Fati).\n5. Remember Death (Memento Mori).\n6. Live by Virtue.\n7. Stay Present.\n8. Seek Anti-fragility.\n9. Manage Passions.\n10. Build the Citadel.', takeaways:['The mind is a fortress that cannot be breached from outside, only surrendered from within.','No one can make you angry without your consent.','Insults come from your judgment, not their words.','The View from Above: Cosmic perspective shrinks the ego.','The Citadel is built by mastering all 10 axes.'] } }
 ];
 
 const CARDS = [
-  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the Dichotomy of Control?',back:'Some things are up to us (judgments, impulses), and some are not (body, reputation, property).'},
-  {id:'c2',moduleId:'m1',core:true,category:'application',front:'Your flight is delayed. Is this up to you or not?',back:'Not up to you. You cannot control the weather or the airline. You can only control your reaction (read a book, don\'t yell at the gate agent).'},
-  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What are the 4 things "up to us"?',back:'Judgments, impulses, desires, and aversions.'},
-  {id:'c4',moduleId:'m1',core:false,category:'application',front:'You are anxious about a performance review. What is the Stoic response?',back:'Focus on what you control: your preparation and work ethic. The boss\'s opinion is not up to you.'},
-  {id:'c5',moduleId:'m1',core:false,category:'quote',front:'Complete the phrase: "Some things are up to us, and some things are..."',back:'"...not up to us." (Epictetus)'},
-  {id:'c6',moduleId:'m1',core:false,category:'concept',front:'Where does anxiety come from?',back:'Trying to control the uncontrollable.'},
-  {id:'c7',moduleId:'m1',core:false,category:'application',front:'You catch a cold. Is this up to you?',back:'No, the virus is not up to you. What is up to you: resting, drinking fluids, not complaining.'},
-  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'What is the modern term for "eph hemin"?',back:'Internal locus of control.'},
-  {id:'c9',moduleId:'m1',core:false,category:'application',front:'The stock market crashes. What do you control?',back:'Your reaction, your portfolio allocation (before the crash), and your decision to panic sell or hold.'},
-  {id:'c10',moduleId:'m1',core:false,category:'quote',front:'"Make the best use of what is in your power, and take the rest as it happens." Who said this?',back:'Epictetus.'},
-  {id:'c11',moduleId:'m1',core:false,category:'concept',front:'Are other people\'s opinions up to us?',back:'No. We can influence them, but we cannot control them.'},
-  {id:'c12',moduleId:'m1',core:false,category:'application',front:'You forgot an anniversary. What is up to you now?',back:'Apologizing, making amends, and setting a reminder. The forgetting is in the past (uncontrollable).'},
+  // M1 (12)
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the Dichotomy of Control?',back:'Some things are up to us (internal: judgments, desires), and some things are not (external: body, wealth, reputation).'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'A coworker takes credit for your work. Is this up to you?',back:'No. Their actions and your reputation are external. Your response (integrity, communication) is internal and up to you.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'What is the source of most human misery?',back:'Trying to control the uncontrollable, or neglecting what is within our power.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'Why tie happiness to internal virtue rather than external outcomes?',back:'External outcomes can be taken away. Internal virtue cannot. Tying happiness to virtue makes you invincible.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What falls under "up to us"?',back:'Our judgments, intentions, desires, and aversions.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'It starts raining on your wedding day. How do you apply the Dichotomy?',back:'Weather is not up to you. Accept it as reality. Optimize your response (move indoors, enjoy the uniqueness).'},
+  {id:'c7',moduleId:'m1',core:false,category:'quote',front:'"Make the best use of what is in your power, and..."',back:'"...take the rest as it happens." - Epictetus'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'Are body and health up to us?',back:'No. We can influence them, but disease and aging are ultimately external. We control our attitude toward them.'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'You are stuck in traffic. What is up to you?',back:'Your frustration level, your breathing, what you listen to. The traffic itself is not up to you.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is the trap of trying to control others?',back:'It makes you a slave to their actions. You can influence, but you cannot control their will.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'Your flight is canceled. Categorize the elements.',back:'External: The flight status, airline policy. Internal: Your reaction, your rebooking strategy, your patience.'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Some things are up to us, and..."',back:'"...some things are not." - Epictetus'},
 
-  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is Premeditatio Malorum?',back:'Negative visualization. Imagining the loss of what you have to build resilience and gratitude.'},
-  {id:'c14',moduleId:'m2',core:true,category:'application',front:'Why imagine losing your job?',back:'It inoculates you against the shock if it happens, and it makes you grateful you currently have one.'},
-  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is hedonic adaptation?',back:'The tendency to quickly return to a baseline of happiness after positive events, taking things for granted.'},
-  {id:'c16',moduleId:'m2',core:false,category:'application',front:'How does Premeditatio Malorum counter hedonic adaptation?',back:'By temporarily imagining loss, it resets your baseline so you appreciate what you have.'},
-  {id:'c17',moduleId:'m2',core:false,category:'quote',front:'Complete the Seneca quote: "Set aside a few days to eat the cheapest food... Is this the condition I..."',back:'"...feared?"'},
-  {id:'c18',moduleId:'m2',core:false,category:'concept',front:'Is Premeditatio Malorum pessimism?',back:'No, it is practical preparation. Pessimism expects the worst; Stoicism prepares for it while hoping for the best.'},
-  {id:'c19',moduleId:'m2',core:false,category:'application',front:'Name 3 things you should periodically visualize losing.',back:'Your job, your health, a loved one.'},
-  {id:'c20',moduleId:'m2',core:false,category:'concept',front:'What are the two benefits of negative visualization?',back:'1. It reduces the shock of bad events. 2. It generates gratitude for current good.'},
-  {id:'c21',moduleId:'m2',core:false,category:'application',front:'You are about to give a speech. What should you visualize?',back:'The worst-case scenario (forgetting lines, mic breaking). You will realize you will survive it.'},
-  {id:'c22',moduleId:'m2',core:false,category:'quote',front:'"We suffer more in imagination than in reality." Who said this?',back:'Seneca.'},
-  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'What is the "inoculation" effect?',back:'Rehearsing a bad event reduces its emotional impact when it actually occurs.'},
-  {id:'c24',moduleId:'m2',core:false,category:'application',front:'Your flight is delayed. Apply Premeditatio Malorum.',back:'You should have visualized this before leaving. You are prepared with a book and snacks. No panic.'},
+  // M2 (12)
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is the "gap" in Stoicism?',back:'The space between stimulus (event) and response. In that space lies our freedom to choose.'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'How do you create an "Objective Impression"?',back:'Strip away value judgments (adjectives like "bad," "terrible") and view the event as raw data.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is the danger of the "force of the impression"?',back:'It carries you away into an emotional reaction before you have time to rationally evaluate the event.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'Your stock drops 20%. How do you phrase this objectively?',back:'"The stock price decreased by 20%." (Not "My portfolio is ruined.")'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'Can you control the initial impression?',back:'Often no. It hits you instantly. But you can control whether you assent to it and add a narrative.'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'Someone insults you. What is the objective impression?',back:'"A person uttered words directed at me." The insult exists only in your judgment of those words.'},
+  {id:'c19',moduleId:'m2',core:false,category:'quote',front:'"Don\'t let the force of the..."',back:'"...impression carry you away." - Epictetus'},
+  {id:'c20',moduleId:'m2',core:false,category:'concept',front:'Why is pausing important?',back:'It breaks the automatic loop between trigger and reaction, allowing your rational mind to engage.'},
+  {id:'c21',moduleId:'m2',core:false,category:'application',front:'You receive a rejection email. What is the objective impression?',back:'"I received an email stating I was not selected for the role."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'What is a value judgment?',back:'Assigning "good" or "bad" to a neutral fact.'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'Your partner is late. How do you strip the judgment?',back:'"My partner arrived at 7:15 instead of 7:00." (Not "They don\'t respect my time.")'},
+  {id:'c24',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Between stimulus and response there is a space. In that space lies our..."',back:'"...freedom." (Viktor Frankl, summarizing Stoicism)'},
 
-  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is Amor Fati?',back:'Loving what happens. Not just enduring events, but embracing them as necessary parts of the whole.'},
-  {id:'c26',moduleId:'m3',core:true,category:'application',front:'What happens when you argue with reality?',back:'You lose, 100% of the time. Suffering comes from wanting reality to be different than it is.'},
-  {id:'c27',moduleId:'m3',core:false,category:'quote',front:'"A blazing fire takes anything you throw on it and makes it..."',back:'"...fuel." (Marcus Aurelius)'},
-  {id:'c28',moduleId:'m3',core:false,category:'concept',front:'Are events inherently good or bad?',back:'No. Events are neutral. Your judgment makes them good or bad.'},
-  {id:'c29',moduleId:'m3',core:false,category:'application',front:'You get a flat tire. How to apply Amor Fati?',back:'Accept it as a fact. Reframe: "This is an opportunity to practice patience."'},
-  {id:'c30',moduleId:'m3',core:false,category:'concept',front:'What is the difference between endurance and Amor Fati?',back:'Endurance is tolerating pain. Amor Fati is embracing it as useful data.'},
-  {id:'c31',moduleId:'m3',core:false,category:'application',front:'Your startup fails. Amor Fati response?',back:'"This happened. It is data. I learned what not to do. I am stronger for it."'},
-  {id:'c32',moduleId:'m3',core:false,category:'quote',front:'"Do not seek for things to happen the way you want them to happen, but..."',back:'"...want them to happen the way they happen." (Epictetus)'},
-  {id:'c33',moduleId:'m3',core:false,category:'concept',front:'What is the "Obstacle is the Way" concept?',back:'Every obstacle is raw material for virtue (courage, patience). The obstacle becomes the path.'},
-  {id:'c34',moduleId:'m3',core:false,category:'application',front:'You are stuck in traffic. Amor Fati?',back:'Don\'t just endure it. Use the time to listen to an audiobook or practice deep breathing.'},
-  {id:'c35',moduleId:'m3',core:false,category:'concept',front:'Why does fighting reality cause suffering?',back:'Because reality always wins. You are wasting energy trying to change the past or the laws of physics.'},
-  {id:'c36',moduleId:'m3',core:false,category:'application',front:'It is raining on your wedding day. Amor Fati?',back:'"The rain is necessary for the plants. We will take photos under umbrellas. It makes a unique story."'},
+  // M3 (12)
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is Premeditatio Malorum?',back:'Negative Visualization. Deliberately pre-rehearsing bad events to reduce shock and increase gratitude.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'Why rehearse loss?',back:'1. To reduce the shock if it happens. 2. To increase gratitude for what you currently have.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'What is Loss Aversion (Kahneman)?',back:'The psychological principle that we feel losses roughly twice as much as equivalent gains.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'How does Premeditatio Malorum combat Loss Aversion?',back:'By experiencing the loss in imagination first, the actual loss (if it occurs) is less shocking. Anticipation is often worse than reality.'},
+  {id:'c29',moduleId:'m3',core:false,category:'quote',front:'Seneca: "Set aside a certain number of days, during which you shall be content with the scantiest fare, saying to yourself..."',back:'"\'Is this the condition that I feared?\'"'},
+  {id:'c30',moduleId:'m3',core:false,category:'concept',front:'Is Negative Visualization pessimistic?',back:'No. It is realistic preparation that leads to greater present-moment gratitude and resilience.'},
+  {id:'c31',moduleId:'m3',core:false,category:'application',front:'Exercise: Visualize losing your job tomorrow. What is the first step you would take?',back:'Identifying the objective reality, stripping panic, and updating the resume. Realizing you would survive.'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'Why is the anticipation of loss often worse than the loss itself?',back:'The mind generates infinite terrifying scenarios. Reality is usually singular and manageable.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'You fear a public speaking failure. How do you premeditate it?',back:'Visualize forgetting your lines, the silence, and then realize: you would still walk off stage alive. It is survivable.'},
+  {id:'c34',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Anticipation of loss is usually..."',back:'"...worse than the loss itself."'},
+  {id:'c35',moduleId:'m3',core:false,category:'concept',front:'What does rehearsing poverty teach you?',back:'That you can survive with very little. This breaks the fear of losing wealth.'},
+  {id:'c36',moduleId:'m3',core:false,category:'application',front:'You are worried about a medical diagnosis. How do you apply this?',back:'Visualize receiving the worst news. Plan your response. Realize your character remains intact regardless of the diagnosis.'},
 
-  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is Antifragility?',back:'A system that gets stronger from stress and disorder (e.g., a muscle, a Stoic mind).'},
-  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'Fragile vs Robust vs Antifragile?',back:'Fragile breaks under stress. Robust stays the same. Antifragile gets stronger.'},
-  {id:'c39',moduleId:'m4',core:false,category:'application',front:'What is the Barbell Strategy?',back:'Keep 90% of assets in safe, low-risk investments. Risk 10% on high-upside, high-risk bets.'},
-  {id:'c40',moduleId:'m4',core:false,category:'application',front:'How do you become antifragile to job loss?',back:'Have 6 months of expenses saved (safe) and multiple income skills (risk/upside).'},
-  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'If you have nothing to lose, you are...?',back:'Free. And invincible.'},
-  {id:'c42',moduleId:'m4',core:false,category:'application',front:'How do small stressors (fasting, cold showers) help?',back:'They vaccinate you against larger shocks. They train the nervous system to handle discomfort.'},
-  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is tail risk?',back:'The risk of an extreme, catastrophic event (e.g., bankruptcy, ruin).'},
-  {id:'c44',moduleId:'m4',core:false,category:'application',front:'Should you optimize for maximum return or maximum survival?',back:'Maximum survival. If you survive, you can play again. If you are ruined, you are out of the game.'},
-  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'"Smooth seas do not make skillful sailors." What does this mean?',back:'You need stress and adversity to build resilience (antifragility).'},
-  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'Why is debt fragile?',back:'It leaves no margin for error. A small drop in income leads to ruin.'},
-  {id:'c47',moduleId:'m4',core:false,category:'application',front:'You have a job offer with higher salary but less stability. Antifragile choice?',back:'It depends. If you have no savings, the stable job. If you have savings, the risky job might be better.'},
-  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What does "skin in the game" mean?',back:'Bearing the consequences of your own decisions. It makes you robust.'},
+  // M4 (12)
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is Amor Fati?',back:'Love of fate. Not just tolerating what happens, but actively embracing it as necessary.'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'Explain the "Dog and the Cart" analogy.',back:'A dog tied to a cart can run willingly (following fate) or be dragged painfully. The cart moves regardless. Choose to run willingly.'},
+  {id:'c39',moduleId:'m4',core:false,category:'application',front:'You get passed over for a promotion. How to apply Amor Fati?',back:'Stop wishing it were different. Embrace the reality. Ask: "How can I use this?" (Maybe it is time to look for a better job).'},
+  {id:'c40',moduleId:'m4',core:false,category:'quote',front:'"Accept the things to which fate binds you, and..."',back:'"...love the people with whom fate brings you together." - Marcus Aurelius'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is the difference between Acceptance and Amor Fati?',back:'Acceptance is passive tolerance. Amor Fati is active embrace and love of the event.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'It rains on your vacation. How do you love this fate?',back:'Recognize it as outside your control. Embrace the opportunity to read indoors or enjoy the unique atmosphere.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'Why is resisting fate futile?',back:'Because fate is the unavoidable path of the universe. Resistance only adds emotional suffering to physical reality.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'A competitor steals your idea. How to embrace it?',back:'Accept that it happened. Use the anger as energy to build the next, better version. Love the competition.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Stop wishing reality were different. Resistance is..."',back:'"...suffering."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'If you love the whole (the universe), what must you do?',back:'You must love the part (the specific event happening to you), as it is a necessary piece of the whole.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'Your car breaks down. How do you run with the cart?',back:'Accept the delay. Call the tow truck. Use the waiting time to listen to a podcast. Do not seethe.'},
+  {id:'c48',moduleId:'m4',core:false,category:'quote',front:'Marcus Aurelius: "A blazing fire makes flame and brightness out of everything that is..."',back:'"...thrown into it."'},
 
-  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is "The Space Between"?',back:'The gap between a stimulus and your response. In that space lies your freedom to choose.'},
-  {id:'c50',moduleId:'m5',core:true,category:'application',front:'What happens if you react immediately to a trigger?',back:'You are acting on amygdala instinct (fight/flight). You are an animal running old programming.'},
-  {id:'c51',moduleId:'m5',core:false,category:'quote',front:'"Don\'t let the force of an impression..."',back:'"...carry you away." (Epictetus)'},
-  {id:'c52',moduleId:'m5',core:false,category:'application',front:'Someone insults you. What is the Stoic pause?',back:'Wait 10 seconds. Feel the anger rise and fall. Then decide if a response is even necessary.'},
-  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'Are you your emotions?',back:'No. You are the observer of your emotions. You feel anger, but you are not anger.'},
-  {id:'c54',moduleId:'m5',core:false,category:'application',front:'You receive an angry email. What do you do?',back:'Do not reply for 24 hours. Let the emotion fade. Reply with logic, not emotion.'},
-  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'What part of the brain reacts instantly?',back:'The amygdala.'},
-  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'What part of the brain needs time to engage?',back:'The prefrontal cortex (logical reasoning).'},
-  {id:'c57',moduleId:'m5',core:false,category:'application',front:'You feel intense craving for junk food. What do you do?',back:'Wait 15 minutes. The craving is a wave. It will peak and subside if you do not act on it.'},
-  {id:'c58',moduleId:'m5',core:false,category:'quote',front:'"Between stimulus and response there is a space. In that space is our power to..."',back:'"...choose our response." (Viktor Frankl)'},
-  {id:'c59',moduleId:'m5',core:false,category:'concept',front:'What is the difference between reacting and responding?',back:'Reacting is automatic and emotional. Responding is deliberate and rational.'},
-  {id:'c60',moduleId:'m5',core:false,category:'application',front:'Your kid spills milk. You feel anger rising. What do you do?',back:'Pause. Breathe. Realize it\'s just milk. Clean it up together. Don\'t yell.'},
+  // M5 (12)
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is Memento Mori?',back:'Remember you must die. A practice of reflecting on mortality to clarify priorities.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'Why is reflecting on death a clarifier?',back:'It strips away trivial anxieties. In the face of death, most fears and arguments become absurd.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is the only non-renewable resource?',back:'Time. Money can be earned back; time cannot.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'You are arguing on Twitter. How does Memento Mori apply?',back:'If today were your last day, would you spend it arguing with strangers? No. Close the app.'},
+  {id:'c53',moduleId:'m5',core:false,category:'quote',front:'"You could leave life right now. Let that determine..."',back:'"...what you do and say and think." - Marcus Aurelius'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'What is the "View from Above"?',back:'Zooming out to a cosmic scale, where your personal slights and empires are insignificant specks.'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'You are stressed about a presentation. How does Memento Mori help?',back:'Will this presentation matter in 100 years? No. The stress is disproportionate. Just do your best.'},
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'Is Memento Mori morbid?',back:'No. It is realistic. It creates urgency and gratitude for the present moment.'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'You are afraid to take a risk. How does death help?',back:'You are going to die anyway. The failure of the risk is temporary; the regret of not trying is permanent.'},
+  {id:'c58',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Time is the only non-renewable resource. Stop..."',back:'"...wasting it."'},
+  {id:'c59',moduleId:'m5',core:false,category:'concept',front:'Why do we squander time?',back:'Because we live as if we are immortal, assuming we have an infinite supply of days.'},
+  {id:'c60',moduleId:'m5',core:false,category:'application',front:'Audit your day. Did you spend time on what matters?',back:'If you were dying, would you have watched 3 hours of TV, or called a friend?'},
 
-  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is Objective Representation (Phantasiai)?',back:'Stripping away the judgments and adjectives to see events as bare physics and math.'},
-  {id:'c62',moduleId:'m6',core:true,category:'application',front:'"My boss yelled at me." Reduce to bare representation.',back:'"A human made sounds with their vocal cords in my direction."'},
-  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'Where is the pain located?',back:'In the story you tell yourself about the event, not in the event itself.'},
-  {id:'c64',moduleId:'m6',core:false,category:'application',front:'"I lost my job." Reduce to bare representation.',back:'"A company stopped transferring numbers into my bank account."'},
-  {id:'c65',moduleId:'m6',core:false,category:'quote',front:'"If you are pained by external things, it is not they that disturb you, but..."',back:'"...your judgment of them." (Marcus Aurelius)'},
-  {id:'c66',moduleId:'m6',core:false,category:'application',front:'"My house is too small." Reduce.',back:'"I am in a structure of 800 sq ft." The "too small" is a comparison, not a fact.'},
-  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'What creates suffering: nouns/verbs or adjectives?',back:'Adjectives. "This is a disaster." Nouns and verbs create clarity.'},
-  {id:'c68',moduleId:'m6',core:false,category:'application',front:'You feel overwhelmed by a project. What question to ask?',back:'"What is actually happening, without the judgment?"'},
-  {id:'c69',moduleId:'m6',core:false,category:'concept',front:'Why does bare representation work?',back:'It removes the emotional sting. You see a neutral fact you can deal with rationally.'},
-  {id:'c70',moduleId:'m6',core:false,category:'quote',front:'"Objective judgment, now at this very moment. Universal nature..."',back:'"...now at this very moment." (Marcus Aurelius)'},
-  {id:'c71',moduleId:'m6',core:false,category:'application',front:'"Nobody likes me." Reduce.',back:'"I received 0 messages today." The "nobody likes me" is a story.'},
-  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'Is "bad" an objective property of an event?',back:'No. "Bad" is a human judgment superimposed on neutral reality.'},
+  // M6 (12)
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the only true good according to Stoics?',back:'Virtue (arete). Everything else (wealth, health) is a "preferred indifferent."'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'Name the Four Cardinal Virtues.',back:'Wisdom, Courage, Justice, Temperance.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'What is Wisdom (Phronesis)?',back:'Knowing what is good, bad, and indifferent.'},
+  {id:'c64',moduleId:'m6',core:false,category:'concept',front:'What is Courage (Andreia)?',back:'Enduring hardship and facing fear for the right reasons.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'What is Justice (Dikaiosyne)?',back:'Treating others fairly and contributing to the common good.'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'What is Temperance (Sophrosyne)?',back:'Self-control, moderation, and discipline.'},
+  {id:'c67',moduleId:'m6',core:false,category:'application',front:'You are offered a lucrative but unethical deal. How do you filter it?',back:'Is it Just? No. Therefore, reject it. Virtue is worth more than money.'},
+  {id:'c68',moduleId:'m6',core:false,category:'concept',front:'What is the Internal Scorecard?',back:'Evaluating your success based on whether you acted with virtue, regardless of the external outcome.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Virtue is the only true good. Everything else is..."',back:'"...indifferent."'},
+  {id:'c70',moduleId:'m6',core:false,category:'application',front:'You lose a game. How do you apply the Internal Scorecard?',back:'Did I play fairly and try my best? If yes, I succeeded. The loss is an indifferent external.'},
+  {id:'c71',moduleId:'m6',core:false,category:'concept',front:'What is the only true evil?',back:'Vice (acting against the virtues).'},
+  {id:'c72',moduleId:'m6',core:false,category:'application',front:'You want to eat a 4th slice of cake. Which virtue applies?',back:'Temperance. Exercise self-control.'},
 
-  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is Memento Mori?',back:'"Remember you must die." A meditation on mortality to prioritize what matters.'},
-  {id:'c74',moduleId:'m7',core:true,category:'application',front:'Why is Memento Mori not morbid?',back:'It is the ultimate prioritization tool. It forces you to drop trivialities and align with values.'},
-  {id:'c75',moduleId:'m7',core:false,category:'quote',front:'"You do not have a scarcity of time, you have a scarcity of..."',back:'"...attention." (Seneca)'},
-  {id:'c76',moduleId:'m7',core:false,category:'application',front:'What is the Deathbed Test?',back:'When facing a decision, ask: "Will this matter on my deathbed?" If no, don\'t worry.'},
-  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'What is the illusion of time?',back:'We act as if we have infinite time, leading to procrastination and holding grudges.'},
-  {id:'c78',moduleId:'m7',core:false,category:'application',front:'You are arguing with a stranger online. Memento Mori.',back:'Is this how you want to spend your finite time? Close the tab.'},
-  {id:'c79',moduleId:'m7',core:false,category:'quote',front:'"You could leave life right now. Let that determine what you..."',back:'"...do and say and think." (Marcus Aurelius)'},
-  {id:'c80',moduleId:'m7',core:false,category:'application',front:'You have 6 months to live. What do you stop doing?',back:'Stop worrying about status, working late, and holding grudges.'},
-  {id:'c81',moduleId:'m7',core:false,category:'concept',front:'Why do we need death to clarify life?',back:'Because without a deadline, everything feels infinitely important. Death creates scarcity, which creates value.'},
-  {id:'c82',moduleId:'m7',core:false,category:'application',front:'Morning meditation: "I may not survive today. I will..."',back:'"...act with virtue."'},
-  {id:'c83',moduleId:'m7',core:false,category:'quote',front:'"It is not that we have a short time to live, but that we..."',back:'"...waste a lot of it." (Seneca)'},
-  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'Does knowing you will die make you sad?',back:'No, it makes you present. It intensifies the value of the current moment.'},
+  // M7 (12)
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is Seneca\'s argument in "On the Shortness of Life"?',back:'Life is not too short; we waste too much of it.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'Where do we spend most of our mental time?',back:'Ruminating on the past (regret) or anticipating the future (anxiety). Rarely in the present.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is the "Trap of Someday"?',back:'Delaying living until a future condition is met (e.g., "I\'ll travel when I retire").'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'How do you practice presence?',back:'Do one thing at a time. Notice when your mind wanders and bring it back to the current task.'},
+  {id:'c77',moduleId:'m7',core:false,category:'quote',front:'"You are arranging what lies in Fortune\'s control, and abandoning..."',back:'"...what lies in yours." - Seneca'},
+  {id:'c78',moduleId:'m7',core:false,category:'concept',front:'Why is multitasking anti-Stoic?',back:'It divides attention, preventing full engagement with the present moment.'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'You are at dinner but checking emails. What is the Stoic move?',back:'Put the phone away. Be present with your dinner companions. The emails can wait.'},
+  {id:'c80',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "The only time you have is..."',back:'"...now."'},
+  {id:'c81',moduleId:'m7',core:false,category:'concept',front:'What is the danger of waiting for retirement?',back:'You might die first. Or be too sick to enjoy it. Live now.'},
+  {id:'c82',moduleId:'m7',core:false,category:'application',front:'You are ruminating on a past mistake. How do you anchor to the present?',back:'Notice your surroundings. Feel your feet on the floor. The past is gone; the mistake is an external now.'},
+  {id:'c83',moduleId:'m7',core:false,category:'concept',front:'Is time a preferred indifferent?',back:'Yes. You cannot control how much you have, but you control how you use it.'},
+  {id:'c84',moduleId:'m7',core:false,category:'application',front:'You feel busy but unproductive. What is wrong?',back:'You are likely "busy" with future anxieties or past regrets, not present actions.'},
 
-  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What are the Four Cardinal Virtues?',back:'Wisdom, Courage, Justice, Temperance.'},
-  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'What is the only true good?',back:'Virtue. Everything else (wealth, health) is a "preferred indifferent."'},
-  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'Define Wisdom (Phronesis).',back:'Knowing what is good, bad, and indifferent. Practical knowledge.'},
-  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'Define Courage (Andreia).',back:'Enduring hardship and acting rightly in the face of fear.'},
-  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'Define Justice (Dikaiosyne).',back:'Treating others fairly. Contributing to the common good.'},
-  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'Define Temperance (Sophrosyne).',back:'Doing things in the right measure. Moderation and self-control.'},
-  {id:'c91',moduleId:'m8',core:false,category:'application',front:'You want to quit your job but are afraid. Which virtue is needed?',back:'Courage.'},
-  {id:'c92',moduleId:'m8',core:false,category:'application',front:'You want to eat a 3rd slice of cake. Which virtue is needed?',back:'Temperance.'},
-  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'"Waste no more time arguing about what a good man should be. Be one." Who said this?',back:'Marcus Aurelius.'},
-  {id:'c94',moduleId:'m8',core:false,category:'application',front:'How to make a decision using the 4 virtues?',back:'Filter: Is it wise? Does it require courage? Is it just? Is it temperate? If yes, act.'},
-  {id:'c95',moduleId:'m8',core:false,category:'concept',front:'Is money a good or an indifferent?',back:'An indifferent. It is "preferred" but not required for virtue.'},
-  {id:'c96',moduleId:'m8',core:false,category:'application',front:'You can cheat a client to get rich. Stoic response?',back:'Do not. It violates Justice. Wealth is indifferent; virtue is the only good.'},
+  // M8 (12)
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is Anti-fragility?',back:'A property where a system gets *stronger* from stress (e.g., a muscle, a Stoic mind).'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'Fragile vs Robust vs Anti-fragile?',back:'Fragile breaks under stress. Robust stays the same. Anti-fragile improves.'},
+  {id:'c87',moduleId:'m8',core:false,category:'application',front:'How does Stoicism create optionality?',back:'If you lose wealth, you practice poverty. If you gain it, you practice temperance. You win either way.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What is an asymmetric bet?',back:'A risk with a small, bounded downside (you only lose what you invested) and an unlimited upside.'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'Why is starting a business an asymmetric bet for a Stoic?',back:'Downside: You lose money and time (survivable). Upside: You gain wealth and freedom. Your character remains intact either way.'},
+  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'How is the Stoic core a "bounded downside"?',back:'Your character and virtue cannot be bankrupted by a market crash or a failure.'},
+  {id:'c91',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "The Stoic removes themselves from the fragility of..."',back:'"...external outcomes."'},
+  {id:'c92',moduleId:'m8',core:false,category:'application',front:'You are fired. How do you get stronger from this stress?',back:'You practice resilience, update your skills, and realize survival is independent of the job.'},
+  {id:'c93',moduleId:'m8',core:false,category:'concept',front:'What happens to a fragile person when they lose everything?',back:'They break. They define themselves by their wealth/status, so loss destroys them.'},
+  {id:'c94',moduleId:'m8',core:false,category:'application',front:'You receive a harsh critique. How is this anti-fragile?',back:'You use the valid points to improve your work, and ignore the invalid points. The critique made you better.'},
+  {id:'c95',moduleId:'m8',core:false,category:'quote',front:'Marcus Aurelius: "The impediment to action advances action..."',back:'"...What stands in the way becomes the way."'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'What is the relationship between stress and growth in Anti-fragility?',back:'Controlled stress (like lifting weights) causes adaptation and growth.'},
 
-  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is the View from Above?',back:'Imagining yourself floating above the Earth to shrink your ego and problems.'},
-  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What is true wealth?',back:'Wanting what you already have. If your desires are zero, your wealth is infinite.'},
-  {id:'c99',moduleId:'m9',core:false,category:'quote',front:'"It is not the man who has too little, but the man who..."',back:'"...craves more, that is poor." (Seneca)'},
-  {id:'c100',moduleId:'m9',core:false,category:'application',front:'You are stressed about your status. Apply the View from Above.',back:'From space, your mansion is a speck, your title is meaningless. Stop worrying about status.'},
-  {id:'c101',moduleId:'m9',core:false,category:'application',front:'How to practice periodic poverty?',back:'Fast for a day, sleep on the floor, don\'t spend money. Realize you can survive it.'},
-  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'Why did Seneca practice poverty?',back:'To inoculate himself against the fear of loss. "Is this the condition I feared?"'},
-  {id:'c103',moduleId:'m9',core:false,category:'application',front:'You want to buy a luxury car to impress neighbors. Stoic response?',back:'Don\'t. Do not buy things to impress people you don\'t like.'},
-  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'What is the cosmic perspective?',back:'We are specks on a speck in a vast universe. Our worries are cosmically insignificant.'},
-  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'"Wealth consists not in having great possessions, but in having..."',back:'"...few wants." (Epictetus)'},
-  {id:'c106',moduleId:'m9',core:false,category:'application',front:'You lose your fortune. Stoic response?',back:'"I lost my money, not my virtue. I am still whole."'},
-  {id:'c107',moduleId:'m9',core:false,category:'concept',front:'Is being poor "bad"?',back:'No, it is a dispreferred indifferent. It doesn\'t affect your ability to be virtuous.'},
-  {id:'c108',moduleId:'m9',core:false,category:'application',front:'You feel jealous of a billionaire. Reframe.',back:'They have more desires and fears. True wealth is contentment, which they may lack.'},
+  // M9 (12)
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is a Protopassion?',back:'The initial, involuntary biological reaction to an event (e.g., heart rate spiking at a bear).'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What is a Passion?',back:'The chosen, sustained emotion based on assent to a judgment (e.g., "This bear is terrible and I am doomed").'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'Do Stoics suppress protopassions?',back:'No. They are biological and involuntary. Even a Sage feels them.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'You feel a flash of anger when cut off in traffic. What is this?',back:'A protopassion. Involuntary. The passion is what comes next if you assent to "This driver is a jerk."'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'What does "assent" mean in Stoicism?',back:'Agreeing with the initial impression. "Yes, this is terrible."'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'How do you manage a protopassion?',back:'Acknowledge it ("I feel anger rising"), but refuse to add the narrative judgment.'},
+  {id:'c103',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Feel the fear, but do not agree that..."',back:'"...the threat is terrible."'},
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'What is the difference between feeling grief and suffering?',back:'Grief is the natural protopassion of loss. Suffering is the passion, the narrative that "I have lost everything and it is unfair."'},
+  {id:'c105',moduleId:'m9',core:false,category:'application',front:'You feel anxious before a pitch. How do you stop it becoming a passion?',back:'Notice the physical sensation (sweaty palms). Do not assent to "I am going to fail." Reframe it as excitement.'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'Are emotions bad in Stoicism?',back:'No. Passions (sustained, irrational emotions based on false judgments) are bad. Natural feelings are fine.'},
+  {id:'c107',moduleId:'m9',core:false,category:'quote',front:'"Don\'t let the force of the impression..."',back:'"...carry you away." - Epictetus'},
+  {id:'c108',moduleId:'m9',core:false,category:'application',front:'You feel a craving for a cigarette. How do you handle it?',back:'Acknowledge the physical craving (protopassion). Refuse the judgment "I need this." Wait. It will pass.'},
 
-  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the Stoic Reserve Clause?',back:'"I will do X, fate permitting." You commit to the process, accept the outcome.'},
-  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What do you control: the goal or the process?',back:'The process (effort, strategy). The goal (result) is subject to fate.'},
-  {id:'c111',moduleId:'m10',core:false,category:'quote',front:'"Do every act of your life as though it were the..."',back:'"...last." (Marcus Aurelius)'},
-  {id:'c112',moduleId:'m10',core:false,category:'application',front:'You train hard but lose the race. Stoic response?',back:'You gave 100%. The result was fate. You succeeded in your effort, which is the true goal.'},
-  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'Why attach effort to process, not outcome?',back:'Because the outcome is uncontrollable. Attaching happiness to outcome guarantees suffering.'},
-  {id:'c114',moduleId:'m10',core:false,category:'application',front:'You start a company. Add the reserve clause.',back:'"I will build this company, fate permitting."'},
-  {id:'c115',moduleId:'m10',core:false,category:'quote',front:'"Success is not final, failure is not fatal: it is the courage to continue that..."',back:'"...counts." (Often attributed to Churchill, very Stoic)'},
-  {id:'c116',moduleId:'m10',core:false,category:'application',front:'You get rejected after a date. Stoic response?',back:'You controlled your effort (being kind, interesting). The rejection is their preference (fate). Move on.'},
-  {id:'c117',moduleId:'m10',core:false,category:'concept',front:'What is "Syllabari"?',back:'The Latin term for the reserve clause: "provided nothing prevents me."'},
-  {id:'c118',moduleId:'m10',core:false,category:'application',front:'You are writing a book but fear it won\'t sell. What do you do?',back:'Write the book. The writing is up to you. The sales are not. "Fate permitting."'},
-  {id:'c119',moduleId:'m10',core:false,category:'quote',front:'"Objective judgment. Unselfish action. Willing acceptance. of all external events." Who said this?',back:'Marcus Aurelius.'},
-  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'Is success defined by achieving the goal?',back:'No. Success is acting virtuously (giving your best effort). The goal is just a target.'}
+  // M10 (12)
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the "Inner Citadel"?',back:'The mind as an invincible fortress that cannot be breached from outside, only surrendered from within.'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'Can someone make you angry without your consent?',back:'No. The anger comes from your judgment of their words, not the words themselves.'},
+  {id:'c111',moduleId:'m10',core:false,category:'application',front:'Someone insults you online. How is the Citadel intact?',back:'The insult only exists in your judgment. If you do not judge their words as insulting, they are just pixels on a screen.'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'What is the "View from Above"?',back:'Zooming out to cosmic scale to shrink the ego and its vulnerabilities.'},
+  {id:'c113',moduleId:'m10',core:false,category:'application',front:'You are stressed about a typo in an email. Apply the View from Above.',back:'In 100 years, no one will remember this email. The typo is meaningless. Let it go.'},
+  {id:'c114',moduleId:'m10',core:false,category:'quote',front:'"If you are pained by external things, it is not they that disturb you, but..."',back:'"...your own judgment of them." - Marcus Aurelius'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'How is the Citadel built?',back:'By mastering all 10 axes: Control, View, Volatile, Fate, Mortal, Virtue, Time, Risk, Emotion, Citadel.'},
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'You lose everything in a fire. What remains?',back:'The Inner Citadel. Your character, your judgments, and your ability to respond virtuously.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "The mind is a fortress that cannot be breached from outside, only..."',back:'"...surrendered from within."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'Why does the ego make the Citadel vulnerable?',back:'The ego cares about reputation and status (externals). Defending the ego means defending the indefensible.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'You are in an argument. How do you hold the Citadel?',back:'Do not surrender to the passion of anger. Maintain the gap. Respond with justice, not ego.'},
+  {id:'c120',moduleId:'m10',core:false,category:'quote',front:'Marcus Aurelius: "You have power over your mind - not outside events. Realize this, and..."',back:'"...you will find strength."'}
 ];
 
 const ARENA = [
-  { id:'p1', moduleId:'m1', title:'Q1: The Traffic Jam', difficulty:1, reward:50, timeLimit:45, body:'You are stuck in a massive traffic jam and will be late for a meeting. You feel your blood pressure rising. What is the Stoic response?', options:['Speed and weave through traffic to gain 2 minutes','Honk repeatedly to vent anger','Call the meeting and yell at them for scheduling it during rush hour','Classify: the traffic is not up to you. Your reaction is. Accept it and notify the meeting.'], correct:3, explanation:'The traffic is uncontrollable. Yelling or speeding only adds risk. Accept the fact, control your reaction, and communicate.' },
-  { id:'p2', moduleId:'m1', title:'Q2: The Bad Review', difficulty:2, reward:100, timeLimit:60, body:'Your boss gives you a harsh performance review. You feel it is unfair. What is up to you?', options:['The boss\'s opinion','The economy','The company culture','Your future work ethic and response'], correct:3, explanation:'You cannot control the boss\'s opinion or the past. You control your response: improve or leave. That is your agency.' },
-  { id:'p3', moduleId:'m1', title:'Q3: The Flight Cancel', difficulty:3, reward:200, timeLimit:90, body:'Your flight to a vacation is canceled, ruining the trip. You are at the gate. What do you control?', options:['The airline\'s schedule','The gate agent\'s mood','Your reaction and rebooking strategy','The weather'], correct:2, explanation:'The schedule and weather are not up to you. Your reaction is. Do not scream at the agent; rebook calmly.' },
-  { id:'p4', moduleId:'m1', title:'Q4: The Stock Crash', difficulty:4, reward:500, timeLimit:120, body:'The stock market crashes 30% in a week. Your portfolio is halved. What is the Dichotomy of Control?', options:['The market is not up to me. My asset allocation and reaction are.','The market is up to me, I should have sold.','The government should control the market.','I must sue my broker.'], correct:0, explanation:'You cannot control the market. You controlled your allocation (before the crash) and you control your reaction (panic sell or hold).' },
-  
-  { id:'p5', moduleId:'m2', title:'Q1: The Job Security', difficulty:1, reward:50, timeLimit:45, body:'You hear rumors of layoffs at your company. How do you apply Premeditatio Malorum?', options:['Panic and update your resume immediately','Ignore the rumors completely','Start slacking off since you might be fired','Imagine being laid off. Realize you would survive. Plan your next steps calmly.'], correct:3, explanation:'Premeditatio Malorum prepares you for the worst. By imagining the layoff, you remove the shock and can plan rationally.' },
-  { id:'p6', moduleId:'m2', title:'Q2: The Health Scare', difficulty:2, reward:100, timeLimit:60, body:'You have a suspicious mole. You are afraid to go to the doctor. How does negative visualization help?', options:['Wait until it hurts','Pretend you are immortal','It doesn\'t, it makes you more scared','Imagine the worst (cancer). Realize you can handle the treatment. Go to the doctor.'], correct:3, explanation:'By imagining the worst case, you remove the fear of the unknown. You realize you can handle it, which frees you to act.' },
-  { id:'p7', moduleId:'m2', title:'Q3: The Gratitude Reset', difficulty:3, reward:200, timeLimit:90, body:'You feel bored and unappreciative of your life. What Stoic exercise should you practice?', options:['Buy something new','Complain on social media','Go on a trip','Negative visualization: imagine losing your sight, your home, your loved ones. Return to the present.'], correct:3, explanation:'Negative visualization resets your hedonic baseline. By imagining loss, you feel intense gratitude for what you currently have.' },
-  { id:'p8', moduleId:'m2', title:'Q4: The Seneca Test', difficulty:4, reward:500, timeLimit:120, body:'Seneca recommended periodically practicing poverty. Why?', options:['To save money','Because poverty is virtuous','Because wealth is evil','To inoculate against the fear of loss and realize "Is this the condition I feared?"'], correct:3, explanation:'Seneca was wealthy but practiced poverty to prove to himself that he could survive without wealth. It eliminates the fear of loss.' },
+  // M1: CONTROL (4)
+  { id:'p1', moduleId:'m1', title:'Q1: The Traffic Jam', difficulty:1, reward:50, timeLimit:45, body:'You are stuck in a massive traffic jam and will be late for a crucial meeting. What is the Stoic response?', options:['Honk the horn and seethe with anger.','Call the meeting organizer to inform them, then listen to a podcast. The traffic is out of your control.','Drive on the shoulder to bypass traffic.','Cancel the meeting entirely out of frustration.'], correct:1, explanation:'The traffic and the delay are external (not up to you). Your reaction and communication are internal (up to you). Optimize the internal; accept the external.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Stock Market', difficulty:2, reward:100, timeLimit:60, body:'Your investment portfolio drops 30% in a crash. What is up to you?', options:['The stock prices','The market conditions','Your decision to hold or sell, and your emotional state','The actions of the Federal Reserve'], correct:2, explanation:'You cannot control the market. You can control your reaction and your trading strategy. Do not tie your happiness to external wealth.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Gossip', difficulty:3, reward:200, timeLimit:90, body:'You discover a coworker is spreading false rumors about you. How do you apply the Dichotomy of Control?', options:['Spread rumors about them to even the score.','Obsess over what others think of you (your reputation).','Recognize their actions and your reputation are external. Focus on continuing to do excellent work (internal).','Confront them aggressively to force them to stop.'], correct:2, explanation:'Your reputation is largely external. Your integrity and work ethic are internal. Control the internal; let the external be what it is.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Illness', difficulty:4, reward:500, timeLimit:120, body:'You are diagnosed with a chronic illness that will limit your physical abilities. What is the ultimate Stoic realization?', options:['Your body is fully up to you, so you must cure it.','Your body is not up to you. Your attitude toward the illness, however, is entirely up to you.','Your life is over.','You must sue the doctor.'], correct:1, explanation:'Health is an external. Disease happens. But your judgment of the illness ("This is terrible" vs. "This is a new challenge") is internal and entirely within your power.' },
 
-  { id:'p9', moduleId:'m3', title:'Q1: The Rain', difficulty:1, reward:50, timeLimit:45, body:'It rains on your wedding day. You feel devastated. How to apply Amor Fati?', options:'["Why me?"','"This shouldn\'t be happening."','"The rain is necessary for plants. We will take photos under umbrellas. It makes a unique story."','Cancel the wedding."]', correct:2, explanation:'Amor Fati means embracing the event. Rain is neutral data. Reframe it as an opportunity for unique memories.' },
-  { id:'p10', moduleId:'m3', title:'Q2: The Flat Tire', difficulty:2, reward:100, timeLimit:60, body:'You get a flat tire on the way to work. You are furious. What is the Amor Fati response?', options:['"This always happens to me!"','"Stupid car!"','"This happened. It is data. I will practice patience while changing it."','Call AAA and cry"], correct:2, explanation:'Amor Fati is embracing the event as fuel. The flat tire is an opportunity to practice patience and problem-solving.' },
-  { id:'p11', moduleId:'m3', title:'Q3: The Failure', difficulty:3, reward:200, timeLimit:90, body:'Your startup fails after 3 years. You feel crushed. How does Amor Fati reframe this?', options:['"This happened. It is data. I learned what not to do. I am stronger for it."','"I am a failure."','"I should give up."','"The market was unfair."'], correct:0, explanation:'Amor Fati embraces the failure as necessary. It is raw material for wisdom and resilience. The fire turns it into fuel.' },
-  { id:'p12', moduleId:'m3', title:'Q4: The Argument', difficulty:4, reward:500, timeLimit:120, body:'Your partner starts an argument over something trivial. How to apply Amor Fati?', options:['"This is an opportunity to practice patience and communication."','Walk away','Get divorced','Win the argument'], correct:0, explanation:'Amor Fati sees the argument not as an annoyance, but as training. It is fuel for the fire of your relationship skills.' },
+  // M2: VIEW (4)
+  { id:'p5', moduleId:'m2', title:'Q1: The Rejection Email', difficulty:1, reward:50, timeLimit:45, body:'You receive a rejection email from a job you wanted. How do you form an Objective Impression?', options:['"I am a failure and will never get a job."','"I received an email stating I was not selected for this role."','"The hiring manager is an idiot."','"I guess I wasn\'t meant for this."'], correct:1, explanation:'Strip the value judgments ("failure," "idiot"). View it as raw data: an email stating a decision. This prevents the emotional hijack.' },
+  { id:'p6', moduleId:'m2', title:'Q2: The Rain', difficulty:2, reward:100, timeLimit:60, body:'It rains on the day of your outdoor wedding. What is the objective impression?', options:['"My wedding is ruined."','"The weather is terrible and unfair."','"Precipitation is falling from the sky during the scheduled event time."','"God hates me."'], correct:2, explanation:'Remove the adjectives. "Rain is falling." The "ruin" only exists in your judgment of the rain. The event can still happen; it will just be wet.' },
+  { id:'p7', moduleId:'m2', title:'Q3: The Pause', difficulty:3, reward:200, timeLimit:90, body:'Someone cuts you off in traffic. You feel the protopassion of anger rising. What is the "gap"?', options:['The space between your car and theirs','The space between the event (cut off) and your response (honking/yelling)','The gap in the traffic flow','The distance to your destination'], correct:1, explanation:'The gap is the psychological space between stimulus and response. In that space, you have the freedom to choose not to assent to the anger.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Insult', difficulty:4, reward:500, timeLimit:120, body:'A rival publicly calls you "incompetent." Where does the insult exist?', options:['In the words they spoke','In the public reaction','In your judgment that their words are insulting and that incompetence is bad','In their malicious intent'], correct:2, explanation:'Words are just sounds. The insult exists only because you judge those sounds to be insulting. If you do not assent to the judgment, the words have no power.' },
 
-  { id:'p13', moduleId:'m4', title:'Q1: The Barbell', difficulty:1, reward:50, timeLimit:45, body:'You have $100,000 to invest. Apply the Barbell Strategy.', options:['Buy a house','Put it all in crypto','Put $90k in safe index funds, $10k in high-risk startups','Put it all in CDs'], correct:2, explanation:'The Barbell Strategy: 90% extremely safe, 10% extremely risky. You avoid the "middle ground" of moderate risk with moderate reward.' },
-  { id:'p14', moduleId:'m4', title:'Q2: The Fragile Job', difficulty:2, reward:100, timeLimit:60, body:'You earn $200k but spend $190k. You have no savings. Are you fragile or antifragile?', options:['Antifragile','Robust','Fragile','Invincible'], correct:2, explanation:'You are fragile. A 10% pay cut or 1 month of unemployment ruins you. You have no margin for error.' },
-  { id:'p15', moduleId:'m4', title:'Q3: The Cold Shower', difficulty:3, reward:200, timeLimit:90, body:'Why would a Stoic take cold showers?', options:['Because hot water is evil','To save on heating','To punish themselves','To vaccinate the nervous system against discomfort'], correct:3, explanation:'Small, voluntary stressors (cold, fasting) train the nervous system to handle larger, involuntary shocks. Antifragility.' },
-  { id:'p16', moduleId:'m4', title:'Q4: The Ruin', difficulty:4, reward:500, timeLimit:120, body:'You are offered a bet: 99% chance to double your net worth, 1% chance to lose everything. Stoic response?', options:['Take it, 99% is great odds','Take it if you feel lucky','Hedge the bet','Decline. If ruin is possible, the bet is unacceptable. Survival > Maximum Return.'], correct:3, explanation:'Tail risk. If the 1% hits, you are out of the game forever. Antifragility requires surviving to play again.' },
+  // M3: VOLATILE (4)
+  { id:'p9', moduleId:'m3', title:'Q1: The Lost Phone', difficulty:1, reward:50, timeLimit:45, body:'You lose your new smartphone. How does Premeditatio Malorum help here?', options:['It doesn\'t; you should just cry.','You already visualized losing it, so the shock is reduced and you know you can survive without it.','You should blame yourself relentlessly.','You should steal someone else\'s phone.'], correct:1, explanation:'By pre-rehearsing the loss, the anticipation was worse than the reality. You realize a phone is an indifferent external, and your character remains intact.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Loss Aversion', difficulty:2, reward:100, timeLimit:60, body:'Why do we fear losing $100 more than we value gaining $100?', options:['Because $100 is a lot of money.','Because of Loss Aversion; we feel losses twice as much as gains.','Because we are rational actors.','Because gaining money is easy.'], correct:1, explanation:'Loss aversion is a cognitive bias. Premeditatio Malorum combats it by rehearsing the loss, proving it is survivable.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Rehearsing Poverty', difficulty:3, reward:200, timeLimit:90, body:'Seneca advised periodically eating stale bread and wearing rough clothes. Why?', options:['To punish himself','To prove to himself that he could survive poverty, removing the fear of it','Because he was cheap','To gain sympathy'], correct:1, explanation:'By voluntarily practicing poverty, you demystify it. You learn that the things you fear losing are not necessary for happiness.' },
+  { id:'p12', moduleId:'m3', title:'Q4: The Anticipation', difficulty:4, reward:500, timeLimit:120, body:'You are waiting for biopsy results. Why is the wait often worse than the diagnosis?', options:['Because doctors are slow.','Because the mind generates infinite terrifying scenarios; reality is singular and manageable.','Because hospitals are scary.','Because you have no coping skills.'], correct:1, explanation:'The imagination is a torture device. Premeditatio Malorum forces you to face the worst-case scenario consciously, making the actual reality easier to bear.' },
 
-  { id:'p17', moduleId:'m5', title:'Q1: The Email', difficulty:1, reward:50, timeLimit:45, body:'You receive a passive-aggressive email from a colleague. You feel anger spiking. What do you do?', options:['Forward it to HR','Reply immediately with fury','Delete it','Wait 24 hours. Let the emotion fade. Reply with logic.'], correct:3, explanation:'The Stoic pause. The amygdala is firing. Wait for the prefrontal cortex to engage. Never act on the first wave of anger.' },
-  { id:'p18', moduleId:'m5', title:'Q2: The Insult', difficulty:2, reward:100, timeLimit:60, body:'A stranger insults you on the street. What is the Stoic response?', options:['Wait 10 seconds. Realize their opinion is not up to you. Walk away.','Punch them','Insult them back','Cry'], correct:0, explanation:'The space between stimulus and response. Their insult is their problem. Your reaction is your virtue. Choose to ignore.' },
-  { id:'p19', moduleId:'m5', title:'Q3: The Craving', difficulty:3, reward:200, timeLimit:90, body:'You are on a diet and crave junk food intensely. How to use the "Space Between"?', options:['White-knuckle it forever','Wait 15 minutes. The craving is a wave. It will peak and subside if you do not act.','Eat it, you only live once','Eat a little bit'], correct:1, explanation:'Cravings are temporary impulses. By waiting and observing, you detach. You are not the craving; you are the observer.' },
-  { id:'p20', moduleId:'m5', title:'Q4: The Bad News', difficulty:4, reward:500, timeLimit:120, body:'You get a call that a loved one is in the hospital. How to apply the Stoic pause?', options:['Panic and drive recklessly','Go numb','Ignore it','Take a breath. Acknowledge the fear. Drive safely. You cannot help them if you crash.'], correct:3, explanation:'Even in crisis, the pause is essential. Panic leads to bad decisions (reckless driving). Agency requires clarity.' },
+  // M4: FATE (4)
+  { id:'p13', moduleId:'m4', title:'Q1: The Dog and the Cart', difficulty:1, reward:50, timeLimit:45, body:'In the Stoic analogy, what does the cart represent?', options:['Your career','The unavoidable path of fate/universe','Your physical body','Your desires'], correct:1, explanation:'The cart moves regardless of the dog\'s actions. Fate happens. You can only choose to run willingly or be dragged painfully.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Amor Fati vs Acceptance', difficulty:2, reward:100, timeLimit:60, body:'What is the difference between Acceptance and Amor Fati?', options:['They are the same.','Acceptance is passive tolerance; Amor Fati is active embrace and love of the event.','Amor Fati is giving up; Acceptance is fighting.','Acceptance is for small things; Amor Fati is for big things.'], correct:1, explanation:'Acceptance is saying "Fine, it happened." Amor Fati is saying "It happened, and I will use it and embrace it as part of the whole."'},
+  { id:'p15', moduleId:'m4', title:'Q3: The Pivot', difficulty:3, reward:200, timeLimit:90, body:'Your startup fails after 3 years. How do you apply Amor Fati?', options:['Pretend it didn\'t happen','Spend years regretting the idea','Embrace the failure as a necessary lesson. Love the experience for the growth it provided.','Blame the market.'], correct:2, explanation:'Amor Fati means loving the failure as part of your journey. It happened; it is necessary. Use it. Do not wish it away.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The "Why Me?"', difficulty:4, reward:500, timeLimit:120, body:'You are laid off during a recession. What is the Stoic question to ask?', options:['"Why did this happen to me?"','"Who can I sue?"','"How can I use this?"','"When will the recession end?"'], correct:2, explanation:'"Why me?" is resistance to fate. "How can I use this?" is Amor Fati. It turns an obstacle into fuel.' },
 
-  { id:'p21', moduleId:'m6', title:'Q1: The Small House', difficulty:1, reward:50, timeLimit:45, body:'"My house is too small." Reduce to bare representation (Phantasiai).', options:['"I am in a structure of 800 sq ft." The "too small" is a comparison.','"I am poor."','"I need a bigger house."','"This house sucks."'], correct:0, explanation:'The pain is in the adjective "too small." The reality is just square footage. The comparison is a story you tell yourself.' },
-  { id:'p22', moduleId:'m6', title:'Q2: The Yelling Boss', difficulty:2, reward:100, timeLimit:60, body:'"My boss yelled at me." Reduce to bare representation.', options:['"A human made sounds with their vocal cords in my direction."','"He is a jerk."','"I am going to be fired."','"My boss hates me."'], correct:0, explanation:'Strip away the narrative. It is just sound waves. The meaning is assigned by you. This reduces the emotional sting.' },
-  { id:'p23', moduleId:'m6', title:'Q3: The Failure', difficulty:3, reward:200, timeLimit:90, body:'"I failed the exam. I am stupid." Reduce to bare representation.', options:['"I will never pass."','"The test was unfair."','"I answered less than 50% of the questions correctly."','"I am stupid."'], correct:2, explanation:'"Stupid" is a judgment. The fact is a score. The score is data. You can study and retake it. The judgment paralyzes.' },
-  { id:'p24', moduleId:'m6', title:'Q4: The Breakup', difficulty:4, reward:500, timeLimit:120, body:'"She left me. I am unlovable." Reduce to bare representation.', options:['"I am unlovable."','"She is evil."','"A human decided to end a romantic relationship with me." The rest is story.','"I will die alone."'], correct:2, explanation:'The event is a change in relationship status. The "unlovable" part is a catastrophic judgment. Stripping it reveals the neutral fact.' },
+  // M5: MORTAL (4)
+  { id:'p17', moduleId:'m5', title:'Q1: The Non-Renewable Resource', difficulty:1, reward:50, timeLimit:45, body:'What is the only truly non-renewable resource?', options:['Money','Oil','Time','Reputation'], correct:2, explanation:'Money can be earned back. Time, once spent, is gone forever. Yet we waste it as if we are immortal.' },
+  { id:'p18', moduleId:'m5', title:'Q2: The View from Above', difficulty:2, reward:100, timeLimit:60, body:'You are stressed about a typo in a report. How does the "View from Above" help?', options:['It makes the typo look bigger.','It reminds you that in 100 years, no one will care about this typo.','It helps you find the typo faster.','It makes you feel superior.'], correct:1, explanation:'Zooming out to cosmic scale shrinks the ego and its anxieties. The typo is meaningless in the grand scheme.' },
+  { id:'p19', moduleId:'m5', title:'Q3: The Twitter Argument', difficulty:3, reward:200, timeLimit:90, body:'You are 20 minutes deep into an angry Twitter argument. Memento Mori reminds you:', options:['To win the argument before you die','That your opponent is an idiot','If today were your last day, would you spend it arguing with strangers?','To block the person'], correct:2, explanation:'Memento Mori clarifies priorities. Arguing with strangers online is a profound waste of finite time.' },
+  { id:'p20', moduleId:'m5', title:'Q4: The Risk', difficulty:4, reward:500, timeLimit:120, body:'You are afraid to start a business because you might fail. How does Memento Mori change the calculus?', options:['It reminds you to write a will first.','It reminds you that you will die anyway, so the failure is temporary, but the regret of not trying is permanent.','It tells you to play it safe.','It makes you reckless.'], correct:1, explanation:'Death equalizes the stakes. The embarrassment of failure is fleeting; the regret of cowardice lasts a lifetime.' },
 
-  { id:'p25', moduleId:'m7', title:'Q1: The Procrastination', difficulty:1, reward:50, timeLimit:45, body:'You are procrastinating on a project. How does Memento Mori help?', options:['"I have infinite time."','"I may not have tomorrow. Do it now."','"I\'ll do it later."','It doesn\'t'], correct:1, explanation:'Memento Mori creates scarcity. If you might die tomorrow, procrastination is absurd. Act now.' },
-  { id:'p26', moduleId:'m7', title:'Q2: The Grudge', difficulty:2, reward:100, timeLimit:60, body:'You are holding a grudge against a friend. Apply the Deathbed Test.', options:['"I will win eventually."','"Never speak to them again."','"Will this matter on my deathbed? No. Forgive them."','"They must suffer."'], correct:2, explanation:'On your deathbed, grudges look pathetic. The Deathbed Test filters out trivial anxieties and prioritizes relationships.' },
-  { id:'p27', moduleId:'m7', title:'Q3: The Time Waste', difficulty:3, reward:200, timeLimit:90, body:'You spent 3 hours scrolling social media. Memento Mori response?', options:['"It was relaxing."\'"I wasted 3 hours of finite life. I will not get it back."\'"I have plenty of time."'], correct:1, explanation:'Seneca: "You do not have a scarcity of time, you have a scarcity of attention." Time wasted is life wasted.' },
-  { id:'p28', moduleId:'m7', title:'Q4: The Fear of Death', difficulty:4, reward:500, timeLimit:120, body:'You are terrified of dying. How does Memento Mori cure this?', options:['By making you immortal','By accepting death as a fact, removing the fear of the unknown','By promising an afterlife','By distracting you'], correct:1, explanation:'You cannot avoid death. By meditating on it daily, it becomes familiar. Familiarity removes the fear.' },
+  // M6: VIRTUE (4)
+  { id:'p21', moduleId:'m6', title:'Q1: The True Good', difficulty:1, reward:50, timeLimit:45, body:'According to Stoicism, what is the only true good?', options:['Wealth','Health','Virtue','Fame'], correct:2, explanation:'Wealth and health are "preferred indifferents." They are nice, but not necessary. Virtue (character) is the only true good.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Four Virtues', difficulty:2, reward:100, timeLimit:60, body:'Which is NOT one of the Four Cardinal Virtues?', options:['Wisdom','Courage','Justice','Ambition'], correct:3, explanation:'The virtues are Wisdom, Courage, Justice, and Temperance. Ambition is an external desire, not a virtue.' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Internal Scorecard', difficulty:3, reward:200, timeLimit:90, body:'You lose a tennis match, but you played fairly and tried your hardest. How did you do on the Internal Scorecard?', options:['You failed, because you lost.','You succeeded, because you acted with virtue (effort, fairness).','It\'s a tie.','You failed, because you didn\'t win.'], correct:1, explanation:'The Internal Scorecard evaluates your actions and character, not the outcome. If you played well and fairly, you succeeded.' },
+  { id:'p24', moduleId:'m6', title:'Q4: The Bribe', difficulty:4, reward:500, timeLimit:120, body:'You are offered $1M to look the other way on a safety violation that might hurt someone. What is the Stoic filter?', options:['Take the money; $1M is a lot.','Is it Just? No. Reject it. Virtue is worth more than money.','Take the money but donate it to charity.','Ask for $2M.'], correct:1, explanation:'Filter through Justice. The action is unjust. Therefore, it is vice. Reject it regardless of the financial reward.' },
 
-  { id:'p29', moduleId:'m8', title:'Q1: The Cake', difficulty:1, reward:50, timeLimit:45, body:'You want a 3rd slice of cake. Which virtue is needed?', options:['Justice','Courage','Wisdom','Temperance'], correct:3, explanation:'Temperance (Sophrosyne) is moderation and self-control. Resisting the 3rd slice is temperance.' },
-  { id:'p30', moduleId:'m8', title:'Q2: The Cheat', difficulty:2, reward:100, timeLimit:60, body:'You can cheat a client and get rich. Which virtue stops you?', options:['Justice','Courage','Temperance','Wisdom'], correct:0, explanation:'Justice (Dikaiosyne) is fairness. Cheating violates justice. Wealth is indifferent; virtue is the only good.' },
-  { id:'p31', moduleId:'m8', title:'Q3: The Quit', difficulty:3, reward:200, timeLimit:90, body:'You want to quit your safe job to start a business, but you are terrified. Which virtue is needed?', options:['Wisdom','Justice','Courage','Temperance'], correct:2, explanation:'Courage (Andreia) is acting rightly in the face of fear. Quitting a safe job for a risk requires courage.' },
-  { id:'p32', moduleId:'m8', title:'Q4: The Investment', difficulty:4, reward:500, timeLimit:120, body:'You are deciding whether to invest in a complex scheme. Run it through the 4 virtues. Which applies most?', options:['Courage (just do it)','Temperance (don\'t over-invest)','Justice (is it fair?)','Wisdom (do you understand it?)'], correct:3, explanation:'Wisdom (Phronesis) is practical knowledge. If you don\'t understand the scheme, Wisdom says do not invest.' },
+  // M7: TIME (4)
+  { id:'p25', moduleId:'m7', title:'Q1: The Shortness of Life', difficulty:1, reward:50, timeLimit:45, body:'Seneca argued that life is...', options:['Too short','Not too short, but we waste too much of it','Meant to be suffered','Endless'], correct:1, explanation:'Life is long enough for a good life, but we squander it on trivialities, anxieties, and distractions.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Mental Time Travel', difficulty:2, reward:100, timeLimit:60, body:'Where do we spend most of our mental time?', options:['In the present','Ruminating on the past or anticipating the future','In a state of flow','Asleep'], correct:1, explanation:'We rarely live in the present. We relive regrets or worry about futures that don\'t exist yet.' },
+  { id:'p27', moduleId:'m7', title:'Q3: The Trap of Someday', difficulty:3, reward:200, timeLimit:90, body:'You delay starting a hobby until you "have more time." What is this?', options:['Good planning','The Trap of Someday. You might die before you have more time.','Rational prioritization','Patience'], correct:1, explanation:'"Someday" is a fictitious future where conditions are perfect. The Stoic refuses to wait. Start today.' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Dinner', difficulty:4, reward:500, timeLimit:120, body:'You are at dinner with your family but checking work emails. What are you doing?', options:['Being productive','Multitasking','Dividing your attention and wasting the present moment with your family','Being a good employee'], correct:2, explanation:'You are not present. The Stoic does one thing at a time. Be at dinner when you are at dinner.' },
 
-  { id:'p33', moduleId:'m9', title:'Q1: The Status', difficulty:1, reward:50, timeLimit:45, body:'You are stressed about not having the latest iPhone. Apply the View from Above.', options:['Buy it on credit','From space, your phone is a speck. Stop worrying about status.','"I need it for work."\'"Everyone else has it."'], correct:1, explanation:'The View from Above shrinks status anxiety. In the cosmic scale, which phone you own is meaningless.' },
-  { id:'p34', moduleId:'m9', title:'Q2: The Wealth', difficulty:2, reward:100, timeLimit:60, body:'You lose your fortune. Stoic response?', options:['"I am ruined."\'"I lost my money, not my virtue. I am still whole."\'"Life is over."'], correct:1, explanation:'Wealth is a preferred indifferent. Virtue is the only good. Losing wealth does not diminish your character.' },
-  { id:'p35', moduleId:'m9', title:'Q3: The Jealousy', difficulty:3, reward:200, timeLimit:90, body:'You feel jealous of a billionaire. Reframe using Stoic wealth.', options:['"They are better than me."\'"They have more desires and fears. True wealth is contentment, which they may lack."\'"I must become a billionaire."'], correct:1, explanation:'"Wealth is wanting what you already have." The billionaire may have infinite desires, making them poor in spirit.' },
-  { id:'p36', moduleId:'m9', title:'Q4: The Practice', difficulty:4, reward:500, timeLimit:120, body:'Why practice periodic poverty (fasting, sleeping on floor)?', options:['Because comfort is evil','To punish yourself','To realize "Is this the condition I feared?" and inoculate against loss','To save money'], correct:2, explanation:'Seneca practiced poverty to prove he could survive it. It removes the fear of loss, which is the source of much anxiety.' },
+  // M8: RISK (4)
+  { id:'p29', moduleId:'m8', title:'Q1: Anti-fragility', difficulty:1, reward:50, timeLimit:45, body:'What happens to an Anti-fragile system under stress?', options:['It breaks','It stays the same','It gets stronger','It complains'], correct:2, explanation:'Fragile breaks. Robust stays the same. Anti-fragile (like a muscle or a Stoic mind) improves and grows stronger.' },
+  { id:'p30', moduleId:'m8', title:'Q2: The Asymmetric Bet', difficulty:2, reward:100, timeLimit:60, body:'What defines an asymmetric bet?', options:['Equal upside and downside','Bounded downside, unlimited upside','Unlimited downside, bounded upside','No risk'], correct:1, explanation:'You can only lose a small, fixed amount (survivable), but the potential upside is massive. This is the ideal risk profile.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Stoic Optionality', difficulty:3, reward:200, timeLimit:90, body:'Why does the Stoic have optionality in outcomes?', options:['They always win','They are content whether they win or lose, because their happiness is internal','They cheat','They don\'t take risks'], correct:1, explanation:'If they win, they practice temperance. If they lose, they practice resilience. They win either way.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Bankruptcy', difficulty:4, reward:500, timeLimit:120, body:'You go bankrupt. How is your downside "bounded"?', options:['You can still eat at fancy restaurants','Your character and virtue cannot be bankrupted. You are intact.','You can declare bankruptcy and keep your yacht.','You don\'t care about money.'], correct:1, explanation:'The Stoic core (character) is immune to financial collapse. The external loss is survivable; the internal self remains strong.' },
 
-  { id:'p37', moduleId:'m10', title:'Q1: The Race', difficulty:1, reward:50, timeLimit:45, body:'You train hard but lose the race. Stoic response?', options:['"I am a failure."\'"I gave 100%. The result was fate. I succeeded in my effort."\'"The winner cheated."'], correct:1, explanation:'The Reserve Clause. You control the effort, not the result. Success is acting virtuously (giving your best).' },
-  { id:'p38', moduleId:'m10', title:'Q2: The Rejection', difficulty:2, reward:100, timeLimit:60, body:'You get rejected after a date. Stoic response?', options:['"I am unlovable."\'"I controlled my effort. The rejection is their preference (fate). Move on."\'"I must change myself."'], correct:1, explanation:'You controlled your effort (being kind). The rejection is their preference, which is not up to you. Move on.' },
-  { id:'p39', moduleId:'m10', title:'Q3: The Startup', difficulty:3, reward:200, timeLimit:90, body:'You start a company. Add the reserve clause.', options:['"I will build this company."\'"I will build this company, fate permitting."\'"I will be a billionaire."'], correct:1, explanation:'"I will do X, fate permitting." You commit 100% to the process, but accept that external factors (fate) may intervene.' },
-  { id:'p40', moduleId:'m10', title:'Q4: The Book', difficulty:4, reward:500, timeLimit:120, body:'You are writing a book but fear it won\'t sell. What do you do?', options:['Write it for fame','Don\'t write it','Write the book. The writing is up to you. The sales are not. "Fate permitting."\'Hire a marketer'], correct:2, explanation:'Attach your effort to the process, not your happiness to the outcome. Write the book; the sales are fate.' }
+  // M9: EMOTION (4)
+  { id:'p33', moduleId:'m9', title:'Q1: The Protopassion', difficulty:1, reward:50, timeLimit:45, body:'You see a snake and your heart rate spikes. What is this?', options:['A passion','A protopassion (involuntary biological reaction)','A vice','A judgment'], correct:1, explanation:'The protopassion is the initial, involuntary physical reaction. Even a Sage feels it. It is biology, not choice.' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Assent', difficulty:2, reward:100, timeLimit:60, body:'What turns a protopassion into a passion?', options:['Time','Assent. You agree with the judgment ("This is terrible").','Repetition','Intensity'], correct:1, explanation:'The passion begins when you assent to the narrative. "Yes, this snake is a terrible threat and it is unfair that it is here."' },
+  { id:'p35', moduleId:'m9', title:'Q3: The Craving', difficulty:3, reward:200, timeLimit:90, body:'You feel a craving for junk food. How do you handle it?', options:['Eat it immediately','Suppress it violently','Acknowledge the craving (protopassion) but refuse the judgment "I need this." Wait for it to pass.','Feel guilty about it'], correct:2, explanation:'Do not suppress the feeling. Acknowledge it. But do not assent to the narrative that you must act on it. It will pass.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Grief', difficulty:4, reward:500, timeLimit:120, body:'You lose a loved one. You feel immense sadness. Is this un-Stoic?', options:['Yes, Stoics don\'t feel sad.','No. The sadness is a natural protopassion. The Stoic avoids adding the passion ("This is unfair, I am destroyed").','Yes, you should suppress it.','No, if you are sad, you are a bad Stoic.'], correct:1, explanation:'Grief is natural and biological. The Stoic feels it fully but refuses to add the narrative of victimhood or unfairness. They process the loss rationally.' },
+
+  // M10: CITADEL (4)
+  { id:'p37', moduleId:'m10', title:'Q1: The Fortress', difficulty:1, reward:50, timeLimit:45, body:'What is the "Inner Citadel"?', back:'The mind as an invincible fortress.', options:['A physical castle','The mind as an invincible fortress that cannot be breached from outside','A military strategy','A meditation technique'], correct:1, explanation:'The mind is a fortress. External events cannot breach it. Only you can surrender it by assenting to false judgments.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Insult', difficulty:2, reward:100, timeLimit:60, body:'Can someone make you angry without your consent?', options:['Yes, if they are mean enough','No. Anger comes from your judgment, not their words.','Only if they insult your family','Yes, but only in person'], correct:1, explanation:'No one can make you angry without your consent. The anger is your reaction to their words, not the words themselves.' },
+  { id:'p39', moduleId:'m10', title:'Q3: The Ego', difficulty:3, reward:200, timeLimit:90, body:'Why does a large ego make the Citadel vulnerable?', options:['It doesn\'t','Because the ego cares about externals (reputation/status), which can be attacked','Because ego is strength','Because ego is a virtue'], correct:1, explanation:'The ego defends externals (reputation, pride). Since externals can be attacked, a large ego is constantly vulnerable.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Fire', difficulty:4, reward:500, timeLimit:120, body:'You lose everything in a fire. What remains?', options:['Nothing','The ashes','The Inner Citadel. Your character, judgments, and ability to respond virtuously.','Your insurance policy'], correct:2, explanation:'Wealth, possessions, and even the body are externals. The Inner Citadel—your character and rational mind—is the only thing that is truly yours and cannot be taken.' }
 ];
 
 const PROJECT_PHASES = [
-  { id:'ph1', moduleId:'m1', title:'Phase 1: The Setup', scenario:'You are launching a startup. You have a co-founder and seed money. Apply the Dichotomy of Control to your initial strategy.', options:['Focus on building a great product and culture (controllable) and accept the market result','Focus entirely on dominating the market (uncontrollable)','Worry about competitors stealing your idea (uncontrollable)','Spend all your time networking for Series A (uncontrollable)'], correct:0, explanation:'You control your product and culture. The market and competitors are not up to you. Focus your energy on what you can control.' },
-  { id:'ph2', moduleId:'m2', title:'Phase 2: The Premortem', scenario:'6 months in, things are going well. Your co-founder wants to scale fast. You suggest a Premeditatio Malorum exercise. What is it?', options:['Fire the co-founder for being too cautious','Imagine massive success and ignore risks','Take a vacation','Imagine going bankrupt. Plan the shutdown steps now.'], correct:3, explanation:'Premeditatio Malorum: imagine the worst (bankruptcy). By rehearsing the failure, you identify the warning signs and remove the shock if it happens.' },
-  { id:'ph3', moduleId:'m3', title:'Phase 3: The Pivot', scenario:'A competitor releases a better product. Your users are churning. Your co-founder is furious. How to apply Amor Fati?', options:['Sue the competitor','Pivot. "This happened. It is data. We will build something better."\'"Give up, they won."'], correct:1, explanation:'Amor Fati embraces the event. The competitor\'s product is fuel. Use it to pivot and improve. Do not argue with reality.' },
-  { id:'ph4', moduleId:'m4', title:'Phase 4: The Cash Runway', scenario:'You have 3 months of cash left. Revenue is flat. How to apply the Asymmetry of Risk?', options:['Cut burn rate to survive 12 months (survival) while testing small channels (risk)','Bet everything on one massive ad campaign','Ignore the runway','Pay yourselves huge salaries'], correct:0, explanation:'Antifragility. Ensure survival (cut burn) so you can play again. Take small, asymmetric bets (cheap tests) to find growth.' },
-  { id:'ph5', moduleId:'m5', title:'Phase 5: The Angry Investor', scenario:'An investor sends a harsh email criticizing your metrics. You feel defensive. What do you do?', options:['Forward it to your co-founder to complain','Reply immediately defending yourself','Ignore it','Wait 24 hours. Reply with data, not emotion'], correct:3, explanation:'The Stoic Pause. Do not react to the stimulus. Wait for the emotion to fade, then respond with logic and data.' },
-  { id:'ph6', moduleId:'m6', title:'Phase 6: The Bad PR', scenario:'A journalist writes a hit piece on your company. "Startup X is a scam." You are panicked. Reduce to bare representation.', options:['"We are ruined."\'"A human wrote words on a screen. Some people read it. We will issue a factual correction."\'"We must sue."'], correct:1, explanation:'Phantasiai. The article is just words. The "ruined" part is your judgment. Issue a correction and move on. The facts are on your side.' },
-  { id:'ph7', moduleId:'m7', title:'Phase 7: The Burnout', scenario:'You are working 100-hour weeks. You are exhausted. Apply Memento Mori.', options:['"I must push harder."\'"If I die tomorrow, is this startup worth it? I will delegate and rest."\'"Sleep is for the weak."'], correct:1, explanation:'Memento Mori prioritizes. Your life and health are more valuable than the startup. Delegate and rest. You cannot lead if you are dead.' },
-  { id:'ph8', moduleId:'m8', title:'Phase 8: The Acquisition', scenario:'A big tech company offers to buy you for $50M. But they want to shut down your core product. Apply the 4 Virtues.', options:['Take it and lie to users','Decline. Is it Just to your users? Is it Temperate? Is it Wise? Does it require Courage?','Negotiate badly','Take the money (wealth is good)'], correct:1, explanation:'Wealth is an indifferent. Shutting down the product your users rely on may violate Justice. Declining requires Courage. Virtue > Wealth.' },
-  { id:'ph9', moduleId:'m9', title:'Phase 9: The IPO', scenario:'You go public. You are now a billionaire on paper. How to maintain Stoic detachment?', options:['Practice the View from Above. The stock price is a number; it doesn\'t change your character.','Quit and do nothing','Buy 10 mansions and a yacht','Become obsessed with the stock price daily'], correct:0, explanation:'The View from Above. From space, your net worth is a speck. True wealth is wanting what you have. Do not let the IPO corrupt your character.' },
-  { id:'ph10', moduleId:'m10', title:'Phase 10: The Exit', scenario:'You retire from the company. You want to start a charity. Apply the Reserve Clause.', options:['"I will end world hunger."\'"I will build this charity, fate permitting." The effort is up to you, the result is not.\'"I must guarantee success."'], correct:1, explanation:'The Reserve Clause. You commit 100% to the effort of building the charity. The ultimate impact is fate. Do your best, accept the rest.' }
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Market Crash', scenario:'The market crashes and your company\'s valuation is wiped out. Investors are panicking. What is up to you?', options:['The stock price','The market conditions','Your decision to pivot or cut costs, and your emotional stability','The actions of the Federal Reserve'], correct:2, explanation:'The market and valuation are external. Your strategy and emotional response are internal. Focus entirely on the internal.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Defection', scenario:'Your co-founder quits to join a competitor, taking key staff with them. How do you form an Objective Impression?', options:['"My co-founder is a traitor and my company is doomed."','"My co-founder resigned. Three engineers also resigned."','"I am ruined."','"They will fail without me."'], correct:1, explanation:'Strip the judgments ("traitor," "doomed"). View the raw facts: people resigned. This prevents emotional hijacking and allows rational planning.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Recall', scenario:'You have to recall your flagship product due to a defect. It will cost millions. How did Premeditatio Malorum prepare you for this?', options:['It didn\'t, this is unexpected.','You already visualized a product failure, so the shock is reduced and you have a crisis plan.','You knew the product was defective.','You are immune to financial loss.'], correct:1, explanation:'By rehearsing this exact scenario, you demystified it. You know you can survive the financial loss. Now you execute the recall with integrity.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Regulation', scenario:'A new regulation bans your core technology. You cannot ship your product. How do you apply Amor Fati?', options:['Lobby against it and hope it changes','Sue the government','Embrace the reality. It happened. Ask "How can we build a compliant product that is even better?"','Close the company'], correct:2, explanation:'The regulation is the cart\'s path. Run willingly. Embrace the constraint and use it to innovate, rather than resisting reality.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Ultimatum', scenario:'You have 6 months of runway left. An investor offers funding but demands you change your mission. What does Memento Mori clarify?', options:['Take the money; survival is all that matters.','If the mission is your life\'s work, taking the money kills the mission. Better to die trying than live a lie.','Negotiate harder.','Quit.'], correct:1, explanation:'Death (of the company) is coming. Will you sacrifice your virtue (mission) to delay it by 6 months? Or will you die with integrity, having tried?' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Bribe', scenario:'A massive client offers a $10M contract, but requires you to install a backdoor for data collection, violating user privacy. Filter through Virtue.', options:['Take it. $10M solves everything.','Is it Just? No. Is it Wise? No. Reject it. Virtue is worth more than $10M.','Take it but warn the users.','Ask for $20M.'], correct:1, explanation:'The action is unjust and unwise. It violates the core virtue of justice. Reject it, no matter the financial reward.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Burnout', scenario:'You are working 100-hour weeks, exhausted, and losing focus. How does Seneca\'s view on time apply?', options:['Push harder; sleep is for the weak.','You are wasting time by being unfocused. Rest is necessary for effective action.','Hire more people.','Work 120 hours.'], correct:1, explanation:'Working 100 hours while exhausted is divided, unfocused time. It is wasted. Rest to regain presence and efficiency.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Pivot', scenario:'You can either slowly die in your current market, or pivot to a new, risky market with a 90% chance of failure. How is this an asymmetric bet?', options:['It isn\'t; 90% failure is too high.','Downside: You burn remaining runway (survivable). Upside: You build a massive company. Your character remains intact either way. Take the bet.','You should not take the risk.','Only pivot if success is guaranteed.'], correct:1, explanation:'The downside is bounded (you lose money and time, which are externals). The upside is unbounded. The Stoic core is anti-fragile. Take the risk.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Betrayal', scenario:'A key employee steals your IP and starts a competing company. You feel intense rage. How do you manage the emotion?', options:['Suppress the rage','Act on the rage and destroy them','Acknowledge the protopassion (rage), but do not assent to "I must destroy them." Let lawyers handle it rationally.','Pretend you don\'t care'], correct:2, explanation:'Feel the rage (protopassion). But do not assent to the passion ("I must retaliate"). Handle the betrayal rationally through legal channels.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Exit', scenario:'Despite all efforts, the company fails. You lose your investment and your job. What remains?', options:['Nothing. You are ruined.','The ashes of the company','The Inner Citadel. Your character, resilience, and experience. You are invincible.','Your reputation'], correct:2, explanation:'Wealth and status are externals. The Inner Citadel—your character, judgments, and resilience—cannot be taken. You survived the fire. You are ready for the next challenge.' }
 ];
 
 const REAL_WORLD_MISSIONS = [
-  { id:'rw1', title:'The Dichotomy List', body:'Write down 3 things stressing you out. For each, ask: "Is this up to me?" If no, cross it out and focus on your reaction.' },
-  { id:'rw2', title:'The Loss Visualization', body:'Spend 2 minutes imagining you lost your job or a loved one. Return to the present. Feel the gratitude.' },
-  { id:'rw3', title:'The Reframe', body:'Take a minor annoyance today (traffic, rain). Say: "This is fuel for my patience." Embrace it.' },
-  { id:'rw4', title:'The 10-Second Rule', body:'Before reacting to an insult or email, count to 10. Let the emotion fade before choosing a response.' },
-  { id:'rw5', title:'The Bare Fact', body:'Take a negative thought ("I\'m broke") and reduce it to bare physics ("My bank account has $50"). Remove the adjectives.' },
-  { id:'rw6', title:'The Deathbed Test', body:'Before starting a task you dread, ask: "Will this matter on my deathbed?" If no, do not worry.' },
-  { id:'rw7', title:'The View from Above', body:'Close your eyes. Imagine floating above your city, then the Earth. See how small your problems look.' },
-  { id:'rw8', title:'The Periodic Poverty', body:'Skip one meal today, or drink only water. Realize: "Is this the condition I feared?" You can survive it.' },
-  { id:'rw9', title:'The Reserve Clause', body:'Start a task today with the phrase: "I will do this, fate permitting." Focus on the effort, not the result.' },
-  { id:'rw10', title:'The Virtue Filter', body:'Before a decision today, ask: Is this Wise? Courageous? Just? Temperate?' },
-  { id:'rw11', title:'The Controllable Action', body:'Identify one thing you are anxious about. Write down the ONE action you can take to influence it. Do only that.' },
-  { id:'rw12', title:'The Fire', body:'When something bad happens today, say: "A fire turns everything into fuel." Use it to get stronger.' },
-  { id:'rw13', title:'The Pause', body:'When you feel an impulse (buying, eating, replying), wait 15 minutes. Observe the wave pass.' },
-  { id:'rw14', title:'The Adjective Strip', body:'Catch yourself using "bad" or "terrible" today. Replace with the bare fact. "The meeting was bad" -> "The meeting lasted 2 hours."' },
-  { id:'rw15', title:'The Finite Time', body:'You have 24 hours. Deduct sleep, work, eating. How many hours of free attention do you have? Don\'t waste them.' },
-  { id:'rw16', title:'The Courage Check', body:'What is one thing you are avoiding out of fear? Do it today. That is Courage (Andreia).' },
-  { id:'rw17', title:'The Cosmic Speck', body:'Look at the night sky. Realize you are a speck on a speck. Your worries are cosmically insignificant.' },
-  { id:'rw18', title:'The Process Goal', body:'Pick a goal (lose weight, get promoted). Write down the process you control. Focus only on that. The result is fate.' },
-  { id:'rw19', title:'The Voluntary Discomfort', body:'Take a cold shower for 30 seconds. Vaccinate your nervous system against discomfort.' },
-  { id:'rw20', title:'The Acceptance', body:'Find one thing you are fighting today (the weather, a colleague). Say: "This is necessary. I accept it."' },
-  { id:'rw21', title:'The Observer', body:'When an emotion hits, say: "I am not anger. I am the observer of anger." Detach from the feeling.' },
-  { id:'rw22', title:'The Memento Mori Morning', body:'Wake up and say: "I may not survive today. I will act with virtue."' },
-  { id:'rw23', title:'The Justice Check', body:'Before interacting with someone today, ask: "Is this fair to them?" Act justly.' },
-  { id:'rw24', title:'The Indifferent Wealth', body:'Look at your bank account. Say: "This is preferred, but not good. My virtue is my only true wealth."' },
-  { id:'rw25', title:'The Syllabari', body:'Add "fate permitting" to your plans for the day. Accept that externals may intervene.' },
-  { id:'rw26', title:'The Gratitude Reset', body:'Imagine losing your sight. Now open your eyes. You can see. Be grateful.' },
-  { id:'rw27', title:'The Space', body:'When someone speaks to you, pause 1 second before replying. Use the space to choose your words.' },
-  { id:'rw28', title:'The Nouns and Verbs', body:'Describe your day using only nouns and verbs. No adjectives. See how neutral it sounds.' },
-  { id:'rw29', title:'The Deathbed Priority', body:'What is the most important thing in your life? Spend 15 minutes on it today, not on trivialities.' },
-  { id:'rw30', title:'The Amor Fati Fire', body:'When an obstacle appears today, say: "This is fuel." Use it to practice a virtue.' }
+  { id:'rw1', title:'The Control Audit', body:'Write down 3 things causing you stress. Categorize each as Internal (up to you) or External (not up to you). Let go of the externals.' },
+  { id:'rw2', title:'The Objective Strip', body:'When something annoying happens today, strip the adjectives. "My coffee is cold," not "This day is ruined."'},
+  { id:'rw3', title:'The Rehearsal', body:'Spend 2 minutes visualizing losing your job or a relationship. Realize you would survive. Return to the present with gratitude.' },
+  { id:'rw4', title:'The Cart', body:'Identify an unchangeable reality you are resisting. Say "I will run with the cart." Ask "How can I use this?"'},
+  { id:'rw5', title:'The Memento', body:'Remind yourself: "I could leave life right now." Let that determine what you do and say today.' },
+  { id:'rw6', title:'The Scorecard', body:'Evaluate your day on the Internal Scorecard: Did I act with Wisdom, Courage, Justice, and Temperance? Ignore the outcomes.' },
+  { id:'rw7', title:'The Presence', body:'Do one thing at a time today. When eating, just eat. When talking, just talk. Catch your mind time-traveling and pull it back.' },
+  { id:'rw8', title:'The Asymmetry', body:'Identify a risk you are avoiding. Check if the downside is survivable (bounded) and the upside is large. If so, take it.' },
+  { id:'rw9', title:'The Protopassion', body:'Notice an involuntary emotion today (anger spike, fear). Acknowledge it, but do not assent to the narrative. Let it pass.' },
+  { id:'rw10', title:'The Citadel', body:'When someone insults or criticizes you, remember: the insult exists only in your judgment. Do not surrender the fortress.' },
+  { id:'rw11', title:'The Traffic', body:'Stuck in traffic or waiting in line? Recognize it as external. Do not seethe. Listen to a podcast or breathe.' },
+  { id:'rw12', title:'The Gossip', body:'Hear a rumor about yourself? Your reputation is external. Continue doing good work. Let the noise fade.' },
+  { id:'rw13', title:'The Rain', body:'Plan an outdoor activity. If it rains, do not say "The weather is terrible." Say "Water is falling. We will adapt."'},
+  { id:'rw14', title:'The Loss', body:'Lose something small (keys, a pen). Notice the spike of frustration. Strip it: "I misplaced an object."'},
+  { id:'rw15', title:'The Poverty Practice', body:'Eat a very simple, cheap meal. Realize you can survive on very little. This breaks the fear of losing wealth.' },
+  { id:'rw16', title:'The "Why Me?"', body:'Catch yourself asking "Why me?" regarding a misfortune. Reframe: "This happened. How can I use it?"'},
+  { id:'rw17', title:'The 100-Year Zoom', body:'Stressed about a minor mistake? Zoom out. Will this matter in 100 years? No. Let it go.' },
+  { id:'rw18', title:'The Temperance', body:'Feel a craving (food, phone, distraction). Exercise Temperance. Acknowledge the craving, but do not act on it.' },
+  { id:'rw19', title:'The Someday Trap', body:'Notice a "someday" thought ("I\'ll travel when..."). Take one micro-step toward it today.' },
+  { id:'rw20', title:'The Bounded Downside', body:'Afraid to ask for a raise? Downside: They say no (survivable). Upside: Higher pay. Ask.' },
+  { id:'rw21', title:'The Anger Pause', body:'Before replying to an annoying email, pause for 10 seconds. Do not let the impression carry you away.' },
+  { id:'rw22', title:'The Anti-Fragile', body:'Face a small hardship (cold shower, hard workout). Recognize that the stress is making you stronger.' },
+  { id:'rw23', title:'The Judgment', body:'Catch yourself judging someone. Strip the adjectives. "They did X," not "They are a terrible person."'},
+  { id:'rw24', title:'The Time Audit', body:'Track your time for 1 hour. Are you present, or ruminating? Bring yourself back to the task.' },
+  { id:'rw25', title:'The Courage', body:'Face a small fear today (speaking up, making a call). Exercise Courage.' },
+  { id:'rw26', title:'The Justice', body:'Do something fair for someone else, even if it costs you slightly. Exercise Justice.' },
+  { id:'rw27', title:'The Wisdom', body:'Before a decision, ask: Is this good, bad, or indifferent? If indifferent, do not stress.' },
+  { id:'rw28', title:'The Memento Mori Phone', body:'Set your phone wallpaper to a Memento Mori symbol. Let it remind you to use your time well.' },
+  { id:'rw29', title:'The Insult', body:'If criticized today, do not defend your ego. Say "They may be right," or simply nod. Keep the Citadel intact.' },
+  { id:'rw30', title:'The Gratitude', body:'Visualize losing everything you have. Now open your eyes. Feel the gratitude for this exact moment.' }
 ];
 
 const PROFILES = [
-  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your Stoic profile.' },
-  { threshold: 500, title: 'PROKOPTON', desc: 'You have begun the path. You are learning to separate what you control.' },
-  { threshold: 1500, title: 'PHILOSOPHER', desc: 'You practice negative visualization and the pause. Your resilience grows.' },
-  { threshold: 3000, title: 'SAGE', desc: 'You embrace fate (Amor Fati) and act with virtue. You are rarely disturbed.' },
-  { threshold: 6000, title: 'STOIC OPERATOR', desc: 'You are antifragile. You turn every obstacle into fuel. You are the Inner Citadel.' }
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your ethical profile.' },
+  { threshold: 500, title: 'PROBATIONER', desc: 'You distinguish between what is up to you and what is not.' },
+  { threshold: 1500, title: 'PRACTITIONER', desc: 'You maintain the gap between event and response.' },
+  { threshold: 3000, title: 'SAGE', desc: 'You embrace fate and remember death. The Citadel is strong.' },
+  { threshold: 6000, title: 'MAGISTER', desc: 'You are anti-fragile. Obstacles have become the way.' }
 ];
 
 const STORAGE_KEY = 'seneca-v1';
@@ -693,8 +710,8 @@ function checkSecretUnlock(){
     if(container && !container.innerHTML){
       let html = '<div class="secret-panel">';
       html += '<h2>// THE INNER CITADEL ACHIEVED</h2>';
-      html += '<p>You have completed all 10 axes and successfully navigated Project Inner Citadel. You now possess the complete Stoic architecture.</p>';
-      html += '<p><strong>The Secret:</strong> The Stoic mind is a fortress that cannot be breached by externals. By mastering the dichotomy of control, practicing negative visualization, and embracing fate, you have built an inner citadel. You are antifragile. You turn every obstacle into fuel. You are the Stoic Operator.</p>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Inner Citadel. You now possess the complete architecture of Stoic decision-making.</p>';
+      html += '<p><strong>The Secret:</strong> The obstacle is the way. By mastering the dichotomy of control, maintaining the gap between stimulus and response, and embracing fate, you have built an invincible mind. External events can no longer breach your fortress. You are anti-fragile; you grow stronger from stress. You are now a Sage.</p>';
       html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
       html += '</div>';
       container.innerHTML = html;
@@ -829,30 +846,30 @@ function renderDashboard(){
   if(dueCards.length > 0){
     missionTitle.textContent = 'Clear Drill Queue';
     missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
-    missionBtn.textContent = 'Drill →';
+    missionBtn.textContent = 'Drill ->';
     missionBtn.onclick = () => showView('drills');
   }else if(nextProjectPhase){
     missionTitle.textContent = 'Project Inner Citadel: ' + nextProjectPhase.title;
-    missionBody.textContent = 'New project phase unlocked. Apply your Stoic architecture to the scenario.';
-    missionBtn.textContent = 'Open Project →';
+    missionBody.textContent = 'New project phase unlocked. Apply your ethical architecture to the scenario.';
+    missionBtn.textContent = 'Open Project ->';
     missionBtn.onclick = () => showView('project');
   }else if(nextModule){
     const prog = moduleProgress(nextModule.id);
     if(prog.done === 0){
       missionTitle.textContent = 'Begin ' + nextModule.codename;
       missionBody.textContent = nextModule.summary;
-      missionBtn.textContent = 'Start Module →';
+      missionBtn.textContent = 'Start Module ->';
       missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
     }else{
       missionTitle.textContent = 'Continue ' + nextModule.codename;
       missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
-      missionBtn.textContent = 'Continue →';
+      missionBtn.textContent = 'Continue ->';
       missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
     }
   }else{
     missionTitle.textContent = 'Architecture Complete';
     missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
-    missionBtn.textContent = 'Drill →';
+    missionBtn.textContent = 'Drill ->';
     missionBtn.onclick = () => showView('drills');
   }
   document.getElementById('dailyStudied').textContent = S.daily.reviews;
@@ -865,8 +882,8 @@ function renderDashboard(){
     document.getElementById('rtTitle').textContent = rtMission.title;
     document.getElementById('rtBody').textContent = rtMission.body;
     const rtBtn = document.getElementById('rtBtn');
-    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
-    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
   }
   const profile = getProfile();
   document.getElementById('profTitle').textContent = profile.title;
@@ -883,7 +900,7 @@ function renderDashboard(){
     const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
     row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
       '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
-      '<span class="maturity-val">'+avg+'%</span>';
+      '<span class="mastery-val">'+avg+'%</span>';
     masteryList.appendChild(row);
   });
   drawRadar();
@@ -893,7 +910,7 @@ function completeRTMission(){
   if(!S.daily.rtMissionCompleted){
     S.daily.rtMissionCompleted = true;
     addXP(25, 'real-world mission');
-    toast('Mission complete · +25 XP', 'success');
+    toast('Mission complete + 25 XP', 'success');
     saveState();
     renderDashboard();
   }
@@ -979,22 +996,22 @@ function showModuleDetail(moduleId){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-module').classList.add('active');
-  let html = '<div class="lesson-back" onclick="SENECA.show(\'modules\')">← Modules</div>';
+  let html = '<div class="lesson-back" onclick="SENECA.show(\'modules\')"> <- Modules</div>';
   html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
   html += '<div class="module-detail-grid">';
   const lessonDone = state.lessonsRead.includes('l1');
-  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="SENECA.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="SENECA.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
   const problem = ARENA.find(p => p.moduleId === moduleId);
   if(problem){
     const problemDone = state.problemSolved;
-    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="SENECA.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="SENECA.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
   }
   html += '</div>';
   if(prog.completed){
     html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
     const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
-    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="SENECA.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
-    html += '<button class="btn secondary mt-1" onclick="SENECA.show(\'project\')">Go to Project →</button>';
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="SENECA.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>'; }
+    html += '<button class="btn secondary mt-1" onclick="SENECA.show(\'project\')">Go to Project -></button>';
     html += '</div>';
   }
   document.getElementById('moduleDetail').innerHTML = html;
@@ -1007,18 +1024,18 @@ function showLesson(moduleId){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-lesson').classList.add('active');
-  let html = '<div class="lesson-back" onclick="SENECA.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
-  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  let html = '<div class="lesson-back" onclick="SENECA.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
   html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
   html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
   m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
   html += '</ul></div>';
   const isRead = S.modules[moduleId].lessonsRead.includes('l1');
   html += '<div class="lesson-actions">';
-  if(!isRead){ html += '<button class="btn" onclick="SENECA.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
-  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  if(!isRead){ html += '<button class="btn" onclick="SENECA.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>Checked Read</button>'; }
   const problem = ARENA.find(p => p.moduleId === moduleId);
-  if(problem){ html += '<button class="btn secondary" onclick="SENECA.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  if(problem){ html += '<button class="btn secondary" onclick="SENECA.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>'; }
   html += '</div>';
   document.getElementById('lessonContent').innerHTML = html;
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1028,7 +1045,7 @@ function markLessonRead(moduleId){
   if(!S.modules[moduleId].lessonsRead.includes('l1')){
     S.modules[moduleId].lessonsRead.push('l1');
     addXP(50, 'lesson read');
-    toast('Lesson complete · +50 XP', 'success');
+    toast('Lesson complete - +50 XP', 'success');
     if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
   }
   saveState();
@@ -1045,9 +1062,9 @@ function renderProject(){
   const totalPhases = PROJECT_PHASES.length;
   let html = '<div class="project-hud">';
   html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
-  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'INNER CITADEL' : 'EXECUTING') + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'CITADEL BUILT' : 'EXECUTING') + '</span></div>';
   html += '</div>';
-  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each Stoic axis to the startup scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each Stoic axis to the startup crisis. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
   html += '<div class="phase-list">';
   PROJECT_PHASES.forEach((p, i) => {
     const m = MODULES.find(x => x.id === p.moduleId);
@@ -1058,7 +1075,7 @@ function renderProject(){
     html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="SENECA.showProjectPhase(\''+p.id+'\')"' : '') + '>';
     html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
     html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
-    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
     html += '</div>';
   });
   html += '</div>';
@@ -1076,7 +1093,7 @@ function showProjectPhase(phaseId){
   container.parentElement.classList.add('active');
   const m = MODULES.find(x => x.id === p.moduleId);
   const solved = S.project[p.id].solved;
-  let html = '<div class="lesson-back" onclick="SENECA.show(\'project\')">← Project</div>';
+  let html = '<div class="lesson-back" onclick="SENECA.show(\'project\')"><- Project</div>';
   html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
   html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
   html += '<div class="options" id="optionsList">';
@@ -1096,7 +1113,7 @@ function answerPhase(idx){
   const options = document.querySelectorAll('.option');
   options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
   const outcome = document.getElementById('outcome');
-  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
   html += '<div class="outcome-text">' + p.explanation + '</div>';
   if(correct){
     if(!S.project[p.id].solved){
@@ -1118,9 +1135,9 @@ function answerPhase(idx){
   actions.style.marginTop = '1.5rem';
   if(correct){
     const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
-    if(next){ actions.innerHTML = '<button class="btn" onclick="SENECA.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
-    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="SENECA.show(\'dashboard\')">View Final Report →</button>'; }
-    else { actions.innerHTML = '<button class="btn" onclick="SENECA.show(\'modules\')">Continue Training →</button>'; }
+    if(next){ actions.innerHTML = '<button class="btn" onclick="SENECA.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="SENECA.show(\'dashboard\')">View Final Report -></button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="SENECA.show(\'modules\')">Continue Training -></button>'; }
   }else{ actions.innerHTML = '<button class="btn secondary" onclick="SENECA.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="SENECA.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
   container.appendChild(actions);
 }
@@ -1140,7 +1157,7 @@ function renderDrills(){
   setupDrillFilters();
   const container = document.getElementById('drillContainer');
   const due = getDueCards(activeFilter);
-  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="SENECA.show(\'arena\')">Arena →</button></div>'; return; }
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="SENECA.show(\'arena\')">Arena -></button></div>'; return; }
   drillQueue = due.slice();
   showNextDrill();
 }
@@ -1149,7 +1166,7 @@ function showNextDrill(){
   renderTopbar();
   if(drillQueue.length === 0){
     const container = document.getElementById('drillContainer');
-    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="SENECA.show(\'dashboard\')">Dashboard →</button></div>';
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="SENECA.show(\'dashboard\')">Dashboard -></button></div>';
     return;
   }
   currentDrill = drillQueue.shift();
@@ -1162,13 +1179,13 @@ function showNextDrill(){
   if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
   html += '</div>';
   html += '<div class="drill-card">';
-  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
   html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
   html += '<div class="drill-question">' + currentDrill.front + '</div>';
   html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
-  html += '<div class="drill-hint" id="drillReveal" onclick="SENECA.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="SENECA.revealDrill()">-> Reveal answer (Space)</div>';
   html += '<div class="drill-rating" id="drillRating">';
-  html += '<button class="rate-btn again" onclick="SENECA.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn again" onclick="SENECA.rateDrill(1)">Again<span class="interval"><1m</span></button>';
   html += '<button class="rate-btn hard" onclick="SENECA.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
   html += '<button class="rate-btn good" onclick="SENECA.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
   html += '<button class="rate-btn easy" onclick="SENECA.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
@@ -1216,8 +1233,8 @@ function renderArena(){
       const diffClass = 'diff-' + p.difficulty;
       const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
       html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="SENECA.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
-      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
-      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
       html += '</div>';
     });
   });
@@ -1237,7 +1254,7 @@ function showArenaProblem(problemId){
   const solved = S.arena[p.id];
   const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
   const diffClass = 'diff-' + p.difficulty;
-  let html = '<div class="lesson-back" onclick="SENECA.show(\'arena\')">← Arena</div>';
+  let html = '<div class="lesson-back" onclick="SENECA.show(\'arena\')"><- Arena</div>';
   html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
   html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
   html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
@@ -1268,7 +1285,7 @@ function answerProblem(idx){
   const options = document.querySelectorAll('.option');
   options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
   const outcome = document.getElementById('outcome');
-  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
   html += '<div class="outcome-text">' + p.explanation + '</div>';
   if(correct){
     if(!S.arena[p.id]){
@@ -1277,7 +1294,7 @@ function answerProblem(idx){
       addXP(p.reward, 'arena: ' + p.id);
       if(!S.modules[p.moduleId].problemSolved){
         S.modules[p.moduleId].problemSolved = true;
-        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(6,214,160,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
         else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
       }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
       flashCombo('+' + p.reward + ' XP');
@@ -1291,7 +1308,7 @@ function answerProblem(idx){
   const actions = document.createElement('div');
   actions.className = 'lesson-actions';
   actions.style.marginTop = '1.5rem';
-  if(correct){ actions.innerHTML = '<button class="btn" onclick="SENECA.show(\'arena\')">Back to Arena →</button>'; }
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="SENECA.show(\'arena\')">Back to Arena -></button>'; }
   else { actions.innerHTML = '<button class="btn secondary" onclick="SENECA.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="SENECA.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
   container.appendChild(actions);
 }
@@ -1300,7 +1317,7 @@ function renderStats(){
   renderTopbar();
   const prog = xpProgress();
   document.getElementById('statXp').textContent = S.xp;
-  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
   let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
   Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
   document.getElementById('statMature').textContent = mature;
@@ -1322,7 +1339,7 @@ function renderStats(){
     const pct = total > 0 ? (cat.count / total) * 100 : 0;
     const row = document.createElement('div');
     row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
-    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(212,163,115,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
     chart.appendChild(row);
   });
   const log = document.getElementById('sessionLog');
@@ -1346,8 +1363,8 @@ function initParticles(){
   for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
   function loop(){
     ctx.clearRect(0, 0, w, h);
-    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
-    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(212, 163, 115, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(255, 209, 102, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
     requestAnimationFrame(loop);
   }
   loop();
@@ -1400,7 +1417,7 @@ function init(){
   checkDailyReset();
   updateStreak();
   saveState();
-  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const today = new Date().toISOString().split('T')[0]; if(!act.includes(today)) { act.push(today); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
   initParticles();
   bootSequence();
 }
