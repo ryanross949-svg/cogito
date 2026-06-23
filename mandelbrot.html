@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // MANDELBROT v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">MANDELBROT</div><div class="boot-sub">Cogito // Fat Tails & Fractals v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">MANDELBROT</div><div class="brand-tag">FAT TAILS & FRACTALS</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="MANDELBROT.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="MANDELBROT.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="MANDELBROT.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="MANDELBROT.setTheme('light')">Light</button><button class="theme-option" onclick="MANDELBROT.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Black Swan</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="MANDELBROT.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of fat-tailed risk. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: BLACK SWAN</h1><p class="section-sub">A cumulative scenario. Navigate a hedge fund through fat-tailed markets.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About MANDELBROT</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>MANDELBROT is a cognitive training simulator designed to install the risk-thinking patterns used by quantitative risk-takers (Taleb, Mandelbrot, Kelly). It trains you to recognize that the real world (markets, wars, wealth) does not follow a normal distribution, and teaches you to prepare for extreme, catastrophic outliers rather than averages.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Black Swan require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>WILD</strong> — The Wild vs. The Mild (Mediocristan vs. Extremistan)</li>
+          <li><strong>PARETO</strong> — Power laws and the 80/20 scaling rule</li>
+          <li><strong>FAT</strong> — Fat tails and infinite variance</li>
+          <li><strong>BLACKSWAN</strong> — Improbable, high-impact, retrospective predictability</li>
+          <li><strong>SCALE</strong> — Fractals, scale invariance, and self-similarity</li>
+          <li><strong>LUDIC</strong> — The casino fallacy and model truncation</li>
+          <li><strong>ANTIFRAG</strong> — Gaining from volatility and disorder</li>
+          <li><strong>RUIN</strong> — Absorbing barriers and avoiding zero</li>
+          <li><strong>HISTORY</strong> — Silent evidence and the narrative fallacy</li>
+          <li><strong>ASYMM</strong> — Convexity, optionality, and asymmetric payoffs</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'WILD', title:'The Wild vs. The Mild', summary:'Mediocristan vs. Extremistan. Gaussian vs. Power Law.', lesson:{ title:'The Architecture of Extremes', body: 'Nassim Taleb divides the world into two domains: Mediocristan (the Mild) and Extremistan (the Wild).\n\n## Mediocristan\n\nIn Mediocristan, no single observation can drastically change the aggregate. If you take 1,000 people and add the heaviest person in the world, the average weight barely changes. Standard deviation works here. Examples: human height, calorie consumption, car accidents.\n\n## Extremistan\n\nIn Extremistan, a single observation can disproportionately affect the total. If you take 1,000 people and add the wealthiest person in the world (Elon Musk), the average wealth becomes a billionaire. Standard deviation is meaningless here. Examples: wealth distribution, book sales, city populations, financial markets, wars.\n\n## The Thanksgiving Turkey\n\nA turkey is fed for 1,000 days. Every day, the data confirms the turkey\'s belief that humans are benevolent. On day 1,001 (the day before Thanksgiving), the turkey experiences a fatal Black Swan. The turkey used Mediocristan statistics in an Extremistan world.\n\n## The Method\n\n1. **Identify the domain:** Are you in Mediocristan or Extremistan?\n2. **If Mediocristan:** Use averages, standard deviation, Gaussian models.\n3. **If Extremistan:** Discard averages. Expect extreme outliers. Use power laws.', takeaways:['Mediocristan: No single observation changes the aggregate (height).','Extremistan: One observation can dwarf all others (wealth, markets).','Standard deviation and Gaussian curves fail in Extremistan.','The Thanksgiving Turkey used Mediocristan stats in an Extremistan world.','Identify your domain before applying statistical models.'] } },
+  { id:'m2', codename:'PARETO', title:'The Pareto Principle', summary:'Power laws, 80/20 rule, and scaling.', lesson:{ title:'The Architecture of Inequality', body: 'Vilfredo Pareto observed that 80% of the peas in his garden came from 20% of the pods. He later found that 80% of Italy\'s land was owned by 20% of the population. This is a power law distribution.\n\n## The 80/20 Rule\n\nThe Pareto Principle states that roughly 80% of effects come from 20% of causes. In business: 80% of revenue comes from 20% of customers. In software: 80% of crashes are caused by 20% of bugs. In language: the most frequent word ("the") accounts for ~7% of all word occurrences.\n\n## Scaling (80/20 squared)\n\nThe top 20% of the top 20% (the top 4%) often produce 80% of 80% (64%) of the results. This recursive scaling means extreme concentration at the top. The top 1% of the top 1% can dominate entire industries.\n\n## Why it Matters\n\nIn a Pareto world, optimizing the "average" is a waste of time. The average customer is irrelevant. You must identify the vital few (the 20%) and obsess over them. The trivial many (the 80%) are noise.\n\n## The Method\n\n1. **Look for concentration:** Is 20% of the input producing 80% of the output?\n2. **Identify the vital few:** Who/what is in the top 20%?\n3. **Allocate resources asymmetrically:** Ignore the bottom 80%. Double down on the top 20%.', takeaways:['80% of effects come from 20% of causes.','Power laws scale recursively (the top 4% produces 64% of results).','In a Pareto world, the "average" is irrelevant.','Identify the vital few and ignore the trivial many.','Allocate resources asymmetrically to the top 20%.'] } },
+  { id:'m3', codename:'FAT', title:'Fat Tails', summary:'Infinite variance and the danger of the bell curve.', lesson:{ title:'The Architecture of the Tail', body: 'A normal distribution (bell curve) has "thin tails." The probability of an extreme event (e.g., 5 standard deviations away) is infinitesimally small. A 7-sigma event happens once every 390 billion years.\n\n## Fat Tails\n\nIn a fat-tailed distribution, extreme events are far more likely. The variance is so high that it may be effectively infinite. In finance, a 7-sigma event (1987 crash, 2008 crisis, 2020 COVID crash) seems to happen once a decade.\n\n## The Problem of Variance\n\nIf a distribution has infinite variance, you cannot reliably calculate standard deviation. Your sample might look stable for years, but a single massive outlier can dwarf all previous data. This is why "historical volatility" is a dangerous predictor of future risk.\n\n## The 2008 Crisis\n\nRisk models (like VaR - Value at Risk) assumed thin tails. They calculated risk based on the last 20 years of data, which didn\'t include a systemic crash. When the crash came, it was labeled a "10,000-year event." It was actually a perfectly normal fat-tailed event.\n\n## The Method\n\n1. **Assume fat tails** in human systems (markets, politics, tech).\n2. **Do not trust standard deviation** as a measure of risk.\n3. **Expect events larger than historical precedent.**', takeaways:['Thin tails (Gaussian): Extreme events are astronomically rare.','Fat tails (Power law): Extreme events happen frequently.','Variance may be infinite; standard deviation is useless.','Historical data cannot predict the size of the next crash.','Assume fat tails in all human/social systems.'] } },
+  { id:'m4', codename:'BLACKSWAN', title:'Black Swans', summary:'Improbable, high-impact, retrospectively predictable.', lesson:{ title:'The Architecture of the Unpredictable', body: 'A Black Swan is an event with three properties:\n1. **Highly improbable** (an outlier).\n2. **Massive impact** (changes the world).\n3. **Retrospectively predictable** (we explain it after the fact as if it were inevitable).\n\n## The Problem of Induction\n\nYou cannot prove "all swans are white" by seeing a million white swans. But one black swan disproves it. In risk, you cannot prove a system is safe by observing years of safety. One catastrophic failure destroys the thesis.\n\n## Retrospective Predictability\n\nAfter 9/11, the 2008 financial crisis, or COVID-19, experts emerged claiming "we should have seen it coming." But before the event, the specific outcome was one of millions of possible scenarios. We only see the signal in the noise *after* the noise resolves into a signal.\n\n## The Method\n\n1. **Accept that Black Swans will happen.** You cannot predict the specific event.\n2. **Do not try to predict them.** Prediction is a waste of resources.\n3. **Build robustness/antifragility.** Ensure you survive the event, whatever it is.\n4. **Beware of experts** who claim to predict rare events using thin-tailed models.', takeaways:['A Black Swan is: Improbable, High-Impact, Retrospectively Predictable.','You cannot disprove risk by observing safety; one event disproves it.','Prediction of specific Black Swans is impossible and a waste of time.','Focus on building robustness, not prediction.','Experts rationalize the past, they do not predict the future.'] } },
+  { id:'m5', codename:'SCALE', title:'Fractals & Scale', summary:'Self-similarity, Mandelbrot sets, and the coastline paradox.', lesson:{ title:'The Architecture of Self-Similarity', body: 'Benoit Mandelbrot discovered that nature is not smooth; it is fractal. A fractal is a shape that is self-similar across scales. If you zoom in on a coastline, it looks like a coastline. If you zoom in on a cloud, it looks like a cloud.\n\n## The Coastline Paradox\n\nHow long is the coast of Britain? It depends on your ruler. If you measure with a 1-mile ruler, you miss bays and peninsulas. If you measure with a 1-meter ruler, it gets longer. With a 1-mm ruler, it approaches infinity. The coastline has no fixed length; it is fractal.\n\n## Financial Markets\n\nMandelbrot found that market charts are fractal. A 1-minute chart, a 1-day chart, and a 1-year chart all look statistically identical. You cannot tell them apart without a label. This means volatility doesn\'t "smooth out" over time; it scales.\n\n## The Method\n\n1. **Look for self-similarity.** Does the part resemble the whole?\n2. **Beware of scale.** A strategy that works on a small scale may fail catastrophically on a large scale (or vice versa).\n3. **Do not assume smoothness.** The world is jagged, discontinuous, and fractal.', takeaways:['Fractals are self-similar across scales (coastlines, clouds).','The coastline paradox: length depends on the ruler; it approaches infinity.','Market charts are fractal: 1-min, 1-day, 1-year look identical.','Volatility does not smooth out; it scales.','The world is jagged and discontinuous, not smooth.'] } },
+  { id:'m6', codename:'LUDIC', title:'The Ludic Fallacy', summary:'The casino vs. the real world. The flaw of models.', lesson:{ title:'The Architecture of the Model', body: 'The Ludic Fallacy (from "ludus," meaning game) is the mistake of applying the rules of a game to real life.\n\n## The Casino\n\nIn a casino, the odds are known, the dice are fair, and the outcomes are bounded. If you play roulette 1,000 times, the distribution will be a perfect bell curve. Risk managers love casinos because they are predictable.\n\n## The Real World\n\nThe real world is not a casino. The rules are unknown, the dice are loaded, and outcomes are unbounded. A casino might go bankrupt not because a gambler won at roulette (thin-tailed), but because a tiger attacked a performer, or a owner skimped on security (fat-tailed).\n\n## The Flaw of Models\n\nFinancial models (like Black-Scholes) assume prices follow a random walk (casino rules). They truncate risk to make the math work. When real-world prices jump discontinuously (a gap), the model breaks, and the firm goes bankrupt (Long-Term Capital Management, 1998).\n\n## The Method\n\n1. **Do not confuse the model with reality.** The map is not the territory.\n2. **Identify the hidden assumptions.** What did the model assume away?\n3. **Expect discontinuities.** Real life has gaps; models usually don\'t.', takeaways:['The Ludic Fallacy: Applying game rules (casino) to real life.','Casinos have known odds and bounded outcomes; real life does not.','Models truncate risk to make math work, causing catastrophic failure.','The map is not the territory.','Expect discontinuities (gaps) in real-world systems.'] } },
+  { id:'m7', codename:'ANTIFRAG', title:'Antifragility', summary:'Gaining from volatility, disorder, and shocks.', lesson:{ title:'The Architecture of Stress', body: 'Fragile things break under stress. Robust things stay the same. Antifragile things get stronger.\n\n## The Triad\n\n- **Fragile:** A glass. A drop breaks it. (Concave to stress)\n- **Robust:** A rock. A drop does nothing. (Linear to stress)\n- **Antifragile:** A muscle. Lifting weights tears it; it rebuilds stronger. (Convex to stress)\n\n## Volatility as a Feature\n\nIn Mediocristan, you can avoid stress. In Extremistan, stress (Black Swans) is inevitable. If you are fragile, a shock destroys you. If you are antifragile, a shock makes you better.\n\n## The Barbell Strategy\n\nTo be antifragile, allocate 80-90% of your resources to extreme safety (cash, T-bills) and 10-20% to extreme risk (options, startups). You avoid the "middle ground" (medium risk) which is fragile to Black Swans. Your downside is capped (you can\'t lose the 90%), but your upside is convex (the 10% can 100x).\n\n## The Method\n\n1. **Identify your exposure:** Are you fragile, robust, or antifragile to shocks?\n2. **Remove fragility:** Eliminate things that break under stress (debt, over-optimization).\n3. **Add convexity:** Seek opportunities where the upside > downside.\n4. **Embrace small stressors:** Iterate, fail small, learn.', takeaways:['Fragile breaks; Robust stays; Antifragile gets stronger.','Volatility is a feature, not a bug, for antifragile systems.','Barbell Strategy: 90% extreme safety, 10% extreme risk.','Eliminate concavity (debt, over-optimization).','Seek convexity (upside > downside).'] } },
+  { id:'m8', codename:'RUIN', title:'Absorbing Barriers', summary:'Asymmetric outcomes and avoiding zero.', lesson:{ title:'The Architecture of Ruin', body: 'An absorbing barrier is a point you cannot recover from. Zero. Bankruptcy. Death. Extinction.\n\n## The Gambler\'s Ruin\n\nIf you play a game with a 51% win rate, but your opponent has infinite money, you will eventually hit zero. It doesn\'t matter how good your odds are; if you play forever, a bad streak will wipe you out. The barrier (zero) absorbs you.\n\n## Asymmetric Outcomes\n\nIf a loss can take you to zero, the expected value of the game is negative infinity, no matter how high the probability of winning. "Don\'t cross a river that averages 4 feet deep." The average doesn\'t matter; the 10-foot section matters if you are 5 feet tall.\n\n## Over-leverage\n\nLeverage introduces an absorbing barrier. A 2x leveraged portfolio can go to zero in a 50% market crash. Long-Term Capital Management used 25x leverage. A 4% market drop wiped them out. They were right about the direction, but the volatility (the path) hit the barrier.\n\n## The Method\n\n1. **Identify your absorbing barriers.** (Financial, reputational, physical).\n2. **Never cross a river that averages 4 feet deep.** The tail matters, not the average.\n3. **Avoid leverage.** It introduces ruin to a system that might otherwise survive.\n4. **Survival is the prerequisite for all future expected value.**', takeaways:['An absorbing barrier is a point of no return (zero, bankruptcy).','Gambler\'s Ruin: Even with positive odds, a bad streak wipes you out.','"Don\'t cross a river that averages 4 feet deep." The tail kills you.','Leverage introduces an absorbing barrier.','Survival is the prerequisite for all future EV. Avoid ruin at all costs.'] } },
+  { id:'m9', codename:'HISTORY', title:'Silent Evidence', summary:'Survivorship bias and the narrative fallacy.', lesson:{ title:'The Architecture of the Past', body: 'We study history by looking at survivors. We read books by successful authors, invest with successful fund managers, and study successful companies. We ignore the graves.\n\n## Survivorship Bias\n\nDuring WWII, the military wanted to add armor to planes. They looked at returning planes and saw bullet holes in the wings. "Put armor on the wings!" said the statisticians. Abraham Wald said, "No, put armor on the engines. The planes with holes in the engines didn\'t return."\n\n## The Narrative Fallacy\n\nWe cannot handle raw randomness. We invent stories to explain the past. "Company X succeeded because of their culture." We ignore the 99 companies with the same culture that failed. The story is a coping mechanism for uncertainty.\n\n## The Method\n\n1. **Look for the graves.** Who/what failed?\n2. **Beware of "best practices."** They are often practices of survivors, not predictors of success.\n3. **Resist the narrative.** The past is messier and more random than history books suggest.', takeaways:['We only see survivors; the graves are silent.','Survivorship bias: Armor the engines, not the wings.','The Narrative Fallacy: We invent stories to explain random success.','"Best practices" are often just practices of survivors.','Look for the graves to find the true risk.'] } },
+  { id:'m10', codename:'ASYMM', title:'Convexity & Optionality', summary:'Asymmetric payoffs and the value of uncertainty.', lesson:{ title:'The Architecture of the Bet', body: 'A convex exposure has a payoff curve that curves upward. Your downside is capped, but your upside is exponential. A concave exposure curves downward: your upside is capped, but your downside is exponential.\n\n## Optionality\n\nAn option gives you the right, but not the obligation, to act. If you buy a call option on a stock, your max loss is the premium paid, but your max gain is infinite. This is convexity.\n\n## The Value of Uncertainty\n\nIf you have a convex exposure, you *want* volatility. The more the price swings, the more likely you hit a massive gain. Uncertainty is your friend. If you have a concave exposure (e.g., you sold the option), uncertainty is your enemy.\n\n## Venture Capital\n\nVCs understand convexity. They invest in 10 startups. 9 fail (loss capped at investment). 1 becomes Google (upside infinite). The average is irrelevant; the tail pays for everything.\n\n## The Method\n\n1. **Map your payoff curve:** Is it convex (curves up) or concave (curves down)?\n2. **Seek optionality:** Situations where you can change your mind or walk away.\n3. **Pay for convexity:** It is often worth paying a premium (insurance, options) to cap downside.\n4. **If you don\'t understand the payoff curve, you are probably concave.**', takeaways:['Convex: Downside capped, upside exponential.','Concave: Upstream capped, downside exponential.','Optionality gives you the right to act without the obligation.','If you are convex, volatility is your friend.','VC model: 9 failures capped, 1 success infinite. The tail pays for all.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the difference between Mediocristan and Extremistan?',back:'Mediocristan: No single observation changes the aggregate (height). Extremistan: One observation can dwarf all others (wealth).'},
+  {id:'c2',moduleId:'m1',core:true,category:'concept',front:'What is the Thanksgiving Turkey illusion?',back:'Using Mediocristan statistics (stable past) in an Extremistan world. The turkey is fed for 1000 days, then killed on day 1001.'},
+  {id:'c3',moduleId:'m1',core:false,category:'application',front:'Is human height in Mediocristan or Extremistan?',back:'Mediocristan. The tallest person in the world cannot change the average height of 1000 people.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'Is wealth distribution in Mediocristan or Extremistan?',back:'Extremistan. Adding Elon Musk to a room of 1000 people makes the average person a billionaire.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'Do Gaussian models (bell curves) work in Extremistan?',back:'No. Standard deviation and variance are meaningless in Extremistan.'},
+  {id:'c6',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "Standard deviation works in Mediocristan and..."',back:'"...fails in Extremistan."'},
+  {id:'c7',moduleId:'m1',core:false,category:'application',front:'Give an example of an Extremistan domain.',back:'Financial markets, wealth distribution, book sales, city populations, wars.'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'What is the first step of the Wild/Mild method?',back:'Identify the domain: Are you in Mediocristan or Extremistan?'},
+  {id:'c9',moduleId:'m1',core:false,category:'concept',front:'What happens to the average in Extremistan?',back:'It becomes meaningless. A single observation can drastically skew it.'},
+  {id:'c10',moduleId:'m1',core:false,category:'application',front:'Why did the turkey\'s risk model fail?',back:'It assumed the future would be like the past (induction). It didn\'t account for the structural break (Thanksgiving).'},
+  {id:'c11',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The turkey used Mediocristan stats in..."',back:'"...an Extremistan world."'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'Can you prove a system is safe by observing years of safety?',back:'No. One catastrophic failure (Black Swan) disproves the thesis. This is the problem of induction.'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is the Pareto Principle?',back:'Roughly 80% of effects come from 20% of causes. (80% of peas from 20% of pods).'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'How does the Pareto Principle scale recursively?',back:'The top 20% of the top 20% (4%) produces 80% of 80% (64%) of results. Extreme concentration.'},
+  {id:'c15',moduleId:'m2',core:false,category:'application',front:'In software, what does the Pareto Principle imply?',back:'80% of crashes are caused by 20% of bugs. Fix the vital few bugs.'},
+  {id:'c16',moduleId:'m2',core:false,category:'concept',front:'In a Pareto world, is the "average" customer relevant?',back:'No. The average is noise. You must identify and obsess over the vital few (top 20%).'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'In language, what does the Pareto Principle look like?',back:'The most frequent word ("the") accounts for ~7% of all word occurrences.'},
+  {id:'c18',moduleId:'m2',core:false,category:'concept',front:'What is a power law distribution?',back:'A distribution where the frequency of an event is inversely proportional to its size (Pareto is a type of power law).'},
+  {id:'c19',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Optimize the vital few..."',back:'"...ignore the trivial many."'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'How should you allocate resources in a Pareto world?',back:'Asymmetrically. Ignore the bottom 80%. Double down on the top 20%.'},
+  {id:'c21',moduleId:'m2',core:false,category:'concept',front:'What is the origin of the 80/20 rule?',back:'Vilfredo Pareto observed 80% of Italy\'s land was owned by 20% of the population.'},
+  {id:'c22',moduleId:'m2',core:false,category:'application',front:'In business, where does 80% of revenue usually come from?',back:'20% of customers.'},
+  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'What is the danger of optimizing for the "average" in a power law?',back:'It is a waste of time. The average is dragged down by the trivial many.'},
+  {id:'c24',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "In a Pareto world, the average is..."',back:'"...irrelevant."'}, 
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is a fat-tailed distribution?',back:'A distribution where extreme events are far more likely than in a Gaussian (thin-tailed) distribution. Variance may be infinite.'},
+  {id:'c26',moduleId:'m3',core:true,category:'concept',front:'Why is standard deviation dangerous in fat-tailed domains?',back:'Because variance may be infinite. A single outlier can dwarf all historical data, making historical volatility useless.'},
+  {id:'c27',moduleId:'m3',core:false,category:'application',front:'What is the problem with using historical volatility to predict risk?',back:'It assumes thin tails. The next crash may be larger than anything in the historical sample.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'In finance, a 7-sigma event seems to happen once a decade. Why?',back:'Because financial markets are fat-tailed, not Gaussian. The models are wrong.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'What is the "flaw of variance" in Extremistan?',back:'You cannot reliably calculate standard deviation because a single new observation can completely change it.'},
+  {id:'c30',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Assume fat tails in..."',back:'"...all human/social systems."'},
+  {id:'c31',moduleId:'m3',core:false,category:'application',front:'Why did VaR (Value at Risk) fail in 2008?',back:'It assumed thin tails and used 20 years of data that didn\'t include a systemic crash.'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'Thin tails vs Fat tails?',back:'Thin: Extreme events are astronomically rare. Fat: Extreme events happen frequently.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'If a 7-sigma event happens in a Gaussian world, how often should it occur?',back:'Once every 390 billion years.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'What is the danger of trusting "historical precedent" in a fat-tailed world?',back:'The historical sample may not contain the tail event that will destroy you.'},
+  {id:'c35',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Historical data cannot predict..."',back:'"...the size of the next crash."'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'What is the difference between a 10,000-year event and a normal fat-tailed event?',back:'Nothing. It is a mislabeling by thin-tailed models. It was a perfectly normal fat-tailed event.'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What are the 3 properties of a Black Swan?',back:'1. Highly improbable (outlier). 2. Massive impact. 3. Retrospectively predictable (rationalized after).'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'What is the Problem of Induction in risk?',back:'You cannot prove a system is safe by observing safety. One catastrophic failure disproves the thesis.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'What is "Retrospective Predictability"?',back:'After a Black Swan, experts claim "we should have seen it coming." Before, it was invisible.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'Should you try to predict specific Black Swans?',back:'No. It is impossible and a waste of resources. Focus on building robustness instead.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'Why do experts rationalize the past?',back:'They see the signal in the noise *after* the noise resolves. They cannot handle raw randomness.'},
+  {id:'c42',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Prediction of specific Black Swans is..."',back:'"...impossible and a waste of time."'},
+  {id:'c43',moduleId:'m4',core:false,category:'application',front:'What is the correct response to the existence of Black Swans?',back:'Build robustness/antifragility. Ensure you survive the event, whatever it is.'},
+  {id:'c44',moduleId:'m4',core:false,category:'concept',front:'Can you disprove "all swans are white" by seeing a million white swans?',back:'No. But one black swan disproves it.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Focus on building robustness..."',back:'"...not prediction."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'What is the danger of experts who claim to predict rare events?',back:'They use thin-tailed models. They are selling certainty in an uncertain world.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'Give examples of Black Swans.',back:'9/11, 2008 financial crisis, COVID-19, the internet.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'Why is the narrative fallacy dangerous regarding Black Swans?',back:'It makes us think the world is predictable and that we can prevent the next one, leading to false confidence.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is a fractal?',back:'A shape that is self-similar across scales. Zooming in reveals the same structure as the whole.'},
+  {id:'c50',moduleId:'m5',core:true,category:'concept',front:'What is the Coastline Paradox?',back:'The length of a coastline depends on the ruler. As the ruler gets smaller, the length approaches infinity.'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'How are financial market charts fractal?',back:'A 1-minute chart, 1-day chart, and 1-year chart all look statistically identical.'},
+  {id:'c52',moduleId:'m5',core:false,category:'concept',front:'What does it mean that volatility "scales" rather than "smooths out"?',back:'It doesn\'t average out over time. The jaggedness remains at every timescale.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'Why might a strategy fail when scaled up?',back:'Because the system is fractal. What works on a small scale may break catastrophically on a large scale (or vice versa).'},
+  {id:'c54',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "The world is jagged and discontinuous..."',back:'"...not smooth."'},
+  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'Who discovered the fractal nature of markets and coastlines?',back:'Benoit Mandelbrot.'},
+  {id:'c56',moduleId:'m5',core:false,category:'application',front:'If a coastline has no fixed length, what does that imply for measurement?',back:'You must define your scale before measuring. The number is scale-dependent.'},
+  {id:'c57',moduleId:'m5',core:false,category:'concept',front:'Why do Gaussian models fail on fractal data?',back:'Gaussian models assume smoothness and independence. Fractals are jagged and clustered.'},
+  {id:'c58',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Volatility does not smooth out; it..."',back:'"...scales."'},
+  {id:'c59',moduleId:'m5',core:false,category:'concept',front:'What is self-similarity?',back:'The property where a part of an object resembles the whole object.'},
+  {id:'c60',moduleId:'m5',core:false,category:'application',front:'If you can\'t tell a 1-min market chart from a 1-year chart, what should you conclude?',back:'The underlying dynamics are scale-invariant (fractal).'}, 
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the Ludic Fallacy?',back:'Applying the rules of a game (casino) to real life. Assuming known odds and bounded outcomes.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'Why do risk managers love casinos?',back:'The odds are known, the dice are fair, and outcomes are bounded. It is predictable.'},
+  {id:'c63',moduleId:'m6',core:false,category:'application',front:'How does the real world differ from a casino?',back:'Rules are unknown, dice are loaded, and outcomes are unbounded (fat-tailed).'},
+  {id:'c64',moduleId:'m6',core:false,category:'concept',front:'What is the flaw of financial models like Black-Scholes?',back:'They truncate risk (assume random walk) to make the math work. When reality jumps, the model breaks.'},
+  {id:'c65',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "The map is..."',back:'"...not the territory."'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'What happened to Long-Term Capital Management (LTCM) in 1998?', back:'Their model assumed no gaps. Real-world prices jumped discontinuously, hitting their absorbing barrier.'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'What is a "discontinuity" (gap) in markets?',back:'A price jump where no trading occurs. Models usually assume continuous paths.'},
+  {id:'c68',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Expect discontinuities..."',back:'"...in real-world systems."'},
+  {id:'c69',moduleId:'m6',core:false,category:'application',front:'Why do casinos go bankrupt?',back:'Not from gamblers winning (thin-tailed), but from tigers attacking performers or owners stealing (fat-tailed).'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What is the danger of "ludic" thinking in business?',back:'You optimize for the rules you know, but get blindsided by the rules you didn\'t know (or assumed away).'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'If a model assumes "no gaps," what is the hidden risk?',back:'A gap will happen, and it will be larger than the model\'s worst-case scenario.'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'What does it mean to "truncate risk" in a model?',back:'To cut off the tails of the distribution to make the math easier. It ignores the catastrophic events.'}, 
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is the difference between Fragile, Robust, and Antifragile?',back:'Fragile breaks under stress. Robust stays the same. Antifragile gets stronger.'},
+  {id:'c74',moduleId:'m7',core:true,category:'concept',front:'What is the Barbell Strategy?',back:'80-90% in extreme safety (cash), 10-20% in extreme risk (options). Avoid the fragile middle ground.'},
+  {id:'c75',moduleId:'m7',core:false,category:'application',front:'Why is the "middle ground" (medium risk) fragile?',back:'It is exposed to Black Swans but doesn\'t have the massive upside to compensate.'},
+  {id:'c76',moduleId:'m7',core:false,category:'concept',front:'What is convexity in this context?',back:'A payoff curve that curves upward. Downside is capped, upside is exponential.'},
+  {id:'c77',moduleId:'m7',core:false,category:'application',front:'How do you become antifragile?',back:'Remove fragility (debt, over-optimization) and add convexity (options, small bets).'},
+  {id:'c78',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Volatility is a feature..."',back:'"...not a bug, for antifragile systems."'},
+  {id:'c79',moduleId:'m7',core:false,category:'concept',front:'What is concavity?',back:'A payoff curve that curves downward. Upside is capped, downside is exponential.'},
+  {id:'c80',moduleId:'m7',core:false,category:'application',front:'Give an example of an antifragile system.',back:'Muscles (tear and rebuild), evolution (mutation and selection), the immune system.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Seek convexity..."',back:'"...(upside > downside)."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'Why is over-optimization fragile?',back:'It removes slack. When a shock hits, there is no buffer, so it breaks.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'Why is debt fragile?',back:'It is concave. The upside is linear, but the downside (ruin) is exponential.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'What is the Triad?',back:'The spectrum from Fragile to Robust to Antifragile. Everything falls on it.'}, 
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is an absorbing barrier?',back:'A point you cannot recover from. Zero, bankruptcy, death.'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'What is Gambler\'s Ruin?',back:'Even with positive odds, if you play forever against an infinite bankroll, a bad streak will eventually wipe you out.'},
+  {id:'c87',moduleId:'m8',core:false,category:'application',front:'What does "Don\'t cross a river that averages 4 feet deep" mean?',back:'The average doesn\'t matter. The 10-foot section (the tail) will drown you if you are 5 feet tall.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'Why does leverage introduce ruin?',back:'It amplifies losses. A 50% market drop wipes out a 2x leveraged portfolio.'},
+  {id:'c89',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Survival is the prerequisite for..."',back:'"...all future expected value."'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'If a loss can take you to zero, what is the expected value of the game?',back:'Negative infinity. No matter the probability of winning, ruin negates everything.'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'What is the danger of "path dependency" in investing?',back:'The order of returns matters. A crash early in retirement (sequence of returns risk) can cause ruin even if the average is fine.'},
+  {id:'c92',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Avoid ruin..."',back:'"...at all costs."'},
+  {id:'c93',moduleId:'m8',core:false,category:'application',front:'LTCM used 25x leverage. What wiped them out?',back:'A 4% market drop. The path (volatility) hit their absorbing barrier.'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'Why is "average return" misleading in the presence of absorbing barriers?',back:'Because if you hit zero, the game stops. You don\'t get to experience the "average."'},
+  {id:'c95',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "The tail matters..."',back:'"...not the average."'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'What is the difference between "ensemble probability" and "time probability"?',back:'Ensemble: 100 people play once. Time: 1 person plays 100 times. Time probability involves absorbing barriers.'}, 
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is Silent Evidence?',back:'The failures we don\'t see. We study survivors, ignoring the graves.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What is the Narrative Fallacy?',back:'Inventing stories to explain the past. We cannot handle raw randomness.'},
+  {id:'c99',moduleId:'m9',core:false,category:'application',front:'What is the lesson of Abraham Wald and the planes?',back:'Armor the engines, not the wings. The planes with holes in the engines didn\'t return (silent evidence).'},
+  {id:'c100',moduleId:'m9',core:false,category:'concept',front:'Why are "best practices" often dangerous?',back:'They are practices of survivors, not predictors of success. The failures used the same practices.'},
+  {id:'c101',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Look for the graves..."',back:'"...to find the true risk."'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'Why do we read books by successful entrepreneurs?',back:'Survivorship bias. We ignore the 99 who failed with the same strategy.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'What is the danger of "hindsight bias" in history?',back:'It makes the past look predictable, leading to false confidence in predicting the future.'},
+  {id:'c104',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "The past is messier..."',back:'"...than history books suggest."'},
+  {id:'c105',moduleId:'m9',core:false,category:'concept',front:'What is the core flaw in case studies of success?',back:'They lack a control group. They don\'t study the companies that did the same things but failed.'},
+  {id:'c106',moduleId:'m9',core:false,category:'application',front:'If 9 out of 10 startups fail, what is the base rate of success?',back:'10%. But we only hear from the 1 that succeeded.'},
+  {id:'c107',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "We only see survivors..."',back:'"...the graves are silent."'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'Why is randomness so uncomfortable for humans?',back:'Our brains are wired for causality. We need to know "why," even when there is no why.'}, 
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is a convex exposure?',back:'Downside is capped, upside is exponential. (e.g., buying a call option).'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'What is optionality?',back:'The right, but not the obligation, to act. It gives you convexity.'},
+  {id:'c111',moduleId:'m10',core:false,category:'application',front:'How does Venture Capital use convexity?',back:'Invest in 10. 9 fail (loss capped). 1 becomes Google (upside infinite). The tail pays for all.'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'If you are convex, how do you feel about volatility?',back:'You want it. The more it swings, the more likely you hit a massive gain.'},
+  {id:'c113',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "If you are convex, volatility is..."',back:'"...your friend."'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'What is a concave exposure?',back:'Upside is capped, downside is exponential. (e.g., selling insurance or options).'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'Why is it often worth paying a premium for convexity?',back:'It caps your downside. Insurance is a premium paid to avoid ruin.'},
+  {id:'c116',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "If you don\'t understand the payoff curve..."',back:'"...you are probably concave."'},
+  {id:'c117',moduleId:'m10',core:false,category:'application',front:'Why is debt concave?',back:'Your upside is linear (fixed interest), but your downside is exponential (bankruptcy/ruin).'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is the "barbell" in the context of convexity?',back:'The safe side protects you from ruin; the risky side provides the convex upside.'},
+  {id:'c119',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "The tail pays for..."',back:'"...all the failures."'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'Why is "average ROI" a bad metric for convex investments?',back:'Because the average is dragged down by the failures. The median is often negative, but the tail is astronomical.'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: Mild vs Wild', difficulty:1, reward:50, timeLimit:45, body:'Which domain does "Human Height" belong to?', options:['Extremistan','Mediocristan','Black Swan','Power Law'], correct:1, explanation:'Mediocristan. The tallest person in the world cannot change the average height of 1000 people. No single observation dominates.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Wealth', difficulty:2, reward:100, timeLimit:60, body:'You put 1000 people in a room. You add Elon Musk. What happens to the average wealth?', options:['It barely changes.','It goes up by a few thousand dollars.','It becomes a billionaire. The average is meaningless.','It stays the same.'], correct:2, explanation:'Extremistan. One observation dwarfs the aggregate. The average is dragged entirely by the outlier.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Turkey', difficulty:3, reward:200, timeLimit:90, body:'A turkey is fed for 1000 days. Its data shows humans are benevolent. What is the flaw?', options:['The turkey didn\'t use enough data.','The turkey used Mediocristan stats in an Extremistan world. The past does not predict the structural break (Thanksgiving).','The turkey should have used a Gaussian curve.','The turkey was right, it was just unlucky.'], correct:1, explanation:'Induction fails when the rules of the game can change. 1000 days of safety cannot prove day 1001 will be safe.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Gaussian Models', difficulty:4, reward:500, timeLimit:120, body:'Why do Gaussian models (bell curves) fail in Extremistan?', options:['Because the sample size is too small.','Because variance may be infinite. A single event can dwarf all others, making standard deviation useless.','Because humans are irrational.','Because they don\'t account for inflation.'], correct:1, explanation:'In Extremistan, variance is unbounded. Standard deviation assumes a stable average and bounded variance. A single outlier breaks the math.' },
+  { id:'p5', moduleId:'m2', title:'Q1: 80/20', difficulty:1, reward:50, timeLimit:45, body:'What is the Pareto Principle?', options:['80% of effects from 20% of causes.','20% of effects from 80% of causes.','The top 1% owns everything.','Averages are always correct.'], correct:0, explanation:'Roughly 80% of effects come from 20% of causes. Extreme concentration.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Scaling', difficulty:2, reward:100, timeLimit:60, body:'If 80% of results come from 20% of causes, what % comes from the top 4% (20% of 20%)?', options:['80%','64% (80% of 80%)','32%','96%'], correct:1, explanation:'Power laws scale recursively. The top 4% produces 64% of results. Extreme concentration at the tail.' },
+  { id:'p7', moduleId:'m2', title:'Q3: The Average Customer', difficulty:3, reward:200, timeLimit:90, body:'In a Pareto world, how should you treat the "average" customer?', options:['Optimize for them.','Ignore them. They are noise. Obsess over the vital few (top 20%).','Fire them.','Give them discounts.'], correct:1, explanation:'The average customer is irrelevant. The vital few pay the bills. Allocate resources asymmetrically.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Software Bugs', difficulty:4, reward:500, timeLimit:120, body:'In software, 80% of crashes come from 20% of bugs. What is the strategic implication?', options:['Rewrite the whole app.','Fix all bugs equally.','Fix the vital few bugs first. Ignore the trivial many.','Hire more QA.'], correct:2, explanation:'Asymmetric allocation. Find the 20% causing 80% of the pain and fix them. The other 80% of bugs are noise.' },
+  { id:'p9', moduleId:'m3', title:'Q1: Fat Tails', difficulty:1, reward:50, timeLimit:45, body:'What is a fat-tailed distribution?', options:['A distribution with a large average.','A distribution where extreme events are far more likely than in a Gaussian curve.','A distribution that is perfectly symmetrical.','A distribution with no variance.'], correct:1, explanation:'Fat tails mean the probability of extreme events (the tails) is much higher than the bell curve predicts.' },
+  { id:'p10', moduleId:'m3', title:'Q2: 7-Sigma', difficulty:2, reward:100, timeLimit:60, body:'In finance, a 7-sigma event (Gaussian) happens once every 390 billion years. In reality, they happen once a decade. Why?', options:['Bankers are unlucky.','Markets are fat-tailed, not Gaussian. The models are wrong.','Government regulation.','Inflation.'], correct:1, explanation:'Financial markets are Extremistan. The Gaussian assumption truncates the tail, making 7-sigma events look impossible when they are routine.' },
+  { id:'p11', moduleId:'m3', title:'Q3: VaR', difficulty:3, reward:200, timeLimit:90, body:'Why did VaR (Value at Risk) fail in 2008?', options:['It didn\'t use enough data.','It assumed thin tails and used 20 years of data that didn\'t include a systemic crash.','It was hacked.','The math was too complex.'], correct:1, explanation:'VaR modeled risk based on a calm historical period. When the fat tail hit, the model broke. Historical data cannot predict the size of the next crash.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Historical Volatility', difficulty:4, reward:500, timeLimit:120, body:'Why is "historical volatility" a dangerous predictor of future risk?', options:['It is always wrong.','Because variance may be infinite. A single new observation can dwarf all historical data.','Because markets always go up.','Because it ignores volume.'], correct:1, explanation:'In a fat-tailed world, your sample might look stable for years, but a single massive outlier can completely change the variance. The past does not bound the future.' },
+  { id:'p13', moduleId:'m4', title:'Q1: Definition', difficulty:1, reward:50, timeLimit:45, body:'What is a Black Swan?', options:['A predictable crash.','An event that is Improbable, High-Impact, and Retrospectively Predictable.','A black bird.','A statistical anomaly.'], correct:1, explanation:'It is an outlier, it has massive impact, and after it happens, experts claim "we should have seen it coming."' },
+  { id:'p14', moduleId:'m4', title:'Q2: Induction', difficulty:2, reward:100, timeLimit:60, body:'Can you prove a system is safe by observing 1000 days of safety?', options:['Yes, 1000 is a large sample.','No. One catastrophic failure (Black Swan) disproves the thesis. The problem of induction.','Only if you use Bayes.','Yes, if the variance is low.'], correct:1, explanation:'You cannot prove "all swans are white" by seeing a million white swans. One black swan disproves it.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Prediction', difficulty:3, reward:200, timeLimit:90, body:'What is the correct strategic response to Black Swans?', options:['Build better predictive models.','Hire better experts.','Build robustness/antifragility. Ensure you survive the event, whatever it is.','Ignore them.'], correct:2, explanation:'Prediction of specific Black Swans is impossible. Focus on survival and convexity instead.' },
+  { id:'p16', moduleId:'m4', title:'Q4: Experts', difficulty:4, reward:500, timeLimit:120, body:'Why do experts rationalize the past after a Black Swan?', options:['They are liars.','They see the signal in the noise *after* the noise resolves. They cannot handle raw randomness.','They have hindsight bias.','They want to sell books.'], correct:1, explanation:'The Narrative Fallacy. We invent stories to explain randomness. The experts didn\'t predict it, but they will claim it was predictable.' },
+  { id:'p17', moduleId:'m5', title:'Q1: Fractals', difficulty:1, reward:50, timeLimit:45, body:'What is a fractal?', options:['A smooth curve.','A shape that is self-similar across scales.','A type of bell curve.','A random walk.'], correct:1, explanation:'Zooming in reveals the same structure as the whole. Coastlines, clouds, markets.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Coastline', difficulty:2, reward:100, timeLimit:60, body:'What is the Coastline Paradox?', options:['Coastlines are too long to measure.','The length depends on the ruler. As the ruler gets smaller, length approaches infinity.','Coastlines change with tides.','Coastlines are straight.'], correct:1, explanation:'The coastline is fractal. It has no fixed length; the number is scale-dependent.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Market Charts', difficulty:3, reward:200, timeLimit:90, body:'Why are financial market charts fractal?', options:['Because they are smooth.','A 1-min, 1-day, and 1-year chart all look statistically identical. Volatility scales.','Because they go up over time.','Because of algorithms.'], correct:1, explanation:'Mandelbrot found that market volatility doesn\'t smooth out over time; it scales. The jaggedness remains at every timescale.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Smoothness', difficulty:4, reward:500, timeLimit:120, body:'Why do Gaussian models fail on fractal data?', options:['They assume smoothness and independence. Fractals are jagged and clustered.','They are too complex.','They don\'t use enough data.','They only work on small scales.'], correct:0, explanation:'Gaussian models assume a smooth, continuous path. Fractals are discontinuous and jagged. The model truncates the reality.' },
+  { id:'p21', moduleId:'m6', title:'Q1: Ludic Fallacy', difficulty:1, reward:50, timeLimit:45, body:'What is the Ludic Fallacy?', options:['Playing too many games.','Applying the rules of a game (casino) to real life.','Ignoring statistics.','Trusting experts.'], correct:1, explanation:'Assuming known odds, fair dice, and bounded outcomes in a world that is unknown, loaded, and unbounded.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Casino', difficulty:2, reward:100, timeLimit:60, body:'Why do risk managers love casinos?', options:['They can win money.','The odds are known, the dice are fair, and outcomes are bounded. It is predictable.','There are no Black Swans.','The math is easy.'], correct:1, explanation:'In a casino, you can calculate risk precisely. Real life is not a casino.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Black-Scholes', difficulty:3, reward:200, timeLimit:90, body:'What is the flaw of financial models like Black-Scholes?', options:['They are too old.','They truncate risk (assume random walk) to make the math work. When reality jumps, the model breaks.','They don\'t use Excel.','They ignore interest rates.'], correct:1, explanation:'Models truncate the tails to make the equations solvable. This hides the catastrophic risk until it happens.' },
+  { id:'p24', moduleId:'m6', title:'Q4: The Map', difficulty:4, reward:500, timeLimit:120, body:'What does "The map is not the territory" mean in risk management?', options:['You need a good GPS.','The model is not reality. Do not confuse the two.','Maps are useless.','Territory changes too fast.'], correct:1, explanation:'The model is a simplification. If you trust the model blindly, you will be destroyed by the reality it left out.' },
+  { id:'p25', moduleId:'m7', title:'Q1: The Triad', difficulty:1, reward:50, timeLimit:45, body:'What is Antifragility?', back:'Getting stronger under stress.', options:['Breaking under stress','Staying the same under stress','Getting stronger under stress','Ignoring stress'], correct:2, explanation:'Fragile breaks. Robust stays the same. Antifragile gets stronger (like a muscle).' },
+  { id:'p26', moduleId:'m7', title:'Q2: Barbell', difficulty:2, reward:100, timeLimit:60, body:'What is the Barbell Strategy?', options:['100% in medium-risk stocks.','80-90% in extreme safety, 10-20% in extreme risk. Avoid the fragile middle.','50% stocks, 50% bonds.','Buy and hold.'], correct:1, explanation:'The middle ground is fragile to Black Swans. The barbell caps downside (90% safe) while keeping convex upside (10% risk).' },
+  { id:'p27', moduleId:'m7', title:'Q3: Debt', difficulty:3, reward:200, timeLimit:90, body:'Why is debt fragile?', options:['It costs money.','It is concave. The upside is linear, but the downside (ruin) is exponential.','It is immoral.','It limits growth.'], correct:1, explanation:'Debt amplifies losses. A small drop in income can lead to bankruptcy. The downside is unbounded.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Convexity', difficulty:4, reward:500, timeLimit:120, body:'How do you become antifragile?', options:['Avoid all risk.','Remove fragility (debt, over-optimization) and add convexity (options, small bets).','Predict the future.','Buy insurance.'], correct:1, explanation:'You cannot avoid Black Swans. You must structure your life so that shocks make you stronger, not weaker.' },
+  { id:'p29', moduleId:'m8', title:'Q1: Absorbing Barrier', difficulty:1, reward:50, timeLimit:45, body:'What is an absorbing barrier?', options:['A wall that absorbs sound.','A point you cannot recover from. Zero, bankruptcy, death.','A statistical anomaly.','A risk model.'], correct:1, explanation:'It is the point of no return. Once you hit it, the game is over.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Gambler\'s Ruin', difficulty:2, reward:100, timeLimit:60, body:'If you have a 51% win rate, but play forever against an infinite bankroll, what happens?', options:['You win forever.','You eventually hit zero. Gambler\'s Ruin.','You break even.','The casino goes bankrupt.'], correct:1, explanation:'No matter how good your odds, a bad streak is inevitable over infinite time. If zero is possible, it becomes certain.' },
+  { id:'p31', moduleId:'m8', title:'Q3: The River', difficulty:3, reward:200, timeLimit:90, body:'What does "Don\'t cross a river that averages 4 feet deep" mean?', options:['Rivers are dangerous.','The average doesn\'t matter. The 10-foot section (the tail) will drown you.','You should measure depth first.','Always wear a life jacket.'], correct:1, explanation:'In fat-tailed domains, the tail risk kills you, not the average. The 10-foot section is the absorbing barrier.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Leverage', difficulty:4, reward:500, timeLimit:120, body:'Why does leverage introduce ruin?', options:['It is expensive.','It amplifies losses. A 50% market drop wipes out a 2x leveraged portfolio.','It is illegal.','It reduces upside.'], correct:1, explanation:'Leverage brings the absorbing barrier closer. A normal market fluctuation can now bankrupt you.' },
+  { id:'p33', moduleId:'m9', title:'Q1: Silent Evidence', difficulty:1, reward:50, timeLimit:45, body:'What is Silent Evidence?', options:['Evidence that is quiet.','The failures we don\'t see. We study survivors, ignoring the graves.','Audio recordings.','Missing data.'], correct:1, explanation:'We read books by winners. We don\'t read books by losers who used the same strategy. The graves are silent.' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Planes', difficulty:2, reward:100, timeLimit:60, body:'Where should you put armor on returning planes?', options:['Where the bullet holes are (wings).','Where the bullet holes AREN\'T (engines). The planes with holes in engines didn\'t return.','Nowhere, they are fine.','Everywhere.'], correct:1, explanation:'Survivorship bias. The returning planes survived wing hits. The missing planes were hit in the engines.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Best Practices', difficulty:3, reward:200, timeLimit:90, body:'Why are "best practices" often dangerous?', options:['They are outdated.','They are practices of survivors, not predictors of success. The failures used them too.','They are too expensive.','They are hard to implement.'], correct:1, explanation:'You need a control group. If failures used the same practice, it isn\'t a predictor of success.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Narrative Fallacy', difficulty:4, reward:500, timeLimit:120, body:'Why do we invent stories to explain the past?', options:['We are liars.','We cannot handle raw randomness. We need causality.','To sell books.','For legal reasons.'], correct:1, explanation:'The Narrative Fallacy. Our brains are wired for cause and effect. We impose order on randomness.' },
+  { id:'p37', moduleId:'m10', title:'Q1: Convexity', difficulty:1, reward:50, timeLimit:45, body:'What is a convex exposure?', options:['Downside is capped, upside is exponential.','Upside is capped, downside is exponential.','Both are capped.','Both are exponential.'], correct:0, explanation:'The payoff curve curves upward. You can only lose a little, but you can win infinity.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Optionality', difficulty:2, reward:100, timeLimit:60, body:'What is optionality?', options:['Having many options.','The right, but not the obligation, to act. It gives you convexity.','Choosing to do nothing.','A type of stock.'], correct:1, explanation:'An option lets you walk away if things go bad, but participate if things go well. Downside is capped.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Venture Capital', difficulty:3, reward:200, timeLimit:90, body:'How does Venture Capital use convexity?', options:['Invest in 1 safe company.','Invest in 10. 9 fail (loss capped). 1 becomes Google (upside infinite). The tail pays for all.','Buy index funds.','Use leverage.'], correct:1, explanation:'The VC model is pure convexity. The average is irrelevant; the median is negative. The massive tail pays for all the failures.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Volatility', difficulty:4, reward:500, timeLimit:120, body:'If you have a convex exposure, how do you feel about volatility?', options:['You hate it.','You want it. The more it swings, the more likely you hit a massive gain.','You are indifferent.','You hedge it.'], correct:1, explanation:'Convexity + Volatility = Antifragility. If your downside is capped, wild swings only help you.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Domain Check', scenario:'You are running a hedge fund. You want to model the risk of your portfolio. What is the first question you must ask?', options:['What is the standard deviation?','Am I in Mediocristan or Extremistan?','What is the average return?','What is the Sharpe ratio?'], correct:1, explanation:'If you are in Extremistan (markets), Gaussian models will fail. Identify the domain before applying math.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The 80/20 Client', scenario:'You analyze your fund\'s revenue. You find that 80% of fees come from 20% of clients. What do you do?', options:['Fire the bottom 80%.','Obsess over the top 20%. Ignore the trivial many.','Treat all clients equally.','Hire more client service reps.'], correct:1, explanation:'The average client is noise. Allocate resources asymmetrically to the vital few who pay the bills.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The VaR Model', scenario:'Your risk manager presents a VaR model based on 20 years of calm market data. What is the danger?', options:['The data is old.','It assumes thin tails. The next crash may be larger than anything in the sample.','It is too complex.','It doesn\'t include inflation.'], correct:1, explanation:'Historical data cannot predict the size of the next crash. The model truncates the fat tail.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Black Swan', scenario:'A global pandemic shuts down the economy. Your models didn\'t predict it. What is the correct response?', options:['Blame the model.','Accept it as a Black Swan. Do not try to predict the next one; build robustness instead.','Update the model to include pandemics.','Hire a virologist.'], correct:1, explanation:'Prediction is impossible. Adding "pandemic" to the model just makes you safe from the last crisis, not the next one.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Fractal Chart', scenario:'You look at a 1-minute chart and a 1-year chart of your fund\'s performance. They look identical. What does this mean?', options:['Your fund is stable.','Volatility scales. The risk doesn\'t smooth out over time.','You need to zoom out more.','Your returns are consistent.'], correct:1, explanation:'Markets are fractal. The risk is the same at every timescale. Do not assume long-term safety.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Model Flaw', scenario:'Your quant team presents a model that assumes no price gaps (discontinuities). What is the hidden risk?', options:['None, it\'s a good model.','A gap will happen, and it will be larger than the model\'s worst-case. The model truncates reality.','The model is too simple.','The team is lazy.'], correct:1, explanation:'The Ludic Fallacy. Real markets have gaps. Assuming them away creates a false sense of security.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Barbell', scenario:'You want to restructure the fund to survive Black Swans. What strategy do you use?', options:['100% in safe bonds.','100% in high-risk tech stocks.','80-90% in extreme safety (T-bills), 10-20% in extreme risk (options). Avoid the fragile middle.','50/50 stocks and bonds.'], correct:2, explanation:'The Barbell Strategy. Cap your downside (90% safe) while keeping convex upside (10% risk). The middle is fragile.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Leverage', scenario:'Your traders want to use 10x leverage to boost returns. What is the danger?', options:['It is illegal.','It introduces an absorbing barrier. A 10% market drop wipes the fund out (Gambler\'s Ruin).','It costs too much interest.','It reduces the Sharpe ratio.'], correct:1, explanation:'Leverage brings the absorbing barrier (zero) closer. Survival is the prerequisite for all future EV.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Survivors', scenario:'You study successful hedge funds to copy their strategies. What is the fallacy?', options:['Their strategies are secret.','Survivorship bias. You are ignoring the 99 funds that used the same strategies and failed.','They got lucky.','Their fees are too high.'], correct:1, explanation:'Silent Evidence. You only see the winners. The "best practices" might be shared by the graves.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Convex Bet', scenario:'You find a startup that will either go to zero or 100x. How do you evaluate the investment?', options:['Calculate the average ROI.','Invest a small amount. The downside is capped (loss of investment), the upside is convex (100x). The tail pays for all.','Don\'t invest, it\'s too risky.','Ask for a 51% win rate.'], correct:1, explanation:'Convexity. The average is irrelevant. The median is negative. The massive tail pays for all the failures.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Domain Check', body:'Identify a risk in your life. Is it in Mediocristan (mild) or Extremistan (wild)? Are you using the right model?' },
+  { id:'rw2', title:'The 80/20 Audit', body:'Look at your work output. Does 20% of your effort produce 80% of results? Double down on that 20%.' },
+  { id:'rw3', title:'The Tail Risk', body:'What is the worst-case scenario in your life/career? Is it survivable (robust) or fatal (fragile)?' },
+  { id:'rw4', title:'The Turkey Check', body:'Are you relying on past stability to predict future safety? Where is the "Thanksgiving" structural break?' },
+  { id:'rw5', title:'The Silent Evidence', body:'Read a success story. Ask: "How many people did the same thing and failed?" Look for the graves.' },
+  { id:'rw6', title:'The Barbell', body:'Review your investments or time allocation. Are you in the fragile middle? Move toward 90% safety / 10% risk.' },
+  { id:'rw7', title:'The Narrative Fallacy', body:'Listen to an expert explain why something happened. Recognize they are imposing order on randomness.' },
+  { id:'rw8', title:'The Absorbing Barrier', body:'Do you have debt? Recognize that debt introduces an absorbing barrier (ruin). Pay it off to remove fragility.' },
+  { id:'rw9', title:'The Optionality', body:'Find a situation where you can say "no" but must say "yes" to upside. That is optionality. Acquire it.' },
+  { id:'rw10', title:'The Fractal', body:'Look at a chart (market, weather, traffic). Does it look the same at different scales? It\'s fractal.' },
+  { id:'rw11', title:'The Casino', body:'Are you treating a real-world risk like a casino game (known odds)? Stop. The real world is unbounded.' },
+  { id:'rw12', title:'The Survivor', body:'Look at a "best practice" in your industry. Did the failures use it too? If so, it\'s not a predictor.' },
+  { id:'rw13', title:'The Convex Bet', body:'Identify a small bet you can make where the downside is capped but the upside is 10x. Make it.' },
+  { id:'rw14', title:'The Average', body:'Stop optimizing for the "average" customer/user/day. Find the vital few and obsess over them.' },
+  { id:'rw15', title:'The Volatility', body:'Do you avoid all stress? Small stressors make you antifragile. Embrace minor volatility.' },
+  { id:'rw16', title:'The Model', body:'Look at a model you use (financial, project). What does it truncate? What hidden assumption is it making?' },
+  { id:'rw17', title:'The Prediction', body:'Stop trying to predict specific future events. Focus on building robustness to survive any event.' },
+  { id:'rw18', title:'The River', body:'Are you crossing a river that "averages 4 feet deep"? The 10-foot section will drown you. Check the tail.' },
+  { id:'rw19', title:'The Leverage', body:'Do you use leverage (financial or time)? Recognize it brings the absorbing barrier closer.' },
+  { id:'rw20', title:'The Hindsight', body:'Listen to someone explain "why" a past event happened. Recognize it is retrospective prediction.' },
+  { id:'rw21', title:'The Mild', body:'Identify something in Mediocristan (height, weight). Gaussian models work here. Use averages.' },
+  { id:'rw22', title:'The Wild', body:'Identify something in Extremistan (wealth, viral posts). Discard averages. Expect extremes.' },
+  { id:'rw23', title:'The Fat Tail', body:'Look at a risk model. Does it assume thin tails? If so, it will fail in a crash.' },
+  { id:'rw24', title:'The Black Swan', body:'What improbable event would destroy your project? Don\'t predict it, but ensure you survive it.' },
+  { id:'rw25', title:'The Scale', body:'Does your strategy scale? Or does it break at a larger size? Test the fractal nature.' },
+  { id:'rw26', title:'The Armor', body:'Where are the bullet holes? Now, where are the missing planes? Armor the engines.' },
+  { id:'rw27', title:'The Downside', body:'Map a payoff curve. Is it convex (upside > downside) or concave (downside > upside)?' },
+  { id:'rw28', title:'The Ruin', body:'What is your absorbing barrier? Zero bank account? Burnout? Ensure you never hit it.' },
+  { id:'rw29', title:'The Story', body:'Catch yourself telling a story about why something succeeded. Acknowledge the randomness.' },
+  { id:'rw30', title:'The Antifragile', body:'What gets stronger when stressed? (Muscles, startups, evolution). Are you acting like a fragile glass or a muscle?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your risk profile.' },
+  { threshold: 500, title: 'OBSERVER', desc: 'You see the difference between the wild and the mild.' },
+  { threshold: 1500, title: 'SKEPTIC', desc: 'You distrust Gaussian models in Extremistan.' },
+  { threshold: 3000, title: 'ANTIFRAGILE', desc: 'You position yourself to gain from volatility.' },
+  { threshold: 6000, title: 'BLACK SWAN SURVIVOR', desc: 'You expect the extreme and survive it. The tail pays for your failures.' }
+];
+
+const STORAGE_KEY = 'mandelbrot-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// BLACK SWAN SURVIVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Black Swan. You now possess the complete architecture of fat-tailed risk.</p>';
+      html += '<p><strong>The Secret:</strong> The world is not a casino. Do not apply game rules to real life. Expect the extreme, prepare for the unpredictable, and position yourself so that volatility makes you stronger. Avoid ruin, cap your downside, and let the tail pay for your failures. You are now a Black Swan Survivor.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Black Swan: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your risk architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="MANDELBROT.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="MANDELBROT.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="MANDELBROT.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="MANDELBROT.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="MANDELBROT.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="MANDELBROT.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="MANDELBROT.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="MANDELBROT.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'SURVIVED' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each risk axis to the hedge fund scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="MANDELBROT.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="MANDELBROT.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MANDELBROT.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'black swan: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="MANDELBROT.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="MANDELBROT.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="MANDELBROT.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="MANDELBROT.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MANDELBROT.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="MANDELBROT.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="MANDELBROT.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="MANDELBROT.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="MANDELBROT.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="MANDELBROT.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="MANDELBROT.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="MANDELBROT.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="MANDELBROT.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="MANDELBROT.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MANDELBROT.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="MANDELBROT.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="MANDELBROT.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MANDELBROT.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'mandelbrot_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading fat-tails kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Black Swan...', 'MANDELBROT online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.MANDELBROT = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
