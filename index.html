@@ -381,14 +381,33 @@ function renderHeatmap() {
 renderHeatmap();
 
 const ACHIEVEMENTS = [
+  // Onboarding & streaks
   { id: 'first_blood', name: 'First Blood', desc: 'Solve 1 Arena problem', icon: '⚔️', check: () => appData.some(a => a.xp > 50) },
   { id: 'streak_7', name: 'Week One', desc: '7-day streak', icon: '🔥', check: () => currentStreak >= 7 },
   { id: 'streak_30', name: 'Unbroken', desc: '30-day streak', icon: '🛡️', check: () => currentStreak >= 30 },
-  { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 5 globally', icon: '🧬', check: () => getLevel(totalXP) >= 5 },
-  { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 10 globally', icon: '🧠', check: () => getLevel(totalXP) >= 10 },
-  { id: 'mastery_100', name: 'Master', desc: '100 cards matured', icon: '💎', check: () => totalMature >= 100 },
-  { id: 'renaissance', name: 'Renaissance', desc: 'Train all disciplines', icon: '🎨', check: () => DISCIPLINES.every(d => { const m = appData.filter(a => a.domain === d.key); return m.length === 0 || m.some(a => a.xp > 0); }) },
-  { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 20 globally', icon: '🚀', check: () => getLevel(totalXP) >= 20 }
+  { id: 'streak_100', name: 'Relentless', desc: '100-day streak', icon: '☄️', check: () => currentStreak >= 100 },
+  // Breadth across the catalog
+  { id: 'explorer', name: 'Explorer', desc: 'Begin 10 courses', icon: '🧭', check: () => appData.filter(a => a.xp > 0).length >= 10 },
+  { id: 'voyager', name: 'Voyager', desc: 'Begin 25 courses', icon: '🗺️', check: () => appData.filter(a => a.xp > 0).length >= 25 },
+  { id: 'omniscient', name: 'Omniscient', desc: 'Begin every course', icon: '🌐', check: () => appData.length > 0 && appData.every(a => a.xp > 0) },
+  // Global depth (XP / level)
+  { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 15 globally', icon: '🌟', check: () => getLevel(totalXP) >= 15 },
+  { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 40 globally', icon: '🎓', check: () => getLevel(totalXP) >= 40 },
+  { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 75 globally', icon: '🚀', check: () => getLevel(totalXP) >= 75 },
+  // Spaced-repetition mastery
+  { id: 'mastery_500', name: 'Master', desc: '500 cards matured', icon: '💎', check: () => totalMature >= 500 },
+  { id: 'archivist', name: 'Archivist', desc: '1,000 cards matured', icon: '📚', check: () => totalMature >= 1000 },
+  // Discipline capstones
+  { id: 'renaissance', name: 'Renaissance', desc: 'Train all 7 disciplines', icon: '🎨', check: () => DISCIPLINES.every(d => { const m = appData.filter(a => a.domain === d.key); return m.length === 0 || m.some(a => a.xp > 0); }) },
+  { id: 'synthesis', name: 'Grand Synthesis', desc: '60%+ maturity in all 7 disciplines', icon: '💠', check: () => { const s = disciplineStats().filter(d => d.count > 0); return s.length === DISCIPLINES.length && s.every(d => d.maturity >= 60); } },
+  // Per-discipline mastery (80% average maturity)
+  { id: 'master_physics', name: 'Natural Philosopher', desc: 'Master Physical Sciences (80%)', icon: '⚛️', check: () => { const d = disciplineStats().find(x => x.key === 'physics'); return !!d && d.maturity >= 80; } },
+  { id: 'master_math', name: 'Logician', desc: 'Master Mathematics & Logic (80%)', icon: '📐', check: () => { const d = disciplineStats().find(x => x.key === 'math'); return !!d && d.maturity >= 80; } },
+  { id: 'master_compute', name: 'Architect', desc: 'Master Computation & Information (80%)', icon: '💻', check: () => { const d = disciplineStats().find(x => x.key === 'compute'); return !!d && d.maturity >= 80; } },
+  { id: 'master_life', name: 'Naturalist', desc: 'Master Life & Evolution (80%)', icon: '🧬', check: () => { const d = disciplineStats().find(x => x.key === 'life'); return !!d && d.maturity >= 80; } },
+  { id: 'master_mind', name: 'Sage', desc: 'Master Mind & Language (80%)', icon: '🧠', check: () => { const d = disciplineStats().find(x => x.key === 'mind'); return !!d && d.maturity >= 80; } },
+  { id: 'master_strategy', name: 'Grandmaster', desc: 'Master Strategy & Economics (80%)', icon: '📈', check: () => { const d = disciplineStats().find(x => x.key === 'strategy'); return !!d && d.maturity >= 80; } },
+  { id: 'master_systems', name: 'Engineer', desc: 'Master Systems & Engineering (80%)', icon: '⚙️', check: () => { const d = disciplineStats().find(x => x.key === 'systems'); return !!d && d.maturity >= 80; } }
 ];
 
 function renderAchievements() {
