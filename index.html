@@ -531,6 +531,10 @@ document.querySelectorAll('.fb-yn').forEach(btn => {
     if(a === 'yes'){ textarea.style.display = 'block'; } else { textarea.style.display = 'none'; textarea.value = ''; }
   };
 });
+  <!-- DEV TOOL: REMOVE BEFORE LAUNCH -->
+  <div style="max-width:1000px;margin:0 auto 3rem;text-align:center;">
+    <button id="devLevel75" style="background:transparent;border:1px dashed var(--red);color:var(--red);padding:0.5rem 1rem;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">DEV: Set Global Lvl 75</button>
+  </div>
 document.getElementById('submitFeedback').onclick = () => {
   let issueBody = "## Feedback Submission\n\n", hasContent = false;
   const issueText = document.getElementById('fb-issue').value.trim();
@@ -545,7 +549,17 @@ document.getElementById('submitFeedback').onclick = () => {
   window.open(url, '_blank');
   modal.style.display = 'none';
 };
-
+  // DEV TOOL: Inject XP to test Hub UI at Level 75
+  document.getElementById('devLevel75').onclick = () => {
+    const app = APPS[0]; // Targets PRIMA
+    let savedData = JSON.parse(localStorage.getItem(app.storageKey) || '{}');
+    savedData.xp = 547600; // Enough XP for Level 75
+    // Ensure the data structure exists so the Hub doesn't crash reading it
+    if(!savedData.modules) savedData.modules = {};
+    if(!savedData.cards) savedData.cards = {}; 
+    localStorage.setItem(app.storageKey, JSON.stringify(savedData));
+    location.reload();
+  };
 window.HUB = { setTheme };
 </script>
 </body>
