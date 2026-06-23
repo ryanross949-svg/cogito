@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // SCHUMPETER v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔥</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#100A05; --void-2:#1A100A; --panel:rgba(26,16,10,0.7); --panel-solid:#1A100A;
+  --cyan:#FF6B00; --cyan-dim:#8F4000; --magenta:#FF2D9C; --amber:#FFD700; --green:#00FFA3; --red:#FF3355;
+  --text:#FFF0E0; --text-dim:#8F7C6E; --text-faint:#4A4035;
+  --border:rgba(255,107,0,0.2); --border-bright:rgba(255,107,0,0.5);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000000; --void-2:#0A0A0A; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --void-2:#2A0A2A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --void-2:#F5F0E0; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --void-2:#3B4252; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{
+  background: radial-gradient(ellipse at 20% 10%,rgba(255,107,0,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%), var(--void);
+  min-height:100vh; position:relative; font-size:14px; line-height:1.6; transition: background 0.3s, color 0.3s;
+}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,107,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(255,107,0,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(255,107,0,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(16,10,5,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(255,107,0,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem; color:var(--text-dim); background:transparent; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em; cursor:pointer; text-transform:uppercase; font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute; right:0; top:120%; background:var(--panel-solid); border:1px solid var(--border-bright); border-radius:4px; display:none; flex-direction:column; z-index:100; min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem; font-size:0.7rem; color:var(--text-dim); cursor:pointer; border:none; background:none; text-align:left; font-family:var(--mono); text-transform:uppercase;}
+.theme-option:hover{background:var(--panel); color:var(--cyan);}
+
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(16,10,5,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+
+.mission{background:linear-gradient(135deg,rgba(255,107,0,0.08),rgba(255,45,156,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(255,107,0,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(255,107,0,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,107,0,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(255,107,0,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(255,107,0,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(255,107,0,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(255,107,0,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(255,107,0,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+
+.arena-container, .project-container{max-width:900px;margin:0 auto;}
+.arena-hud, .project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(255,107,0,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,102,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(255,107,0,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(255,107,0,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(255,107,0,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,102,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(255,107,0,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(255,107,0,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(255,45,156,0.05), rgba(255,107,0,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+
+.arena-group-header{font-family:var(--display); font-size:1.1rem; color:var(--cyan); margin-top:2rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); letter-spacing:0.1em;}
+.arena-row{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); padding:1rem 1.5rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s; border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright); transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex; align-items:center; gap:1rem; flex:1;}
+.arena-num{font-family:var(--display); color:var(--cyan-dim); font-size:0.85rem; width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem; font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem; border-radius:2px; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15); color:var(--green); border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15); color:var(--amber); border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15); color:var(--magenta); border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15); color:var(--red); border:1px solid var(--red);}
+
+@media(max-width:700px){
+  .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
+  .stats-strip{flex-wrap:wrap;gap:0.85rem;}
+  .nav{padding:0 1rem;}
+  .nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}
+  .view{padding:1rem;}
+  .lesson-title{font-size:1.7rem;}
+  .drill-card{padding:1.75rem 1.25rem;min-height:340px;}
+  .drill-question{font-size:1.1rem;}
+  .scenario{padding:1.5rem;}
+  .mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}
+  .big-stat-value{font-size:1.8rem;}
+  .section-title{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div id="boot">
+  <div class="boot-logo">SCHUMPETER</div>
+  <div class="boot-sub">Cogito // Creative Destruction Protocol v1.0</div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="brand">SCHUMPETER</div>
+        <div class="brand-tag">CREATIVE DESTRUCTION</div>
+      </div>
+      <a href="index.html" class="hub-link">← COGITO</a>
+    </div>
+    <div class="stats-strip">
+      <div class="theme-dropdown">
+        <button class="theme-btn" id="themeBtn">Theme</button>
+        <div class="theme-menu" id="themeMenu">
+          <button class="theme-option" onclick="SCHUMPETER.setTheme('quantum')">Quantum</button>
+          <button class="theme-option" onclick="SCHUMPETER.setTheme('matrix')">Matrix</button>
+          <button class="theme-option" onclick="SCHUMPETER.setTheme('cyberpunk')">Cyberpunk</button>
+          <button class="theme-option" onclick="SCHUMPETER.setTheme('light')">Light</button>
+          <button class="theme-option" onclick="SCHUMPETER.setTheme('nord')">Nord</button>
+        </div>
+      </div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
+      <div class="stat-pill">XP <b id="topXp">0</b></div>
+      <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
+      <div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+    <div class="nav-item" data-view="project">Project PHOENIX</div>
+    <div class="nav-item" data-view="drills">Drills</div>
+    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="stats">Stats</div>
+    <div class="nav-item" data-view="about">About</div>
+  </nav>
+  
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1>
+      <p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      
+      <div class="dash-grid">
+        <div class="panel mission">
+          <div class="panel-label">// Next Mission</div>
+          <h2 id="missionTitle">Initialize Training</h2>
+          <p id="missionBody">Loading innovation architecture...</p>
+          <div class="flex gap-1" style="flex-wrap:wrap">
+            <button class="btn" id="missionBtn">Begin →</button>
+            <button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-label">// Daily Output</div>
+          <div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div>
+          <div class="big-stat-sub">cards reviewed today</div>
+          <div class="mt-2" style="display:grid;gap:0.4rem">
+            <div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div>
+            <div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div>
+            <div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// Daily Real-World Mission</div>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
+          <button class="btn secondary" id="rtBtn" onclick="SCHUMPETER.completeRTMission()">Mark Complete · +25 XP</button>
+        </div>
+        <div class="profile-card">
+          <div class="panel-label">// Operator Profile</div>
+          <div class="profile-title" id="profTitle">UNRANKED</div>
+          <div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div>
+        </div>
+      </div>
+
+      <div id="secretUnlockContainer"></div>
+      
+      <div class="panel">
+        <div class="panel-label">// Ten-Axis Mastery</div>
+        <div class="dash-grid" style="margin:0">
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg>
+          </div>
+          <div class="mastery-list" id="masteryList"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="view" id="view-modules">
+      <h1 class="section-title">Training Modules</h1>
+      <p class="section-sub">Ten axes of creative destruction. Sequential unlock.</p>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </section>
+    
+    <section class="view" id="view-project">
+      <h1 class="section-title">Project: PHOENIX</h1>
+      <p class="section-sub">A cumulative scenario. Navigate a legacy auto manufacturer through the EV/autonomous paradigm shift.</p>
+      <div class="project-container" id="projectContainer"></div>
+    </section>
+    
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    
+    <section class="view" id="view-drills">
+      <h1 class="section-title">Spaced Repetition Drills</h1>
+      <p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p>
+      <div class="filter-bar" id="drillFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="core">★ Core Only</button>
+        <button class="filter-btn" data-filter="concept">Concepts</button>
+        <button class="filter-btn" data-filter="application">Application</button>
+        <button class="filter-btn" data-filter="quote">Quotes</button>
+      </div>
+      <div class="drill-container" id="drillContainer"></div>
+    </section>
+    
+    <section class="view" id="view-arena">
+      <h1 class="section-title">Combat Arena</h1>
+      <p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p>
+      <div class="arena-container" id="arenaContainer"></div>
+    </section>
+    
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1>
+      <p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat">
+          <div class="big-stat-label">Total XP</div>
+          <div class="big-stat-value" id="statXp">0</div>
+          <div class="big-stat-sub" id="statLevel">Level 1</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Cards Mature</div>
+          <div class="big-stat-value" id="statMature">0</div>
+          <div class="big-stat-sub" id="statMatureSub">of 0 total</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Retention Rate</div>
+          <div class="big-stat-value" id="statRetention">--</div>
+          <div class="big-stat-sub">last 100 reviews</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Longest Streak</div>
+          <div class="big-stat-value" id="statLongStreak">0</div>
+          <div class="big-stat-sub" id="statCurStreak">current: 0d</div>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Backup & Restore</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p>
+        <div class="flex gap-1" style="flex-wrap:wrap">
+          <button class="btn secondary" id="exportBtn">Export Save File</button>
+          <label class="btn secondary" style="cursor:pointer">
+            Import Save File
+            <input type="file" id="importBtn" accept=".json" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Card Maturity Distribution</div>
+        <div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Session Log</div>
+        <div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Reset</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p>
+        <button class="btn danger" id="resetBtn">Reset All Progress</button>
+      </div>
+    </section>
+    
+    <section class="view" id="view-about">
+      <h1 class="section-title">About SCHUMPETER</h1>
+      <p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>SCHUMPETER is a cognitive training simulator designed to install the strategic thinking patterns of innovation economics. It trains the brain to see how the destruction of old systems is not a bug of capitalism, but the essential mechanism of progress.</p>
+        
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul>
+          <li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality. Forgetting curve combat.</li>
+          <li><strong>Active Recall:</strong> Every drill requires generation, not recognition. You must produce the answer, not just identify it.</li>
+          <li><strong>Interleaving:</strong> Drills mix concepts across modules. Forced discrimination strengthens memory vs. blocked practice.</li>
+          <li><strong>Elaboration:</strong> Arena problems and Project PHOENIX require applying concepts to novel scenarios.</li>
+        </ul>
+        
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>GALE</strong> — The Gale of Destruction (Why perfect equilibrium is stagnation)</li>
+          <li><strong>PARADIGM</strong> — Technological Paradigm Shifts (Kuhnian structure applied to economics)</li>
+          <li><strong>MONOPOLY</strong> — The Necessity of Monopoly (Why perfect competition is a trap)</li>
+          <li><strong>ENTREPRENEUR</strong> — The Entrepreneur as Disruptor (Innovator vs. Manager)</li>
+          <li><strong>CYCLE</strong> — Long Waves and Business Cycles (Kondratiev waves)</li>
+          <li><strong>CREDIT</strong> — Credit and Capital Creation (Funding the future)</li>
+          <li><strong>OBSOLESCENCE</strong> — Planned and Natural Obsolescence (The death of the old)</li>
+          <li><strong>RIGIDITY</strong> — The Rigidity of Incumbents (The Innovator's Dilemma)</li>
+          <li><strong>INSTITUTION</strong> — Institutional Adaptation (Law vs. Tech)</li>
+          <li><strong>PROGRESS</strong> — The Engine of Progress (Destruction as wealth creation)</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ============== DATA: MODULES ==============
+const MODULES = [
+  { id:'m1', codename:'GALE', title:'The Gale of Destruction', summary:'Why perfect equilibrium is stagnation, and why monopolies are temporarily necessary.', lesson:{ title:'The Architecture of Progress', body: 'Classical economics aimed for equilibrium: a state where supply matches demand and all markets clear. Joseph Schumpeter argued that this equilibrium is actually a state of stagnation. It is the economic equivalent of death.\n\n## The Gale of Creative Destruction\n\nCapitalism is by nature an evolutionary, disruptive process. The "gale of creative destruction" is the essential force that incessantly revolutionizes the economic structure from within, destroying the old and creating the new.\n\n> The fundamental impulse that sets and keeps the capitalist engine in motion comes from the new consumers, goods, the new methods of production or transportation, the new markets, the new forms of industrial organization that capitalist enterprise creates. - Schumpeter\n\n## The Necessity of Monopoly\n\nPerfect competition is held up as the ideal in classical economics. Schumpeter argued it is impossible and undesirable. Perfect competition means no one has any market power, which means no one has the surplus (profit) required to fund massive, risky innovation.\n\nTemporary monopolies (patents, trade secrets, brand) are the prize that incentivizes the entrepreneur to take the massive risk of creating something new. Without the prospect of a temporary monopoly, there is no venture capital, no R&D, no step-change.\n\n## The Method\n\n1. **Stop optimizing for equilibrium.** If your market is stable, you are vulnerable to disruption.\n2. **Identify the destructive force.** What is the gale that will destroy the current structure?\n3. **Accept that destruction is necessary.** Do not protect the old; build the new.\n4. **Seek temporary monopoly.** Innovation requires a protected space to grow.', takeaways:['Perfect equilibrium is economic stagnation, not the ideal.','Creative destruction is the essential mechanism of capitalism.','Perfect competition lacks the surplus required for massive innovation.','Temporary monopolies (patents, brand) are the prize that incentivizes risk.','Stop optimizing for stability; seek the gale.'] } },
+  { id:'m2', codename:'PARADIGM', title:'Technological Paradigms', summary:'Kuhnian paradigm shifts applied to economics and technology.', lesson:{ title:'The Architecture of the Shift', body: 'Thomas Kuhn introduced the concept of "paradigm shifts" in science: periods of normal science punctuated by revolutionary changes in worldview. Schumpeter applied a similar logic to economics.\n\n## Technological Paradigms\n\nA technological paradigm is a dominant design or architecture. The internal combustion engine, the personal computer, the smartphone. During the "normal" phase, everyone optimizes within the paradigm (faster cars, faster CPUs).\n\n## The Shift\n\nOccasionally, a new paradigm emerges that makes the old one obsolete. Electric vehicles are not "better cars"; they are a different paradigm where the drivetrain is software, not mechanics.\n\nIncumbents fail because they are optimized for the old paradigm. They view the new paradigm through the lens of the old (early EVs were literally "horseless carriages").\n\n## The Method\n\n1. **Identify the current paradigm.** What is the dominant architecture?\n2. **Look for the new paradigm.** What fundamental assumption is being violated?\n3. **Do not judge the new by the old.** Early versions of the new paradigm are always inferior to mature versions of the old.\n4. **Attack the paradigm, not the product.**', takeaways:['A technological paradigm is a dominant design or architecture.','Progress alternates between optimization (normal) and revolution (shift).','Incumbents fail because they view the new paradigm through the lens of the old.','Early versions of the new paradigm are always inferior to mature versions of the old.','Attack the fundamental assumption, not the product.'] } },
+  { id:'m3', codename:'MONOPOLY', title:'The Necessity of Monopoly', summary:'Why perfect competition is a trap, and temporary monopolies fund the future.', lesson:{ title:'The Architecture of the Prize', body: 'Peter Thiel popularized the Schumpeterian view in his book "Zero to One": Competition is for losers. Monopoly is the condition of successful innovation.\n\n## The Trap of Perfect Competition\n\nIn perfect competition, marginal revenue equals marginal cost. Profit approaches zero. With zero profit, there is no capital to invest in R&D. The industry becomes a commodity, competing on price, leading to a race to the bottom.\n\n## The Monopoly Prize\n\nA monopoly (in the Schumpeterian sense, not the illegal, anti-competitive sense) is a company that is so good at what it does that no one can offer a close substitute. This generates surplus profit (economic rent), which funds the next generation of innovation.\n\n## The Method\n\n1. **Avoid commoditization.** If you are competing on price, you are in perfect competition.\n2. **Build a temporary moat.** Proprietary tech, network effects, economies of scale, brand.\n3. **Use the surplus to fund the next monopoly.** Amazon\'s retail monopoly funded AWS.\n4. **Accept that all monopolies are temporary.** The gale of destruction will eventually destroy yours.', takeaways:['Perfect competition means zero profit and zero capital for innovation.','Monopoly (economic rent) is the prize that funds the next generation of R&D.','Monopolies are built on moats: tech, network effects, scale, brand.','Use the surplus from one monopoly to fund the next.','All monopolies are temporary; eventually, you will be disrupted.'] } },
+  { id:'m4', codename:'ENTREPRENEUR', title:'The Entrepreneur as Disruptor', summary:'The innovator vs. the manager. Vision over optimization.', lesson:{ title:'The Architecture of the Vision', body: 'Schumpeter distinguished between the "manager" and the "entrepreneur." The manager optimizes the existing system. The entrepreneur destroys it to build something new.\n\n## The Manager vs. The Entrepreneur\n\nThe manager is an administrator. They focus on efficiency, cutting costs, and incremental improvements. They operate within the existing paradigm.\n\nThe entrepreneur is a visionary. They see a future that does not exist yet and forces it into existence. They are not optimizing; they are creating.\n\n## The Role of the Vision\n\nThe entrepreneur does not just have an idea; they have a "vision." A conviction about how the world should work, which is currently incorrect but which they will make correct through sheer force of will and capital.\n\n## The Method\n\n1. **Stop optimizing and start creating.** If you are just cutting costs, you are managing.\n2. **Develop a vision that others think is crazy.** If everyone agrees, it is not a vision, it is a trend.\n3. **Execute with relentless force.** The vision is nothing without the capital and will to build it.\n4. **Beware of becoming a manager.** Once you succeed, you become the incumbent.', takeaways:['Managers optimize the existing system; entrepreneurs destroy it to build the new.','Entrepreneurs operate on vision, not just ideas.','If everyone agrees with your plan, you are managing, not entrepreneuring.','Execution requires capital and will; vision is nothing without them.','Beware of success: once you win, you become the manager you replaced.'] } },
+  { id:'m5', codename:'CYCLE', title:'Long Waves and Cycles', summary:'Kondratiev waves and the timing of creative destruction.', lesson:{ title:'The Architecture of the Wave', body: 'Nikolai Kondratiev proposed that capitalist economies experience long waves (50-60 years) of expansion and contraction, driven by major technological revolutions.\n\n## The Kondratiev Wave\n\n1. **Expansion:** A new paradigm (steam, rail, electricity, auto, IT) triggers a boom.\n2. **Boom:** Capital flows into the new paradigm, leading to overinvestment.\n3. **Recession:** Overcapacity leads to a crash.\n4. **Depression:** The old structure is destroyed (creative destruction).\n5. **Recovery:** The new paradigm matures and the cycle begins again.\n\n## The Schumpeterian View\n\nSchumpeter adopted Kondratiev waves and linked them to clusters of innovation. The gale of destruction is strongest during the depression phase, clearing the way for the next expansion.\n\n## The Method\n\n1. **Identify your position in the wave.** Are you in the boom, crash, or depression?\n2. **In the boom, build the new.** Capital is cheap; take risks.\n3. **In the depression, buy the old.** Assets are cheap; consolidate.\n4. **Do not fight the cycle.** You cannot stop the wave; you can only ride it.', takeaways:['Kondratiev waves are 50-60 year cycles driven by technological revolutions.','The cycle: Expansion -> Boom -> Recession -> Depression -> Recovery.','Creative destruction is strongest during the depression phase.','In the boom, build the new (capital is cheap). In the depression, buy the old (assets are cheap).','You cannot stop the wave; you can only position yourself relative to it.'] } },
+  { id:'m6', codename:'CREDIT', title:'Credit and Capital Creation', summary:'How credit fuels innovation and destroys old capital.', lesson:{ title:'The Architecture of the Future', body: 'Schumpeter argued that credit is the essential mechanism of creative destruction. Without credit, the entrepreneur cannot break the inertia of the established system.\n\n## The Function of Credit\n\nCredit gives the entrepreneur purchasing power *before* they have contributed to production. It allows them to enter the market, buy the means of production, and challenge the incumbents.\n\nWithout credit, the established firms (with their accumulated capital) would always win. Credit levels the playing field by allowing a newcomer to command resources today based on the promise of tomorrow.\n\n## The Destruction of Old Capital\n\nWhen the entrepreneur succeeds, they render the capital of the incumbents obsolete. The old factories, the old skills, the old brands lose their value. This is the "destruction" part.\n\n> The process of creative destruction is the process of making obsolete the capital of the incumbents. - Schumpeter\n\n## The Method\n\n1. **Credit is the fuel of disruption.** Without access to capital, you cannot challenge incumbents.\n2. **Use credit to command resources today.** Do not wait to accumulate profits.\n3. **Accept that success destroys old capital.** Your victory is someone else\'s bankruptcy.\n4. **Beware of over-leverage.** If the vision fails, the debt remains.', takeaways:['Credit gives entrepreneurs purchasing power before they have produced.','Without credit, incumbents with accumulated capital would always win.','Credit levels the playing field for newcomers.','Success renders the capital of incumbents obsolete (destruction).','Beware over-leverage: if the vision fails, the debt remains.'] } },
+  { id:'m7', codename:'OBSOLESCENCE', title:'Killing the Old', summary:'Planned and natural obsolescence as features of progress.', lesson:{ title:'The Architecture of the End', body: 'In a Schumpeterian system, obsolescence is not a bug; it is the mechanism. Things must die for progress to occur.\n\n## Natural Obsolescence\n\nWhen a new paradigm arrives, the old paradigm naturally becomes obsolete. The horse-drawn carriage didn\'t fail; it was rendered obsolete by the automobile. Blockbuster didn\'t fail; it was rendered obsolete by streaming.\n\n## Planned Obsolescence\n\nSometimes, companies engineer obsolescence (e.g., fashion seasons, software updates, iPhone cycles). While often criticized, Schumpeterians argue this is necessary to keep the gale of destruction blowing. Without forced obsolescence, the system tends toward stagnation.\n\n## The Method\n\n1. **Accept that obsolescence is necessary.** Do not mourn the old; celebrate the new.\n2. **Plan for your own obsolescence.** If you don\'t kill your product, someone else will.\n3. **Use obsolescence as a weapon.** Make the competitor\'s product obsolete.\n4. **Beware of artificial obsolescence.** If the new is only marginally better, the customer will rebel.', takeaways:['Obsolescence is the mechanism of progress, not a bug.','Natural obsolescence: new paradigms render old ones obsolete.','Planned obsolescence: forced cycles keep the system dynamic.','If you don\'t kill your product, a competitor will.','Beware artificial obsolescence: customers rebel if the new is only marginally better.'] } },
+  { id:'m8', codename:'RIGIDITY', title:'The Innovator\'s Dilemma', summary:'Why large, successful companies fail to innovate.', lesson:{ title:'The Architecture of Incumbent Failure', body: 'Clayton Christensen formalized the Schumpeterian observation that incumbents fail not because they are stupid, but because they are optimized for their current, profitable customers.\n\n## The Dilemma\n\nIncumbents are focused on "sustaining innovation" (making the current product better for current customers). They ignore "disruptive innovation" (new, cheaper, inferior technology that serves a niche market).\n\nThe disruptor starts in a niche, improves rapidly, and eventually attacks the incumbent\'s main market. By the time the incumbent notices, it is too late.\n\n## Why Incumbents Can\'t Pivot\n\n1. **Customer Focus:** Current customers don\'t want the new tech.\n2. **Margin Focus:** The new tech has lower margins.\n3. **Process Rigidity:** The org is optimized for the old process.\n4. **Stock Market:** Wall Street punishes lower margins.\n\n## The Method\n\n1. **Do not listen to your best customers.** They want sustaining innovation, not disruption.\n2. **Watch the niches.** Disruption starts where margins are low.\n3. **Spin off the disruptive tech.** Give it its own P&L so it isn\'t killed by the main business.\n4. **Accept that you will cannibalize yourself.** If you don\'t, someone else will.', takeaways:['Incumbents fail because they are optimized for current, profitable customers.','Sustaining innovation (better for current) vs. Disruptive (new, cheaper, niche).','Disruptors start in low-margin niches and move upmarket.','Incumbents cannot pivot due to customer focus, margin focus, and process rigidity.','Spin off disruptive tech so it isn\'t killed by the main business.'] } },
+  { id:'m9', codename:'INSTITUTION', title:'Institutional Adaptation', summary:'How laws and norms must adapt to new paradigms.', lesson:{ title:'The Architecture of the Rules', body: 'Creative destruction destroys not just products, but institutions. The regulatory framework built for the horse-drawn carriage ( licensing, stables, manure laws) was useless for the automobile.\n\n## The Lag\n\nInstitutions (laws, norms, regulators) always lag behind technology. The internet outpaced copyright law (Napster). Crypto outpaced banking law. AI is outpacing labor law.\n\nThis lag is a feature, not a bug. It allows the new paradigm to grow before being regulated to death. But eventually, institutions must adapt, or they will be bypassed.\n\n## The Method\n\n1. **Do not wait for regulation.** Build the future first; ask permission later.\n2. **Exploit the regulatory arbitrage.** If the old rules don\'t fit, find a jurisdiction where they don\'t apply.\n3. **Lobby for new rules.** Once you are established, help write the new rules to lock in your advantage.\n4. **Beware of regulatory capture.** Incumbents use regulation to prevent disruption.', takeaways:['Institutions (laws, norms) always lag behind technology.','The lag allows new paradigms to grow before being regulated to death.','Do not wait for regulation; build first, ask permission later.','Exploit regulatory arbitrage (jurisdictions with favorable rules).','Once established, lobby for new rules to lock in your advantage.'] } },
+  { id:'m10', codename:'PROGRESS', title:'The Engine of Progress', summary:'Synthesis: destruction as the fundamental mechanism of wealth creation.', lesson:{ title:'The Architecture of Wealth', body: 'Schumpeter\'s final synthesis is that the destruction of the old is not a side effect of capitalism; it IS capitalism. Wealth is not created by preserving capital, but by constantly destroying it and rebuilding it better.\n\n## The Paradox of Wealth\n\nIf you want to create wealth, you must be willing to destroy value. The automobile destroyed the value of the horse industry. The smartphone destroyed the value of the camera, GPS, and MP3 player industries. Net, society is richer, but the specific losers are real.\n\n## The End of Capitalism?\n\nSchumpeter famously predicted that capitalism would eventually destroy itself. Not because it fails, but because it succeeds. The entrepreneurial spirit would be replaced by corporate bureaucracy, and the intellectual class would turn against the system that feeds them.\n\n> Capitalism, while economically stable, is sociologically unstable. - Schumpeter\n\n## The Method\n\n1. **Embrace the paradox.** To create, you must destroy.\n2. **Do not protect losers.** Subsidizing obsolete industries prevents wealth creation.\n3. **Foster the entrepreneur.** The system relies on the visionary minority.\n4. **Beware the bureaucrats.** Success breeds complacency, which breeds failure.', takeaways:['Destruction of the old IS the mechanism of wealth creation, not a side effect.','To create wealth, you must be willing to destroy value.','Subsidizing obsolete industries prevents net wealth creation.','Schumpeter predicted capitalism would destroy itself via bureaucracy.','Foster the entrepreneur; beware the manager.'] } }
+];
+
+// ============== DATA: FLASHCARDS (120 Total) ==============
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the "Gale of Creative Destruction"?',back:'The incessant force that revolutionizes the economic structure from within, destroying the old and creating the new. It is the essential mechanism of capitalism.'},
+  {id:'c2',moduleId:'m1',core:true,category:'concept',front:'Why is perfect equilibrium actually stagnation?',back:'It is the economic equivalent of death. If supply perfectly matches demand and all markets clear, there is no profit, no surplus, and no capital for innovation.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Why are temporary monopolies necessary for innovation?',back:'They provide the surplus (profit) required to fund massive, risky R&D. Without the prospect of a temporary monopoly, there is no incentive to innovate.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'What is the Schumpeterian view of perfect competition?',back:'It is impossible and undesirable. It means no one has market power, which means no one has the surplus to fund the next step-change.'},
+  {id:'c5',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The process of creative destruction is the process of..."',back:'"...making obsolete the capital of the incumbents."'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'If your market is stable, what should you do?',back:'You are vulnerable to disruption. Stop optimizing for equilibrium and look for the destructive force.'},
+  {id:'c7',moduleId:'m1',core:false,category:'concept',front:'What is the relationship between destruction and progress?',back:'Destruction is not a side effect; it is the prerequisite. The old must die for the new to live.'},
+  {id:'c8',moduleId:'m1',core:false,category:'application',front:'Why did Schumpeter argue that classical economics was wrong?',back:'Classical economics aimed for equilibrium and perfect competition, which Schumpeter saw as stagnation and the absence of innovation.'},
+  {id:'c9',moduleId:'m1',core:false,category:'concept',front:'What is "economic rent" in the Schumpeterian sense?',back:'The surplus profit generated by a temporary monopoly. It is the prize that incentivizes the entrepreneur.'},
+  {id:'c10',moduleId:'m1',core:false,category:'application',front:'How do you identify a Schumpeterian opportunity?',back:'Find a stable, equilibrium market. The opportunity is the gale that will destroy that equilibrium.'},
+  {id:'c11',moduleId:'m1',core:false,category:'concept',front:'Is destruction a bug or a feature of capitalism?',back:'A feature. It is the fundamental impulse that keeps the capitalist engine in motion.'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The fundamental impulse that sets and keeps the capitalist engine in motion comes from..."',back:'"...the new consumers, goods, the new methods of production or transportation, the new markets, the new forms of industrial organization."'},
+  
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is a technological paradigm?',back:'A dominant design or architecture (e.g., internal combustion engine, PC, smartphone). During "normal" phases, everyone optimizes within it.'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'Why do incumbents fail during a paradigm shift?',back:'They are optimized for the old paradigm. They view the new paradigm through the lens of the old (e.g., early EVs as "horseless carriages").'},
+  {id:'c15',moduleId:'m2',core:false,category:'application',front:'How should you judge a new paradigm?',back:'Do not judge it by the standards of the old. Early versions of the new are always inferior to mature versions of the old, but they improve exponentially.'},
+  {id:'c16',moduleId:'m2',core:false,category:'concept',front:'What is the difference between optimization and revolution?',back:'Optimization improves within the paradigm. Revolution replaces the paradigm entirely.'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'How do you identify a paradigm shift?',back:'Look for a violation of a fundamental assumption. EVs violate the assumption that cars are mechanical; they are software.'},
+  {id:'c18',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Attack the paradigm..."',back:'"...not the product."'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'What is "normal science" in Kuhnian terms?',back:'Periods where scientists work within the accepted paradigm, solving puzzles. Equivalent to "normal" economics (sustaining innovation).'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'Why are early EVs "inferior" to gas cars?',back:'They are being judged by the old paradigm (range, refueling speed). In the new paradigm (software, integration), they are superior.'},
+  {id:'c21',moduleId:'m2',core:false,category:'concept',front:'What is a "dominant design"?',back:'The architecture that becomes the industry standard after a period of experimentation (e.g., QWERTY keyboard, iOS/Android).'},
+  {id:'c22',moduleId:'m2',core:false,category:'application',front:'How do you survive a paradigm shift?',back:'Do not optimize the old. Build the new, even if it cannibalizes your current business.'},
+  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'What is the relationship between paradigms and cycles?',back:'New paradigms trigger new Kondratiev waves (long economic cycles).'},
+  {id:'c24',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Progress alternates between..."',back:'"...optimization (normal) and revolution (shift)."'},
+  
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'Why is perfect competition a trap?',back:'In perfect competition, marginal revenue equals marginal cost. Profit approaches zero. With zero profit, there is no capital to invest in R&D.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'What is the "Monopoly Prize"?',back:'A temporary monopoly (patent, trade secret, brand) that generates surplus profit, which funds the next generation of innovation.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'What are the 4 types of moats that build monopolies?',back:'1. Proprietary technology. 2. Network effects. 3. Economies of scale. 4. Brand.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'How did Amazon use one monopoly to build another?',back:'Amazon\'s retail monopoly (scale) generated surplus capital, which funded AWS (proprietary tech), creating a second monopoly.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'Are all monopolies permanent?',back:'No. In a Schumpeterian system, all monopolies are temporary. The gale of destruction will eventually destroy them.'},
+  {id:'c30',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Competition is for..."',back:'"...losers." - Peter Thiel'},
+  {id:'c31',moduleId:'m3',core:false,category:'application',front:'If you are competing on price, what does that mean?',back:'You are in perfect competition. You are commoditized and have no moat.'},
+  {id:'c32',moduleId:'m3',core:false,category:'concept',front:'What is the difference between a Schumpeterian monopoly and an illegal one?',back:'A Schumpeterian monopoly is earned by being so good no one can offer a substitute. An illegal one is maintained by anti-competitive practices.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'What should you do with monopoly profits?',back:'Use the surplus to fund the next monopoly. If you just pay dividends, you will be disrupted.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'What is "economic rent"?',back:'The surplus profit earned by a monopoly above the competitive rate. It is the fuel of innovation.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'Why do commodity industries race to the bottom?',back:'Perfect competition forces price down to marginal cost. The only way to survive is to cut costs, leading to lower quality.'},
+  {id:'c36',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Monopoly is the condition of..."',back:'"...successful innovation."'},
+  
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is the difference between a manager and an entrepreneur?',back:'A manager optimizes the existing system (efficiency). An entrepreneur destroys it to build something new (creation).'},
+  {id:'c38',moduleId:'m4',core:true,category:'concept',front:'What is the role of "vision" for an entrepreneur?',back:'A conviction about how the world should work, which is currently incorrect but which they will make correct through force of will and capital.'},
+  {id:'c39',moduleId:'m4',core:false,category:'application',front:'If everyone agrees with your plan, what are you doing?',back:'You are managing, not entrepreneuring. A true vision is initially seen as crazy.'},
+  {id:'c40',moduleId:'m4',core:false,category:'concept',front:'What is the danger of success for an entrepreneur?',back:'Once you succeed, you become the incumbent. You risk becoming the manager you replaced.'},
+  {id:'c41',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "The entrepreneur does not just have an idea; they have a..."',back:'"...vision."'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'What is the entrepreneur\'s relationship to the existing paradigm?',back:'They do not optimize it. They violate its fundamental assumptions to create the new paradigm.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is the "will" of the entrepreneur?',back:'The relentless execution required to force the vision into existence, despite resistance from incumbents, regulators, and the market.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'How do you avoid becoming a manager?',back:'Keep seeking the gale. Do not rest on your monopoly; use it to fund the next disruption.'},
+  {id:'c45',moduleId:'m4',core:false,category:'concept',front:'Is the entrepreneur an administrator?',back:'No. Administrators manage what exists. Entrepreneurs create what does not exist.'},
+  {id:'c46',moduleId:'m4',core:false,category:'application',front:'What happens when an entrepreneur stops creating?',back:'They become a manager. The system stagnates and becomes vulnerable to the next entrepreneur.'},
+  {id:'c47',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Managers optimize the existing system; entrepreneurs..."',back:'"...destroy it to build the new."'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What is the difference between an idea and a vision?',back:'An idea is a concept. A vision is a conviction about the future that the entrepreneur is willing to bet their life and capital on.'},
+  
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is a Kondratiev wave?',back:'A 50-60 year economic cycle of expansion and contraction, driven by major technological revolutions (steam, rail, electricity, auto, IT).'},
+  {id:'c50',moduleId:'m5',core:true,category:'concept',front:'What are the 5 phases of the Kondratiev wave?',back:'1. Expansion (new paradigm). 2. Boom (overinvestment). 3. Recession (crash). 4. Depression (destruction). 5. Recovery (maturation).'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'When is the gale of creative destruction strongest?',back:'During the depression phase. It clears the old structure to make way for the next expansion.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'What should you do during the boom phase?',back:'Build the new. Capital is cheap and risk appetite is high. This is when disruptive startups are born.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'What should you do during the depression phase?',back:'Buy the old. Assets are cheap. Consolidate the survivors to prepare for the next expansion.'},
+  {id:'c54',moduleId:'m5',core:false,category:'concept',front:'Can you stop the Kondratiev wave?',back:'No. You can only position yourself relative to it. Fighting the cycle leads to ruin.'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'How are Kondratiev waves linked to innovation?',back:'Each wave is driven by a "cluster" of innovations around a new paradigm (e.g., the IT wave: PCs, internet, software).'},
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'What is "overinvestment" in the boom phase?',back:'Capital flows into the new paradigm faster than demand can absorb, leading to overcapacity and a crash.'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'Why do incumbents die during the depression?',back:'Their capital is tied up in the old paradigm. The depression destroys the value of that capital, making them insolvent.'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'What is the "recovery" phase?',back:'The new paradigm matures and becomes the new normal. The survivors of the depression dominate.'},
+  {id:'c59',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "You cannot stop the wave; you can only..."',back:'"...ride it."'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'What triggers a new Kondratiev wave?',back:'A technological paradigm shift that creates entirely new markets and destroys old ones.'},
+  
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the function of credit in creative destruction?',back:'It gives the entrepreneur purchasing power *before* they have produced, allowing them to challenge incumbents.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'Without credit, who would always win?',back:'The incumbents. They have accumulated capital. Credit levels the playing field for newcomers.'},
+  {id:'c63',moduleId:'m6',core:false,category:'application',front:'How does credit "level the playing field"?',back:'It allows a newcomer to command resources today based on the promise of tomorrow, rather than waiting years to accumulate profits.'},
+  {id:'c64',moduleId:'m6',core:false,category:'concept',front:'What is the "destruction" part of creative destruction?',back:'When the entrepreneur succeeds, they render the capital of the incumbents obsolete. The old factories, skills, and brands lose their value.'},
+  {id:'c65',moduleId:'m6',core:false,category:'application',front:'What is the risk of using credit to fuel disruption?',back:'If the vision fails, the debt remains. Over-leverage kills startups.'},
+  {id:'c66',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Credit is the fuel of..."',back:'"...disruption."'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'Does the entrepreneur use their own capital?',back:'Rarely. They use credit (VC, debt, equity) to command resources far beyond their personal wealth.'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'What happens to the incumbent\'s capital when disrupted?',back:'It is destroyed. The factories become scrap, the skills become useless, the brands become irrelevant.'},
+  {id:'c69',moduleId:'m6',core:false,category:'concept',front:'Why is credit necessary for progress?',back:'Without it, the inertia of established capital would prevent any new paradigm from taking hold.'},
+  {id:'c70',moduleId:'m6',core:false,category:'application',front:'How should an entrepreneur view debt?',back:'As a tool to buy time and resources. But it must be serviced by the future success of the vision.'},
+  {id:'c71',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Your victory is..."',back:'"...someone else\'s bankruptcy."'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'What is the relationship between credit and risk?',back:'Credit amplifies risk. It allows the entrepreneur to take bigger bets, but also increases the downside if they fail.'},
+  
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'Is obsolescence a bug or a feature of capitalism?',back:'A feature. It is the mechanism. Things must die for progress to occur.'},
+  {id:'c74',moduleId:'m7',core:true,category:'concept',front:'What is "natural obsolescence"?',back:'When a new paradigm renders the old obsolete. The horse-drawn carriage didn\'t fail; it was rendered obsolete by the automobile.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is "planned obsolescence"?',back:'When companies engineer cycles (fashion seasons, software updates) to force customers to buy new products.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'Why is planned obsolescence necessary?',back:'Without forced cycles, the system tends toward stagnation. It keeps the gale of destruction blowing.'},
+  {id:'c77',moduleId:'m7',core:false,category:'application',front:'What should you do if you don\'t kill your product?',back:'Someone else will. Plan for your own obsolescence.'},
+  {id:'c78',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "If you don\'t kill your product..."',back:'"...a competitor will."'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'How can you use obsolescence as a weapon?',back:'Make the competitor\'s product obsolete by introducing a paradigm shift that makes their features irrelevant.'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'What is the danger of artificial obsolescence?',back:'If the new is only marginally better, customers will rebel. The new must be a clear step-change.'},
+  {id:'c81',moduleId:'m7',core:false,category:'application',front:'Did Blockbuster fail?',back:'No. It was rendered obsolete by streaming. The old paradigm didn\'t fail; it was destroyed.'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is the relationship between obsolescence and wealth creation?',back:'Destroying the old (obsolescence) frees up capital and labor for the new, creating net wealth.'},
+  {id:'c83',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Obsolescence is the mechanism of progress..."',back:'"...not a bug."'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'Why do incumbents resist obsolescence?',back:'Their capital is tied up in the old. Obsolescence means writing off their assets.'},
+  
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is the "Innovator\'s Dilemma"?',back:'Incumbents fail not because they are stupid, but because they are optimized for their current, profitable customers.'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'What is the difference between sustaining and disruptive innovation?',back:'Sustaining: making the current product better for current customers. Disruptive: new, cheaper, inferior tech that serves a niche.'},
+  {id:'c87',moduleId:'m8',core:false,category:'application',front:'Where do disruptors start?',back:'In low-margin niches that incumbents ignore. They improve rapidly and move upmarket.'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'Why can\'t incumbents pivot to disrupt?',back:'1. Customer focus (current customers don\'t want it). 2. Margin focus (new tech has lower margins). 3. Process rigidity. 4. Stock market pressure.'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'How can an incumbent survive disruption?',back:'Spin off the disruptive tech into a separate entity with its own P&L, so it isn\'t killed by the main business.'},
+  {id:'c90',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Do not listen to your best customers..."',back:'"...they want sustaining innovation, not disruption."'},
+  {id:'c91',moduleId:'m8',core:false,category:'application',front:'Why are incumbents focused on "efficiency"?',back:'They are managing, not entrepreneuring. They optimize the existing paradigm rather than seeking the new.'},
+  {id:'c92',moduleId:'m8',core:false,category:'concept',front:'What is "cannibalization"?',back:'When a company\'s new product destroys the market for its old product. It is necessary for survival.'},
+  {id:'c93',moduleId:'m8',core:false,category:'application',front:'Why do incumbents use regulation to prevent disruption?',back:'They cannot compete on technology, so they use the legal system to outlaw the new paradigm (regulatory capture).'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'What is the "blind spot" of incumbents?',back:'They judge the new paradigm by the standards of the old. They see it as inferior, not as a threat.'},
+  {id:'c95',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Incumbents fail because they are optimized for..."',back:'"...their current, profitable customers."'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'What is the difference between a "low-end" and "new-market" disruption?',back:'Low-end: attacking the least profitable segment. New-market: creating a market that didn\'t exist.'},
+  
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is the relationship between technology and institutions?',back:'Institutions (laws, norms, regulators) always lag behind technology. Creative destruction destroys old institutions and forces new ones.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'Is the institutional lag a bug or a feature?',back:'A feature. It allows the new paradigm to grow before being regulated to death.'},
+  {id:'c99',moduleId:'m9',core:false,category:'application',front:'How should an entrepreneur handle regulation?',back:'Do not wait for it. Build first, ask permission later. Exploit regulatory arbitrage.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'What is "regulatory arbitrage"?',back:'Finding jurisdictions where the old rules don\'t apply, allowing the new paradigm to grow.'},
+  {id:'c101',moduleId:'m9',core:false,category:'application',front:'Once established, what should an entrepreneur do about rules?',back:'Lobby for new rules to lock in their advantage and prevent the next disruptor.'},
+  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'What is "regulatory capture"?',back:'When incumbents use regulation to prevent disruption, protecting their obsolete capital.'},
+  {id:'c103',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Do not wait for regulation; build first..."',back:'"...ask permission later."'},
+  {id:'c104',moduleId:'m9',core:false,category:'concept',front:'Why do old institutions fail?',back:'They were designed for the old paradigm. They cannot adapt fast enough to the new.'},
+  {id:'c105',moduleId:'m9',core:false,category:'application',front:'How did the internet outpace institutions?',back:'It outpaced copyright law (Napster), privacy law, and tax law. The institutions are still catching up.'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What happens when institutions are bypassed?',back:'The system becomes unstable. Eventually, new rules must be written to stabilize the new paradigm.'},
+  {id:'c107',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Institutions always lag behind..."',back:'"...technology."'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'What is the role of the intellectual class?',back:'Schumpeter predicted they would turn against the system that feeds them, criticizing capitalism\'s instability.'},
+  
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the Schumpeterian paradox of wealth?',back:'To create wealth, you must be willing to destroy value. The automobile destroyed the horse industry; net, society is richer.'},
+  {id:'c110',moduleId:'m10',core:true,category:'concept',front:'Is destruction a side effect of capitalism?',back:'No. It IS capitalism. Wealth is not created by preserving capital, but by constantly destroying it and rebuilding it better.'},
+  {id:'c111',moduleId:'m10',core:false,category:'application',front:'What happens if you subsidize obsolete industries?',back:'You prevent net wealth creation. You are protecting losers at the expense of winners.'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'What did Schumpeter predict would be the end of capitalism?',back:'Not failure, but success. The entrepreneurial spirit would be replaced by corporate bureaucracy.'},
+  {id:'c113',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Capitalism, while economically stable, is..."',back:'"...sociologically unstable."'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'How do you foster the entrepreneur?',back:'Protect their temporary monopolies. Do not regulate them to death. Allow them to destroy the old.'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'Why does success breed failure?',back:'Success breeds complacency. The entrepreneur becomes the manager. The monopoly becomes the bureaucracy.'},
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'What is the ultimate engine of progress?',back:'The visionary minority (entrepreneurs) who are willing to destroy the old to build the new.'},
+  {id:'c117',moduleId:'m10',core:false,category:'concept',front:'Is capitalism a static system?',back:'No. It is an evolutionary, dynamic process. It never rests.'},
+  {id:'c118',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "To create, you must..."',back:'"...destroy."'},
+  {id:'c119',moduleId:'m10',core:false,category:'concept',front:'What is the difference between preserving capital and creating wealth?',back:'Preserving capital (saving) leads to stagnation. Creating wealth requires destroying old capital to build new, better capital.'},
+  {id:'c120',moduleId:'m10',core:false,category:'application',front:'How do you avoid the bureaucratization of your company?',back:'Keep the entrepreneurial spirit alive. Reward vision and risk-taking over efficiency and process.'}
+];
+
+// ============== DATA: ARENA PROBLEMS (40 Total - 4 per module) ==============
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: The Equilibrium Trap', difficulty:1, reward:50, timeLimit:60, body:'Your industry is stable. Margins are predictable. Competition is fierce but balanced. According to Schumpeter, what is your biggest risk?', options:['Price wars eroding margins.','The gale of creative destruction. Stability is stagnation; a disruptor will emerge.','Regulatory capture by incumbents.','Rising labor costs.'], correct:1, explanation:'Schumpeter argued that equilibrium is stagnation. The "gale of creative destruction" destroys stable markets. If you are stable, you are vulnerable.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Perfect Competition', difficulty:2, reward:100, timeLimit:60, body:'A consultant advises you to enter a perfectly competitive market to gain scale. What is the Schumpeterian critique?', options:['Perfect competition yields zero profit, meaning no capital for innovation. It is a trap.','Perfect competition is the most efficient market structure.','You should enter only if you have a cost advantage.','You should form a cartel to fix prices.'], correct:0, explanation:'In perfect competition, MR=MC and profit approaches zero. Without profit (surplus), there is no capital to fund R&D. It is a trap.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Temporary Monopoly', difficulty:3, reward:200, timeLimit:90, body:'A startup secures a patent on a new battery tech, giving them a temporary monopoly. Critics call it "uncompetitive." How would Schumpeter defend it?', options:['Monopolies are always bad for consumers.','The monopoly is the prize that incentivized the massive R&D risk. Without it, no innovation occurs.','The government should break the patent immediately.','The startup should license the tech to everyone.'], correct:1, explanation:'Temporary monopolies are the prize that incentivizes innovation. They generate the surplus (profit) required to fund the next generation of R&D.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Gale', difficulty:4, reward:500, timeLimit:120, body:'You are the CEO of a profitable legacy business. What is the most Schumpeterian strategic move?', options:['Cut costs to maximize current profit.','Acquire competitors to consolidate the industry.','Use current profits to fund a disruptive internal startup that will cannibalize your main business.','Lobby for regulations to protect your market.'], correct:2, explanation:'Do not protect the old. Use the surplus from the old to build the new. If you don\'t destroy your own business, a disruptor will.' },
+  
+  { id:'p5', moduleId:'m2', title:'Q1: The Paradigm', difficulty:1, reward:50, timeLimit:45, body:'What is a "technological paradigm"?', options:['A failed experiment.','A dominant design or architecture (e.g., internal combustion engine).','A government regulation.','A type of business plan.'], correct:1, explanation:'A paradigm is the dominant architecture. During "normal" phases, everyone optimizes within it. Shifts replace it entirely.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Incumbent Failure', difficulty:2, reward:100, timeLimit:60, body:'Why do incumbents fail during a paradigm shift?', options:['They run out of money.','They are optimized for the old paradigm and judge the new by old standards.','They are poorly managed.','They don\'t hire enough MBAs.'], correct:1, explanation:'Incumbents view the new paradigm through the lens of the old. Early EVs were "horseless carriages." They cannot see the new paradigm\'s potential.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Judging the New', difficulty:3, reward:200, timeLimit:90, body:'A new technology is clunky, expensive, and serves a tiny niche. The incumbent dismisses it. What is the Schumpeterian view?', options:['The incumbent is correct; it will fail.','Do not judge the new by the old. It will improve exponentially and disrupt the main market.','The startup should pivot to a mass market immediately.','The government should fund the startup.'], correct:1, explanation:'Early versions of the new paradigm are always inferior to mature versions of the old. But they improve exponentially. Dismissing them is fatal.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Shift', difficulty:4, reward:500, timeLimit:120, body:'You are building an AI startup. How do you attack Google\'s search monopoly?', options:['Build a better search engine.','Attack the paradigm. Search is keyword-based; AI is intent-based. Do not compete on search; make search obsolete.','Undercut Google on ad prices.','Build a niche search engine for doctors.'], correct:1, explanation:'Attack the paradigm, not the product. Do not build a better search engine; build an answer engine that makes search irrelevant.' },
+  
+  { id:'p9', moduleId:'m3', title:'Q1: The Trap', difficulty:1, reward:50, timeLimit:45, body:'Why is perfect competition a trap for innovation?', options:['It creates too many competitors.','Profit approaches zero, leaving no capital for R&D.','It is too efficient.','Regulators hate it.'], correct:1, explanation:'In perfect competition, MR=MC. Profit approaches zero. With zero profit, there is no capital to invest in innovation.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Prize', difficulty:2, reward:100, timeLimit:60, body:'What is the "Monopoly Prize"?', options:['A government grant.','The surplus profit (economic rent) generated by a temporary monopoly, which funds the next innovation.','A trophy for winning a hackathon.','A tax break for large corporations.'], correct:1, explanation:'The surplus profit from a temporary monopoly is the prize that incentivizes the entrepreneur to take the massive risk of creating something new.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Moat', difficulty:3, reward:200, timeLimit:90, body:'Which is NOT a Schumpeterian moat for building a monopoly?', options:['Proprietary technology.','Network effects.','Lowest price.','Brand identity.'], correct:2, explanation:'Lowest price is a symptom of perfect competition (commoditization). Moats are tech, network effects, scale, and brand—things that prevent commoditization.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Amazon', difficulty:4, reward:500, timeLimit:120, body:'How did Amazon use one monopoly to build another?', options:['They used book sales to build retail scale, then used retail profits to build AWS.','They used AWS profits to buy Whole Foods.','They used Prime to lock in customers.','They used Kindle to disrupt publishers.'], correct:0, explanation:'Amazon\'s retail monopoly (scale) generated surplus capital, which funded AWS (proprietary tech). One monopoly funds the next.' },
+  
+  { id:'p13', moduleId:'m4', title:'Q1: Manager vs Entrepreneur', difficulty:1, reward:50, timeLimit:45, body:'What is the core difference between a manager and an entrepreneur?', options:['Managers make more money.','Managers optimize the existing system; entrepreneurs destroy it to build the new.','Entrepreneurs take no risk.','Managers work in big companies.'], correct:1, explanation:'Managers are administrators focused on efficiency. Entrepreneurs are visionaries focused on creation through destruction.' },
+  { id:'p14', moduleId:'m4', title:'Q2: The Vision', difficulty:2, reward:100, timeLimit:60, body:'If everyone agrees with your business plan, what are you doing?', options:['Building a strong consensus.','Managing, not entrepreneuring. A true vision is initially seen as crazy.','Pitching to VCs correctly.','Avoiding risk.'], correct:1, explanation:'If everyone agrees, it is not a vision; it is a trend. A true vision is a conviction about the future that others currently find absurd.' },
+  { id:'p15', moduleId:'m4', title:'Q3: The Danger of Success', difficulty:3, reward:200, timeLimit:90, body:'You just IPO\'d and are now a billionaire CEO. What is your biggest risk?', options:['Regulatory scrutiny.','Becoming the manager you replaced. Success breeds complacency.','Stock volatility.','Employee turnover.'], correct:1, explanation:'Success breeds complacency. Once you win, you become the incumbent. You risk becoming the manager you replaced.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Will', difficulty:4, reward:500, timeLimit:120, body:'An entrepreneur has a vision for a Mars colony. What else is required to make it real?', options:['A good PR team.','Relentless execution (will) and massive capital.','A government contract.','A lucky break.'], correct:1, explanation:'Vision is nothing without capital and will. The entrepreneur must execute relentlessly to force the vision into existence.' },
+  
+  { id:'p17', moduleId:'m5', title:'Q1: The Wave', difficulty:1, reward:50, timeLimit:45, body:'What is a Kondratiev wave?', options:['A short business cycle.','A 50-60 year economic cycle driven by technological revolutions.','A stock market crash.','A demographic trend.'], correct:1, explanation:'Kondratiev waves are long economic cycles (50-60 years) driven by major paradigm shifts (steam, rail, electricity, auto, IT).' },
+  { id:'p18', moduleId:'m5', title:'Q2: The Phases', difficulty:2, reward:100, timeLimit:60, body:'What are the 5 phases of the Kondratiev wave?', options:['Spring, Summer, Fall, Winter.','Expansion, Boom, Recession, Depression, Recovery.','Birth, Growth, Maturity, Decline.','Idea, Startup, Scale, Exit.'], correct:1, explanation:'1. Expansion (new paradigm). 2. Boom (overinvestment). 3. Recession (crash). 4. Depression (destruction). 5. Recovery (maturation).' },
+  { id:'p19', moduleId:'m5', title:'Q3: The Gale', difficulty:3, reward:200, timeLimit:90, body:'When is the gale of creative destruction strongest?', options:['During the expansion.','During the boom.','During the depression. It clears the old structure.','During the recovery.'], correct:2, explanation:'The depression phase is when the old structure is destroyed, clearing the way for the next expansion.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Strategy', difficulty:4, reward:500, timeLimit:120, body:'It is 2009 (Depression). You have cash. What is the Schumpeterian move?', options:['Buy safe assets (bonds).','Buy distressed assets (old capital) cheaply to consolidate for the recovery.','Start a risky tech company.','Hold cash and wait.'], correct:1, explanation:'In the depression, assets are cheap. Consolidate the survivors to prepare for the next expansion.' },
+  
+  { id:'p21', moduleId:'m6', title:'Q1: Credit', difficulty:1, reward:50, timeLimit:45, body:'What is the function of credit in creative destruction?', options:['It allows consumers to buy things.','It gives entrepreneurs purchasing power before they have produced.','It allows governments to fund deficits.','It inflates asset bubbles.'], correct:1, explanation:'Credit allows newcomers to command resources today based on the promise of tomorrow, leveling the playing field against incumbents.' },
+  { id:'p22', moduleId:'m6', title:'Q2: Without Credit', difficulty:2, reward:100, timeLimit:60, body:'Without credit, who would always win?', options:['The government.','The incumbents with accumulated capital.','The most innovative startup.','The consumer.'], correct:1, explanation:'Incumbents have accumulated capital. Without credit, newcomers cannot challenge them. Credit levels the playing field.' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Destruction', difficulty:3, reward:200, timeLimit:90, body:'When the entrepreneur succeeds, what happens to the incumbent\'s capital?', options:['It is acquired.','It is rendered obsolete (destroyed).','It is upgraded.','It is subsidized.'], correct:1, explanation:'Success renders the incumbent\'s capital obsolete. The old factories, skills, and brands lose their value. This is the destruction.' },
+  { id:'p24', moduleId:'m6', title:'Q4: The Risk', difficulty:4, reward:500, timeLimit:120, body:'An entrepreneur raises $100M in debt to fund a disruptor. The vision fails. What is the outcome?', options:['The debt is forgiven.','The debt remains. Over-leverage kills startups.','The VCs cover the loss.','The government bails them out.'], correct:1, explanation:'Credit amplifies risk. If the vision fails, the debt remains. Over-leverage is a leading cause of startup death.' },
+  
+  { id:'p25', moduleId:'m7', title:'Q1: Obsolescence', difficulty:1, reward:50, timeLimit:45, body:'Is obsolescence a bug or a feature of capitalism?', options:['A bug. It wastes resources.','A feature. It is the mechanism of progress.','Neither; it is random.','It depends on the industry.'], correct:1, explanation:'Obsolescence is the mechanism. Things must die for progress to occur. The old must be cleared for the new to grow.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Natural vs Planned', difficulty:2, reward:100, timeLimit:60, body:'What is "natural obsolescence"?', options:['Designing products to break.','A new paradigm rendering the old obsolete (e.g., car vs horse).','Wear and tear.','Software updates.'], correct:1, explanation:'Natural obsolescence is when a new paradigm makes the old irrelevant. The horse-drawn carriage didn\'t fail; it was rendered obsolete.' },
+  { id:'p27', moduleId:'m7', title:'Q3: The Weapon', difficulty:3, reward:200, timeLimit:90, body:'How can you use obsolescence as a weapon against a competitor?', options:['Copy their product.','Make their product obsolete by introducing a paradigm shift that makes their features irrelevant.','Undercut their price.','Sue them for patent infringement.'], correct:1, explanation:'Do not compete on features. Introduce a paradigm shift that makes their features irrelevant. (e.g., iPhone making BlackBerry\'s keyboard obsolete).' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Danger', difficulty:4, reward:500, timeLimit:120, body:'Why is artificial obsolescence (e.g., minor software updates) risky?', options:['It is illegal.','If the new is only marginally better, customers will rebel.','It costs too much.','It attracts regulators.'], correct:1, explanation:'If the new is only marginally better, customers see it as a cash grab and rebel. The new must be a clear step-change.' },
+  
+  { id:'p29', moduleId:'m8', title:'Q1: The Dilemma', difficulty:1, reward:50, timeLimit:45, body:'What is the "Innovator\'s Dilemma"?', options:['Innovators can\'t get funding.','Incumbents fail because they are optimized for current, profitable customers.','Innovators burn out.','Innovators are too risky.'], correct:1, explanation:'Incumbents fail not because they are stupid, but because they listen to their best customers, who want sustaining innovation, not disruption.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Sustaining vs Disruptive', difficulty:2, reward:100, timeLimit:60, body:'What is the difference between sustaining and disruptive innovation?', options:['Sustaining is for big companies; disruptive is for startups.','Sustaining improves the current product; disruptive is new, cheaper, inferior tech for a niche.','Sustaining is tech; disruptive is business models.','Sustaining is safe; disruptive is risky.'], correct:1, explanation:'Sustaining: making the current product better for current customers. Disruptive: new, cheaper, inferior tech that serves a niche, then improves and moves upmarket.' },
+  { id:'p31', moduleId:'m8', title:'Q3: The Pivot', difficulty:3, reward:200, timeLimit:90, body:'Why can\'t incumbents pivot to disrupt?', options:['They don\'t have the money.','Customer focus, margin focus, and process rigidity prevent it.','They don\'t see the threat.','Their employees are too old.'], correct:1, explanation:'Current customers don\'t want the new tech. The new tech has lower margins. The org is optimized for the old process. The pivot is structurally blocked.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Solution', difficulty:4, reward:500, timeLimit:120, body:'You are an incumbent CEO. A disruptor is attacking your niche. How do you survive?', options:['Cut prices to drive them out.','Spin off a separate entity with its own P&L to build the disruptive tech.','Acquire the disruptor and kill it.','Ignore them; they are too small.'], correct:1, explanation:'Spin off the disruptive tech so it isn\'t killed by the main business\'s margin requirements. Give it its own P&L and mandate.' },
+  
+  { id:'p33', moduleId:'m9', title:'Q1: The Lag', difficulty:1, reward:50, timeLimit:45, body:'What is the relationship between technology and institutions?', options:['Institutions lead technology.','Institutions lag behind technology.','They move at the same speed.','Institutions prevent technology.'], correct:1, explanation:'Institutions (laws, norms, regulators) always lag behind technology. The internet outpaced copyright law; crypto outpaced banking law.' },
+  { id:'p34', moduleId:'m9', title:'Q2: Feature or Bug', difficulty:2, reward:100, timeLimit:60, body:'Is the institutional lag a bug or a feature?', options:['A bug. It causes chaos.','A feature. It allows the new paradigm to grow before being regulated to death.','Neither; it is random.','It depends on the politician.'], correct:1, explanation:'The lag allows innovation to breathe. If regulators acted instantly, Uber, Airbnb, and crypto would have been killed at birth.' },
+  { id:'p35', moduleId:'m9', title:'Q3: The Strategy', difficulty:3, reward:200, timeLimit:90, body:'How should an entrepreneur handle regulation?', options:['Hire lobbyists before launching.','Build first, ask permission later. Exploit regulatory arbitrage.','Wait for clear laws.','Only operate in regulated industries.'], correct:1, explanation:'Do not wait for regulation. Build the future first. If the old rules don\'t fit, find a jurisdiction where they don\'t apply (arbitrage).' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Capture', difficulty:4, reward:500, timeLimit:120, body:'Once you are an established disruptor, what should you do about regulation?', options:['Ignore it.','Lobby for new rules to lock in your advantage and prevent the next disruptor.','Deregulate everything.','Give money to politicians.'], correct:1, explanation:'Once established, help write the new rules. This locks in your advantage and creates a moat against the next entrepreneur (regulatory capture).' },
+  
+  { id:'p37', moduleId:'m10', title:'Q1: The Paradox', difficulty:1, reward:50, timeLimit:45, body:'What is the Schumpeterian paradox of wealth?', options:['The rich get richer.','To create wealth, you must be willing to destroy value.','Wealth creates happiness.','Wealth is zero-sum.'], correct:1, explanation:'The automobile destroyed the horse industry. Net, society is richer, but the specific losers are real. Creation requires destruction.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Engine', difficulty:2, reward:100, timeLimit:60, body:'What is the ultimate engine of progress?', options:['Government planning.','The visionary minority (entrepreneurs) willing to destroy the old.','Central banks.','Education.'], correct:1, explanation:'Progress relies on the entrepreneurial minority who are willing to take risks and destroy the old to build the new.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Subsidies', difficulty:3, reward:200, timeLimit:90, body:'What happens if you subsidize obsolete industries?', options:['You create jobs.','You prevent net wealth creation. You are protecting losers at the expense of winners.','You increase tax revenue.','You stabilize the economy.'], correct:1, explanation:'Subsidizing obsolete industries (e.g., coal) prevents capital and labor from flowing to the new (solar). You prevent net wealth creation.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The End', difficulty:4, reward:500, timeLimit:120, body:'What did Schumpeter predict would be the end of capitalism?', options:['A proletarian revolution.','Its own success. The entrepreneurial spirit would be replaced by corporate bureaucracy.','Resource depletion.','Nuclear war.'], correct:1, explanation:'Schumpeter predicted capitalism would destroy itself via success. The entrepreneur becomes the manager; the monopoly becomes the bureaucracy.' }
+];
+
+// ============== DATA: PROJECT PHOENIX ==============
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Gale', scenario:'You are CEO of Vulcan Motors, a 100-year-old combustion engine giant. EVs are emerging. The board wants to optimize current margins. What do you do?', options:['Cut R&D to maximize quarterly profit.','Accept that combustion is the old paradigm. The gale of destruction is coming. Begin shifting capital to EVs, even if it hurts margins.','Lobby against EV subsidies.','Acquire a small EV startup and bury it.'], correct:1, explanation:'Schumpeterian logic: Do not protect the old. The gale is coming. Use current profits to fund the new paradigm, even if it cannibalizes your core business.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Paradigm', scenario:'Your engineers are building EVs by taking out the engine and putting in a battery. They are "horseless carriages." How do you correct this?', options:['Fire the engineers and hire new ones.','Change the paradigm. An EV is not a car with a battery; it is a software platform with wheels. Re-architect from the ground up.','Benchmark against Tesla.','Focus on range above all else.'], correct:1, explanation:'Incumbents fail because they view the new paradigm through the lens of the old. An EV is a software-defined vehicle. Re-architect completely.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Monopoly', scenario:'You need a battery supplier. Build your own gigafactory (huge capex, temporary monopoly) or buy from Panasonic (commodity)?', options:['Buy from Panasonic. It is cheaper.','Build the gigafactory. You need a temporary monopoly (scale + tech) to fund the next phase of innovation.','Form a joint venture.','Outsource to China.'], correct:1, explanation:'Build the moat. A gigafactory creates economies of scale (a moat). This temporary monopoly (economic rent) funds your software R&D.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Vision', scenario:'The board wants a 5-year plan to become "profitable in EVs." You need to pitch a 10-year vision for autonomous mobility.', options:['Agree to the 5-year profit plan.','Pitch the 10-year vision: Vulcan will not sell cars; it will sell autonomous mobility as a service. It will be unprofitable for 7 years.','Compromise: 7 years.','Resign.'], correct:1, explanation:'The entrepreneur operates on vision, not quarterly profit. The vision is autonomous mobility. It requires relentless execution and capital, and will be unprofitable for years.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Cycle', scenario:'It is 2025. The EV boom is peaking (overinvestment). A recession is looming. What is your move?', options:['Halt all R&D.','Use the depression to buy distressed assets (lithium mines, battery tech) cheaply. Prepare for the recovery.','Pivot back to combustion.','IPO immediately.'], correct:1, explanation:'In the boom, build. In the depression, buy. Use the downturn to consolidate the supply chain and acquire distressed tech for the next expansion.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Credit', scenario:'You need $50B to build the autonomous fleet. Wall Street wants profits. How do you fund it?', options:['Issue stock dividends.','Raise debt (credit) to fund the future. The debt will be serviced by the future monopoly of autonomous mobility.','Sell assets.','Cut costs.'], correct:1, explanation:'Credit is the fuel of disruption. It gives you purchasing power today based on the promise of tomorrow. Use debt to build the fleet.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Kill', scenario:'Your combustion engine division is still profitable but declining. The board wants to protect it. What do you do?', options:['Keep it; it pays the bills.','Kill it. Planned obsolescence. Announce the end of combustion production by 2030 to force the market and the company to adapt.','Spin it off.','Merge it with a competitor.'], correct:1, explanation:'If you don\'t kill your product, a competitor will. Announce the end of combustion to commit the company fully to the new paradigm.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Pivot', scenario:'Your dealer network is resisting EVs (they need less service). How do you handle this incumbent rigidity?', options:['Give them bigger margins on EVs.','Bypass them. Move to direct-to-consumer sales. Spin off a new "Vulcan Direct" entity.','Sue them.','Compromise: sell EVs online but service at dealers.'], correct:1, explanation:'Incumbents (dealers) are optimized for the old paradigm. Spin off a direct-sales entity so the old process doesn\'t kill the new paradigm.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Rules', scenario:'Autonomous vehicles are illegal in most states. How do you proceed?', options:['Wait for federal legislation.','Build first, ask permission later. Launch in states/jurisdictions with favorable laws (regulatory arbitrage).','Lobby Congress for a national framework.','Abandon autonomy.'], correct:1, explanation:'Do not wait for regulation. Exploit regulatory arbitrage. Launch where legal, prove the concept, then lobby for new rules.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Phoenix', scenario:'Vulcan Motors has successfully transitioned to an autonomous mobility company. The stock is up 10x. What is the final Schumpeterian lesson?', options:['Rest on your laurels.','Wealth was created by destroying the old combustion capital. Beware: success breeds complacency. Start looking for the next gale.','Buy back stock.','Retire.'], correct:1, explanation:'To create wealth, you destroyed value. But success breeds bureaucracy. You are now the incumbent. Start looking for the next paradigm to destroy yourself.' }
+];
+
+// ============== DATA: REAL-WORLD MISSIONS ==============
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Stable Market', body:'Identify a stable, mature market. What is the "gale" that could destroy it? Write down the paradigm shift.' },
+  { id:'rw2', title:'The Monopoly Audit', body:'Look at a company you admire. What is their temporary monopoly (moat)? Is it tech, network, scale, or brand?' },
+  { id:'rw3', title:'The Obsolescence', body:'Find a product you used 5 years ago but don\'t today. What paradigm rendered it obsolete?' },
+  { id:'rw4', title:'The Incumbent', body:'Identify an incumbent in your industry. What is their Innovator\'s Dilemma? What customer are they listening to?' },
+  { id:'rw5', title:'The Vision', body:'Write down a vision for your industry that others would call "crazy." What fundamental assumption does it violate?' },
+  { id:'rw6', title:'The Credit', body:'How are you using credit (debt, equity) to command resources today based on tomorrow\'s promise?' },
+  { id:'rw7', title:'The Cycle', body:'Where are we in the Kondratiev wave? Boom or depression? How should your strategy change?' },
+  { id:'rw8', title:'The Cannibal', body:'What product of yours should you kill to make way for the new? If you don\'t, who will?' },
+  { id:'rw9', title:'The Regulation', body:'What regulation is lagging behind your industry? How can you exploit the arbitrage?' },
+  { id:'rw10', title:'The Manager vs Entrepreneur', body:'Are you optimizing the existing system, or destroying it to build the new? Be honest.' },
+  { id:'rw11', title:'The Niche', body:'Where is the "low-end" disruption in your market? Who is serving the niche you ignore?' },
+  { id:'rw12', title:'The Moat', body:'If you are competing on price, you have no moat. What moat are you building?' },
+  { id:'rw13', title:'The Lag', body:'Find a law designed for the old paradigm. How is it being bypassed by the new?' },
+  { id:'rw14', title:'The Surplus', body:'How are you using your current profit (surplus) to fund the next monopoly?' },
+  { id:'rw15', title:'The Destruction', body:'What value are you destroying today to create wealth tomorrow?' },
+  { id:'rw16', title:'The Phoenix', body:'If your company burned down today, what would you rebuild, and what would you leave in the ashes?' },
+  { id:'rw17', title:'The Paradigm', body:'What is the dominant architecture in your field? What would violate its fundamental assumption?' },
+  { id:'rw18', title:'The Pivot', body:'Why can\'t your organization pivot? Is it customer focus, margin focus, or process rigidity?' },
+  { id:'rw19', title:'The Prize', body:'What is the "temporary monopoly" you are aiming for? What will you do with the surplus?' },
+  { id:'rw20', title:'The Complacency', body:'Success breeds complacency. Where have you become the manager you replaced?' },
+  { id:'rw21', title:'The Wave', body:'Are you riding the wave or fighting it? What would "riding" look like?' },
+  { id:'rw22', title:'The Will', body:'Vision is nothing without will. What relentless execution is required for your vision?' },
+  { id:'rw23', title:'The Obsolete Capital', body:'What capital (skills, assets, brand) of yours is becoming obsolete?' },
+  { id:'rw24', title:'The Disruptor', body:'Who is the disruptor in your industry? Are you dismissing them because their tech is "inferior"?' },
+  { id:'rw25', title:'The Subsidy', body:'Are you subsidizing an obsolete process or product? Stop it. Let it die.' },
+  { id:'rw26', title:'The Arbitrage', body:'Find a jurisdiction where your idea is legal but not yet regulated. Build there.' },
+  { id:'rw27', title:'The Entrepreneur', body:'Are you an administrator or a creator? Spend 1 hour today creating, not administering.' },
+  { id:'rw28', title:'The New', body:'Judge the new by its potential, not by the standards of the old. What are you dismissing?' },
+  { id:'rw29', title:'The Capture', body:'Once you win, will you use regulation to prevent the next disruptor? (Be honest).' },
+  { id:'rw30', title:'The End', body:'Schumpeter predicted capitalism would end in bureaucracy. Are you building a bureaucracy or an engine?' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your innovator profile.' },
+  { threshold: 500, title: 'OBSERVER', desc: 'You see the gale. The destruction is becoming visible.' },
+  { threshold: 1500, title: 'DISRUPTOR', desc: 'You actively destroy the old. Monopolies are your target.' },
+  { threshold: 3000, title: 'ENTREPRENEUR', desc: 'You build visions and force them into existence. Credit is your weapon.' },
+  { threshold: 6000, title: 'ARCHITECT OF PROGRESS', desc: 'You understand that destruction is the engine of wealth. You ride the wave.' }
+];
+
+// ============== STATE ==============
+const STORAGE_KEY = 'schumpeter-v1-clean';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){
+    console.error("Failed to load save, resetting.", e);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+  return defaultState();
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+// ============== PROGRESSION ==============
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){
+  const lvl = level(S.xp);
+  const cur = xpForLevel(lvl);
+  const next = xpForLevel(lvl+1);
+  return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 };
+}
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){
+    toast('LEVEL UP — LVL '+newLvl, 'success');
+    flashCombo('LVL '+newLvl);
+  }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){
+    S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null };
+  }
+  if(!S.daily.rtMissionId){
+    const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length);
+    S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id;
+  }
+}
+
+function unlockNextModule(moduleId){
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if(idx >= 0 && idx < MODULES.length - 1){
+    S.modules[MODULES[idx+1].id].unlocked = true;
+  }
+}
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){
+  let current = PROFILES[0];
+  for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; }
+  return current;
+}
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// ARCHITECTURE UNLOCKED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project PHOENIX. You now possess the complete architecture of creative destruction.</p>';
+      html += '<p><strong>The Secret:</strong> The destruction of the old is not a side effect of capitalism; it IS capitalism. Wealth is not created by preserving capital, but by constantly destroying it and rebuilding it better. To create, you must destroy. You are now an Architect of Progress.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+// ============== SPACED REPETITION (SM-2) ==============
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){
+    card.repetitions = 0; card.interval = 0; card.wrong += 1;
+  }else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else {
+      const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8);
+      card.interval = Math.max(1, Math.round(card.interval * factor));
+    }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){
+    card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if(card.ease < 1.3) card.ease = 1.3;
+  }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else {
+    const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8);
+    interval = Math.max(1, Math.round(interval * factor));
+  }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => {
+    if(a.core !== b.core) return a.core ? -1 : 1;
+    return S.cards[a.id].due - S.cards[b.id].due;
+  });
+}
+
+// ============== UI: HELPERS ==============
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+// ============== VIEWS ==============
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) {
+        const prevPhaseId = PROJECT_PHASES[i-1].id;
+        if (!S.project[prevPhaseId].solved) canUnlock = false;
+      }
+      if (canUnlock) {
+        nextProjectPhase = p;
+        break;
+      }
+    }
+  }
+  
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project PHOENIX: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your innovation architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary + ' Start with the lesson, then test yourself in the Arena.';
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module. Finish the remaining items to unlock the next axis.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery. The work is never done — only sharpened.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){
+      rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5';
+    } else {
+      rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1';
+    }
+  }
+
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100);
+      totalMaturity += maturity;
+    });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="maturity-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length;
+  const R = 95;
+  
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30));
+      totalMaturity += maturity;
+    });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="SCHUMPETER.show(\'modules\')"><- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="SCHUMPETER.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="SCHUMPETER.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  
+  html += '</div>';
+  
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){
+      html += '<button class="btn success mt-1" onclick="SCHUMPETER.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>';
+    }
+    html += '<button class="btn secondary mt-1" onclick="SCHUMPETER.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="SCHUMPETER.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){
+    html += '<button class="btn" onclick="SCHUMPETER.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>';
+  }else{
+    html += '<button class="btn secondary" disabled>Checked Read</button>';
+  }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    html += '<button class="btn secondary" onclick="SCHUMPETER.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>';
+  }
+  html += '</div>';
+  
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    
+    if(moduleProgress(moduleId).completed){
+      unlockNextModule(moduleId);
+      toast('Next axis unlocked', 'success');
+    }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+// ============== PROJECT PHOENIX ==============
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'REBORN' : 'BURNING') + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each axis to navigate a paradigm shift. Phases unlock sequentially.</p>';
+  
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) {
+      const prevPhaseId = PROJECT_PHASES[i-1].id;
+      if (!S.project[prevPhaseId].solved) {
+        unlocked = false;
+      }
+    }
+    
+    const active = !solved && unlocked;
+    
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="SCHUMPETER.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info">';
+    html += '<div class="phase-title">' + p.title + '</div>';
+    html += '<div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div>';
+    html += '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  
+  let html = '<div class="lesson-back" onclick="SCHUMPETER.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div>';
+  html += '</div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="SCHUMPETER.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'phoenix: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="SCHUMPETER.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){
+      actions.innerHTML = '<button class="btn success" onclick="SCHUMPETER.show(\'dashboard\')">View Final Report -></button>';
+    }
+    else { actions.innerHTML = '<button class="btn" onclick="SCHUMPETER.show(\'modules\')">Continue Training -></button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="SCHUMPETER.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="SCHUMPETER.showProjectPhase(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== DRILLS ==============
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => {
+    btn.onclick = () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderDrills();
+    };
+  });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="SCHUMPETER.show(\'arena\')">Arena -></button></div>';
+    return;
+  }
+  
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="SCHUMPETER.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div>';
+  html += '<div>Axis: <b>' + module.codename + '</b></div>';
+  html += '<div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="SCHUMPETER.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="SCHUMPETER.rateDrill(1)">Again<span class="interval"><1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="SCHUMPETER.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="SCHUMPETER.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="SCHUMPETER.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+// ============== ARENA ==============
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  
+  let html = '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="SCHUMPETER.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content">';
+      html += '<div class="arena-num">' + String(i+1).padStart(2,'0') + '</div>';
+      html += '<div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div>';
+      html += '<div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div>';
+      html += '</div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  
+  let html = '<div class="lesson-back" onclick="SCHUMPETER.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div>';
+  html += '</div>';
+  
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="SCHUMPETER.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){
+      clearInterval(arenaTimer);
+      if(problemState === 'idle'){ answerProblem(-1); }
+    }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){
+          unlockNextModule(p.moduleId);
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
+        }else{
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        }
+      }else{
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+      }
+      flashCombo('+' + p.reward + ' XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    actions.innerHTML = '<button class="btn" onclick="SCHUMPETER.show(\'arena\')">Back to Arena -></button>';
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="SCHUMPETER.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="SCHUMPETER.showArenaProblem(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== STATS ==============
+function renderStats(){
+  renderTopbar();
+  
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => {
+    if(c.interval >= 21) mature++;
+    else if(c.interval >= 7) young++;
+    else if(c.interval >= 1) learning++;
+    else newCards++;
+  });
+  
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){
+    const correctCount = recent.filter(h => h.correct).length;
+    document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%';
+  }else{ document.getElementById('statRetention').textContent = '--'; }
+  
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(157,78,221,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){
+    log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>';
+  }else{
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+// ============== PARTICLES ==============
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 107, 0, ' + p.o + ')';
+      ctx.fill();
+    });
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(255, 45, 156, ' + (0.1 * (1 - d/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){
+    if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; }
+  }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){
+    const map = { '1': 1, '2': 3, '3': 4, '4': 5 };
+    if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); }
+  }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); }
+  }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); }
+  }
+});
+
+// ============== THEME SWITCHER ==============
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme);
+  document.getElementById('themeMenu').classList.remove('active');
+}
+
+document.getElementById('themeBtn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('themeMenu').classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.theme-dropdown')) {
+    document.getElementById('themeMenu').classList.remove('active');
+  }
+});
+
+// ============== BACKUP & RESTORE ==============
+document.getElementById('exportBtn').onclick = () => {
+  const dataStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([dataStr], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'schumpeter_save.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Save file exported', 'success');
+};
+
+document.getElementById('importBtn').onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      S = JSON.parse(event.target.result);
+      saveState();
+      showView('dashboard');
+      toast('Save file imported successfully', 'success');
+    } catch(err) {
+      toast('Invalid save file', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
+// ============== RESET & NAV ==============
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error');
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { showView(item.dataset.view); });
+});
+
+// ============== BOOT ==============
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = [
+    'Initializing creative destruction v1.0...',
+    'Loading innovation kernel...',
+    'Calibrating SM-2 spaced repetition engine...',
+    'Mounting Pareto priority queue...',
+    'Indexing 10 axes / 120 cards / 40 arena scenarios...',
+    'Initializing Project PHOENIX...',
+    'SCHUMPETER online.'
+  ];
+  
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      setTimeout(() => {
+        document.getElementById('boot').classList.add('fade');
+        document.getElementById('app').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('boot').style.display = 'none';
+          showView('dashboard');
+        }, 800);
+      }, 300);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+// ============== PUBLIC API ==============
+window.SCHUMPETER = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+// ============== INIT ==============
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  
+  // Global Activity Tracker for Hub Heatmap
+  try {
+    let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
+    const todayDate = new Date().toISOString().split('T')[0];
+    if(!act.includes(todayDate)) { 
+      act.push(todayDate); 
+      localStorage.setItem('cogito-activity', JSON.stringify(act)); 
+    }
+  } catch(e) {}
+
+  saveState();
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
