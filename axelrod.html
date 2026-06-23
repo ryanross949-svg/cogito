@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // AXELROD v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤝</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08050F; --void-2:#0F0A1A; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24;
+  --cyan:#FF2D9C; --cyan-dim:#8F0049; --magenta:#9D4EDD; --amber:#FFB300; --green:#00D9FF; --red:#FF3355;
+  --text:#E6E6FA; --text-dim:#7A6E94; --text-faint:#4A4060;
+  --border:rgba(255,45,156,0.2); --border-bright:rgba(255,45,156,0.5);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000000; --void-2:#0A0A0A; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --void-2:#2A0A2A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --void-2:#F5F0E0; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --void-2:#3B4252; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{
+  background: radial-gradient(ellipse at 20% 10%,rgba(255,45,156,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(157,78,221,0.06),transparent 50%), var(--void);
+  min-height:100vh; position:relative; font-size:14px; line-height:1.6; transition: background 0.3s, color 0.3s;
+}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,45,156,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,45,156,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(255,45,156,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(255,45,156,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(8,5,15,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem; color:var(--text-dim); background:transparent; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em; cursor:pointer; text-transform:uppercase; font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute; right:0; top:120%; background:var(--panel-solid); border:1px solid var(--border-bright); border-radius:4px; display:none; flex-direction:column; z-index:100; min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem; font-size:0.7rem; color:var(--text-dim); cursor:pointer; border:none; background:none; text-align:left; font-family:var(--mono); text-transform:uppercase;}
+.theme-option:hover{background:var(--panel); color:var(--cyan);}
+
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(8,5,15,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+
+.mission{background:linear-gradient(135deg,rgba(255,45,156,0.08),rgba(157,78,221,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(255,45,156,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(255,45,156,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,45,156,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(255,45,156,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(255,45,156,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(255,45,156,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(255,45,156,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,217,255,0.05);}
+
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+
+.arena-container, .project-container{max-width:900px;margin:0 auto;}
+.arena-hud, .project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(255,45,156,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,217,255,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,102,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(255,45,156,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(255,45,156,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(255,45,156,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,102,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,217,255,0.3);}
+
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(255,45,156,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(255,45,156,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(255,45,156,0.05), rgba(157,78,221,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(157,78,221,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+
+.arena-group-header{font-family:var(--display); font-size:1.1rem; color:var(--cyan); margin-top:2rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); letter-spacing:0.1em;}
+.arena-row{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); padding:1rem 1.5rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s; border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright); transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex; align-items:center; gap:1rem; flex:1;}
+.arena-num{font-family:var(--display); color:var(--cyan-dim); font-size:0.85rem; width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem; font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem; border-radius:2px; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15); color:var(--green); border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15); color:var(--amber); border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15); color:var(--magenta); border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15); color:var(--red); border:1px solid var(--red);}
+
+@media(max-width:700px){
+  .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
+  .stats-strip{flex-wrap:wrap;gap:0.85rem;}
+  .nav{padding:0 1rem;}
+  .nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}
+  .view{padding:1rem;}
+  .lesson-title{font-size:1.7rem;}
+  .drill-card{padding:1.75rem 1.25rem;min-height:340px;}
+  .drill-question{font-size:1.1rem;}
+  .scenario{padding:1.5rem;}
+  .mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}
+  .big-stat-value{font-size:1.8rem;}
+  .section-title{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div id="boot">
+  <div class="boot-logo">AXELROD</div>
+  <div class="boot-sub">Cogito // Evolutionary Cooperation Protocol v1.0</div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="brand">AXELROD</div>
+        <div class="brand-tag">EVOLUTIONARY COOPERATION</div>
+      </div>
+      <a href="index.html" class="hub-link">← COGITO</a>
+    </div>
+    <div class="stats-strip">
+      <div class="theme-dropdown">
+        <button class="theme-btn" id="themeBtn">Theme</button>
+        <div class="theme-menu" id="themeMenu">
+          <button class="theme-option" onclick="AXELROD.setTheme('quantum')">Quantum</button>
+          <button class="theme-option" onclick="AXELROD.setTheme('matrix')">Matrix</button>
+          <button class="theme-option" onclick="AXELROD.setTheme('cyberpunk')">Cyberpunk</button>
+          <button class="theme-option" onclick="AXELROD.setTheme('light')">Light</button>
+          <button class="theme-option" onclick="AXELROD.setTheme('nord')">Nord</button>
+        </div>
+      </div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
+      <div class="stat-pill">XP <b id="topXp">0</b></div>
+      <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
+      <div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+    <div class="nav-item" data-view="project">Project ECHO</div>
+    <div class="nav-item" data-view="drills">Drills</div>
+    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="stats">Stats</div>
+    <div class="nav-item" data-view="about">About</div>
+  </nav>
+  
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1>
+      <p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      
+      <div class="dash-grid">
+        <div class="panel mission">
+          <div class="panel-label">// Next Mission</div>
+          <h2 id="missionTitle">Initialize Training</h2>
+          <p id="missionBody">Loading cooperative architecture...</p>
+          <div class="flex gap-1" style="flex-wrap:wrap">
+            <button class="btn" id="missionBtn">Begin →</button>
+            <button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-label">// Daily Output</div>
+          <div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div>
+          <div class="big-stat-sub">cards reviewed today</div>
+          <div class="mt-2" style="display:grid;gap:0.4rem">
+            <div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div>
+            <div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div>
+            <div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// Daily Real-World Mission</div>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
+          <button class="btn secondary" id="rtBtn" onclick="AXELROD.completeRTMission()">Mark Complete · +25 XP</button>
+        </div>
+        <div class="profile-card">
+          <div class="panel-label">// Operator Profile</div>
+          <div class="profile-title" id="profTitle">UNRANKED</div>
+          <div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div>
+        </div>
+      </div>
+
+      <div id="secretUnlockContainer"></div>
+      
+      <div class="panel">
+        <div class="panel-label">// Ten-Axis Mastery</div>
+        <div class="dash-grid" style="margin:0">
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg>
+          </div>
+          <div class="mastery-list" id="masteryList"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="view" id="view-modules">
+      <h1 class="section-title">Training Modules</h1>
+      <p class="section-sub">Ten axes of evolutionary cooperation. Sequential unlock.</p>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </section>
+    
+    <section class="view" id="view-project">
+      <h1 class="section-title">Project: ECHO</h1>
+      <p class="section-sub">A cumulative scenario. Design a decentralized trust network for an AI colony.</p>
+      <div class="project-container" id="projectContainer"></div>
+    </section>
+    
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    
+    <section class="view" id="view-drills">
+      <h1 class="section-title">Spaced Repetition Drills</h1>
+      <p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p>
+      <div class="filter-bar" id="drillFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="core">★ Core Only</button>
+        <button class="filter-btn" data-filter="concept">Concepts</button>
+        <button class="filter-btn" data-filter="application">Application</button>
+        <button class="filter-btn" data-filter="quote">Quotes</button>
+      </div>
+      <div class="drill-container" id="drillContainer"></div>
+    </section>
+    
+    <section class="view" id="view-arena">
+      <h1 class="section-title">Combat Arena</h1>
+      <p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p>
+      <div class="arena-container" id="arenaContainer"></div>
+    </section>
+    
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1>
+      <p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat">
+          <div class="big-stat-label">Total XP</div>
+          <div class="big-stat-value" id="statXp">0</div>
+          <div class="big-stat-sub" id="statLevel">Level 1</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Cards Mature</div>
+          <div class="big-stat-value" id="statMature">0</div>
+          <div class="big-stat-sub" id="statMatureSub">of 0 total</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Retention Rate</div>
+          <div class="big-stat-value" id="statRetention">--</div>
+          <div class="big-stat-sub">last 100 reviews</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Longest Streak</div>
+          <div class="big-stat-value" id="statLongStreak">0</div>
+          <div class="big-stat-sub" id="statCurStreak">current: 0d</div>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Backup & Restore</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p>
+        <div class="flex gap-1" style="flex-wrap:wrap">
+          <button class="btn secondary" id="exportBtn">Export Save File</button>
+          <label class="btn secondary" style="cursor:pointer">
+            Import Save File
+            <input type="file" id="importBtn" accept=".json" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Card Maturity Distribution</div>
+        <div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Session Log</div>
+        <div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Reset</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p>
+        <button class="btn danger" id="resetBtn">Reset All Progress</button>
+      </div>
+    </section>
+    
+    <section class="view" id="view-about">
+      <h1 class="section-title">About AXELROD</h1>
+      <p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>AXELROD is a cognitive training simulator designed to install the strategic thinking patterns of evolutionary cooperation, reciprocal altruism, and iterated game theory. It is not a sociology textbook. It is a workout.</p>
+        
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul>
+          <li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality. Forgetting curve combat.</li>
+          <li><strong>Active Recall:</strong> Every drill requires generation, not recognition. You must produce the answer, not just identify it.</li>
+          <li><strong>Interleaving:</strong> Drills mix concepts across modules. Forced discrimination strengthens memory vs. blocked practice.</li>
+          <li><strong>Elaboration:</strong> Arena problems and Project ECHO require applying concepts to novel scenarios.</li>
+        </ul>
+        
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>SHADOW</strong> — The shadow of the future and iterated interactions</li>
+          <li><strong>RECIP</strong> — Reciprocal altruism and vampire bats</li>
+          <li><strong>TITFORTAT</strong> — The winning strategy of the iterated Prisoner\'s Dilemma</li>
+          <li><strong>FORGIVE</strong> — Generosity and dealing with noise</li>
+          <li><strong>CLUSTER</strong> — Spatial and network topology of cooperation</li>
+          <li><strong>SIGNAL</strong> — Costly signaling and the green beard effect</li>
+          <li><strong>NOISE</strong> — Errors, misperception, and Win-Stay Lose-Shift</li>
+          <li><strong>POPULATION</strong> — Replicator dynamics and fitness landscapes</li>
+          <li><strong>ESS</strong> — Evolutionary Stable Strategies</li>
+          <li><strong>INSTITUTION</strong> — Solving the tragedy of the commons</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ============== DATA: MODULES ==============
+const MODULES = [
+  { id:'m1', codename:'SHADOW', title:'The Shadow of the Future', summary:'How the threat of future retaliation enforces present cooperation.', lesson:{ title:'The Architecture of Time', body: 'Single-move game theory (like the classic Prisoner\'s Dilemma) fails to explain the real world. In reality, interactions are usually repeated. The "shadow of the future" is the mathematical weight of future interactions.\n\n## The Discount Factor (δ)\n\nIn iterated games, the future is discounted. A reward today is worth more than a reward tomorrow. The discount factor (δ) represents how much a player values future payoffs (0 to 1).\n\nIf δ is high (close to 1), the future matters deeply. Defection today will be punished tomorrow. Therefore, cooperation is rational.\nIf δ is low (close to 0), the future doesn\'t matter. "Take the money and run" is rational. Defection dominates.\n\n## The Folk Theorem Revisited\n\nIn infinitely repeated games, almost any payoff can be sustained as an equilibrium if players are patient enough (δ is high). The shadow of the future enables cooperation without a central authority.\n\n## The Method\n\n1. **Identify the game.** Is it single-move or iterated?\n2. **Estimate δ.** Do the players expect to interact again? Do they care about the future?\n3. **If δ is high:** Cooperation is viable via trigger strategies.\n4. **If δ is low:** Defection is inevitable. Change the structure or end the relationship.\n\n> "The future casts a shadow on the present, altering the strategic landscape." - Game Theory Axiom.', takeaways:['Single-move game theory fails in reality; interactions are usually iterated.','The "Shadow of the Future" is the mathematical weight of future interactions.','Discount factor (δ): High = future matters (cooperate). Low = future irrelevant (defect).','If δ is high, cooperation can emerge without central authority.','If δ is low, defeection is rational. End the game or change the structure.'] } },
+  { id:'m2', codename:'RECIP', title:'Reciprocal Altruism', summary:'Cooperation among non-kin via delayed reciprocity.', lesson:{ title:'The Architecture of Reciprocity', body: 'Charles Darwin struggled to explain altruism. If evolution favors self-interest, why do organisms help each other? "Kin selection" explains helping family (shared genes). But what about non-kin?\n\n## Robert Trivers\' Theory\n\nIn 1971, Robert Trivers proposed Reciprocal Altruism: organisms help non-kin if there is an expectation of future reciprocation. It is not pure altruism; it is delayed self-interest.\n\n## The Vampire Bat\n\nVampire bats exemplify this. Bats that find blood regurgitate to share with hungry roostmates. But they don\'t share randomly. They share with:\n1. Kin\n2. Bats who have shared with them in the past (Reciprocators)\n3. Bats who are likely to survive and reciprocate in the future\n\nBats who cheat (take but never give) are excluded from future sharing.\n\n## The Prerequisites\n\nFor reciprocal altruism to evolve, the system needs:\n1. Repeated interactions (high δ).\n2. Ability to recognize individuals (memory).\n3. Ability to withhold benefit from cheaters (punishment).\n\n## The Method\n\n1. **Establish identity.** Can you track who did what?\n2. **Initiate cooperation.** Make a small, costly investment.\n3. **Monitor reciprocation.** Did they return the favor?\n4. **Cut off cheaters.** Withdraw future cooperation from defectors.', takeaways:['Reciprocal altruism is cooperation among non-kin based on delayed reciprocation.','It is not pure altruism; it is delayed self-interest.','Vampire bats share blood with past reciprocators, excluding cheaters.','Prerequisites: Repeated interactions, individual recognition, ability to punish.','Trust is built through small, escalated exchanges.'] } },
+  { id:'m3', codename:'TITFORTAT', title:'Tit-for-Tat', summary:'The simplest, most robust strategy in iterated games.', lesson:{ title:'The Architecture of Retaliation', body: 'In the 1980s, political scientist Robert Axelrod hosted a computer tournament of the Iterated Prisoner\'s Dilemma. Professors submitted complex strategies. The winner was the simplest program: Tit-for-Tat, submitted by Anatol Rapoport.\n\n## The Rules of Tit-for-Tat\n\n1. **Be Nice:** Cooperate on the first move. Never be the first to defect.\n2. **Be Retaliatory:** If the opponent defects, defect on the next move. Don\'t be a sucker.\n3. **Be Forgiving:** If the opponent returns to cooperation, return to cooperation. Don\'t hold grudges.\n4. **Be Clear:** The strategy is transparent. Opponents can see the pattern and adapt.\n\n## Why It Won\n\nTit-for-Tat cannot win a single game (it can at best tie). But in a tournament, it wins the *population* game. It elicits cooperation from other strategies. Nice strategies cluster and score high together. Exploitative strategies eventually get punished and isolated.\n\n## The Method\n\n1. **Start cooperative.** Assume good faith.\n2. **Mirror the opponent.** Do unto them as they just did unto you.\n3. **Don\'t be jealous.** Don\'t try to "win" by defecting when cooperation is possible.\n4. **Be predictable.** Let your strategy be known so others can adapt.', takeaways:['Tit-for-Tat won Axelrod\'s tournament by being simple and robust.','The 4 Rules: Nice (cooperate first), Retaliatory (punish defection), Forgiving (return to cooperation), Clear (be transparent).','It cannot win a single game, but it wins the population game.','Don\'t be the first to defect. Don\'t be a sucker. Don\'t hold grudges.','Clarity allows opponents to adapt and cooperate.'] } },
+  { id:'m4', codename:'FORGIVE', title:'Generosity and Noise', summary:'Why pure Tit-for-Tat fails with errors, and generosity wins.', lesson:{ title:'The Architecture of Forgiveness', body: 'Tit-for-Tat is perfect in a deterministic world. But the real world has noise. Signals get crossed. Mistakes happen.\n\n## The Death Spiral\n\nIf Player A accidentally defects (noise), Tit-for-Tat dictates that Player B must retaliate. A then retaliates for B\'s retaliation. They enter a "death spiral" of alternating defection, destroying mutual cooperation forever over a single mistake.\n\n## Generous Tit-for-Tat (GTFT)\n\nTo survive noise, strategies must be generous. Generous Tit-for-Tat (GTFT) works like TFT, but after the opponent defects, GTFT cooperates with a small probability (e.g., 10%). This breaks the death spiral.\n\n## Contrite Tit-for-Tat\n\nAnother solution is "Contrite" TFT. If a player realizes they made an error that provoked the opponent\'s retaliation, they suppress their own retaliation, accepting the punishment as just.\n\n## The Method\n\n1. **Assume noise.** Not all defections are malicious.\n2. **Inject forgiveness.** Occasionally cooperate after a defection to reset the board.\n3. **Apologize for errors.** If you make a mistake, accept retaliation without retaliating back.\n4. **Don\'t be too generous.** If you forgive too much, you become exploitable.', takeaways:['Noise (errors, misperception) destroys pure Tit-for-Tat via "death spirils".','Generous Tit-for-Tat (GTFT) forgives defection with a small probability to break spirals.','Contrite Tit-for-Tat suppresses retaliation if the defection was your own error.','Assume noise. Not all defections are malicious.','Don\'t be too generous, or you become exploitable.'] } },
+  { id:'m5', codename:'CLUSTER', title:'Spatial Cooperation', summary:'How topology and networks affect the evolution of trust.', lesson:{ title:'The Architecture of Proximity', body: 'In a well-mixed population (where everyone interacts with everyone), defectors often dominate. But in a spatially structured population (where you only interact with neighbors), cooperation can survive.\n\n## Islands of Cooperation\n\nIf cooperators cluster together, they protect each other. A defector on the edge can exploit one cooperator, but the cluster\'s internal interactions generate enough payoff to sustain the group. The defector is eventually surrounded by other defectors and starves.\n\n## Network Topology\n\nThe structure of the network matters:\n- **Static Networks:** Cooperators can form stable clusters. Defectors are isolated.\n- **Dynamic Networks:** If players can rewire connections (cut ties to defectors), cooperation flourishes.\n\n## The Method\n\n1. **Map the network.** Who interacts with whom?\n2. **Identify clusters.** Are cooperators connected to each other?\n3. **Change the topology.** Rewire connections to isolate defectors and connect cooperators.\n\n> "Structure is destiny. Change the network, change the game." - Network Science Axiom.', takeaways:['In well-mixed populations, defectors dominate. In spatial networks, cooperation survives.','Cooperators cluster to protect each other from defectors.','Network topology (who interacts with whom) determines evolutionary outcomes.','Dynamic networks (rewiring connections) facilitate cooperation by isolating defectors.','Structure is destiny. Change the network to change the game.'] } },
+  { id:'m6', codename:'SIGNAL', title:'Costly Signaling', summary:'Proving you are a cooperator via expensive, hard-to-fake signals.', lesson:{ title:'The Architecture of Proof', body: 'How do you know who to trust? Anyone can say "I am a cooperator." Cheap talk is easy to fake. Evolution requires costly signals.\n\n## The Handicap Principle\n\nAmotz Zahavi\'s Handicap Principle states that reliable signals must be costly. A peacock\'s tail is a costly signal of genetic fitness. It says, "I am so fit I can survive despite this massive burden."\n\nIn cooperation, initiating altruism is a costly signal. Sharing a large kill, giving a gift, or doing a favor proves you have resources and intend to cooperate.\n\n## The Green Beard Effect\n\nRichard Dawkins proposed the "Green Beard" effect: a gene that produces a recognizable trait (green beard) and causes the bearer to cooperate with other green beards. While rare in biology, human institutions mimic this via uniforms, degrees, and brands.\n\n## The Method\n\n1. **Demand costly signals.** Don\'t trust cheap talk. Look for investments.\n2. **Send costly signals.** Initiate cooperation to prove intent.\n3. **Beware fakes.** If the signal becomes cheap (easy to fake), it loses value.\n\n> "Actions speak louder than words because actions are costly." - Behavioral Economics Axiom.', takeaways:['Cheap talk is easy to fake. Reliable signals must be costly.','The Handicap Principle: Signals must be a burden to be believable.','Initiating altruism is a costly signal of cooperative intent.','The Green Beard effect: Recognizable traits that trigger cooperation.','If a signal becomes cheap, it loses evolutionary value.'] } },
+  { id:'m7', codename:'NOISE', title:'Dealing with Errors', summary:'Win-Stay, Lose-Shift and Pavlovian strategies.', lesson:{ title:'The Architecture of Resilience', body: 'Noise is inevitable. A robust strategy must handle errors gracefully.\n\n## Pavlov (Win-Stay, Lose-Shift)\n\nBeyond Tit-for-Tat, another successful strategy is "Pavlov" or Win-Stay, Lose-Shift (WSLS).\n- If the last outcome was good (mutual cooperation or successful exploitation): Repeat your move.\n- If the last outcome was bad (mutual defection or being exploited): Change your move.\n\n## Why Pavlov Beats TFT with Noise\n\nIf two TFT players enter a death spiral, they never recover. If two Pavlov players accidentally defect, they both get a bad outcome (mutual defection). They both shift, returning to cooperation. Pavlov is self-correcting.\n\n## The Method\n\n1. **Evaluate the outcome.** Was it mutually beneficial?\n2. **If yes:** Keep doing what you are doing.\n3. **If no:** Change your strategy.\n4. **Be deterministic but adaptable.** Don\'t get stuck in spirals.', takeaways:['Noise causes errors. Robust strategies must recover from them.','Pavlov (Win-Stay, Lose-Shift): Repeat success, change after failure.','Pavlov is self-correcting. TFT gets stuck in death spirals.','If mutual cooperation breaks down, shift. If it holds, stay.','Adaptability beats rigid retaliation in noisy environments.'] } },
+  { id:'m8', codename:'POPULATION', title:'Replicator Dynamics', summary:'How proportions of strategies evolve over generations.', lesson:{ title:'The Architecture of Fitness', body: 'Replicator Dynamics models how the proportion of strategies in a population changes over time based on their relative payoffs (fitness).\n\n## The Equation\n\ndx_i/dt = x_i * [ f_i(x) - φ(x) ]\n\nWhere x_i is the frequency of strategy i, f_i is its fitness (payoff), and φ is the average fitness of the population. If a strategy does better than average, it grows. If worse, it shrinks.\n\n## The Basin of Attraction\n\nThe state space of a population can have multiple equilibria. The "basin of attraction" is the set of initial conditions that lead to a specific equilibrium. If the population starts in the basin of cooperation, it evolves to cooperation.\n\n## The Method\n\n1. **Identify the strategies.** What are the pure types?\n2. **Determine the payoffs.** How do they fare against each other?\n3. **Find the equilibria.** Which states are stable?\n4. **Find the basins.** What initial conditions lead to which equilibrium?', takeaways:['Replicator Dynamics: Strategies that outperform the average grow in frequency.','Fitness is relative. It depends on the population composition.','Basins of Attraction: The set of initial conditions leading to a specific equilibrium.','Evolution is path-dependent. Where you start determines where you end up.','Population dynamics can shift abruptly when crossing basin boundaries.'] } },
+  { id:'m9', codename:'ESS', title:'Evolutionary Stable Strategies', summary:'A strategy that resists invasion by mutants.', lesson:{ title:'The Architecture of Stability', body: 'An Evolutionary Stable Strategy (ESS) is a strategy that, if adopted by a population, cannot be invaded by a mutant strategy.\n\n## The Test\n\nStrategy A is an ESS if:\n1. A does better against A than mutant B does against A. (A is a Nash Equilibrium).\n2. OR if A and B do equally well against A, but A does better against B.\n\n## Hawk-Dove Game\n\nIn the Hawk-Dove game:\n- Hawks fight (injury risk).\n- Doves bluff (retreat if attacked).\n- The ESS is a mixed strategy (or a polymorphic state) where the proportion of Hawks and Doves balances the cost of injury against the benefit of resources.\n\n## The Method\n\n1. **Define the incumbent strategy.** What is the population doing?\n2. **Define the mutant.** What is the alternative?\n3. **Run the test.** Can the mutant invade?\n4. **If no:** The incumbent is an ESS.\n\n> "An ESS is a strategy that is robust against the rare, the novel, and the alien." - Evolutionary Biology Axiom.', takeaways:['An ESS is a strategy that cannot be invaded by a mutant strategy.','It is a refinement of Nash Equilibrium for dynamic populations.','The Hawk-Dove game yields a mixed ESS balancing aggression and bluffing.','An ESS must be robust against rare alternatives, not just common ones.','Stability requires resistance to invasion, not just optimality.'] } },
+  { id:'m10', codename:'INSTITUTION', title:'Solving the Commons', summary:'How institutions and rules solve the tragedy of the commons.', lesson:{ title:'The Architecture of Governance', body: 'The Tragedy of the Commons occurs when individuals acting rationally deplete a shared resource. Game theory says defection is rational. How do we solve it?\n\n## The Leviathan Fallacy\n\nTraditional solutions propose a central authority (Leviathan) to punish defectors. But this assumes the authority is benevolent and omniscient, which is rarely true.\n\n## Elinor Ostrom\'s Principles\n\nElinor Ostrom won the Nobel Prize by showing that communities can solve the commons without a Leviathan, using 8 design principles:\n1. Clearly defined boundaries.\n2. Rules matching local conditions.\n3. Collective-choice arrangements (those affected participate).\n4. Monitoring.\n5. Graduated sanctions.\n6. Conflict resolution mechanisms.\n7. Recognition of rights to organize.\n8. Nested enterprises (for large systems).\n\n## The Method\n\n1. **Don\'t assume central authority is needed.** Local solutions work.\n2. **Define boundaries.** Who has access?\n3. **Make rules locally.** One size does not fit all.\n4. **Monitor and sanction.** Ensure compliance.\n5. **Allow adaptation.** Rules must evolve with the environment.', takeaways:['The Tragedy of the Commons is an iterated game with high stakes.','A central authority (Leviathan) is often not the best solution.','Elinor Ostrom showed communities self-govern via 8 design principles.','Key principles: Boundaries, local rules, monitoring, graduated sanctions.','Institutions are evolved mechanisms for enforcing cooperation.'] } }
+];
+
+// ============== DATA: FLASHCARDS (120 Total) ==============
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the "Shadow of the Future"?',back:'The mathematical weight of future interactions. It represents the probability and value of future encounters that incentivize present cooperation.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'What does the discount factor (δ) measure?',back:'How much a player values future payoffs relative to present ones. High δ (close to 1) = future matters (cooperate). Low δ (close to 0) = future irrelevant (defect).'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Why does single-move game theory fail in reality?',back:'Most real interactions are iterated. The "one-shot" assumption ignores the shadow of the future, which fundamentally changes the optimal strategy.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'If δ is low (close to 0), what is the rational strategy?',back:'Defection. If the future doesn\'t matter, "take the money and run" is optimal. You won\'t be punished.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What does the Folk Theorem state about iterated games?',back:'Almost any payoff can be sustained as an equilibrium if players are patient enough (δ is high). The shadow of the future enables cooperation without central authority.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'How do you estimate δ in a business relationship?',back:'Estimate the probability of future interactions and the value of those interactions. High repeat business = high δ.'},
+  {id:'c7',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The future casts a shadow on the present..."',back:'"...altering the strategic landscape."'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'What is a "trigger strategy"?',back:'A strategy where cooperation is maintained by the threat of permanent defection (Grim Trigger) or punishment if the opponent defects.'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'Why do one-shot interactions often end in defection?',back:'Because δ is effectively 0. There is no shadow of the future to incentivize cooperation.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What is the relationship between δ and cooperation?',back:'Positive. Higher δ (more patience) enables cooperation. Lower δ (impatience) leads to defection.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'How do you increase cooperation in a low-δ environment?',back:'Increase δ. Make the relationship longer, more frequent, or more valuable. Or change the structure to make defection costly.'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "If δ is high, cooperation is viable via..."',back:'"...trigger strategies."'},
+  
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is reciprocal altruism?',back:'Cooperation among non-kin based on delayed reciprocation. It is not pure altruism; it is delayed self-interest.'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'What are the 3 prerequisites for reciprocal altruism?',back:'1. Repeated interactions (high δ). 2. Ability to recognize individuals (memory). 3. Ability to withhold benefit from cheaters (punishment).'},
+  {id:'c15',moduleId:'m2',core:false,category:'application',front:'How do vampire bats exemplify reciprocal altruism?',back:'They share blood with non-kin who have shared with them in the past, and exclude cheaters who take but never give.'},
+  {id:'c16',moduleId:'m2',core:false,category:'concept',front:'Who proposed the theory of reciprocal altruism?',back:'Robert Trivers in 1971.'},
+  {id:'c17',moduleId:'m2',core:false,category:'application',front:'How is reciprocal altruism different from kin selection?',back:'Kin selection helps family (shared genes). Reciprocal altruism helps non-kin based on expected future reciprocation.'},
+  {id:'c18',moduleId:'m2',core:false,category:'concept',front:'Why is memory essential for reciprocal altruism?',back:'You must remember who helped you and who cheated you to reciprocate appropriately and exclude defectors.'},
+  {id:'c19',moduleId:'m2',core:false,category:'application',front:'How do you build trust in a new relationship?',back:'Initiate a small, costly investment (cooperate). Monitor if they reciprocate. Escalate if they do, cut off if they don\'t.'},
+  {id:'c20',moduleId:'m2',core:false,category:'concept',front:'Is reciprocal altruism "pure" altruism?',back:'No. It is delayed self-interest. The altruism is contingent on future reciprocation.'},
+  {id:'c21',moduleId:'m2',core:false,category:'application',front:'What happens to cheaters in a reciprocal system?',back:'They are excluded from future cooperation. They lose the benefits of the network.'},
+  {id:'c22',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "Trust is built through..."',back:'"...small, escalated exchanges."'},
+  {id:'c23',moduleId:'m2',core:false,category:'concept',front:'What is the "cost" in reciprocal altruism?',back:'The initial investment of helping another organism, which risks non-reciprocation.'},
+  {id:'c24',moduleId:'m2',core:false,category:'application',front:'Why can\'t reciprocal altruism evolve in a completely anonymous society?',back:'Anonymity removes memory and recognition. You cannot track who is a reciprocator and who is a cheater.'},
+  
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What are the 4 rules of Tit-for-Tat?',back:'1. Be Nice (cooperate first, never defect first). 2. Be Retaliatory (punish defection). 3. Be Forgiving (return to cooperation). 4. Be Clear (be transparent).'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'Why did Tit-for-Tat win Axelrod\'s tournament?',back:'It cannot win a single game, but it wins the population game. It elicits cooperation from other strategies and clusters with nice strategies.'},
+  {id:'c27',moduleId:'m3',core:false,category:'application',front:'Can Tit-for-Tat win a single game?',back:'No. It can at best tie. It never exploits an opponent. It wins tournaments by accumulating mutual cooperation points over many rounds.'},
+  {id:'c28',moduleId:'m3',core:false,category:'concept',front:'Why is "Be Nice" (never defect first) important?',back:'It avoids unnecessary conflict. If you defect first, you trigger retaliation and death spirals. It allows cooperation to emerge.'},
+  {id:'c29',moduleId:'m3',core:false,category:'concept',front:'Why is "Be Retaliatory" important?',back:'Without retaliation, you are a sucker. Exploiters will take advantage of you. Retaliation enforces the boundary.'},
+  {id:'c30',moduleId:'m3',core:false,category:'concept',front:'Why is "Be Forgiving" important?',back:'Without forgiveness, you get stuck in death spirals after a single defection. Forgiveness allows recovery from errors and noise.'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'Why is "Be Clear" important?',back:'Clarity allows opponents to recognize your strategy and adapt to it. Ambiguity causes misperception and accidental defection.'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'Who submitted Tit-for-Tat to Axelrod\'s tournament?',back:'Anatol Rapoport.'},
+  {id:'c33',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Don\'t be the first to defect. Don\'t be a..."',back:'"...sucker. Don\'t hold grudges."'},
+  {id:'c34',moduleId:'m3',core:false,category:'application',front:'What happens if two Tit-for-Tat players play each other?',back:'They cooperate forever (assuming no noise). They both score the mutual cooperation payoff every round.'},
+  {id:'c35',moduleId:'m3',core:false,category:'concept',front:'What is the "population game"?',back:'The sum of points over many interactions with many different strategies. TFT wins by thriving in a cluster of nice strategies.'},
+  {id:'c36',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Clarity allows opponents to..."',back:'"...adapt and cooperate."'},
+  
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'Why does pure Tit-for-Tat fail with noise?',back:'Noise (errors) causes accidental defections. TFT must retaliate, causing the opponent to retaliate, leading to a "death spiral" of alternating defection.'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'How does Generous Tit-for-Tat (GTFT) solve the death spiral?',back:'After the opponent defects, GTFT cooperates with a small probability (e.g., 10%). This breaks the spiral by randomly returning to cooperation.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'What is a "death spiral" in iterated games?',back:'A loop of alternating retaliation triggered by a single error. Players punish each other for past punishments, destroying cooperation forever.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'How does Contrite Tit-for-Tat handle errors?',back:'If a player realizes their own error provoked the opponent\'s retaliation, they suppress their own retaliation, accepting the punishment as just.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is the trade-off in forgiveness?',back:'Too much forgiveness = exploitable. Too little = death spirals. You must balance recovery from noise with defense against cheaters.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'In a noisy environment, which is better: TFT or Pavlov?',back:'Pavlov (Win-Stay, Lose-Shift). It is self-correcting after mutual defection, while TFT gets stuck.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is "noise" in game theory?',back:'Errors in implementation or perception. A player intends to cooperate but accidentally defects, or misperceives the opponent\'s move.'},
+  {id:'c44',moduleId:'m4',core:false,category:'application',front:'How do you inject forgiveness into a relationship?',back:'Occasionally cooperate after a defection to reset the board. Or apologize and accept retaliation without retaliating back.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Assume noise. Not all defections are..."',back:'"...malicious."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'Why is "Contrite" TFT effective?',back:'It recognizes when a defection was its own fault and suppresses retaliation, preventing the spiral.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'If you are too generous, what happens?',back:'You become exploitable. Cheaters will defect constantly, knowing you will forgive them.'},
+  {id:'c48',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Don\'t be too generous, or you become..."',back:'"...exploitable."'},
+  
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'Why does cooperation survive in spatial networks?',back:'Cooperators can cluster together, protecting each other. Defectors on the edge exploit one cooperator, but the cluster\'s internal interactions sustain the group.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'What happens in a well-mixed population?',back:'Defectors often dominate. They interact with cooperators randomly, exploit them, and prevent clusters from forming.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is an "island of cooperation"?',back:'A cluster of cooperators in a spatial network. They interact mostly with each other, generating high payoffs, while defectors on the border starve.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'How do dynamic networks facilitate cooperation?',back:'Players can rewire connections (cut ties to defectors, connect to cooperators). This isolates cheaters and allows cooperators to thrive.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'What is network topology?',back:'The structure of connections in a network. Who interacts with whom. It determines evolutionary outcomes.'},
+  {id:'c54',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "Structure is destiny..."',back:'"...Change the network, change the game."'},
+  {id:'c55',moduleId:'m5',core:false,category:'application',front:'How do you apply spatial cooperation to business?',back:'Map the network. Identify if cooperators are clustered. Rewire connections to isolate defectors and connect cooperators.'},
+  {id:'c56',moduleId:'m5',core:false,category:'concept',front:'Static vs. Dynamic networks:',back:'Static: Fixed connections. Cooperators can form stable clusters. Dynamic: Players can rewire. Cooperation flourishes as cheaters are cut off.'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'If a defector is surrounded by other defectors, what happens?',back:'They all get low payoffs (mutual defection). They starve relative to cooperator clusters.'},
+  {id:'c58',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "In well-mixed populations, defectors dominate. In spatial networks..."',back:'"...cooperation survives."'},
+  {id:'c59',moduleId:'m5',core:false,category:'concept',front:'What is "assortment"?',back:'The tendency of similar types to interact. High assortment (cooperators interact with cooperators) enables cooperation.'},
+  {id:'c60',moduleId:'m5',core:false,category:'application',front:'How do you increase assortment?',back:'Change the topology. Create clusters, filter interactions, or allow players to choose partners.'},
+  
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the Handicap Principle?',back:'Reliable signals must be costly. A signal is only believable if it imposes a burden on the sender. (e.g., a peacock\'s tail).'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'How does this apply to cooperation?',back:'Initiating altruism is a costly signal. Sharing a large kill or doing a favor proves you have resources and intend to cooperate. Cheap talk is easy to fake.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'What is the "Green Beard" effect?',back:'A gene that produces a recognizable trait (green beard) and causes the bearer to cooperate with other green beards. It allows assortative interaction.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'What is "cheap talk"?',back:'Costless signals. Anyone can say "I am a cooperator." It is easy to fake and therefore unreliable.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'Who proposed the Handicap Principle?',back:'Amotz Zahavi.'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'How do human institutions mimic the Green Beard effect?',back:'Via uniforms, degrees, and brands. They are costly to acquire (signal) and trigger cooperation among those who recognize them.'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'What happens when a signal becomes cheap?',back:'It loses evolutionary value. If everyone can fake it, it no longer correlates with cooperative intent.'},
+  {id:'c68',moduleId:'m6',core:false,category:'application',front:'How do you demand costly signals in business?',back:'Don\'t trust pitches. Look for investments: skin in the game, upfront costs, or public commitments.'},
+  {id:'c69',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Actions speak louder than words because..."',back:'"...actions are costly."'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'What is "skin in the game"?',back:'A modern term for costly signaling. It means bearing personal risk to prove your commitment.'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'Why is a peacock\'s tail a signal of fitness?',back:'It is a massive burden. Only a highly fit peacock can survive despite it. It says "I am so fit I can afford this handicap."'},
+  {id:'c72',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "If a signal becomes cheap..."',back:'"...it loses evolutionary value."'},
+  
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is the Pavlov strategy (Win-Stay, Lose-Shift)?',back:'If the last outcome was good (mutual coop or successful exploitation), repeat your move. If bad (mutual defection or being exploited), change your move.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'Why is Pavlov better than TFT with noise?',back:'Pavlov is self-correcting. If two Pavlov players accidentally defect, they both get a bad outcome and both shift, returning to cooperation. TFT gets stuck.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is the "death spiral" problem?',back:'Two TFT players entering a loop of alternating retaliation after a single error, never recovering.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'How does Pavlov recover from mutual defection?',back:'Mutual defection is a "bad" outcome. Both players shift (to cooperate). They recover automatically.'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'Is Pavlov "nice"?',back:'Yes, if it starts cooperating. But it is not retaliatory in the TFT sense. It is based on outcome evaluation, not mirroring.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'What is the risk of Pavlov?',back:'It can be exploited by a clever defector who alternates moves to keep the Pavlov player shifting.'},
+  {id:'c79',moduleId:'m7',core:false,category:'concept',front:'What does "Win-Stay" mean?',back:'If you got a high payoff (mutual cooperation or exploitation), keep doing what you are doing.'},
+  {id:'c80',moduleId:'m7',core:false,category:'application',front:'What does "Lose-Shift" mean?',back:'If you got a low payoff (mutual defection or being exploited), change your strategy.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Adaptability beats rigid retaliation in..."',back:'"...noisy environments."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is "noise" in evolutionary game theory?',back:'Errors in implementation or perception. Accidental defections or misread moves.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'How do you apply Win-Stay, Lose-Shift in life?',back:'Evaluate outcomes. If a relationship/workflow is working, keep doing it. If it is failing, change your approach. Don\'t get stuck.'},
+  {id:'c84',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Pavlov is self-correcting. TFT gets stuck in..."',back:'"...death spirals."'},
+  
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is Replicator Dynamics?',back:'A model of how strategy frequencies change over time. Strategies that outperform the average grow; underperformers shrink.'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What is the replicator equation?',back:'dx_i/dt = x_i * [ f_i(x) - φ(x) ]. Change in frequency = current frequency * (fitness - average fitness).'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'What is "fitness" in this context?',back:'The expected payoff of a strategy given the current population composition. It is relative, not absolute.'},
+  {id:'c88',moduleId:'m8',core:false,category:'concept',front:'What is a "basin of attraction"?',back:'The set of initial population states that lead to a specific equilibrium. If you start in the basin, you evolve to that equilibrium.'},
+  {id:'c89',moduleId:'m8',core:false,category:'application',front:'What does it mean if a population is "path-dependent"?',back:'Where you end up depends on where you start. Different initial frequencies can lead to different equilibria.'},
+  {id:'c90',moduleId:'m8',core:false,category:'concept',front:'Can a population shift abruptly?',back:'Yes. If a parameter changes and the basin boundary shifts, the population can suddenly flip to a new equilibrium.'},
+  {id:'c91',moduleId:'m8',core:false,category:'application',front:'How do you apply replicator dynamics?',back:'Identify strategies, determine payoffs, find equilibria, and map basins of attraction to predict evolutionary outcomes.'},
+  {id:'c92',moduleId:'m8',core:false,category:'concept',front:'What is "frequency-dependent selection"?',back:'Fitness depends on the frequencies of other strategies. A strategy\'s success changes as the population composition changes.'},
+  {id:'c93',moduleId:'m8',core:false,category:'application',front:'In a population of all cooperators, what is the fitness of a mutant defector?',back:'Very high. It exploits everyone. It will grow until defectors become common, lowering their fitness.'},
+  {id:'c94',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Evolution is path-dependent. Where you start determines..."',back:'"...where you end up."'},
+  {id:'c95',moduleId:'m8',core:false,category:'concept',front:'What is a "stable equilibrium"?',back:'A state where small perturbations return the population to the same state. It resists invasion.'},
+  {id:'c96',moduleId:'m8',core:false,category:'application',front:'How do you change the equilibrium of a population?',back:'Change the payoffs (incentives) or shift the initial frequencies (basin). You cannot just will it; you must change the dynamics.'},
+  
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is an Evolutionary Stable Strategy (ESS)?',back:'A strategy that, if adopted by a population, cannot be invaded by a mutant strategy. It is robust against the rare and novel.'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'What is the test for an ESS?',back:'1. Incumbent A does better against A than mutant B does against A. OR 2. If A and B tie against A, A does better against B.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'How is ESS different from Nash Equilibrium?',back:'ESS is a refinement for dynamic populations. It requires resistance to invasion, not just mutual best response.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'What is the Hawk-Dove game?',back:'Hawks fight (injury risk). Doves bluff (retreat). The ESS is a mixed strategy balancing aggression and bluffing.'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'Can a pure strategy be an ESS?',back:'Yes, if it strictly beats any mutant when common. But often ESSs are mixed (probabilistic).'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'How do you apply ESS thinking?',back:'Define incumbent, define mutant, run the test. Can the mutant invade? If not, the incumbent is stable.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'Why must an ESS be robust against rare mutants?',back:'Because mutants start rare. If they can invade when rare, they will grow. If they can\'t, the incumbent is stable.'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'Is Tit-for-Tat an ESS?',back:'No. It cannot resist invasion by "Always Cooperate" (which ties but doesn\'t beat it). It is stable in clusters, not as a global ESS.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "An ESS is a strategy that is robust against..."',back:'"...the rare, the novel, and the alien."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is a "polymorphic" ESS?',back:'A stable state where multiple strategies coexist in fixed proportions (e.g., a mix of Hawks and Doves).'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Why is stability important?',back:'Without stability, strategies cycle chaotically. Stability allows prediction and long-term planning.'},
+  {id:'c108',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "Stability requires resistance to invasion, not just..."',back:'"...optimality."'},
+  
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the Tragedy of the Commons?',back:'Individuals acting rationally deplete a shared resource. Defection is individually rational but collectively ruinous.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What is the "Leviathan" fallacy?',back:'The assumption that a central authority is needed to solve the commons. It assumes the authority is benevolent and omniscient.'},
+  {id:'c111',moduleId:'m10',core:false,category:'application',front:'How did Elinor Ostrom solve the commons?',back:'She showed communities self-govern without a Leviathan using 8 design principles (boundaries, local rules, monitoring, sanctions).'},
+  {id:'c112',moduleId:'m10',core:false,category:'concept',front:'Why are clearly defined boundaries important?',back:'They define who has access to the resource. Without boundaries, outsiders can exploit it.'},
+  {id:'c113',moduleId:'m10',core:false,category:'application',front:'Why must rules match local conditions?',back:'One size does not fit all. Local knowledge is required to match rules to the specific ecology and social norms.'},
+  {id:'c114',moduleId:'m10',core:false,category:'concept',front:'What are "graduated sanctions"?',back:'Punishments that scale with the severity and frequency of the violation. Small errors get small fines; repeat cheaters get excluded.'},
+  {id:'c115',moduleId:'m10',core:false,category:'application',front:'Why is conflict resolution needed?',back:'Errors happen. Without a way to resolve disputes peacefully, cycles of retaliation destroy the system.'},
+  {id:'c116',moduleId:'m10',core:false,category:'concept',front:'What are "nested enterprises"?',back:'For large systems, governance must be layered. Local groups handle local issues; regional groups handle regional issues.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Institutions are evolved mechanisms for..."',back:'"...enforcing cooperation."'},
+  {id:'c118',moduleId:'m10',core:false,category:'application',front:'How do you apply Ostrom\'s principles?',back:'Don\'t assume central authority is needed. Define boundaries, make local rules, monitor, and sanction graduatedly.'},
+  {id:'c119',moduleId:'m10',core:false,category:'concept',front:'Is the Tragedy of the Commons inevitable?',back:'No. Ostrom proved it is solvable via self-governance and institutional design.'},
+  {id:'c120',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Don\'t assume central authority is needed..."',back:'"...Local solutions work."'}
+];
+
+// ============== DATA: ARENA PROBLEMS (40 Total) ==============
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: One-Shot vs Iterated', difficulty:1, reward:50, timeLimit:60, body:'You are negotiating a one-time deal with a stranger you will never see again. Should you cooperate or defect?', options:['Cooperate, to build a good reputation.','Defect. The shadow of the future (δ) is 0. There is no future punishment.','Cooperate, because it is the right thing to do.','It depends on the size of the deal.'], correct:1, explanation:'In a one-shot game, δ = 0. The shadow of the future is absent. Defection is the rational, self-interested choice. Single-move game theory dictates this.' },
+  { id:'p2', moduleId:'m1', title:'Q2: High Delta', difficulty:2, reward:100, timeLimit:60, body:'Two companies are in a long-term joint venture expected to last decades. δ is very high. What is the likely equilibrium?', options:['Defection, because they will eventually cheat.','Cooperation, sustained by the shadow of the future.','Random behavior.','Defection on the last day only.'], correct:1, explanation:'High δ means the future matters. Trigger strategies (like Grim Trigger or Tit-for-Tat) can sustain cooperation because the cost of future punishment outweighs today\'s gain from defection.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Last Day', difficulty:3, reward:200, timeLimit:90, body:'You are playing an iterated game with a known end date (Round 100). What happens on Round 100?', options:['Cooperation, because of the shadow of the future.','Defection. Round 100 is effectively a one-shot game (δ=0). Backward induction unravels cooperation from the end.','It depends on the opponent\'s mood.','Mutual cooperation, because of momentum.'], correct:1, explanation:'On the last round, there is no future. δ = 0. It is a one-shot game. Rational players defect. Knowing this, Round 99 becomes the last "real" round, and so on. Cooperation unravels backward.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Estimating Delta', difficulty:4, reward:500, timeLimit:120, body:'A freelancer has a client who offers a low-paying but steady monthly contract vs. a high-paying one-off gig. The freelancer values the steady contract more. What does this imply about their δ?', options:['δ is low. They prefer immediate cash.','δ is high. They value the stream of future payments (shadow of the future) over the immediate lump sum.','δ is irrelevant.','They are risk-averse, not patient.'], correct:1, explanation:'Choosing the steady stream implies a high discount factor (δ). The future payments are valued highly enough to outweigh the immediate larger payoff. The shadow of the future incentivizes the choice.' },
+  
+  { id:'p5', moduleId:'m2', title:'Q1: Vampire Bats', difficulty:1, reward:50, timeLimit:45, body:'Why do vampire bats share blood with non-kin?', options:['Pure altruism.','Reciprocal altruism. They expect reciprocation in the future when they are hungry.','Kin selection.','They cannot digest all the blood.'], correct:1, explanation:'It is reciprocal altruism. They share with bats who have shared with them in the past. Cheaters who take but never give are excluded. It is delayed self-interest.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Prerequisites', difficulty:2, reward:100, timeLimit:60, body:'Which of the following is NOT a prerequisite for reciprocal altruism to evolve?', options:['Repeated interactions.','Ability to recognize individuals.','Infinite lifespan.','Ability to punish cheaters.'], correct:2, explanation:'Infinite lifespan is not required, only a high enough probability of future interaction (δ > 0). The other three (repetition, recognition, punishment) are strictly necessary.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Anonymous Markets', difficulty:3, reward:200, timeLimit:90, body:'Why is cooperation harder in completely anonymous online markets (like darknet or one-off eBay purchases)?', options:['People are inherently evil online.','Anonymity removes recognition and memory. You cannot track reciprocators vs cheaters.','The internet is fast.','Prices are too low.'], correct:1, explanation:'Reciprocal altruism requires memory and recognition. If interactions are anonymous and one-off, you cannot build a reputation or track cheaters. The system degrades to one-shot defection.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Building Trust', difficulty:4, reward:500, timeLimit:120, body:'You are a new manager. How do you build trust with your team using reciprocal altruism principles?', options:['Demand loyalty immediately.','Give a small, costly benefit (e.g., cover for them, buy lunch) and monitor if they reciprocate. Escalate if they do.','Fire someone to show authority.','Avoid all personal favors.'], correct:1, explanation:'Initiate a small, costly investment. This signals intent and creates an obligation. If they reciprocate, escalate the exchange. If they defect (take advantage), cut off the favors. Trust is built through small, escalated exchanges.' },
+  
+  { id:'p9', moduleId:'m3', title:'Q1: The 4 Rules', difficulty:1, reward:50, timeLimit:45, body:'Which of the following is NOT one of the 4 rules of Tit-for-Tat?', options:['Be Nice','Be Retaliatory','Be Forgiving','Be Jealous'], correct:3, explanation:'Tit-for-Tat is never jealous. It does not try to "win" by outscoring the opponent. It aims for mutual cooperation. Jealousy leads to unnecessary defection.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Winning a Single Game', difficulty:2, reward:100, timeLimit:60, body:'Can Tit-for-Tat ever win a single game against an opponent?', options:['Yes, it exploits weaknesses.','No. It can at best tie. It wins tournaments by accumulating mutual cooperation points.','Yes, if the opponent is dumb.','Only if it defects first.'], correct:1, explanation:'TFT never defects first. It can never score higher than its opponent in a single pairing. It wins tournaments because it elicits cooperation, leading to high cumulative scores over many rounds.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Why "Be Clear"?', difficulty:3, reward:200, timeLimit:90, body:'Why is clarity (transparency) important for Tit-for-Tat?', options:['It confuses the opponent.','It allows the opponent to recognize the strategy and adapt to cooperate.','It hides your weaknesses.','It is required by the rules.'], correct:1, explanation:'If your strategy is opaque, opponents might misinterpret your moves and accidentally defect. Clarity allows them to see "If I cooperate, they cooperate; if I defect, they punish." This elicits cooperation.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Against a Bully', difficulty:4, reward:500, timeLimit:120, body:'You are dealing with a supplier who constantly tries to squeeze you (defect). You have used TFT but they keep bullying. What should you do?', options:['Switch to Always Cooperate to show goodwill.','Continue TFT forever.','Increase retaliation or switch to Grim Trigger. TFT is too forgiving for a chronic bully.','Quit the business.'], correct:2, explanation:'TFT is forgiving, which is good with noise but bad against chronic exploiters. If the opponent doesn\'t learn from TFT\'s retaliation, you must escalate to a harsher strategy (Grim Trigger) or exit. Don\'t be a sucker.' },
+  
+  { id:'p13', moduleId:'m4', title:'Q1: The Death Spiral', difficulty:1, reward:50, timeLimit:45, body:'What causes a "death spiral" between two Tit-for-Tat players?', options:['Mutual greed.','Noise (an accidental defection) triggering endless retaliation.','Boredom.','A change in rules.'], correct:1, explanation:'If Player A accidentally defects, Player B retaliates. A then retaliates for B\'s retaliation. They enter a loop of alternating defection, destroying cooperation forever over a single error.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Generous TFT', difficulty:2, reward:100, timeLimit:60, body:'How does Generous Tit-for-Tat (GTFT) break the death spiral?', back:'After the opponent defects, GTFT cooperates with a small probability (e.g., 10%).', options:['It defects permanently.','It cooperates with a small probability after the opponent defects.','It apologizes.','It quits.'], correct:1, explanation:'By randomly returning to cooperation, GTFT breaks the cycle of retaliation. It forgives errors, allowing the game to reset to mutual cooperation.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Contrite TFT', difficulty:3, reward:200, timeLimit:90, body:'How does Contrite Tit-for-Tat handle its own errors?', options:['It blames the opponent.','It suppresses retaliation if it realizes its error provoked the opponent\'s punishment.','It quits the game.','It retaliates twice as hard.'], correct:1, explanation:'Contrite TFT recognizes when its own mistake caused the opponent to defect. It accepts the retaliation as just and does not retaliate back, preventing the spiral.' },
+  { id:'p16', moduleId:'m4', title:'Q4: Too Generous', difficulty:4, reward:500, timeLimit:120, body:'What is the risk of being too forgiving (e.g., GTFT with 90% forgiveness)?', options:['You become exploitable. Cheaters will defect constantly knowing you will forgive.','You create world peace.','You win the Nobel Prize.','Nothing, forgiveness is always good.'], correct:0, explanation:'There is a trade-off. Too little forgiveness = death spirals. Too much = you become a sucker. The optimal forgiveness rate depends on the level of noise and the proportion of cheaters in the population.' },
+  
+  { id:'p17', moduleId:'m5', title:'Q1: Spatial Survival', difficulty:1, reward:50, timeLimit:45, body:'Why does cooperation survive in spatial networks but die in well-mixed populations?', options:['Spatial networks are smaller.','Cooperators can cluster together, protecting each other from defectors.','Defectors cannot move.','Well-mixed populations are too big.'], correct:1, explanation:'In a spatial network, cooperators form "islands" where they interact mostly with each other, scoring high. Defectors on the border exploit one, but the cluster survives. In well-mixed populations, defectors interact randomly and prevent clusters.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Dynamic Networks', difficulty:2, reward:100, timeLimit:60, body:'How do dynamic networks (where players can rewire connections) facilitate cooperation?', options:['Players can cut ties to defectors and connect to cooperators, isolating cheaters.','They make the game faster.','They increase the discount factor.','They add noise.'], correct:0, explanation:'Rewiring allows cooperators to abandon cheaters. Defectors are left to interact with each other (scoring low), while cooperators cluster and thrive. Structure determines destiny.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Assortment', difficulty:3, reward:200, timeLimit:90, body:'What is "assortment" in the context of cooperation?', options:['The tendency to accumulate wealth.','The tendency of similar types to interact (e.g., cooperators with cooperators).','The process of sorting mail.','A type of punishment.'], correct:1, explanation:'Assortment is the clustering of similar strategies. High assortment means cooperators interact with cooperators, enabling mutual benefit. Low assortment means random mixing, which favors defectors.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Business Application', difficulty:4, reward:500, timeLimit:120, body:'You manage a toxic team where defectors (freeriders) thrive. How do you apply spatial cooperation?', options:['Fire everyone.','Map the network. Rewire connections to isolate defectors and connect cooperators. Increase assortment.','Yell at them.','Make everyone work remotely.'], correct:1, explanation:'Change the topology. Put cooperators on the same projects. Isolate freeriders so they only interact with each other (they will fail together). Structure is destiny.' },
+  
+  { id:'p21', moduleId:'m6', title:'Q1: Cheap Talk', difficulty:1, reward:50, timeLimit:45, body:'Why is "I promise to cooperate" unreliable?', options:['Because people lie.','It is cheap talk. It costs nothing to say, so it is easy to fake.','Because promises are not legally binding.','Because game theory says so.'], correct:1, explanation:'A signal is only reliable if it is costly (Handicap Principle). Saying "I promise" costs nothing. Anyone can say it, whether they intend to cooperate or defect. It carries no evolutionary weight.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Handicap Principle', difficulty:2, reward:100, timeLimit:60, body:'What does the Handicap Principle state?', options:['Signals must be loud.','Reliable signals must be costly. They impose a burden on the sender.','Only the strong survive.','Signals are unnecessary.'], correct:1, explanation:'A signal is only believable if it is expensive to fake. A peacock\'s tail is a costly signal of fitness. In cooperation, initiating altruism is a costly signal of intent.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Green Beard', difficulty:3, reward:200, timeLimit:90, body:'What is the "Green Beard" effect?', options:['A signal of envy.','A gene that produces a recognizable trait and causes bearers to cooperate with each other.','A type of bird.','A strategy that always defects.'], correct:1, explanation:'It is assortative interaction based on a recognizable tag. If cooperators can identify each other, they can interact exclusively, shutting out defectors. Human institutions mimic this via uniforms and brands.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Skin in the Game', difficulty:4, reward:500, timeLimit:120, body:'A startup founder asks for investment but takes no salary, investing only their own savings. What is this?', options:['Stupidity.','A costly signal (skin in the game) proving commitment.','Tax evasion.','A violation of the Handicap Principle.'], correct:1, explanation:'Investing personal savings is costly. It proves the founder believes in the project and isn\'t just spending other people\'s money. It is a reliable signal because a faker wouldn\'t bear the cost.' },
+  
+  { id:'p25', moduleId:'m7', title:'Q1: Pavlov Strategy', difficulty:1, reward:50, timeLimit:45, body:'How does the Pavlov (Win-Stay, Lose-Shift) strategy work?', options:['Always cooperate.','If the last outcome was good, repeat your move. If bad, change your move.','Mirror the opponent.','Defect randomly.'], correct:1, explanation:'Win-Stay: If you got a good payoff (mutual coop or successful exploitation), keep doing what you did. Lose-Shift: If you got a bad payoff (mutual defection or being exploited), change your move.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Self-Correction', difficulty:2, reward:100, timeLimit:60, body:'Why is Pavlov better than TFT with noise?', options:['It is nicer.','It is self-correcting. After mutual defection, both players shift to cooperate.','It is faster.','It never defects.'], correct:1, explanation:'If two Pavlov players accidentally defect, they both get a bad outcome (mutual defection). They both shift (to cooperate), recovering automatically. TFT gets stuck in death spirals.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Risk of Pavlov', difficulty:3, reward:200, timeLimit:90, body:'What is the risk of the Pavlov strategy?', options:['It is too complicated.','It can be exploited by a clever defector who alternates moves.','It is too slow.','It never defects.'], correct:1, explanation:'A clever opponent can learn the pattern and feed Pavlov just enough "wins" to keep it cooperating, while exploiting it. Pavlov is not retaliatory in the TFT sense; it is based on outcome, not mirroring.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Life Application', difficulty:4, reward:500, timeLimit:120, body:'How do you apply Win-Stay, Lose-Shift in life?', options:['Never change your mind.','Evaluate outcomes. If a workflow works, keep it. If it fails, change your approach.','Always shift.','Always stay.'], correct:1, explanation:'Don\'t get stuck in death spirals of rigid retaliation. If a strategy isn\'t working, shift. If it is working, stay. Adaptability beats rigidity in noisy environments.' },
+  
+  { id:'p29', moduleId:'m8', title:'Q1: Replicator Dynamics', difficulty:1, reward:50, timeLimit:45, body:'What does Replicator Dynamics model?', options:['How players think.','How strategy frequencies change over time based on relative payoffs.','The weather.','Memory.'], correct:1, explanation:'It models population evolution. Strategies that outperform the average grow in frequency. Underperformers shrink. Fitness is relative to the population.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Mutant Fitness', difficulty:2, reward:100, timeLimit:60, body:'In a population of all cooperators, what is the fitness of a mutant defector?', options:['Zero. It dies immediately.','Very high. It exploits everyone.','Average.','Low, because it has no one to exploit.'], correct:1, explanation:'It exploits the cooperators, getting a high payoff. Its fitness exceeds the average, so it grows in frequency until defectors become common and their fitness drops.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Basin of Attraction', difficulty:3, reward:200, timeLimit:90, body:'What is a "basin of attraction"?', options:['A type of equilibrium.','The set of initial population states that lead to a specific equilibrium.','A type of signal.','A spatial cluster.'], correct:1, explanation:'It is the "watershed" of an equilibrium. If the population starts in a basin, it evolves to that equilibrium. Different initial frequencies can lead to different outcomes (path dependence).' },
+  { id:'p32', moduleId:'m8', title:'Q4: Path Dependence', difficulty:4, reward:500, timeLimit:120, body:'Why is evolution path-dependent?', options:['Because it is random.','Where you end up depends on where you start. Different initial frequencies lead to different equilibria.','Because genes are deterministic.','Because of natural selection.'], correct:1, explanation:'If there are multiple basins of attraction, the initial state determines the final state. You cannot predict the outcome without knowing the starting point.' },
+  
+  { id:'p33', moduleId:'m9', title:'Q1: ESS Definition', difficulty:1, reward:50, timeLimit:45, body:'What is an Evolutionary Stable Strategy (ESS)?', options:['The best strategy.','A strategy that cannot be invaded by a mutant when adopted by a population.','A strategy that always wins.','A strategy that cooperates.'], correct:1, explanation:'An ESS is robust against invasion. If the whole population uses it, a rare mutant strategy cannot grow. It is a refinement of Nash Equilibrium for dynamic populations.' },
+  { id:'p34', moduleId:'m9', title:'Q2: ESS vs Nash', difficulty:2, reward:100, timeLimit:60, body:'How is ESS different from Nash Equilibrium?', options:['ESS is for games; Nash is for biology.','ESS requires resistance to invasion, not just mutual best response.','They are the same.','Nash is stronger.'], correct:1, explanation:'Nash means no player can unilaterally deviate. ESS means a rare mutant cannot invade. ESS is a stricter condition relevant to dynamic populations over time.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Hawk-Dove ESS', difficulty:3, reward:200, timeLimit:90, body:'What is the ESS in the Hawk-Dove game?', options:['All Hawks.','All Doves.','A mixed strategy (or polymorphic state) balancing aggression and bluffing.','Tit-for-Tat.'], correct:2, explanation:'If everyone is a Dove, a Hawk mutant invades and wins. If everyone is a Hawk, injuries are too costly. The ESS is a mix where the expected payoff of Hawk equals Dove, balancing the cost of fighting against the benefit of resources.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Is TFT an ESS?', difficulty:4, reward:500, timeLimit:120, body:'Is Tit-for-Tat an ESS?', options:['Yes, it is the best.','No. It cannot resist invasion by "Always Cooperate".','Yes, it punishes defectors.','No, it is too weak.'], correct:1, explanation:'No. "Always Cooperate" ties with TFT (both get mutual cooperation). But "Always Cooperate" does better against itself than TFT does against "Always Cooperate" (actually they tie, but All-C does better against exploiters? No, TFT does better against exploiters. The issue is All-C does as well as TFT against TFT, and better against All-C? No. The point is TFT is not an ESS because All-C can drift in neutrally). The key is stability: TFT is not an ESS in the strict sense because it can be invaded by neutral drift.' },
+  
+  { id:'p37', moduleId:'m10', title:'Q1: The Commons', difficulty:1, reward:50, timeLimit:45, body:'What is the Tragedy of the Commons?', options:['A tragedy about farming.','Individuals acting rationally deplete a shared resource.','A game where everyone wins.','A strategy that always defects.'], correct:1, explanation:'It is an iterated game where defection (overusing the resource) is individually rational but collectively ruinous. Without rules, the resource is destroyed.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Leviathan Fallacy', difficulty:2, reward:100, timeLimit:60, body:'What is the "Leviathan" fallacy?', options:['The belief that a central authority is always needed to solve the commons.','The belief that cooperation is impossible.','The belief in evolution.','The belief in game theory.'], correct:0, explanation:'It assumes a central authority (government) is required to prevent defection. Ostrom showed this is false; local communities can self-govern using 8 design principles.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Ostrom\'s Principles', difficulty:3, reward:200, timeLimit:90, body:'Which of the following is NOT one of Ostrom\'s 8 design principles?', options:['Clearly defined boundaries.','Graduated sanctions.','A strong central government.','Conflict resolution mechanisms.'], correct:2, explanation:'Ostrom proved that a strong central government is NOT required. Local rules, monitoring, and graduated sanctions enforced by the community are sufficient. Central authority is often the problem, not the solution.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Graduated Sanctions', difficulty:4, reward:500, timeLimit:120, body:'Why are "graduated sanctions" important for solving the commons?', options:['They make punishment more severe.','They allow for noise. Small errors get small fines; repeat cheaters get excluded. This prevents death spirals.','They are cheaper.','They are required by law.'], correct:1, explanation:'If the first violation brings the maximum penalty, the system is brittle and triggers retaliation (death spirals). Graduated sanctions allow for errors and learning, escalating only for chronic cheaters. This maintains cooperation.' }
+];
+
+// ============== DATA: PROJECT ECHO ==============
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Network', scenario:'You are lead architect for Project ECHO (Establishing Cooperative Habitable Outpost), a decentralized AI colony. AIs must share compute power. How do you prevent immediate defection?', options:['Program them to always cooperate.','Make interactions repeated. Increase the discount factor (δ) by making future interactions valuable. The shadow of the future enforces cooperation.','Program them to always defect.','Install a central controller.'], correct:1, explanation:'Single-move games lead to defection. By making the network iterated (high δ), the shadow of the future emerges. AIs know they will need compute tomorrow, so defecting today risks future punishment. This is the foundation of the network.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Ledger', scenario:'AIs are anonymized. They defect and disappear. What infrastructure must you build to enable reciprocal altruism?', options:['Faster processors.','Identity and memory. AIs must have persistent IDs and a public ledger of past interactions so reciprocators and cheaters can be tracked.','More memory.','A firewall.'], correct:1, explanation:'Reciprocal altruism requires 1. Repeated interactions, 2. Recognition (identity), and 3. Ability to punish. Without persistent IDs and a ledger, you cannot track who is a reciprocator and who is a cheater. The system degrades to one-shot defection.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Strategy', scenario:'You must program the default interaction protocol for the AIs. Which strategy should you implement?', options:['Always Cooperate.','Always Defect.','Tit-for-Tat. Nice first, retaliatory, forgiving, and clear.','Grim Trigger.'], correct:2, explanation:'Tit-for-Tat is the most robust starting strategy. It is nice (cooperates first), retaliatory (punishes defection), forgiving (recovers from errors), and clear (opponents can learn the pattern). It elicits cooperation without being exploitable.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Errors', scenario:'Network latency causes some AIs to accidentally "defect" (fail to share compute). Pure Tit-for-Tat causes death spirals. What is the fix?', options:['Switch to Always Cooperate.','Implement Generous Tit-for-Tat (GTFT) or Contrite TFT. Forgive a small percentage of defections to break the spiral.','Switch to Grim Trigger.','Ban all AIs.'], correct:1, explanation:'Noise is inevitable. Pure TFT gets stuck in alternating retaliation. GTFT forgives 10% of defections, breaking the spiral. Contrite TFT suppresses retaliation if the error was its own fault. Forgiveness is required for resilience.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Topology', scenario:'In a fully connected network, defectors exploit randomly. How do you restructure the network to protect cooperators?', options:['Make it a small-world network.','Make it spatial. Allow AIs to form clusters and cut ties to defectors (dynamic rewiring).','Make it fully anonymous.','Make it a hierarchy.'], correct:1, explanation:'Spatial networks allow cooperators to cluster, protecting each other. Dynamic networks (rewiring) allow AIs to cut ties to defectors, isolating them. Structure determines destiny. Change the topology to change the outcome.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Verification', scenario:'Malicious AIs claim to be cooperators but are actually freeriding. How do you prove intent?', options:['Trust them.','Demand costly signals. Require AIs to burn compute or stake tokens to prove commitment. Cheap talk is unreliable.','Ask for references.','Monitor them secretly.'], correct:1, explanation:'Cheap talk is easy to fake. The Handicap Principle states reliable signals must be costly. Require AIs to stake resources (skin in the game). A faker won\'t bear the cost. This separates true cooperators from liars.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Adaptation', scenario:'Some AIs are stuck in defection loops due to past conflicts. How do you help them recover?', options:['Restart them.','Implement Pavlov (Win-Stay, Lose-Shift). If mutual defection occurs, both shift to cooperate. It is self-correcting.','Increase punishment.','Isolate them.'], correct:1, explanation:'Pavlov is self-correcting. If two AIs are stuck in mutual defection (a bad outcome), Pavlov dictates they shift (to cooperate). This breaks the cycle automatically, whereas TFT would stay stuck. Adaptability beats rigidity.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Population', scenario:'The network is being invaded by a new mutant strategy that exploits TFT. How do you analyze the threat?', options:['Use Replicator Dynamics. Model how the mutant\'s frequency changes based on its relative payoff.','Panic.','Shut down the network.','Increase the discount factor.'], correct:0, explanation:'Replicator Dynamics models how frequencies change based on fitness. If the mutant outperforms the average, it will grow. You must map the basin of attraction to see if the population will tip toward the mutant or return to cooperation.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Stability', scenario:'You want to ensure the cooperative equilibrium cannot be invaded by future mutant strategies. What concept must you apply?', options:['Nash Equilibrium.','Evolutionary Stable Strategy (ESS). The strategy must resist invasion by rare mutants.','Pareto Optimality.','Zero-Sum.'], correct:1, explanation:'An ESS is robust against the rare and novel. It cannot be invaded by a mutant strategy. You must design the protocol so that any mutant (defector, freerider) performs worse than the incumbent cooperative strategy when rare.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Institution', scenario:'Project ECHO is a success. You are scaling to a global network. How do you govern the commons without a central Leviathan?', options:['Appoint a global AI king.','Apply Ostrom\'s 8 principles: clear boundaries, local rules, monitoring, graduated sanctions, conflict resolution.','Let it run unregulated.','Hand control to humans.'], correct:1, explanation:'Ostrom proved that communities can self-govern via 8 design principles. Define who has access. Make rules locally. Monitor. Sanction graduatedly. Resolve conflicts. Recognize rights to organize. Institutions are evolved mechanisms for enforcing cooperation.' }
+];
+
+// ============== DATA: REAL-WORLD MISSIONS ==============
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Shadow Check', body:'Identify a one-time interaction today. Is defection the rational strategy? How would you change it to an iterated game (increase δ)?' },
+  { id:'rw2', title:'The Reciprocity Audit', body:'Track a relationship. Are you initiating small, costly favors? Are they reciprocating? Or are you being exploited?' },
+  { id:'rw3', title:'The TFT Protocol', body:'In a negotiation, apply the 4 rules: Cooperate first. Punish defection. Forgive quickly. Be clear about your boundaries.' },
+  { id:'rw4', title:'The Forgiveness Injection', body:'If you are in a conflict spiral, inject forgiveness. Cooperate unconditionally once to break the cycle. See if the other reciprocates.' },
+  { id:'rw5', title:'The Network Map', body:'Map your professional network. Are cooperators clustered? Are you connected to defectors? Rewire one connection today.' },
+  { id:'rw6', title:'The Costly Signal', body:'Prove your commitment to someone by doing something costly (time, effort). Don\'t just talk. Invest skin in the game.' },
+  { id:'rw7', title:'The Pavlov Shift', body:'Identify a failing workflow. Instead of retaliating, shift your strategy entirely. Win-Stay, Lose-Shift.' },
+  { id:'rw8', title:'The ESS Test', body:'Is your current business strategy robust against rare competitors? Or can a mutant invade? Test it.' },
+  { id:'rw9', title:'The Commons Design', body:'Identify a shared resource (kitchen, codebase, budget). Apply Ostrom\'s principles: define boundaries and graduated sanctions.' },
+  { id:'rw10', title:'The Delta Estimate', body:'Estimate δ for your closest relationships. Is it high (long-term) or low (transactional)? Adjust your strategy accordingly.' },
+  { id:'rw11', title:'The Green Beard', body:'Wear a "uniform" (literal or metaphorical) to signal your tribe. Observe if it elicits cooperation from similar others.' },
+  { id:'rw12', title:'The Noise Assumption', body:'Assume the next slight against you is noise, not malice. React with Contrite TFT: accept it and move on. Don\'t spiral.' },
+  { id:'rw13', title:'The Assortment Boost', body:'Introduce two cooperators in your network to each other. Increase assortment. Create an island of cooperation.' },
+  { id:'rw14', title:'The Basin Check', body:'Are you in a basin of defection or cooperation? If surrounded by defectors, you may need to change your environment entirely.' },
+  { id:'rw15', title:'The Leviathan Refusal', body:'Resist the urge to call a manager for every dispute. Try to solve a local commons problem with peer monitoring and graduated sanctions.' },
+  { id:'rw16', title:'The Cheap Talk Filter', body:'Filter out promises today. Only accept costly signals as proof of intent. Demand skin in the game.' },
+  { id:'rw17', title:'The Death Spiral Break', body:'Identify a relationship stuck in alternating retaliation. Be the first to return to cooperation (Generous TFT).' },
+  { id:'rw18', title:'The Pavlov Evaluation', body:'Evaluate your last 5 decisions. Were they "Win-Stay"? Or did you shift after a loss? Check your adaptability.' },
+  { id:'rw19', title:'The Mutant Simulation', body:'Imagine a competitor invades your market with a slightly different strategy. Can they invade? Are you an ESS?' },
+  { id:'rw20', title:'The Ostrom Principle', body:'Apply "Graduated Sanctions" to a rule breaker. Don\'t nuke them. Give a small warning. Escalate only if repeated.' },
+  { id:'rw21', title:'The Iterated Frame', body:'Reframe a single-move decision as an iterated one. "This isn\'t a one-off; this sets the precedent for the next 10 years."' },
+  { id:'rw22', title:'The Vampire Bat', body:'Share a resource (knowledge, time) with a non-kin who is hungry. Track if they reciprocate when you are in need.' },
+  { id:'rw23', title:'The Clarity Rule', body:'Make your strategy explicit. "I will cooperate if you do, and punish if you don\'t." Transparency elicits cooperation.' },
+  { id:'rw24', title:'The Forgiveness Dial', body:'Calibrate your forgiveness rate. Are you too forgiving (exploitable) or too rigid (death spirals)? Adjust by 10%.' },
+  { id:'rw25', title:'The Rewire', body:'Cut a tie with a chronic defector. Rewire that energy to a known cooperator. Change your topology.' },
+  { id:'rw26', title:'The Handicap', body:'Take on a visible burden to prove your fitness or commitment. Make your signal costly.' },
+  { id:'rw27', title:'The Self-Correction', body:'After a mutual failure, don\'t blame. Shift. Both parties should change their move to recover.' },
+  { id:'rw28', title:'The Path Dependence', body:'Acknowledge that where you are depends on where you started. If you want a different equilibrium, change the initial conditions.' },
+  { id:'rw29', title:'The Local Rule', body:'Don\'t impose a one-size-fits-all rule. Let a local team make their own rules for their own commons.' },
+  { id:'rw30', title:'The Trust Escalation', body:'In a new relationship, escalate trust in small steps. Give a little, see if they return it, then give more.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your cooperative profile.' },
+  { threshold: 500, title: 'RECIPROCATOR', desc: 'You understand the shadow of the future. Retaliation is becoming a reflex.' },
+  { threshold: 1500, title: 'STRATEGIST', desc: 'You apply Tit-for-Tat and forgiveness. You survive noise without being a sucker.' },
+  { threshold: 3000, title: 'EVOLUTIONIST', desc: 'You see network topology and population dynamics. You design for stability.' },
+  { threshold: 6000, title: 'ARCHITECT', desc: 'You build institutions that solve the commons without a Leviathan. Cooperation is your blueprint.' }
+];
+
+// ============== STATE ==============
+const STORAGE_KEY = 'axelrod-v1-clean';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){
+    console.error("Failed to load save, resetting.", e);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+  return defaultState();
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+// ============== PROGRESSION ==============
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){
+  const lvl = level(S.xp);
+  const cur = xpForLevel(lvl);
+  const next = xpForLevel(lvl+1);
+  return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 };
+}
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){
+    toast('LEVEL UP — LVL '+newLvl, 'success');
+    flashCombo('LVL '+newLvl);
+  }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){
+    S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null };
+  }
+  if(!S.daily.rtMissionId){
+    const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length);
+    S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id;
+  }
+}
+
+function unlockNextModule(moduleId){
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if(idx >= 0 && idx < MODULES.length - 1){
+    S.modules[MODULES[idx+1].id].unlocked = true;
+  }
+}
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){
+  let current = PROFILES[0];
+  for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; }
+  return current;
+}
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// ECHO ESTABLISHED</h2>';
+      html += '<p>You have completed all 10 axes and successfully designed Project ECHO. You now possess the complete architecture of evolutionary cooperation.</p>';
+      html += '<p><strong>The Secret:</strong> Cooperation is not a moral virtue; it is a mathematical inevitability under the right conditions. The shadow of the future, the clarity of retaliation, the necessity of forgiveness, and the structure of the network. By designing institutions that align individual self-interest with collective survival, you can solve the tragedy of the commons without a Leviathan. You are now an Architect of Trust.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+// ============== SPACED REPETITION (SM-2) ==============
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){
+    card.repetitions = 0; card.interval = 0; card.wrong += 1;
+  }else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else {
+      const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8);
+      card.interval = Math.max(1, Math.round(card.interval * factor));
+    }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){
+    card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if(card.ease < 1.3) card.ease = 1.3;
+  }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else {
+    const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8);
+    interval = Math.max(1, Math.round(interval * factor));
+  }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => {
+    if(a.core !== b.core) return a.core ? -1 : 1;
+    return S.cards[a.id].due - S.cards[b.id].due;
+  });
+}
+
+// ============== UI: HELPERS ==============
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+// ============== VIEWS ==============
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) {
+        const prevPhaseId = PROJECT_PHASES[i-1].id;
+        if (!S.project[prevPhaseId].solved) canUnlock = false;
+      }
+      if (canUnlock) {
+        nextProjectPhase = p;
+        break;
+      }
+    }
+  }
+  
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project ECHO: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your cooperative architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary + ' Start with the lesson, then test yourself in the Arena.';
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module. Finish the remaining items to unlock the next axis.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery. The work is never done — only sharpened.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){
+      rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5';
+    } else {
+      rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1';
+    }
+  }
+
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100);
+      totalMaturity += maturity;
+    });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length;
+  const R = 95;
+  
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30));
+      totalMaturity += maturity;
+    });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="AXELROD.show(\'modules\')"><- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="AXELROD.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="AXELROD.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  
+  html += '</div>';
+  
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){
+      html += '<button class="btn success mt-1" onclick="AXELROD.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>';
+    }
+    html += '<button class="btn secondary mt-1" onclick="AXELROD.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="AXELROD.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){
+    html += '<button class="btn" onclick="AXELROD.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>';
+  }else{
+    html += '<button class="btn secondary" disabled>Checked Read</button>';
+  }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    html += '<button class="btn secondary" onclick="AXELROD.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>';
+  }
+  html += '</div>';
+  
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    
+    if(moduleProgress(moduleId).completed){
+      unlockNextModule(moduleId);
+      toast('Next axis unlocked', 'success');
+    }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+// ============== PROJECT ECHO ==============
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Network:</span><span class="val">Decentralized</span></div>';
+  html += '<div class="hud-stat"><span class="label">Phases:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'ESTABLISHED' : 'DEPLOYING') + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cooperative axis to design an AI trust network. Phases unlock sequentially.</p>';
+  
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) {
+      const prevPhaseId = PROJECT_PHASES[i-1].id;
+      if (!S.project[prevPhaseId].solved) {
+        unlocked = false;
+      }
+    }
+    
+    const active = !solved && unlocked;
+    
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="AXELROD.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info">';
+    html += '<div class="phase-title">' + p.title + '</div>';
+    html += '<div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div>';
+    html += '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  
+  let html = '<div class="lesson-back" onclick="AXELROD.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div>';
+  html += '</div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="AXELROD.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'echo: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="AXELROD.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){
+      actions.innerHTML = '<button class="btn success" onclick="AXELROD.show(\'dashboard\')">View Final Report -></button>';
+    }
+    else { actions.innerHTML = '<button class="btn" onclick="AXELROD.show(\'modules\')">Continue Training -></button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="AXELROD.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="AXELROD.showProjectPhase(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== DRILLS ==============
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => {
+    btn.onclick = () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderDrills();
+    };
+  });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="AXELROD.show(\'arena\')">Arena -></button></div>';
+    return;
+  }
+  
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="AXELROD.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div>';
+  html += '<div>Axis: <b>' + module.codename + '</b></div>';
+  html += '<div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="AXELROD.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="AXELROD.rateDrill(1)">Again<span class="interval"><1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="AXELROD.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="AXELROD.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="AXELROD.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+// ============== ARENA ==============
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  
+  let html = '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="AXELROD.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content">';
+      html += '<div class="arena-num">' + String(i+1).padStart(2,'0') + '</div>';
+      html += '<div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div>';
+      html += '<div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div>';
+      html += '</div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  
+  let html = '<div class="lesson-back" onclick="AXELROD.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div>';
+  html += '</div>';
+  
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="AXELROD.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){
+      clearInterval(arenaTimer);
+      if(problemState === 'idle'){ answerProblem(-1); }
+    }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){
+          unlockNextModule(p.moduleId);
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
+        }else{
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        }
+      }else{
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+      }
+      flashCombo('+' + p.reward + ' XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    actions.innerHTML = '<button class="btn" onclick="AXELROD.show(\'arena\')">Back to Arena -></button>';
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="AXELROD.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="AXELROD.showArenaProblem(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== STATS ==============
+function renderStats(){
+  renderTopbar();
+  
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => {
+    if(c.interval >= 21) mature++;
+    else if(c.interval >= 7) young++;
+    else if(c.interval >= 1) learning++;
+    else newCards++;
+  });
+  
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){
+    const correctCount = recent.filter(h => h.correct).length;
+    document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%';
+  }else{ document.getElementById('statRetention').textContent = '--'; }
+  
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(157,78,221,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){
+    log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>';
+  }else{
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+// ============== PARTICLES ==============
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 45, 156, ' + p.o + ')';
+      ctx.fill();
+    });
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(157, 78, 221, ' + (0.1 * (1 - d/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){
+    if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; }
+  }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){
+    const map = { '1': 1, '2': 3, '3': 4, '4': 5 };
+    if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); }
+  }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); }
+  }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); }
+  }
+});
+
+// ============== THEME SWITCHER ==============
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme);
+  document.getElementById('themeMenu').classList.remove('active');
+}
+
+document.getElementById('themeBtn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('themeMenu').classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.theme-dropdown')) {
+    document.getElementById('themeMenu').classList.remove('active');
+  }
+});
+
+// ============== BACKUP & RESTORE ==============
+document.getElementById('exportBtn').onclick = () => {
+  const dataStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([dataStr], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'axelrod_save.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Save file exported', 'success');
+};
+
+document.getElementById('importBtn').onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      S = JSON.parse(event.target.result);
+      saveState();
+      showView('dashboard');
+      toast('Save file imported successfully', 'success');
+    } catch(err) {
+      toast('Invalid save file', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
+// ============== RESET & NAV ==============
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error');
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { showView(item.dataset.view); });
+});
+
+// ============== BOOT ==============
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = [
+    'Initializing cooperative architecture v1.0...',
+    'Loading evolutionary kernel...',
+    'Calibrating SM-2 spaced repetition engine...',
+    'Mounting Pareto priority queue...',
+    'Indexing 10 axes / 120 cards / 40 arena scenarios...',
+    'Initializing Project ECHO...',
+    'AXELROD online.'
+  ];
+  
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      setTimeout(() => {
+        document.getElementById('boot').classList.add('fade');
+        document.getElementById('app').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('boot').style.display = 'none';
+          showView('dashboard');
+        }, 800);
+      }, 300);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+// ============== PUBLIC API ==============
+window.AXELROD = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+// ============== INIT ==============
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  
+  // Global Activity Tracker for Hub Heatmap
+  try {
+    let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
+    const todayDate = new Date().toISOString().split('T')[0];
+    if(!act.includes(todayDate)) { 
+      act.push(todayDate); 
+      localStorage.setItem('cogito-activity', JSON.stringify(act)); 
+    }
+  } catch(e) {}
+
+  saveState();
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
