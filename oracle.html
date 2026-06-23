@@ -338,6 +338,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 </head>
 <body>
 <canvas id="particles"></canvas>
+<script src="cogito-bg.js"></script>
 
 <div id="boot">
   <div class="boot-logo">ORACLE</div>
@@ -2150,7 +2151,7 @@ function init(){
     } 
   } catch(e) {}
 
-  initParticles();
+  initBackground();
   bootSequence();
 }
 

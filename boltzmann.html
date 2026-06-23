@@ -268,6 +268,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 </head>
 <body>
 <canvas id="particles"></canvas>
+<script src="cogito-bg.js"></script>
 <div id="boot"><div class="boot-logo">BOLTZMANN</div><div class="boot-sub">Cogito // Thermodynamics of Life v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
 <div id="app">
   <header class="topbar">
@@ -1399,7 +1400,7 @@ function init(){
   saveState();
   // Track activity for Hub Heatmap
   try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
-  initParticles();
+  initBackground();
   bootSequence();
 }
 

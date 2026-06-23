@@ -79,6 +79,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 </head>
 <body>
 <canvas id="particles"></canvas>
+<script src="cogito-bg.js"></script>
 <div id="boot">
   <div class="boot-logo">LAKOFF</div>
   <div class="boot-sub">Cogito // Metaphor & Framing Protocol v1.0</div>
@@ -515,7 +516,7 @@ document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL prog
 document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
 function bootSequence(){ const log = document.getElementById('bootLog'); const bar = document.getElementById('bootBar'); const lines = [ 'Initializing cognitive architecture v1.0...', 'Loading linguistics kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project METAPHOR...', 'LAKOFF online.' ]; let i = 0; function nextLine(){ if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; } const line = document.createElement('div'); line.className = 'boot-log-line'; line.textContent = '> ' + lines[i]; log.appendChild(line); bar.style.width = ((i + 1) / lines.length * 100) + '%'; i++; setTimeout(nextLine, 220 + Math.random() * 180); } nextLine(); }
 window.LAKOFF = { show: showView, showModuleDetail, showLesson, markLessonRead, showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission, showProjectPhase, answerPhase, setTheme };
-function init(){ const savedTheme = localStorage.getItem('cogito-theme') || 'quantum'; document.body.dataset.theme = savedTheme; S = loadState(); checkDailyReset(); updateStreak(); try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const todayDate = new Date().toISOString().split('T')[0]; if(!act.includes(todayDate)) { act.push(todayDate); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {} saveState(); initParticles(); bootSequence(); }
+function init(){ const savedTheme = localStorage.getItem('cogito-theme') || 'quantum'; document.body.dataset.theme = savedTheme; S = loadState(); checkDailyReset(); updateStreak(); try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const todayDate = new Date().toISOString().split('T')[0]; if(!act.includes(todayDate)) { act.push(todayDate); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {} saveState(); initBackground(); bootSequence(); }
 init();
 })();
 </script>

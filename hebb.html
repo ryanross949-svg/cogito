@@ -261,6 +261,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
 </head>
 <body>
 <canvas id="particles"></canvas>
+<script src="cogito-bg.js"></script>
 <div id="boot"><div class="boot-logo">HEBB</div><div class="boot-sub">Cogito // Neuroplasticity Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
 <div id="app">
   <header class="topbar">
@@ -1383,7 +1384,7 @@ function init(){
   saveState();
   // Track activity for Hub Heatmap
   try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const today = new Date().toISOString().split('T')[0]; if(!act.includes(today)) { act.push(today); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
-  initParticles();
+  initBackground();
   bootSequence();
 }
 
