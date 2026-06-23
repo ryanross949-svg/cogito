@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // LOCI v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">LOCI</div><div class="boot-sub">Cogito // Memory & Mnemonic Architecture v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">LOCI</div><div class="brand-tag">MNEMONIC ARCHITECTURE</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="LOCI.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="LOCI.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="LOCI.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="LOCI.setTheme('light')">Light</button><button class="theme-option" onclick="LOCI.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Mnemonic Vault</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="LOCI.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of mnemonic architecture. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: MNEMONIC VAULT</h1><p class="section-sub">A cumulative scenario. Build a memory palace to memorize a 100-digit number.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About LOCI</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>LOCI is a cognitive training simulator designed to install the mnemonic techniques used by memory athletes. It trains you to artificially expand working memory using spatial navigation, chunking, and associative imagery.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Mnemonic Vault require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>PALACE</strong> — The Method of Loci (Memory Palaces)</li>
+          <li><strong>CHUNK</strong> — Working memory limits (7±2) and chunking</li>
+          <li><strong>MAJOR</strong> — The Major System (numbers to consonants)</li>
+          <li><strong>LINK</strong> — The Linking Method & Story Method</li>
+          <li><strong>PEG</strong> — The Peg System (rhyming/shape pegs)</li>
+          <li><strong>SPACING</strong> — The Spacing Effect & Ebbinghaus curve</li>
+          <li><strong>VISUAL</strong> — Visualization & Vivid Imagery</li>
+          <li><strong>ASSOC</strong> — Associative Hooks & Elaboration</li>
+          <li><strong>REVIEW</strong> — Active Recall & Testing Effect</li>
+          <li><strong>OVERL</strong> — Overlearning & Automaticity</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'PALACE', title:'The Memory Palace', summary:'Spatial memory hacking via the Method of Loci.', lesson:{ title:'The Architecture of Space', body: 'The Method of Loci (Memory Palace) is the oldest mnemonic technique, dating back to ancient Greece. It hijacks the brain\'s evolutionary hardware for spatial navigation to memorize abstract data.\n\n## The Evolutionary Hack\n\nYour brain is terrible at remembering lists of numbers, but exceptional at remembering where things are. You can recall the layout of your childhood home decades later, but forget a 10-digit phone number in 30 seconds. The Method of Loci maps abstract data to physical locations.\n\n## The Method\n\n1. **Choose a familiar place:** Your house, your commute, a school.\n2. **Select a route:** A specific path through the space (e.g., front door -> hallway -> kitchen).\n3. **Place items:** Mentally place each item you want to memorize at a specific "locus" (station) along the route.\n4. **Make it vivid:** The image must be bizarre, colorful, and interactive. A giant apple crushing your front door is easier to remember than just "an apple."\n5. **Walk the route:** To recall the list, simply walk the route in your mind and "see" what you placed there.\n\n## Why It Works\n\nThe hippocampus (the brain\'s memory center) was originally a spatial map. By converting abstract data into spatial sequences, you utilize the most robust memory system in the brain.', takeaways:['The Method of Loci maps abstract data to physical locations.','It hijacks the brain\'s evolutionary spatial navigation hardware.','Choose a route, place vivid/bizarre images at each station.','To recall, walk the route in your mind.','The hippocampus is a spatial map; use it for abstract data.'] } },
+  { id:'m2', codename:'CHUNK', title:'Working Memory', summary:'The 7±2 limit and the power of chunking.', lesson:{ title:'The Architecture of Capacity', body: 'In 1956, George Miller published "The Magical Number Seven, Plus or Minus Two." He found that human working memory can hold about 7 items at a time. This is why phone numbers are 7 digits long.\n\n## The Bottleneck\n\nYou cannot consciously hold more than ~7 discrete pieces of information in your mind at once. If you try to remember a 16-digit credit card number as individual digits (16 items), you will fail.\n\n## Chunking\n\nChunking is the process of grouping individual items into larger, meaningful units.\n- 16 individual digits = 16 items (fails).\n- Grouped into 4 sets of 4 = 4 items (succeeds).\n\nA chess grandmaster doesn\'t see 32 pieces on a board; they see 3-4 "formations" (chunks). This is why they can play blindfolded.\n\n## The Method\n\n1. **Identify patterns:** Look for groups in the data.\n2. **Compress:** Convert individual items into chunks.\n3. **Assign meaning:** The chunk must be a single retrievable unit in your mind.', takeaways:['Working memory holds about 7±2 items.','You cannot consciously hold 16 individual digits at once.','Chunking groups items into larger, meaningful units.','16 digits grouped into 4 sets of 4 = only 4 items.','Grandmasters see formations (chunks), not individual pieces.'] } },
+  { id:'m3', codename:'MAJOR', title:'The Major System', summary:'Converting numbers into consonants and words.', lesson:{ title:'The Architecture of Numbers', body: 'Numbers are the hardest thing for the human brain to remember because they are abstract. The Major System, invented in the 17th century, converts numbers into phonetic sounds, which you can then use to form words.\n\n## The Phonetic Code\n\n0 = s, z\n1 = t, d\n2 = n\n3 = m\n4 = r\n5 = l\n6 = j, ch, sh\n7 = k, g\n8 = f, v\n9 = p, b\n\nVowels (a, e, i, o, u) and w, h, y have no value. They are "fillers."\n\n## Example\n\nYou want to remember the number 92.\n- 9 = p, b\n- 2 = n\n- Combine: p + n. Add a vowel: "pan" or "bone" or "pen".\n\nYou place a "pan" or a "bone" in your memory palace. When you walk the route and see the bone, you decode it back: b(9) + n(2) = 92.\n\n## Why It Works\n\nIt converts an abstract number into a concrete, visualizable object. The brain remembers images, not digits.', takeaways:['The Major System converts numbers to phonetic sounds.','0=s/z, 1=t/d, 2=n, 3=m, 4=r, 5=l, 6=j/ch/sh, 7=k/g, 8=f/v, 9=p/b.','Vowels are free fillers.','Convert numbers to words, then visualize the word.','It transforms abstract digits into concrete, memorable images.'] } },
+  { id:'m4', codename:'LINK', title:'The Linking Method', summary:'Chaining items together via absurd stories.', lesson:{ title:'The Architecture of Chains', body: 'The Linking Method (or Story Method) connects a sequence of items by creating a chain of absurd, vivid interactions.\n\n## The Method\n\nIf you need to remember: Egg, Milk, Bread, Apples.\n1. Imagine a giant Egg rolling down a hill.\n2. The Egg crashes into a river of Milk.\n3. The Milk river flows into a canyon made of Bread.\n4. Apples start raining from the sky into the canyon.\n\nTo recall, you just play the movie: Egg -> Milk -> Bread -> Apples.\n\n## Why It Works\n\nThe brain remembers sequences of actions better than static lists. By forcing the items to interact violently or absurdly, you create strong associative bonds. If you forget item 3, the strong link between Milk and Apples will usually trigger it.\n\n## The Trap\n\nThe Linking Method is sequential. If you want item 50, you have to walk the chain from 1 to 50. This is why the Memory Palace (spatial) is superior to the Linking Method (sequential) for long lists.', takeaways:['The Linking Method chains items via absurd stories.','Create vivid, violent, or bizarre interactions between items.','The brain remembers sequences of actions better than static lists.','Trap: It is sequential. You must walk the chain to find item 50.','Memory Palace is spatial; Linking is sequential.'] } },
+  { id:'m5', codename:'PEG', title:'The Peg System', summary:'Pre-memorized mental hooks for arbitrary lists.', lesson:{ title:'The Architecture of Hooks', body: 'The Peg System solves a different problem than the Memory Palace. If you want to recall item #14 instantly without walking a route, you need a "peg" — a pre-memorized hook for the number 14.\n\n## Number-Rhyme Pegs\n\n1 = Bun\n2 = Shoe\n3 = Tree\n4 = Door\n5 = Hive\n\nIf item #2 on your list is "Milk," you link Milk to Shoe. Imagine pouring milk into a giant, smelly shoe.\n\n## How to Use\n\nIf someone asks, "What was item 3?", you instantly think "Tree." What was on the tree? You see the image (e.g., apples hanging from the tree). You recall instantly without walking a sequence.\n\n## Combining Systems\n\nMemory athletes combine systems. They might use a Memory Palace for the main structure (100 stations), and within each station, use the Major System to encode a 2-digit number, and the Linking Method to connect concepts.', takeaways:['The Peg System uses pre-memorized hooks for numbers.','Number-Rhyme: 1=Bun, 2=Shoe, 3=Tree, 4=Door, 5=Hive.','It allows instant random access to item #N without walking a sequence.','You link the target item to the peg via a vivid image.','Memory athletes combine Palaces, Pegs, and the Major System.'] } },
+  { id:'m6', codename:'SPACING', title:'The Spacing Effect', summary:'Ebbinghaus curve and distributed practice.', lesson:{ title:'The Architecture of Forgetting', body: 'Hermann Ebbinghaus discovered the Forgetting Curve. If you learn something today, you will forget 50% of it within an hour, and 90% within a week, unless you review it.\n\n## The Spacing Effect\n\nIf you review information just as you are about to forget it, you reset the forgetting curve, and the curve gets flatter. Each subsequent review makes the memory more permanent.\n\nDay 1: Learn. (Curve drops fast).\nDay 2: Review. (Curve drops slower).\nDay 7: Review. (Curve drops even slower).\nDay 30: Review. (Memory is now semi-permanent).\n\n## The Application\n\nThis entire app (LOCI) is built on the SM-2 Spaced Repetition Algorithm. It automatically schedules your reviews for the optimal moment—right before the forgetting curve would have dropped you below the threshold of recall.\n\n## Cramming vs Spacing\n\nCramming (massed practice) feels effective because it holds items in working memory, but it creates zero long-term retention. Spaced practice forces retrieval from long-term memory, which strengthens the neural pathway.', takeaways:['The Forgetting Curve: You forget 50% in an hour, 90% in a week.','Reviewing just before forgetting flattens the curve permanently.','The Spacing Effect is the foundation of spaced repetition (SM-2).','Cramming holds items in working memory; spacing builds long-term memory.','Retrieval (active recall) is the mechanism that strengthens the pathway.'] } },
+  { id:'m7', codename:'VISUAL', title:'Vivid Imagery', summary:'The Von Restorff effect and bizarre images.', lesson:{ title:'The Architecture of Distinctiveness', body: 'The Von Restorff Effect (or "Isolation Effect") states that an item that stands out like a sore thumb is remembered better than items that blend in.\n\n## The Rule of Bizarre\n\nIf you place an "apple" on your kitchen table in your memory palace, you will forget it, because apples belong on tables. It is too normal.\n\nIf you place a giant, glowing, neon-pink apple that is screaming and bleeding apple juice all over the table, you will never forget it.\n\n## Multi-Sensory Encoding\n\nMake your images:\n1. **Vivid:** Bright colors, high contrast.\n2. **Bizarre:** Break the laws of physics.\n3. **Violent/Sexual:** The brain prioritizes survival and reproduction. (Keep it private, but use it).\n4. **Interactive:** The image should be doing something, not just sitting there.\n\n## The Method\n\nWhen creating a mnemonic image, ask: "Is this distinct enough to trigger the Von Restorff effect?" If it feels normal, make it weirder.', takeaways:['The Von Restorff Effect: Distinctive items are remembered better.','Normal images are forgotten; bizarre images are retained.','Make images vivid, bizarre, and interactive.','The brain prioritizes survival/reproduction (violence/sex) for memory.','If a mnemonic image feels normal, make it weirder.'] } },
+  { id:'m8', codename:'ASSOC', title:'Associative Hooks', summary:'Elaborative rehearsal and connecting new to old.', lesson:{ title:'The Architecture of Connection', body: 'You cannot remember something in a vacuum. Memory is a web of associations. To remember something new, you must hook it to something you already know.\n\n## Elaborative Rehearsal\n\nMaintenance rehearsal is repeating "apple, apple, apple" (useless). Elaborative rehearsal is asking, "How does an apple connect to my life?" (e.g., "I ate an apple yesterday, it was red, it reminded me of Snow White").\n\n## The Peg Hook\n\nThe Memory Palace and Peg Systems are essentially artificial associative hooks. You are creating a forced connection between the new data (a number) and an old, stable memory (your house).\n\n## The Method\n\n1. **Never memorize in isolation.**\n2. **Find an existing anchor:** What do you already know that is related?\n3. **Force a connection:** Even if the connection is absurd, it works.\n4. **Elaborate:** Add details, stories, and sensory data to the connection.', takeaways:['Memory is a web of associations; nothing exists in a vacuum.','Maintenance rehearsal (repeating) is useless.','Elaborative rehearsal (connecting to existing knowledge) builds memory.','Memory Palaces are artificial associative hooks.','Force connections, even absurd ones, to anchor new data.'] } },
+  { id:'m9', codename:'REVIEW', title:'Active Recall', summary:'The testing effect and the illusion of competence.', lesson:{ title:'The Architecture of Retrieval', body: 'Rereading notes feels like studying. It is actually an illusion of competence. You are recognizing the text, not retrieving it.\n\n## The Testing Effect\n\nActive recall (forcing yourself to retrieve the answer from memory) is 2-3x more effective than passive review. The act of retrieval itself strengthens the neural pathway.\n\n## Flashcards\n\nFlashcards (like the ones in this app) work because they force active recall. If you look at the front ("What is the Major System code for 5?") and flip to the back ("L"), you either knew it or you didn\'t. The struggle to retrieve is the workout.\n\n## The Method\n\n1. **Close the book.**\n2. **Write down everything you remember.**\n3. **Check for gaps.**\n4. **Focus your next review only on the gaps.**\n\nNever reread a chapter. Always test yourself first.', takeaways:['Rereading creates an illusion of competence (recognition, not recall).','Active recall is 2-3x more effective than passive review.','The act of retrieval strengthens the neural pathway.','Flashcards force retrieval; use them.','Close the book and write what you remember. Struggle is the workout.'] } },
+  { id:'m10', codename:'OVERL', title:'Overlearning', summary:'Automaticity and the 150% rule.', lesson:{ title:'The Architecture of Fluency', body: 'Overlearning is practicing a skill beyond the point of initial mastery. If it takes you 10 tries to memorize a poem, overlearning means reciting it 15 times (150%).\n\n## Why It Matters\n\nInitial mastery is fragile. If you stop exactly when you first get it right, the memory decays rapidly. Overlearning solidifies the pathway into automaticity.\n\n## The 150% Rule\n\nIf it takes 10 repetitions to learn, do 15. The extra 5 reps lock it into the basal ganglia, making it automatic. This is why pianists practice scales long after they "know" them.\n\n## Application in Memory Sports\n\nMemory athletes don\'t just learn their palaces; they walk them dozens of times until the loci are as familiar as their own home. The palace must be a non-conscious substrate so the athlete\'s working memory is entirely focused on creating new images, not remembering the route.\n\n## The Method\n\n1. **Learn it.**\n2. **Practice 50% more.**\n3. **Achieve automaticity.**', takeaways:['Overlearning is practicing beyond initial mastery.','Initial mastery is fragile; overlearning solidifies the pathway.','The 150% Rule: If it takes 10 reps, do 15.','Automaticity frees up working memory for higher-level tasks.','Memory palaces must be overlearned until they are automatic.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the Method of Loci (Memory Palace)?',back:'A mnemonic device that maps abstract data to physical locations along a familiar route.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'What are the 5 steps of the Method of Loci?',back:'1. Choose a familiar place. 2. Select a route. 3. Place items at stations. 4. Make images vivid. 5. Walk the route.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Why does the Method of Loci work evolutionarily?',back:'The brain\'s memory center (hippocampus) was originally a spatial map. The method hijacks this robust spatial hardware for abstract data.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'How do you recall a list using a Memory Palace?',back:'You walk the route in your mind and "see" what you placed at each station.'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What part of the brain is leveraged by the Memory Palace?',back:'The hippocampus, which handles spatial navigation.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'Why must the images in a Memory Palace be vivid?',back:'Bizarre, colorful, interactive images are easier to remember than normal ones (Von Restorff Effect).'},
+  {id:'c7',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The hippocampus is a..."',back:'"...spatial map; use it for abstract data."'},
+  {id:'c8',moduleId:'m1',core:false,category:'concept',front:'What is a "locus"?',back:'A specific station or location along the route in a Memory Palace.'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'Should items in a Memory Palace be static or interactive?',back:'Interactive. They should be doing something violent or bizarre.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'Is the Memory Palace spatial or sequential?',back:'Spatial. You can jump to station 50 without walking 1-49.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'Example of a good locus?',back:'Your front door, your bed, the kitchen sink. Familiar, distinct locations.'},
+  {id:'c12',moduleId:'m1',core:false,category:'quote',front:'Complete: "The oldest mnemonic technique, dating back to..."',back:'"...ancient Greece."'},
+  
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is George Miller\'s Magical Number?',back:'7±2. Human working memory can hold about 7 items at a time.'},
+  {id:'c14',moduleId:'m2',core:true,category:'concept',front:'What is chunking?',back:'Grouping individual items into larger, meaningful units to bypass the 7-item limit.'},
+  {id:'c15',moduleId:'m2',core:false,category:'application',front:'How many items is a 16-digit credit card number if ungrouped?',back:'16 items. (Exceeds the 7-item limit, so it fails).'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'How many items is a 16-digit credit card number if chunked into 4s?',back:'4 items. (Fits within the 7-item limit, so it succeeds).'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'Why do chess grandmasters play blindfolded?',back:'They see formations (chunks), not individual pieces. They compress the board into 3-4 items.'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'How to chunk a phone number (5558675309)?',back:'555-867-5309. Group into 3 chunks instead of 10 digits.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'What is the bottleneck of human cognition?',back:'Working memory capacity (7±2 items).'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'How do experts bypass the working memory limit?',back:'They build a vast library of chunks (patterns) in long-term memory.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete: "Working memory holds about 7..."',back:'"...plus or minus two items."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'Does chunking increase the physical size of working memory?',back:'No. It increases the density (complexity) of each item.'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'If you try to remember 16 individual digits, what happens?',back:'You fail because it exceeds the 7-item bottleneck.'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'What must a chunk be to work?',back:'A single retrievable unit in your mind.'},
+  
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is the Major System?',back:'A mnemonic system that converts numbers into phonetic sounds to form words.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'Major System: 1 = ?',back:'t, d.'},
+  {id:'c27',moduleId:'m3',core:false,category:'application',front:'Major System: 0 = ?',back:'s, z.'},
+  {id:'c28',moduleId:'m3',core:false,category:'application',front:'Major System: 2 = ?',back:'n.'},
+  {id:'c29',moduleId:'m3',core:false,category:'application',front:'Major System: 3 = ?',back:'m.'},
+  {id:'c30',moduleId:'m3',core:false,category:'application',front:'Major System: 4 = ?',back:'r.'},
+  {id:'c31',moduleId:'m3',core:false,category:'application',front:'Major System: 5 = ?',back:'l.'},
+  {id:'c32',moduleId:'m3',core:false,category:'application',front:'Major System: 9 = ?',back:'p, b.'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'Major System: 8 = ?',back:'f, v.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'What are vowels (a, e, i, o, u) in the Major System?',back:'Free fillers. They have no numeric value.'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'Convert 92 using the Major System.',back:'9=p/b, 2=n. Add vowels: "pan" or "bone".'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'Why does the Major System work?',back:'It converts abstract digits into concrete, visualizable objects. The brain remembers images.'},
+  
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is the Linking Method?',back:'A mnemonic that chains items together via absurd, vivid interactions.'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'How do you link Egg, Milk, Bread?',back:'Imagine an Egg crashing into a river of Milk that flows into a canyon of Bread.'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'Why does the Linking Method work?',back:'The brain remembers sequences of actions better than static lists.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'How do you recall a linked list?',back:'Play the mental movie from the beginning.'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What is the main trap of the Linking Method?',back:'It is sequential. You must walk the chain from 1 to 50 to find item 50.'},
+  {id:'c42',moduleId:'m4',core:false,category:'concept',front:'Memory Palace vs. Linking Method: which is better for long lists?',back:'Memory Palace (spatial) because it allows random access; Linking (sequential) does not.'},
+  {id:'c43',moduleId:'m4',core:false,category:'application',front:'Should linked items interact violently or be placed side-by-side?',back:'Violently/bizarrely. Interaction creates strong associative bonds.'},
+  {id:'c44',moduleId:'m4',core:false,category:'concept',front:'What creates the strong associative bond in linking?',back:'Forcing the items to interact absurdly.'},
+  {id:'c45',moduleId:'m4',core:false,category:'quote',front:'Complete: "The brain remembers sequences of..."',back:'"...actions better than static lists."'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'If you forget item 3 in a linked list, what triggers it?',back:'The strong link between item 2 and item 4.'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'Is the Linking Method spatial or sequential?',back:'Sequential.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What is another name for the Linking Method?',back:'The Story Method.'},
+  
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is the Peg System?',back:'A mnemonic that uses pre-memorized hooks (pegs) for numbers to allow instant random access.'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'Number-Rhyme Peg: 1 = ?',back:'Bun.'},
+  {id:'c51',moduleId:'m5',core:false,category:'application',front:'Number-Rhyme Peg: 2 = ?',back:'Shoe.'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'Number-Rhyme Peg: 3 = ?',back:'Tree.'},
+  {id:'c53',moduleId:'m5',core:false,category:'application',front:'Number-Rhyme Peg: 4 = ?',back:'Door.'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'Number-Rhyme Peg: 5 = ?',back:'Hive.'},
+  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'What problem does the Peg System solve?',back:'It allows instant recall of item #N without walking a sequence from 1 to N.'},
+  {id:'c56',moduleId:'m5',core:false,category:'application',front:'If item #2 is Milk, how do you peg it?',back:'Link Milk to Shoe. Imagine pouring milk into a giant shoe.'},
+  {id:'c57',moduleId:'m5',core:false,category:'concept',front:'How do memory athletes combine systems?',back:'Palace for structure, Major System for numbers, Linking for concepts.'},
+  {id:'c58',moduleId:'m5',core:false,category:'application',front:'To recall item 3, what do you think of?',back:'Tree. What was on the tree?'},
+  {id:'c59',moduleId:'m5',core:false,category:'quote',front:'Complete: "The Peg System allows..."',back:'"...instant random access to item #N."'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'What is a "peg"?',back:'A pre-memorized mental hook for a specific number.'},
+  
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is the Forgetting Curve?',back:'The decline of memory retention over time if there is no attempt to retain it.'},
+  {id:'c62',moduleId:'m6',core:true,category:'concept',front:'What is the Spacing Effect?',back:'Reviewing information just as you are about to forget it flattens the curve and makes memory permanent.'},
+  {id:'c63',moduleId:'m6',core:false,category:'application',front:'According to Ebbinghaus, how much do you forget in an hour?',back:'50%.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'According to Ebbinghaus, how much do you forget in a week?',back:'90%.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'What happens to the curve after each spaced review?',back:'It gets flatter (memory decays slower).'},
+  {id:'c66',moduleId:'m6',core:false,category:'concept',front:'What algorithm is this app built on?',back:'SM-2 (Spaced Repetition Algorithm).'},
+  {id:'c67',moduleId:'m6',core:false,category:'application',front:'When is the optimal moment to review?',back:'Right before the forgetting curve would drop you below the threshold of recall.'},
+  {id:'c68',moduleId:'m6',core:false,category:'concept',front:'Cramming vs. Spacing: which builds long-term memory?',back:'Spacing.'},
+  {id:'c69',moduleId:'m6',core:false,category:'concept',front:'Why does cramming feel effective but fail long-term?',back:'It holds items in working memory (recognition), not long-term memory.'},
+  {id:'c70',moduleId:'m6',core:false,category:'application',front:'What is massed practice (cramming)?',back:'Studying everything in one long session without breaks.'},
+  {id:'c71',moduleId:'m6',core:false,category:'quote',front:'Complete: "Reviewing just before forgetting flattens..."',back:'"...the curve permanently."'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'What mechanism strengthens the neural pathway during spacing?',back:'Retrieval (active recall).'},
+  
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is the Von Restorff Effect?',back:'An item that stands out like a sore thumb is remembered better than items that blend in.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'How do you make an image memorable in a Memory Palace?',back:'Make it vivid, bizarre, and interactive. Break the laws of physics.'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'Will a normal apple on a table be remembered?',back:'No. It is too normal. It blends in.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'How to make the apple memorable?',back:'A giant, glowing, neon-pink apple screaming and bleeding apple juice.'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'What types of images does the brain prioritize for memory?',back:'Violent and sexual images (survival and reproduction).'},
+  {id:'c78',moduleId:'m7',core:false,category:'concept',front:'Should mnemonic images be static or interactive?',back:'Interactive. The image should be doing something.'},
+  {id:'c79',moduleId:'m7',core:false,category:'application',front:'What are the 4 rules of vivid imagery?',back:'1. Vivid (bright). 2. Bizarre. 3. Violent/Sexual. 4. Interactive.'},
+  {id:'c80',moduleId:'m7',core:false,category:'concept',front:'Another name for the Von Restorff Effect?',back:'The Isolation Effect.'},
+  {id:'c81',moduleId:'m7',core:false,category:'quote',front:'Complete: "If a mnemonic image feels normal..."',back:'"...make it weirder."'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'Why does distinctiveness aid memory?',back:'It prevents the item from blending into the background noise.'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'Should you keep bizarre images private?',back:'Yes. Use them mentally, but don\'t share them.'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'What is the test for a good mnemonic image?',back:'"Is this distinct enough to trigger the Von Restorff effect?"'},
+  
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'Can you remember something in a vacuum?',back:'No. Memory is a web of associations.'},
+  {id:'c86',moduleId:'m8',core:true,category:'concept',front:'What is elaborative rehearsal?',back:'Connecting new information to things you already know.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'What is maintenance rehearsal?',back:'Repeating "apple, apple, apple" (useless).'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'How do you elaboratively rehearse an apple?',back:'"I ate an apple yesterday, it was red, it reminded me of Snow White."'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'What is a Memory Palace essentially?',back:'An artificial associative hook. You force a connection between new data and a stable memory.'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'How to anchor new data?',back:'Find an existing anchor and force a connection, even if absurd.'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'What must you do to remember something new?',back:'Hook it to something you already know.'},
+  {id:'c92',moduleId:'m8',core:false,category:'concept',front:'What is the difference between maintenance and elaborative rehearsal?',back:'Maintenance is repetition (bad). Elaborative is connection (good).'},
+  {id:'c93',moduleId:'m8',core:false,category:'quote',front:'Complete: "Memory is a web of..."',back:'"...associations; nothing exists in a vacuum."'},
+  {id:'c94',moduleId:'m8',core:false,category:'application',front:'If you want to remember a new name, what do you do?',back:'Connect it to someone you already know with that name, or a visual feature of the person.'},
+  {id:'c95',moduleId:'m8',core:false,category:'concept',front:'Why are forced connections effective?',back:'They create a retrieval path. Even an absurd path is better than no path.'},
+  {id:'c96',moduleId:'m8',core:false,category:'application',front:'How to elaborate a connection?',back:'Add details, stories, and sensory data to the connection.'},
+  
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is the Testing Effect?',back:'Active recall (forcing retrieval) is 2-3x more effective than passive review.'},
+  {id:'c98',moduleId:'m9',core:true,category:'concept',front:'What is the illusion of competence?',back:'Rereading notes feels like studying, but it is just recognition, not recall.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'Why is rereading useless?',back:'You are recognizing the text, not retrieving it from memory.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'How do flashcards leverage the Testing Effect?',back:'They force you to retrieve the answer. The struggle to retrieve is the workout.'},
+  {id:'c101',moduleId:'m9',core:false,category:'application',front:'How to study using active recall?',back:'1. Close the book. 2. Write down everything you remember. 3. Check for gaps.'},
+  {id:'c102',moduleId:'m9',core:false,category:'concept',front:'What strengthens the neural pathway?',back:'The act of retrieval itself.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'Is recognition the same as recall?',back:'No. Recognition is easy and useless. Recall is hard and effective.'},
+  {id:'c104',moduleId:'m9',core:false,category:'application',front:'After testing yourself, what should you focus on?',back:'Only the gaps you failed to retrieve.'},
+  {id:'c105',moduleId:'m9',core:false,category:'quote',front:'Complete: "Rereading creates an illusion of..."',back:'"...competence."'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'Why is active recall 2-3x more effective?',back:'Because the struggle to retrieve physically strengthens the synapses.'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Should you ever reread a chapter?',back:'Never. Always test yourself first.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'What is the "workout" of memory?',back:'The struggle to retrieve.'},
+  
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is overlearning?',back:'Practicing a skill beyond the point of initial mastery.'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'What is the 150% Rule?',back:'If it takes 10 reps to learn, do 15. The extra 5 reps lock it in.'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'Why is initial mastery fragile?',back:'If you stop exactly when you first get it right, the memory decays rapidly.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'What does overlearning achieve?',back:'Automaticity (locks it into the basal ganglia).'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'Why do pianists practice scales long after "knowing" them?',back:'To achieve automaticity, freeing up working memory for musicality.'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'How do memory athletes use overlearning?',back:'They walk their palaces dozens of times until the loci are non-conscious.'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'What happens when a palace is overlearned?',back:'It becomes a non-conscious substrate. Working memory is freed for new images.'},
+  {id:'c116',moduleId:'m10',core:false,category:'application',front:'How to apply overlearning to a presentation?',back:'Practice it 50% more times than it took to get it right once.'},
+  {id:'c117',moduleId:'m10',core:false,category:'quote',front:'Complete: "If it takes 10 reps to learn..."',back:'"...do 15."'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is automaticity?',back:'Performing a task without conscious effort.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'What happens if you stop at initial mastery?',back:'The memory decays rapidly under stress.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'Where do overlearned skills reside?',back:'The basal ganglia.'}
+];
+
+const ARENA = [
+  // M1: PALACE
+  { id:'p1', moduleId:'m1', title:'Q1: The Method', difficulty:1, reward:50, timeLimit:45, body:'What is the core mechanism of the Method of Loci?', options:['Repeating items out loud','Mapping abstract data to physical locations along a route','Writing items down repeatedly','Creating acronyms'], correct:1, explanation:'The Method of Loci maps abstract data to physical locations (loci) along a familiar route.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Evolutionary Hack', difficulty:2, reward:100, timeLimit:60, body:'Why does the Memory Palace work so well?', options:['It uses the brain\'s evolutionary spatial navigation hardware (hippocampus).','It uses the brain\'s language centers.','It creates muscle memory.','It relies on auditory processing.'], correct:0, explanation:'The hippocampus was originally a spatial map. The Method of Loci hijacks this robust spatial hardware for abstract data.' },
+  { id:'p3', moduleId:'m1', title:'Q3: Vivid Images', difficulty:3, reward:200, timeLimit:90, body:'You place an "apple" on your kitchen table in your palace. You forget it. Why?', options:['You didn\'t repeat it enough.','Apples are too boring. The image was not distinct (Von Restorff Effect).','The table was too small.','You walked the route too fast.'], correct:1, explanation:'Normal images blend in. To trigger the Von Restorff Effect, the image must be bizarre, vivid, and interactive.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Palace vs. Linking', difficulty:4, reward:500, timeLimit:120, body:'Why is the Memory Palace superior to the Linking Method for a 50-item list?', options:['It requires less concentration.','It allows random access. You can jump to item 50 without walking 1-49.','It uses different brain waves.','It doesn\'t require visualization.'], correct:1, explanation:'The Linking Method is sequential (you must walk the chain). The Palace is spatial (you can jump to any locus instantly).' },
+  // M2: CHUNK
+  { id:'p5', moduleId:'m2', title:'Q1: Miller\'s Number', difficulty:1, reward:50, timeLimit:45, body:'According to George Miller, what is the capacity of human working memory?', options:['5±2 items','7±2 items','10±2 items','Unlimited'], correct:1, explanation:'7±2. This is why phone numbers are 7 digits long.' },
+  { id:'p6', moduleId:'m2', title:'Q2: The Bottleneck', difficulty:2, reward:100, timeLimit:60, body:'Why do you fail to memorize a 16-digit credit card number as individual digits?', options:['16 is an unlucky number.','16 items exceeds the 7-item working memory bottleneck.','You don\'t have enough sleep.','Numbers are hard.'], correct:1, explanation:'16 individual digits = 16 items. Working memory can only hold ~7. You must chunk.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Chunking', difficulty:3, reward:200, timeLimit:90, body:'How do you successfully memorize the 16-digit number?', options:['Repeat it 100 times.','Group it into 4 sets of 4 (chunking). Now it is 4 items.','Write it in pen','Use a different credit card.'], correct:1, explanation:'Chunking groups items into larger units. 16 digits grouped into 4s = only 4 items, which fits in working memory.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Chess Masters', difficulty:4, reward:500, timeLimit:120, body:'How can chess grandmasters play blindfolded?', options:['They have photographic memory.','They see formations (chunks), not individual pieces. They compress the board into 3-4 items.','They use the Method of Loci for the board.','They count the pieces.'], correct:1, explanation:'Grandmasters have a vast library of patterns (chunks) in long-term memory. They see the board as 3-4 formations, not 32 pieces.' },
+  // M3: MAJOR
+  { id:'p9', moduleId:'m3', title:'Q1: Major System 1', difficulty:1, reward:50, timeLimit:45, body:'In the Major System, what sound represents the number 1?', options:['s, z','t, d','n','m'], correct:1, explanation:'1 = t, d.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Major System 9', difficulty:2, reward:100, timeLimit:60, body:'In the Major System, what sound represents the number 9?', options:['p, b','f, v','k, g','l'], correct:0, explanation:'9 = p, b.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Vowels', difficulty:3, reward:200, timeLimit:90, body:'What role do vowels (a, e, i, o, u) play in the Major System?', options:['They represent 0.','They are "free fillers" with no numeric value.','They represent 5.','They cannot be used.'], correct:1, explanation:'Vowels have no value. You insert them between consonants to form words (e.g., p+n = pan).' },
+  { id:'p12', moduleId:'m3', title:'Q4: Convert 92', difficulty:4, reward:500, timeLimit:120, body:'Using the Major System, convert the number 92 into a memorable word.', options:['Apple (1=p, 2=p, 9=l, 5=e)','Pan or Bone (9=p/b, 2=n)','Cat (1=t, 0=s, 3=m)','Dog (1=d, 0=s, 7=g)'], correct:1, explanation:'9=p/b, 2=n. Add a vowel (a) to get "pan", or add (o, e) to get "bone". You visualize a pan or a bone.' },
+  // M4: LINK
+  { id:'p13', moduleId:'m4', title:'Q1: The Linking Method', difficulty:1, reward:50, timeLimit:45, body:'What is the Linking Method?', options:['Chaining items together via absurd stories.','Writing links on paper.','Connecting ideas to websites.','Using a chain as a peg.'], correct:0, explanation:'The Linking Method connects a sequence of items by creating a chain of absurd, vivid interactions.' },
+  { id:'p14', moduleId:'m4', title:'Q2: Linking Egg, Milk, Bread', difficulty:2, reward:100, timeLimit:60, body:'Which is the correct way to link Egg, Milk, Bread?', options:['Place them in a row.','Imagine an Egg crashing into a river of Milk that flows into a canyon of Bread.','Think of the word EMB.','Look at them in the fridge.'], correct:1, explanation:'The items must interact violently/bizarrely. The Egg crashes into the Milk, which flows into the Bread.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Why It Works', difficulty:3, reward:200, timeLimit:90, body:'Why does the Linking Method work?', options:['It uses the brain\'s language centers.','The brain remembers sequences of actions better than static lists.','It uses spatial memory.','It is easy.'], correct:1, explanation:'Forcing items to interact creates strong associative bonds. The brain remembers stories (actions) better than lists.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Trap', difficulty:4, reward:500, timeLimit:120, body:'What is the main disadvantage of the Linking Method?', options:['It requires too much visualization.','It is sequential. You must walk the chain from 1 to 50 to find item 50.','It only works for short lists.','It is not as memorable as repeating.'], correct:1, explanation:'If you want item 50, you have to walk the chain from 1 to 50. The Memory Palace (spatial) solves this.' },
+  // M5: PEG
+  { id:'p17', moduleId:'m5', title:'Q1: The Peg System', difficulty:1, reward:50, timeLimit:45, body:'What is the Peg System?', options:['A system for hanging coats.','Pre-memorized hooks for numbers to allow instant random access.','A type of Memory Palace.','A way to link items.'], correct:1, explanation:'Pegs are pre-memorized hooks. If someone asks for item 3, you think "Tree" instantly.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Number-Rhyme 2', difficulty:2, reward:100, timeLimit:60, body:'In the Number-Rhyme system, what is the peg for 2?', options:['Bun','Shoe','Tree','Door'], correct:1, explanation:'2 = Shoe.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Using the Peg', difficulty:3, reward:200, timeLimit:90, body:'Item #2 on your list is "Milk". How do you peg it?', options:['Drink the milk.','Imagine pouring milk into a giant, smelly shoe.','Put the milk in the fridge.','Link the milk to a bun.'], correct:1, explanation:'You link the target item (Milk) to the peg (Shoe) via a vivid, bizarre image.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Combining Systems', difficulty:4, reward:500, timeLimit:120, body:'How do memory athletes combine systems for massive datasets?', options:['They only use the Palace.','They use Palace for structure, Major System for numbers, and Linking for concepts.','They only use the Peg System.','They don\'t combine them.'], correct:1, explanation:'Athletes build a palace with 100 stations. At each station, they might place a Major System word (encoding 2-3 digits), and link them.' },
+  // M6: SPACING
+  { id:'p21', moduleId:'m6', title:'Q1: The Forgetting Curve', difficulty:1, reward:50, timeLimit:45, body:'Who discovered the Forgetting Curve?', options:['George Miller','Hermann Ebbinghaus','Enrico Fermi','John von Neumann'], correct:1, explanation:'Ebbinghaus discovered the curve. If you don\'t review, you forget 50% in an hour, 90% in a week.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Spacing Effect', difficulty:2, reward:100, timeLimit:60, body:'What is the Spacing Effect?', options:['Studying in short bursts.','Reviewing information just as you are about to forget it, flattening the curve.','Studying late at night.','Streading out your books.'], correct:1, explanation:'Reviewing at the optimal moment (before forgetting) resets the curve and makes it flatter (more permanent).' },
+  { id:'p23', moduleId:'m6', title:'Q3: Cramming', difficulty:3, reward:200, timeLimit:90, body:'Why does cramming fail long-term?', options:['It is too stressful.','It holds items in working memory (recognition), not long-term memory.','You don\'t sleep enough.','It uses the wrong part of the brain.'], correct:1, explanation:'Cramming (massed practice) feels effective because you hold items in working memory, but it creates zero long-term retention.' },
+  { id:'p24', moduleId:'m6', title:'Q4: This App', difficulty:4, reward:500, timeLimit:120, body:'What algorithm does this app use to implement the Spacing Effect?', options:['FIFO','SM-2 (Spaced Repetition Algorithm)','Bubble Sort','AES-256'], correct:1, explanation:'The SM-2 algorithm schedules your reviews for the optimal moment—right before the forgetting curve drops you below recall threshold.' },
+  // M7: VISUAL
+  { id:'p25', moduleId:'m7', title:'Q1: Von Restorff', difficulty:1, reward:50, timeLimit:45, body:'What does the Von Restorff Effect state?', options:['Normal items are remembered best.','Distinctive items (sore thumbs) are remembered better than items that blend in.','Red items are remembered best.','Small items are forgotten.'], correct:1, explanation:'The Isolation Effect. An item that stands out is remembered better than items that blend in.' },
+  { id:'p26', moduleId:'m7', title:'Q2: The Rule of Bizarre', difficulty:2, reward:100, timeLimit:60, body:'Why must images in a Memory Palace be bizarre?', options:['Because the brain likes jokes.','Normal images blend in and are forgotten. Bizarre images trigger the Von Restorff Effect.','Because it is fun.','To impress your friends.'], correct:1, explanation:'An apple on a table is too normal. A giant neon-pink screaming apple stands out and is retained.' },
+  { id:'p27', moduleId:'m7', title:'Q3: Brain Priorities', difficulty:3, reward:200, timeLimit:90, body:'What types of images does the brain prioritize for memory (even if socially taboo)?', options:['Cute animals','Nature scenes','Violent and sexual images (survival and reproduction)','Abstract art'], correct:2, explanation:'The brain prioritizes survival and reproduction. Use violent or sexual imagery (mentally) to create strong memories.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Static vs. Interactive', difficulty:4, reward:500, timeLimit:120, body:'Should mnemonic images be static or interactive?', options:['Static, like a painting.','Interactive. They should be doing something violent.','Black and white.','Symmetrical.'], correct:1, explanation:'The image should be doing something. Action creates stronger associative bonds than static placement.' },
+  // M8: ASSOC
+  { id:'p29', moduleId:'m8', title:'Q1: Memory in a Vacuum', difficulty:1, reward:50, timeLimit:45, body:'Can you remember something in a vacuum?', options:['Yes, if you repeat it.','No. Memory is a web of associations.','Yes, if it is important.','Yes, if you sleep.'], correct:1, explanation:'Nothing exists in a vacuum. To remember something new, you must hook it to something you already know.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Rehearsal Types', difficulty:2, reward:100, timeLimit:60, body:'What is the difference between maintenance and elaborative rehearsal?', options:['Maintenance is for long-term; elaborative is for short-term.','Maintenance is repetition (useless). Elaborative is connection (effective).','They are the same.','Maintenance is visual; elaborative is auditory.'], correct:1, explanation:'Maintenance rehearsal is repeating "apple, apple" (bad). Elaborative rehearsal is connecting it to your life (good).' },
+  { id:'p31', moduleId:'m8', title:'Q3: Artificial Hooks', difficulty:3, reward:200, timeLimit:90, body:'What is a Memory Palace essentially?', options:['A real building.','An artificial associative hook connecting new data to a stable memory.','A type of peg.','A memory trick for actors.'], correct:1, explanation:'The palace is a stable memory. You force connections between new data and the loci.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Forced Connections', difficulty:4, reward:500, timeLimit:120, body:'Why do forced (even absurd) connections work for memory?', options:['Because they are funny.','They create a retrieval path. Even an absurd path is better than no path.','They use less energy.','They are easier to visualize.'], correct:1, explanation:'An absurd connection still links the new item to an old anchor. It gives you a path to retrieve the data.' },
+  // M9: REVIEW
+  { id:'p33', moduleId:'m9', title:'Q1: The Illusion', difficulty:1, reward:50, timeLimit:45, body:'What is the "illusion of competence"?', options:['Thinking you are smart.','Rereading notes feels like studying, but it is just recognition, not recall.','Memorizing too fast.','Using mnemonics.'], correct:1, explanation:'Rereading gives you the feeling of knowing, but you haven\'t actually retrieved the data. It is a false positive.' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Testing Effect', difficulty:2, reward:100, timeLimit:60, body:'What is the Testing Effect?', options:['Tests cause stress.','Active recall is 2-3x more effective than passive review.','Tests are bad for learning.','You should test yourself once a month.'], correct:1, explanation:'The act of forcing yourself to retrieve information strengthens the neural pathway. Flashcards work because of this.' },
+  { id:'p35', moduleId:'m9', title:'Q3: How to Study', difficulty:3, reward:200, timeLimit:90, body:'What is the correct active recall study method?', options:['Read the chapter 5 times.','1. Close the book. 2. Write down everything you remember. 3. Check for gaps.','Highlight the text.','Listen to a recording.'], correct:1, explanation:'Close the book and write what you remember. The struggle to retrieve is the workout. Then check gaps.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Neural Pathway', difficulty:4, reward:500, timeLimit:120, body:'What physically strengthens the neural pathway during active recall?', options:['The act of retrieval itself.','The act of reading.','The act of hearing.','The act of writing.'], correct:0, explanation:'Retrieval is not just a test; it is the mechanism of consolidation. The struggle to retrieve strengthens the synapses.' },
+  // M10: OVERL
+  { id:'p37', moduleId:'m10', title:'Q1: Overlearning', difficulty:1, reward:50, timeLimit:45, body:'What is overlearning?', options:['Learning too much.','Practicing a skill beyond the point of initial mastery.','Forgetting on purpose.','Using mnemonics for everything.'], correct:1, explanation:'If it takes 10 tries to learn, you do 15. The extra reps lock it in.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The 150% Rule', difficulty:2, reward:100, timeLimit:60, body:'If it takes you 10 repetitions to memorize a poem, how many should you do?', options:['10','11','15 (150%)','20'], correct:2, explanation:'The 150% Rule. Do 50% more reps than it took to initially master it. This solidifies the pathway.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Initial Mastery', difficulty:3, reward:200, timeLimit:90, body:'Why is stopping at initial mastery dangerous?', options:['You will forget it rapidly under stress.','It is too easy.','You didn\'t use mnemonics.','You need more sleep.'], correct:0, explanation:'Initial mastery is fragile. If you stop exactly when you first get it right, the memory decays rapidly. Overlearning builds automaticity.' },
+  { id:'p40', moduleId:'m10', title:'Q4: Memory Athletes', difficulty:4, reward:500, timeLimit:120, body:'How do memory athletes use overlearning for their Memory Palaces?', options:['They build new palaces every day.','They walk their palaces dozens of times until the loci are non-conscious.','They only use them once.','They use bigger palaces.'], correct:1, explanation:'The palace must be a non-conscious substrate. They overlearn it so working memory is entirely freed for creating new images.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Vault Blueprint', scenario:'You need to memorize a 100-digit number for a competition. What is your first step?', options:['Start memorizing the digits.','Build a Memory Palace with 50 distinct loci (stations) along a familiar route.','Buy a bigger brain.','Repeat the number 100 times.'], correct:1, explanation:'Before memorizing data, you need the architecture. Build a palace with enough stations to hold the chunks of data.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: Chunking Strategy', scenario:'The 100-digit number is too long to hold in working memory. How do you process it?', options:['Give up.','Chunk it into 2-digit pairs (00-99) using the Major System, creating 50 items.','Try to read it faster.','Write it on your arm.'], correct:1, explanation:'100 individual digits = 100 items (impossible). 50 two-digit chunks = 50 items (possible with a 50-station palace).' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Encoding Digits', scenario:'Your first two digits are 92. How do you memorize them?', options:['Repeat "92" 10 times.','Use the Major System: 9=p/b, 2=n. Form the word "Pan" or "Bone". Visualize it at station 1.','Visualize the number 92.','Hope you remember it.'], correct:1, explanation:'Convert the abstract digits into a concrete, visualizable word using the Major System, then place it in the palace.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: Linking Stations', scenario:'You have 50 stations, each with a Major System word. How do you ensure you don\'t skip a station?', options:['Write them down.','Use the Linking Method: make the image at station 1 interact violently with the image at station 2.','Count them.','Pray.'], correct:1, explanation:'While the palace is spatial, linking the images sequentially ensures continuity and prevents skipping loci.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: Random Access', scenario:'The judge asks, "What was digit pair 35?" How do you answer instantly?', options:['Walk the palace from 1 to 35.','Use a Peg System. If you have a peg for 35, you recall the peg, see the image, and decode the digits.','Guess.','Ask for a hint.'], correct:1, explanation:'If you only used a palace, you must walk 1-34 first. A Peg System for the station numbers gives instant random access.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: Retention', scenario:'You memorized the 100 digits in 5 minutes. The recall is in 2 hours. What do you do?', options:['Nothing, it\'s locked in.','Review it using spaced repetition (e.g., 10 mins, 30 mins, 1 hour) to flatten the forgetting curve.','Drink coffee.','Reread the number.'], correct:1, explanation:'Ebbinghaus curve will destroy the memory in 2 hours. You must review at expanding intervals to flatten the curve.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: Forgetting an Image', scenario:'At station 23, you placed a "Cat" (digits 71). During recall, you forget it. Why?', options:['The cat was too cute.','The image was not vivid/bizarre enough to trigger the Von Restorff Effect.','Cats are hard to remember.','You don\'t like cats.'], correct:1, explanation:'Normal images are forgotten. The cat should have been a giant, neon, screaming cat fighting a laser shark.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: Elaborative Anchors', scenario:'You keep confusing stations 12 and 21. How do you fix this?', options:['Move them.','Use elaborative rehearsal: anchor distinct features to them (e.g., "Station 12 is the bloody sink, 21 is the exploding bed").','Give up.','Use numbers.'], correct:1, explanation:'Force stronger associative hooks. Make the loci themselves distinct and memorable so they don\'t blend.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Recall Struggle', scenario:'During practice, you struggle to recall station 45. What is the correct training method?', options:['Look at the answer immediately.','Struggle for 10 seconds to retrieve it (active recall). The struggle strengthens the pathway. Then check.','Skip it.','Give up.'], correct:1, explanation:'The struggle to retrieve is the workout. If you look immediately, you get the illusion of competence. Struggle first, then check.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: Automaticity', scenario:'You want to break the world record. What must you do with your palaces?', options:['Build 100 of them.','Overlearn them. Walk them dozens of times until they are non-conscious substrates.','Use drugs.','Sleep more.'], correct:1, explanation:'Overlearning (150% rule) makes the palace automatic. Working memory is freed entirely for creating new, bizarre images.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The First Palace', body:'Choose a room in your house. Select 5 distinct locations (loci). Mentally walk the route 3 times until it is automatic.' },
+  { id:'rw2', title:'The Shopping List', body:'Memorize your next grocery list (5 items) by placing vivid, bizarre images of each item in the 5 loci of your palace.' },
+  { id:'rw3', title:'The Phone Number', body:'Take a phone number. Chunk it into 3-4 pieces instead of 7+ digits. Notice how much easier it is to hold in mind.' },
+  { id:'rw4', title:'The Major Drill', body:'Write down the 10 Major System consonants (s, t, n, m, r, l, j, k, f, p). Quiz yourself on the numbers (0-9) until instant.' },
+  { id:'rw5', title:'The 2-Digit Word', body:'Pick a random 2-digit number. Convert it to consonants, add vowels, and form a memorable word. Visualize the object.' },
+  { id:'rw6', title:'The Linking Story', body:'Take 4 random objects. Create a bizarre, violent story linking them in sequence. Recall the story 1 hour later.' },
+  { id:'rw7', title:'The Number-Rhyme Peg', body:'Memorize the 5 number-rhyme pegs (1-Bun, 2-Shoe, 3-Tree, 4-Door, 5-Hive). Test yourself.' },
+  { id:'rw8', title:'The Peg List', body:'Create a 5-item shopping list. Peg each item to the number-rhyme pegs (e.g., 1-Bun-Milk: imagine milk pouring on a bun).' },
+  { id:'rw9', title:'The Forgetting Curve', body:'Learn a new fact right now. Set a timer for 1 hour. Try to recall it before looking it up. Notice the decay.' },
+  { id:'rw10', title:'The Spaced Review', body:'Review a flashcard deck right now. Schedule the next review for tomorrow, then 3 days, then a week. Watch the curve flatten.' },
+  { id:'rw11', title:'The Bizarre Image', body:'Take a boring item (e.g., a stapler). Make it neon pink, 10 feet tall, and screaming. Notice how it sticks in your mind.' },
+  { id:'rw12', title:'The Name Hook', body:'Meet someone new. Force an associative hook (e.g., "Brian" -> "Brain" -> imagine a brain on his head).' },
+  { id:'rw13', title:'The Active Recall Test', body:'Close this app. Write down the 5 steps of the Method of Loci from memory. Struggle first, then check.' },
+  { id:'rw14', title:'The Overlearning Rep', body:'Practice a skill you just learned 50% more times than it took to get it right once. Notice the automaticity.' },
+  { id:'rw15', title:'The 7-Item Limit', body:'Try to hold 7 random words in your mind. Then try 10. Notice the wall.' },
+  { id:'rw16', title:'The Chunking Trick', body:'Memorize a 12-digit sequence by chunking it into 3 sets of 4. Compare to trying 12 individual digits.' },
+  { id:'rw17', title:'The 92 Image', body:'Visualize the word "Pan" or "Bone". Place it in your kitchen. Recall the digits (92).' },
+  { id:'rw18', title:'The Palace Route', body:'Walk the route of your Memory Palace backwards. Ensure you can access loci in reverse.' },
+  { id:'rw19', title:'The Story Link', body:'Link 10 items into a single, continuous story. Recall the sequence.' },
+  { id:'rw20', title:'The Peg Random Access', body:'Ask a friend to name a number 1-5. Instantly recall the peg and the item you pegged to it.' },
+  { id:'rw21', title:'The Hippocampus Hack', body:'Reflect on why spatial memory is stronger than list memory. Use this evolutionary hack daily.' },
+  { id:'rw22', title:'The Illusion Check', body:'Reread a paragraph. Feel the false confidence. Now close the book and write what you learned. Feel the gap.' },
+  { id:'rw23', title:'The Retrieval Workout', body:'Find a fact you "know". Force yourself to retrieve it without looking. The struggle is the growth.' },
+  { id:'rw24', title:'The 150% Rule', body:'Count how many reps it took to learn a new skill today. Do 50% more.' },
+  { id:'rw25', title:'The Automatic Palace', body:'Walk your palace 20 times until you don\'t have to think about the route, only the images.' },
+  { id:'rw26', title:'The Von Restorff Image', body:'Make an image so weird you slightly cringe. Notice how you can\'t unsee it.' },
+  { id:'rw27', title:'The Elaborative Hook', body:'Connect a new idea to an old memory. Add a story and sensory details.' },
+  { id:'rw28', title:'The Maintenance Trap', body:'Notice when you are just repeating words vs. connecting them. Stop repeating. Start connecting.' },
+  { id:'rw29', title:'The Testing Effect', body:'Before studying today, test yourself on what you think you know. Focus only on the gaps.' },
+  { id:'rw30', title:'The Meta-Cognition', body:'Reflect on how you learn. Which mnemonic worked best for you today? Use it tomorrow.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your mnemonic profile.' },
+  { threshold: 500, title: 'MNEMONIST', desc: 'You have built your first memory palace.' },
+  { threshold: 1500, title: 'CHUNKER', desc: 'You bypass the 7-item limit via pattern recognition.' },
+  { threshold: 3000, title: 'ATHLETE', desc: 'You combine palaces, pegs, and the Major System.' },
+  { threshold: 6000, title: 'GRANDMASTER', desc: 'You operate at the frontier of human memory capacity.' }
+];
+
+const STORAGE_KEY = 'loci-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// MNEMONIC VAULT COMPLETE</h2>';
+      html += '<p>You have completed all 10 axes and successfully built your Mnemonic Vault. You now possess the complete architecture of memory.</p>';
+      html += '<p><strong>The Secret:</strong> Memory is not a storage drive; it is a spatial map. By converting abstract data into vivid, bizarre images and placing them in familiar locations, you bypass the 7-item bottleneck of working memory. The brain remembers spaces and stories, not lists and numbers. You are now a Grandmaster of Memory.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Mnemonic Vault: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your mnemonic architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="LOCI.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="LOCI.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="LOCI.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="LOCI.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="LOCI.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="LOCI.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="LOCI.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="LOCI.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'VAULT COMPLETE' : 'BUILDING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each mnemonic axis to build a memory vault. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="LOCI.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="LOCI.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="LOCI.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'mnemonic vault: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="LOCI.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="LOCI.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="LOCI.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="LOCI.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="LOCI.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="LOCI.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="LOCI.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="LOCI.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="LOCI.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="LOCI.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="LOCI.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="LOCI.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="LOCI.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="LOCI.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="LOCI.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="LOCI.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="LOCI.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="LOCI.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'loci_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading mnemonic kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Mnemonic Vault...', 'LOCI online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.LOCI = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  // Track activity for Hub Heatmap
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
