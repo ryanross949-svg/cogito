@@ -51,12 +51,15 @@
   .heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10px, 1fr)); gap: 2px; margin-top: 0.5rem; }
   .heat-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.05); border-radius: 1px; }
   .heat-active-4 { background: var(--cyan); box-shadow: 0 0 4px var(--cyan); }
-  .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+  .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
   .ach-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 1rem 0.5rem; text-align: center; border-radius: 4px; opacity: 0.4; transition: all 0.3s; }
   .ach-card.unlocked { opacity: 1; border-color: var(--green); background: rgba(0,255,163,0.05); box-shadow: 0 0 10px rgba(0,255,163,0.1); }
   .ach-icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
   .ach-name { font-size: 0.7rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
   .ach-desc { font-size: 0.6rem; color: var(--text-dim); line-height: 1.2; }
+  .ach-track { font-size: 0.55rem; letter-spacing: 0.12em; color: var(--text-faint); text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
+  .ach-next { font-size: 0.58rem; color: var(--text-dim); line-height: 1.25; display: block; margin-top: 0.4rem; }
+  .ach-next.done { color: var(--green); }
   .domain-section { max-width: 1000px; margin: 0 auto 3rem; }
   .domain-title { font-family: var(--display); font-size: 1.2rem; color: var(--magenta); border-bottom: 1px solid rgba(157,78,221,0.3); padding-bottom: 0.5rem; margin-bottom: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
@@ -380,44 +383,63 @@ function renderHeatmap() {
 }
 renderHeatmap();
 
-const ACHIEVEMENTS = [
-  // Onboarding & streaks
-  { id: 'first_blood', name: 'First Blood', desc: 'Solve 1 Arena problem', icon: '⚔️', check: () => appData.some(a => a.xp > 50) },
-  { id: 'streak_7', name: 'Week One', desc: '7-day streak', icon: '🔥', check: () => currentStreak >= 7 },
-  { id: 'streak_30', name: 'Unbroken', desc: '30-day streak', icon: '🛡️', check: () => currentStreak >= 30 },
-  { id: 'streak_100', name: 'Relentless', desc: '100-day streak', icon: '☄️', check: () => currentStreak >= 100 },
-  // Breadth across the catalog
-  { id: 'explorer', name: 'Explorer', desc: 'Begin 10 courses', icon: '🧭', check: () => appData.filter(a => a.xp > 0).length >= 10 },
-  { id: 'voyager', name: 'Voyager', desc: 'Begin 25 courses', icon: '🗺️', check: () => appData.filter(a => a.xp > 0).length >= 25 },
-  { id: 'omniscient', name: 'Omniscient', desc: 'Begin every course', icon: '🌐', check: () => appData.length > 0 && appData.every(a => a.xp > 0) },
-  // Global depth (XP / level)
-  { id: 'centaur', name: 'Centaur', desc: 'Reach Lvl 15 globally', icon: '🌟', check: () => getLevel(totalXP) >= 15 },
-  { id: 'polymath', name: 'Polymath', desc: 'Reach Lvl 40 globally', icon: '🎓', check: () => getLevel(totalXP) >= 40 },
-  { id: 'apollo', name: 'Apollo', desc: 'Reach Lvl 75 globally', icon: '🚀', check: () => getLevel(totalXP) >= 75 },
-  // Spaced-repetition mastery
-  { id: 'mastery_500', name: 'Master', desc: '500 cards matured', icon: '💎', check: () => totalMature >= 500 },
-  { id: 'archivist', name: 'Archivist', desc: '1,000 cards matured', icon: '📚', check: () => totalMature >= 1000 },
-  // Discipline capstones
-  { id: 'renaissance', name: 'Renaissance', desc: 'Train all 7 disciplines', icon: '🎨', check: () => DISCIPLINES.every(d => { const m = appData.filter(a => a.domain === d.key); return m.length === 0 || m.some(a => a.xp > 0); }) },
-  { id: 'synthesis', name: 'Grand Synthesis', desc: '60%+ maturity in all 7 disciplines', icon: '💠', check: () => { const s = disciplineStats().filter(d => d.count > 0); return s.length === DISCIPLINES.length && s.every(d => d.maturity >= 60); } },
-  // Per-discipline mastery (80% average maturity)
-  { id: 'master_physics', name: 'Natural Philosopher', desc: 'Master Physical Sciences (80%)', icon: '⚛️', check: () => { const d = disciplineStats().find(x => x.key === 'physics'); return !!d && d.maturity >= 80; } },
-  { id: 'master_math', name: 'Logician', desc: 'Master Mathematics & Logic (80%)', icon: '📐', check: () => { const d = disciplineStats().find(x => x.key === 'math'); return !!d && d.maturity >= 80; } },
-  { id: 'master_compute', name: 'Architect', desc: 'Master Computation & Information (80%)', icon: '💻', check: () => { const d = disciplineStats().find(x => x.key === 'compute'); return !!d && d.maturity >= 80; } },
-  { id: 'master_life', name: 'Naturalist', desc: 'Master Life & Evolution (80%)', icon: '🧬', check: () => { const d = disciplineStats().find(x => x.key === 'life'); return !!d && d.maturity >= 80; } },
-  { id: 'master_mind', name: 'Sage', desc: 'Master Mind & Language (80%)', icon: '🧠', check: () => { const d = disciplineStats().find(x => x.key === 'mind'); return !!d && d.maturity >= 80; } },
-  { id: 'master_strategy', name: 'Grandmaster', desc: 'Master Strategy & Economics (80%)', icon: '📈', check: () => { const d = disciplineStats().find(x => x.key === 'strategy'); return !!d && d.maturity >= 80; } },
-  { id: 'master_systems', name: 'Engineer', desc: 'Master Systems & Engineering (80%)', icon: '⚙️', check: () => { const d = disciplineStats().find(x => x.key === 'systems'); return !!d && d.maturity >= 80; } }
+const ACHIEVEMENT_TRACKS = [
+  // Each track renders as ONE card showing the current tier + the next goal.
+  { label: 'Engagement', mode: 'ladder', tiers: [
+    { name: 'First Blood', desc: 'Solve 1 Arena problem', icon: '⚔️', check: () => appData.some(a => a.xp > 50) },
+    { name: 'Week One', desc: '7-day streak', icon: '🔥', check: () => currentStreak >= 7 },
+    { name: 'Unbroken', desc: '30-day streak', icon: '🛡️', check: () => currentStreak >= 30 },
+    { name: 'Relentless', desc: '100-day streak', icon: '☄️', check: () => currentStreak >= 100 }
+  ]},
+  { label: 'Breadth', mode: 'ladder', tiers: [
+    { name: 'Explorer', desc: 'Begin 10 courses', icon: '🧭', check: () => appData.filter(a => a.xp > 0).length >= 10 },
+    { name: 'Voyager', desc: 'Begin 25 courses', icon: '🗺️', check: () => appData.filter(a => a.xp > 0).length >= 25 },
+    { name: 'Omniscient', desc: 'Begin every course', icon: '🌐', check: () => appData.length > 0 && appData.every(a => a.xp > 0) }
+  ]},
+  { label: 'Ascension', mode: 'ladder', tiers: [
+    { name: 'Centaur', desc: 'Reach Lvl 15', icon: '🌟', check: () => getLevel(totalXP) >= 15 },
+    { name: 'Polymath', desc: 'Reach Lvl 40', icon: '🎓', check: () => getLevel(totalXP) >= 40 },
+    { name: 'Apollo', desc: 'Reach Lvl 75', icon: '🚀', check: () => getLevel(totalXP) >= 75 }
+  ]},
+  { label: 'Memory', mode: 'ladder', tiers: [
+    { name: 'Master', desc: '500 cards matured', icon: '💎', check: () => totalMature >= 500 },
+    { name: 'Archivist', desc: '1,000 cards matured', icon: '📚', check: () => totalMature >= 1000 }
+  ]},
+  { label: 'Synthesis', mode: 'ladder', tiers: [
+    { name: 'Renaissance', desc: 'Train all 7 disciplines', icon: '🎨', check: () => DISCIPLINES.every(d => { const m = appData.filter(a => a.domain === d.key); return m.length === 0 || m.some(a => a.xp > 0); }) },
+    { name: 'Grand Synthesis', desc: '60%+ maturity in all 7', icon: '💠', check: () => { const s = disciplineStats().filter(d => d.count > 0); return s.length === DISCIPLINES.length && s.every(d => d.maturity >= 60); } }
+  ]},
+  { label: 'Discipline Mastery', mode: 'set', tiers: [
+    { name: 'Natural Philosopher', desc: 'Physical Sciences 80%', icon: '⚛️', check: () => { const d = disciplineStats().find(x => x.key === 'physics'); return !!d && d.maturity >= 80; } },
+    { name: 'Logician', desc: 'Mathematics & Logic 80%', icon: '📐', check: () => { const d = disciplineStats().find(x => x.key === 'math'); return !!d && d.maturity >= 80; } },
+    { name: 'Architect', desc: 'Computation & Info 80%', icon: '💻', check: () => { const d = disciplineStats().find(x => x.key === 'compute'); return !!d && d.maturity >= 80; } },
+    { name: 'Naturalist', desc: 'Life & Evolution 80%', icon: '🧬', check: () => { const d = disciplineStats().find(x => x.key === 'life'); return !!d && d.maturity >= 80; } },
+    { name: 'Sage', desc: 'Mind & Language 80%', icon: '🧠', check: () => { const d = disciplineStats().find(x => x.key === 'mind'); return !!d && d.maturity >= 80; } },
+    { name: 'Grandmaster', desc: 'Strategy & Economics 80%', icon: '📈', check: () => { const d = disciplineStats().find(x => x.key === 'strategy'); return !!d && d.maturity >= 80; } },
+    { name: 'Engineer', desc: 'Systems & Engineering 80%', icon: '⚙️', check: () => { const d = disciplineStats().find(x => x.key === 'systems'); return !!d && d.maturity >= 80; } }
+  ]}
 ];
 
 function renderAchievements() {
   const grid = document.getElementById('achGrid');
   grid.innerHTML = '';
-  ACHIEVEMENTS.forEach(ach => {
-    const unlocked = ach.check();
+  ACHIEVEMENT_TRACKS.forEach(track => {
+    const total = track.tiers.length;
+    const done = track.tiers.filter(t => t.check()).length;
+    let current, next;
+    if (track.mode === 'set') {
+      current = track.tiers.filter(t => t.check()).slice(-1)[0] || null;
+      next = track.tiers.find(t => !t.check()) || null;
+    } else {
+      current = done > 0 ? track.tiers[done - 1] : null;
+      next = done < total ? track.tiers[done] : null;
+    }
     const card = document.createElement('div');
-    card.className = 'ach-card' + (unlocked ? ' unlocked' : '');
-    card.innerHTML = `<span class="ach-icon">${unlocked ? ach.icon : '🔒'}</span><div class="ach-name">${ach.name}</div><div class="ach-desc">${ach.desc}</div>`;
+    card.className = 'ach-card' + (done > 0 ? ' unlocked' : '');
+    const nextLine = next
+      ? `<span class="ach-next">▸ ${next.name}: ${next.desc}</span>`
+      : `<span class="ach-next done">✓ Track complete</span>`;
+    card.innerHTML = `<span class="ach-track">${track.label} · ${done}/${total}</span><span class="ach-icon">${current ? current.icon : '🔒'}</span><div class="ach-name">${current ? current.name : 'Not started'}</div>${nextLine}`;
     grid.appendChild(card);
   });
 }
