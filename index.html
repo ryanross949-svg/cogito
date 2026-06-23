@@ -385,39 +385,41 @@ renderHeatmap();
 
 const ACHIEVEMENT_TRACKS = [
   // Each track renders as ONE card showing the current tier + the next goal.
-  { label: 'Engagement', mode: 'ladder', tiers: [
+  { label: 'Engagement', tiers: [
     { name: 'First Blood', desc: 'Solve 1 Arena problem', icon: '⚔️', check: () => appData.some(a => a.xp > 50) },
     { name: 'Week One', desc: '7-day streak', icon: '🔥', check: () => currentStreak >= 7 },
     { name: 'Unbroken', desc: '30-day streak', icon: '🛡️', check: () => currentStreak >= 30 },
     { name: 'Relentless', desc: '100-day streak', icon: '☄️', check: () => currentStreak >= 100 }
   ]},
-  { label: 'Breadth', mode: 'ladder', tiers: [
+  { label: 'Breadth', tiers: [
     { name: 'Explorer', desc: 'Begin 10 courses', icon: '🧭', check: () => appData.filter(a => a.xp > 0).length >= 10 },
     { name: 'Voyager', desc: 'Begin 25 courses', icon: '🗺️', check: () => appData.filter(a => a.xp > 0).length >= 25 },
     { name: 'Omniscient', desc: 'Begin every course', icon: '🌐', check: () => appData.length > 0 && appData.every(a => a.xp > 0) }
   ]},
-  { label: 'Ascension', mode: 'ladder', tiers: [
+  { label: 'Ascension', tiers: [
     { name: 'Centaur', desc: 'Reach Lvl 15', icon: '🌟', check: () => getLevel(totalXP) >= 15 },
     { name: 'Polymath', desc: 'Reach Lvl 40', icon: '🎓', check: () => getLevel(totalXP) >= 40 },
     { name: 'Apollo', desc: 'Reach Lvl 75', icon: '🚀', check: () => getLevel(totalXP) >= 75 }
   ]},
-  { label: 'Memory', mode: 'ladder', tiers: [
+  { label: 'Memory', tiers: [
     { name: 'Master', desc: '500 cards matured', icon: '💎', check: () => totalMature >= 500 },
     { name: 'Archivist', desc: '1,000 cards matured', icon: '📚', check: () => totalMature >= 1000 }
   ]},
-  { label: 'Synthesis', mode: 'ladder', tiers: [
+  { label: 'Synthesis', tiers: [
     { name: 'Renaissance', desc: 'Train all 7 disciplines', icon: '🎨', check: () => DISCIPLINES.every(d => { const m = appData.filter(a => a.domain === d.key); return m.length === 0 || m.some(a => a.xp > 0); }) },
     { name: 'Grand Synthesis', desc: '60%+ maturity in all 7', icon: '💠', check: () => { const s = disciplineStats().filter(d => d.count > 0); return s.length === DISCIPLINES.length && s.every(d => d.maturity >= 60); } }
-  ]},
-  { label: 'Discipline Mastery', mode: 'set', tiers: [
-    { name: 'Natural Philosopher', desc: 'Physical Sciences 80%', icon: '⚛️', check: () => { const d = disciplineStats().find(x => x.key === 'physics'); return !!d && d.maturity >= 80; } },
-    { name: 'Logician', desc: 'Mathematics & Logic 80%', icon: '📐', check: () => { const d = disciplineStats().find(x => x.key === 'math'); return !!d && d.maturity >= 80; } },
-    { name: 'Architect', desc: 'Computation & Info 80%', icon: '💻', check: () => { const d = disciplineStats().find(x => x.key === 'compute'); return !!d && d.maturity >= 80; } },
-    { name: 'Naturalist', desc: 'Life & Evolution 80%', icon: '🧬', check: () => { const d = disciplineStats().find(x => x.key === 'life'); return !!d && d.maturity >= 80; } },
-    { name: 'Sage', desc: 'Mind & Language 80%', icon: '🧠', check: () => { const d = disciplineStats().find(x => x.key === 'mind'); return !!d && d.maturity >= 80; } },
-    { name: 'Grandmaster', desc: 'Strategy & Economics 80%', icon: '📈', check: () => { const d = disciplineStats().find(x => x.key === 'strategy'); return !!d && d.maturity >= 80; } },
-    { name: 'Engineer', desc: 'Systems & Engineering 80%', icon: '⚙️', check: () => { const d = disciplineStats().find(x => x.key === 'systems'); return !!d && d.maturity >= 80; } }
   ]}
+];
+
+// Per-discipline mastery, shown as 7 individual tiles (mastered at 80% avg maturity).
+const DISCIPLINE_MASTERY = [
+  { key: 'physics',  title: 'Natural Philosopher' },
+  { key: 'math',     title: 'Logician' },
+  { key: 'compute',  title: 'Architect' },
+  { key: 'life',     title: 'Naturalist' },
+  { key: 'mind',     title: 'Sage' },
+  { key: 'strategy', title: 'Grandmaster' },
+  { key: 'systems',  title: 'Engineer' }
 ];
 
 function renderAchievements() {
@@ -426,20 +428,28 @@ function renderAchievements() {
   ACHIEVEMENT_TRACKS.forEach(track => {
     const total = track.tiers.length;
     const done = track.tiers.filter(t => t.check()).length;
-    let current, next;
-    if (track.mode === 'set') {
-      current = track.tiers.filter(t => t.check()).slice(-1)[0] || null;
-      next = track.tiers.find(t => !t.check()) || null;
-    } else {
-      current = done > 0 ? track.tiers[done - 1] : null;
-      next = done < total ? track.tiers[done] : null;
-    }
+    const current = done > 0 ? track.tiers[done - 1] : null;
+    const next = done < total ? track.tiers[done] : null;
     const card = document.createElement('div');
     card.className = 'ach-card' + (done > 0 ? ' unlocked' : '');
     const nextLine = next
       ? `<span class="ach-next">▸ ${next.name}: ${next.desc}</span>`
       : `<span class="ach-next done">✓ Track complete</span>`;
     card.innerHTML = `<span class="ach-track">${track.label} · ${done}/${total}</span><span class="ach-icon">${current ? current.icon : '🔒'}</span><div class="ach-name">${current ? current.name : 'Not started'}</div>${nextLine}`;
+    grid.appendChild(card);
+  });
+  const stats = disciplineStats();
+  DISCIPLINE_MASTERY.forEach(dm => {
+    const d = DISCIPLINES.find(x => x.key === dm.key);
+    const st = stats.find(x => x.key === dm.key);
+    if (!d || !st) return;
+    const mastered = st.maturity >= 80;
+    const card = document.createElement('div');
+    card.className = 'ach-card' + (mastered ? ' unlocked' : '');
+    const line = mastered
+      ? `<span class="ach-next done">✓ Mastered</span>`
+      : `<span class="ach-next">${st.maturity}% ▸ 80%</span>`;
+    card.innerHTML = `<span class="ach-track">${d.emoji} ${d.title}</span><span class="ach-icon">${mastered ? d.emoji : '🔒'}</span><div class="ach-name">${dm.title}</div>${line}`;
     grid.appendChild(card);
   });
 }
