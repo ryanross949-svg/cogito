@@ -14,7 +14,7 @@ Update the CARDS array (120 flashcards, 12 per module).
 Update the ARENA array (100 problems, 10 per module, 4 difficulty tiers).
 Update the PROJECT_PHASES array (10 cumulative project phases).
 Update the REAL_WORLD_MISSIONS array (30 daily missions).
-Add the new app to the APPS array in index.html so it tracks on the Global Dashboard.
+Add the new app to the APPS array in index.html so it tracks on the Global Dashboard. Its `domain` MUST be one of the 7 master discipline keys in the DISCIPLINES array: physics, math, compute, life, mind, strategy, systems. The Global Mastery Matrix (radar) and Discipline Breakdown aggregate every course up to these 7 axes (average maturity per discipline; XP summed). An unknown domain is now skipped gracefully instead of crashing the hub, but the course won't appear until its domain matches a discipline.
 Ensure the Theme Switcher CSS, HTML, and JS are included (copy from ORACLE v7.6).
 Key Mechanics
 Spaced Repetition (SM-2): Flashcards schedule based on quality (1-5). Maturity is 21+ days.
