@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // TETLOCK v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000000; --void-2:#0A0A0A; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3366; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --void-2:#2A0A2A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --void-2:#F5F0E0; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --void-2:#3B4252; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{
+  background: radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%), radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%), var(--void);
+  min-height:100vh; position:relative; font-size:14px; line-height:1.6; transition: background 0.3s, color 0.3s;
+}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem; color:var(--text-dim); text-decoration:none; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem; color:var(--text-dim); background:transparent; border:1px solid var(--border); padding:0.3rem 0.5rem; border-radius:2px; letter-spacing:0.1em; cursor:pointer; text-transform:uppercase; font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute; right:0; top:120%; background:var(--panel-solid); border:1px solid var(--border-bright); border-radius:4px; display:none; flex-direction:column; z-index:100; min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem; font-size:0.7rem; color:var(--text-dim); cursor:pointer; border:none; background:none; text-align:left; font-family:var(--mono); text-transform:uppercase;}
+.theme-option:hover{background:var(--panel); color:var(--cyan);}
+
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+
+.arena-container, .project-container{max-width:900px;margin:0 auto;}
+.arena-hud, .project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,102,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,102,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg, rgba(255,45,156,0.05), rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg, rgba(255,51,85,0.1), rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+
+.arena-group-header{font-family:var(--display); font-size:1.1rem; color:var(--cyan); margin-top:2rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); letter-spacing:0.1em;}
+.arena-row{display:flex; justify-content:space-between; align-items:center; background:var(--panel); border:1px solid var(--border); padding:1rem 1.5rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s; border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright); transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex; align-items:center; gap:1rem; flex:1;}
+.arena-num{font-family:var(--display); color:var(--cyan-dim); font-size:0.85rem; width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem; font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem; border-radius:2px; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15); color:var(--green); border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15); color:var(--amber); border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15); color:var(--magenta); border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15); color:var(--red); border:1px solid var(--red);}
+
+@media(max-width:700px){
+  .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
+  .stats-strip{flex-wrap:wrap;gap:0.85rem;}
+  .nav{padding:0 1rem;}
+  .nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}
+  .view{padding:1rem;}
+  .lesson-title{font-size:1.7rem;}
+  .drill-card{padding:1.75rem 1.25rem;min-height:340px;}
+  .drill-question{font-size:1.1rem;}
+  .scenario{padding:1.5rem;}
+  .mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}
+  .big-stat-value{font-size:1.8rem;}
+  .section-title{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div id="boot">
+  <div class="boot-logo">TETLOCK</div>
+  <div class="boot-sub">Cogito // Forecasting Protocol v1.0</div>
+  <div class="boot-log" id="bootLog"></div>
+  <div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="brand">TETLOCK</div>
+        <div class="brand-tag">CALIBRATION ARCHITECTURE</div>
+      </div>
+      <a href="index.html" class="hub-link">← COGITO</a>
+    </div>
+    <div class="stats-strip">
+      <div class="theme-dropdown">
+        <button class="theme-btn" id="themeBtn">Theme</button>
+        <div class="theme-menu" id="themeMenu">
+          <button class="theme-option" onclick="TETLOCK.setTheme('quantum')">Quantum</button>
+          <button class="theme-option" onclick="TETLOCK.setTheme('matrix')">Matrix</button>
+          <button class="theme-option" onclick="TETLOCK.setTheme('cyberpunk')">Cyberpunk</button>
+          <button class="theme-option" onclick="TETLOCK.setTheme('light')">Light</button>
+          <button class="theme-option" onclick="TETLOCK.setTheme('nord')">Nord</button>
+        </div>
+      </div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div>
+      <div class="stat-pill">XP <b id="topXp">0</b></div>
+      <div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div>
+      <div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div>
+    <div class="nav-item" data-view="modules">Modules</div>
+    <div class="nav-item" data-view="project">Project ORACLE</div>
+    <div class="nav-item" data-view="drills">Drills</div>
+    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="stats">Stats</div>
+    <div class="nav-item" data-view="about">About</div>
+  </nav>
+  
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1>
+      <p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      
+      <div class="dash-grid">
+        <div class="panel mission">
+          <div class="panel-label">// Next Mission</div>
+          <h2 id="missionTitle">Initialize Training</h2>
+          <p id="missionBody">Loading predictive architecture...</p>
+          <div class="flex gap-1" style="flex-wrap:wrap">
+            <button class="btn" id="missionBtn">Begin →</button>
+            <button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-label">// Daily Output</div>
+          <div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div>
+          <div class="big-stat-sub">cards reviewed today</div>
+          <div class="mt-2" style="display:grid;gap:0.4rem">
+            <div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div>
+            <div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div>
+            <div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-label">// Daily Real-World Mission</div>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
+          <button class="btn secondary" id="rtBtn" onclick="TETLOCK.completeRTMission()">Mark Complete · +25 XP</button>
+        </div>
+        <div class="profile-card">
+          <div class="panel-label">// Operator Profile</div>
+          <div class="profile-title" id="profTitle">UNRANKED</div>
+          <div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div>
+        </div>
+      </div>
+
+      <div id="secretUnlockContainer"></div>
+      
+      <div class="panel">
+        <div class="panel-label">// Ten-Axis Mastery</div>
+        <div class="dash-grid" style="margin:0">
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg>
+          </div>
+          <div class="mastery-list" id="masteryList"></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="view" id="view-modules">
+      <h1 class="section-title">Training Modules</h1>
+      <p class="section-sub">Ten axes of probabilistic reasoning. Sequential unlock.</p>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </section>
+    
+    <section class="view" id="view-project">
+      <h1 class="section-title">Project: ORACLE</h1>
+      <p class="section-sub">A cumulative scenario. Run a geopolitical forecasting tournament.</p>
+      <div class="project-container" id="projectContainer"></div>
+    </section>
+    
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    
+    <section class="view" id="view-drills">
+      <h1 class="section-title">Spaced Repetition Drills</h1>
+      <p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p>
+      <div class="filter-bar" id="drillFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="core">★ Core Only</button>
+        <button class="filter-btn" data-filter="concept">Concepts</button>
+        <button class="filter-btn" data-filter="application">Application</button>
+        <button class="filter-btn" data-filter="quote">Quotes</button>
+      </div>
+      <div class="drill-container" id="drillContainer"></div>
+    </section>
+    
+    <section class="view" id="view-arena">
+      <h1 class="section-title">Combat Arena</h1>
+      <p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p>
+      <div class="arena-container" id="arenaContainer"></div>
+    </section>
+    
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1>
+      <p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat">
+          <div class="big-stat-label">Total XP</div>
+          <div class="big-stat-value" id="statXp">0</div>
+          <div class="big-stat-sub" id="statLevel">Level 1</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Cards Mature</div>
+          <div class="big-stat-value" id="statMature">0</div>
+          <div class="big-stat-sub" id="statMatureSub">of 0 total</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Retention Rate</div>
+          <div class="big-stat-value" id="statRetention">--</div>
+          <div class="big-stat-sub">last 100 reviews</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-label">Longest Streak</div>
+          <div class="big-stat-value" id="statLongStreak">0</div>
+          <div class="big-stat-sub" id="statCurStreak">current: 0d</div>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Backup & Restore</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p>
+        <div class="flex gap-1" style="flex-wrap:wrap">
+          <button class="btn secondary" id="exportBtn">Export Save File</button>
+          <label class="btn secondary" style="cursor:pointer">
+            Import Save File
+            <input type="file" id="importBtn" accept=".json" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Card Maturity Distribution</div>
+        <div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Session Log</div>
+        <div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div>
+      </div>
+      <div class="panel mt-2">
+        <div class="panel-label">// Reset</div>
+        <p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p>
+        <button class="btn danger" id="resetBtn">Reset All Progress</button>
+      </div>
+    </section>
+    
+    <section class="view" id="view-about">
+      <h1 class="section-title">About TETLOCK</h1>
+      <p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>TETLOCK is a cognitive training simulator designed to install the forecasting and calibration patterns used by superforecasters, based on the research of Philip Tetlock. It is not a textbook. It is a workout.</p>
+        
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul>
+          <li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality. Forgetting curve combat.</li>
+          <li><strong>Active Recall:</strong> Every drill requires generation, not recognition. You must produce the answer, not just identify it.</li>
+          <li><strong>Interleaving:</strong> Drills mix concepts across modules. Forced discrimination strengthens memory vs. blocked practice.</li>
+          <li><strong>Elaboration:</strong> Arena problems and Project ORACLE require applying concepts to novel scenarios.</li>
+        </ul>
+        
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>FOXY</strong> — Fox vs Hedgehog thinking</li>
+          <li><strong>CALIB</strong> — Probabilistic calibration</li>
+          <li><strong>BRIER</strong> — Brier scores and measurement</li>
+          <li><strong>DECOMP</strong> — Fermi-izing the future</li>
+          <li><strong>BASE</strong> — Base rates and the outside view</li>
+          <li><strong>BAYES</strong> — Bayesian updating</li>
+          <li><strong>DRAGON</strong> — Cognitive biases and dragon effects</li>
+          <li><strong>PACK</strong> — The wisdom of crowds</li>
+          <li><strong>HORIZON</strong> — Time horizons and forecast decay</li>
+          <li><strong>SUPRA</strong> — The superforecaster mindset</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ============== DATA: MODULES ==============
+const MODULES = [
+  { id:'m1', codename:'FOXY', title:'The Fox and the Hedgehog', summary:'Why knowing one big thing fails, but aggregating many small pieces yields terrifyingly accurate predictions.', lesson:{ title:'The Architecture of Prediction', body: 'In his 2005 book "Expert Political Judgment", Philip Tetlock analyzed 284 experts making 82,361 forecasts. He found that the average expert was roughly as accurate as a dart-throwing chimpanzee.\n\n## The Hedgehog\n\nHedgehogs know "one big thing." They are ideological. They view the world through a single lens (Marxism, Capitalism, Realpolitik). When events contradict their theory, they cry "off-sides" or "delayed effect." They are confident, articulate, and wrong.\n\n## The Fox\n\nFoxes know "many small things." They are eclectic. They aggregate information from multiple sources, are comfortable with ambiguity, and update their beliefs incrementally. They are less confident, less articulate, but terrifyingly accurate.\n\n## The Dragon Effect\n\nTetlock noted a "dragon effect": when a hedgehog makes a bold prediction and is right, they are celebrated as a prophet. When they are wrong, they are forgotten. The media rewards confident, extreme predictions, not calibrated ones. This creates a market for bad forecasting.\n\n## The Method\n\n1. **Embrace Eclecticism:** Don\'t fall in love with one theory.\n2. **Aggregate:** Combine multiple sources of information.\n3. **Be Less Confident:** The world is complex; certainty is a red flag.\n4. **Update Incrementally:** Adjust probabilities as new evidence arrives, not in massive reversals.\n\n> "The fox knows many things, but the hedgehog knows one big thing." - Archilochus', takeaways:['Hedgehogs know one big thing (ideology); foxes know many small things (eclecticism).','Foxes aggregate information and update incrementally.','Hedgehogs are confident and wrong; foxes are cautious and accurate.','The "Dragon Effect": media rewards bold, extreme predictions, not calibrated ones.','Embrace eclecticism and be less confident.'] } },
+  { id:'m2', codename:'CALIB', title:'Probabilistic Calibration', summary:'What does 70% confidence actually mean?', lesson:{ title:'The Architecture of Confidence', body: 'Calibration is the alignment between subjective confidence and objective accuracy. If you say you are 90% sure, you should be right 9 out of 10 times.\n\n## The Overconfidence Trap\n\nMost people are terribly miscalibrated. When they say "100% sure," they are right about 85% of the time. When they say "90% sure," they are right about 75% of the time. This gap is overconfidence.\n\n## The Calibration Curve\n\nA perfect forecaster\'s calibration curve lies on the 45-degree line. If you forecast at 70%, you are right 70% of the time. If you are right more often (e.g., 90%), you are underconfident. If you are right less often (e.g., 50%), you are overconfident.\n\n## The Method\n\n1. **Force Probabilities:** Never say "might" or "probably." Use specific numbers (0.70, 0.85).\n2. **Track Your Accuracy:** Keep a record of your predictions and the outcomes.\n3. **Adjust:** If your 90% forecasts are only right 80% of the time, lower your future confidence.\n\n> "The first principle is that you must not fool yourself - and you are the easiest person to fool." - Richard Feynman', takeaways:['Calibration is the alignment between confidence and accuracy.','90% confidence means you should be right 9 out of 10 times.','Most people are overconfident; their 90% predictions are right 80% of the time.','Force specific probabilities (0.70) instead of vague words ("probably").','Track your accuracy and adjust your confidence levels accordingly.'] } },
+  { id:'m3', codename:'BRIER', title:'Brier Scores', summary:'Measuring forecast accuracy mathematically.', lesson:{ title:'The Architecture of Measurement', body: 'How do you measure the quality of a probabilistic forecast? You use a Brier score.\n\n## The Formula\n\nBrier Score = (Forecast Probability - Outcome)^2\n\nWhere Outcome is 1 (happened) or 0 (did not happen).\n\n- If you forecast 100% (1.0) and it happens (1), Score = (1-1)^2 = 0. Perfect.\n- If you forecast 100% (1.0) and it fails (0), Score = (1-0)^2 = 1. Terrible.\n- If you forecast 50% (0.5), Score = (0.5-1)^2 = 0.25. Mediocre.\n\n## The Range\n\nA Brier score ranges from 0 (perfect) to 1 (perfectly wrong). A score of 0.25 is the baseline for a coin flip (50/50). A score of 0.33 is worse than guessing.\n\n## The Insight\n\nThe Brier score penalizes being confident and wrong heavily. A forecast of 0.9 that fails scores 0.81. A forecast of 0.6 that fails scores 0.36. The quadratic nature punishes overconfidence.\n\n## The Method\n\n1. **Calculate the score** for every forecast.\n2. **Average them** over time.\n3. **Aim for a score below 0.25** (better than chance).', takeaways:['Brier Score = (Forecast - Outcome)^2.','0 is perfect; 1 is perfectly wrong.','0.25 is the baseline for a coin flip (50/50).','The quadratic formula heavily penalizes confident wrong predictions.','Aim for a score below 0.25 (better than chance).'] } },
+  { id:'m4', codename:'DECOMP', title:'Fermi-izing the Future', summary:'Breaking down vague questions into tractable components.', lesson:{ title:'The Architecture of Tractability', body: 'A question like "Will the UK leave the EU by 2020?" seems impossible to answer. But a superforecaster breaks it down.\n\n## The Decomposition\n\n1. **Will the referendum happen?** (p = 0.8)\n2. **If it happens, will Leave win?** (p = 0.4)\n3. **If Leave wins, will the government actually trigger Article 50?** (p = 0.9)\n4. **If triggered, will it complete by 2020?** (p = 0.3)\n\nTotal Probability = 0.8 * 0.4 * 0.9 * 0.3 = 0.086 (8.6%).\n\n## The Power of Decomposition\n\nDecomposition forces you to identify the underlying drivers. Instead of guessing the final outcome, you estimate the probability of each step. This exposes assumptions and allows you to research each component.\n\n## The Method\n\n1. **Identify the final question.**\n2. **Break it into necessary conditions** (an "and" chain).\n3. **Estimate the probability of each condition.**\n4. **Multiply them** to get the final probability.\n\n> "A problem well-stated is half-solved." - Charles Kettering', takeaways:['Break vague questions into a chain of necessary conditions (an "and" chain).','Estimate the probability of each condition independently.','Multiply the probabilities to get the final estimate.','Decomposition exposes hidden assumptions and enables targeted research.','A problem well-stated is half-solved.'] } },
+  { id:'m5', codename:'BASE', title:'Base Rates', summary:'The outside view vs the inside view.', lesson:{ title:'The Architecture of the Outside View', body: 'When predicting the future, we usually take the "inside view": we focus on the specific details of the case at hand. Superforecasters take the "outside view" first: they look at the base rate.\n\n## The Base Rate\n\nIf you are predicting whether a startup will fail, the inside view looks at the founder, the market, the product. The outside view notes that 90% of startups fail. That 90% is the base rate. Start there.\n\n## The Planning Fallacy\n\nWe routinely underestimate how long things will take because we use the inside view ("This time will be different"). The outside view says: "Most similar projects took 2 years, so this one probably will too."\n\n## The Method\n\n1. **Identify the reference class.** (What category does this belong to?).\n2. **Find the base rate.** (What % of the reference class experiences the outcome?).\n3. **Adjust for specifics.** Use the inside view to move slightly up or down from the base rate, but don\'t abandon it entirely.\n\n> "The view from inside is intoxicating; the view from outside is clarifying." - Daniel Kahneman', takeaways:['The outside view (base rate) comes before the inside view (specifics).','Base rate: the frequency of an outcome in a reference class.','Planning fallacy: we underestimate time because we use the inside view.','Identify the reference class, find the base rate, then adjust for specifics.','The outside view is clarifying; the inside view is intoxicating.'] } },
+  { id:'m6', codename:'BAYES', title:'Bayesian Updating', summary:'Adjusting probabilities as new evidence arrives.', lesson:{ title:'The Architecture of Belief Revision', body: 'Bayes\' Theorem is the mathematical rule for updating probabilities based on new evidence.\n\n## The Formula\n\nP(A|B) = [ P(B|A) * P(A) ] / P(B)\n\n- P(A) = Prior probability (your initial belief).\n- P(B) = Probability of the evidence.\n- P(B|A) = Likelihood (probability of evidence given A is true).\n- P(A|B) = Posterior probability (your updated belief).\n\n## The Insight\n\nYou don\'t overturn your beliefs with every new data point. You update incrementally. If you are 70% sure a suspect is guilty, and you find a new piece of evidence that is 80% likely if guilty and 20% likely if innocent, you don\'t jump to 100%. You adjust to roughly 92%.\n\n## The Method\n\n1. **Start with a Prior.** (Base rate or current belief).\n2. **Identify the Evidence.**\n3. **Calculate the Likelihood.** (How likely is this evidence under each hypothesis?).\n4. **Update to the Posterior.**\n\n> "When the facts change, I change my mind. What do you do, sir?" - John Maynard Keynes', takeaways:['Bayes\' Theorem updates probabilities based on new evidence.','Prior + Evidence = Posterior.','Update incrementally; don\'t swing wildly with new data.','P(A|B) = [ P(B|A) * P(A) ] / P(B).','When the facts change, change your mind.'] } },
+  { id:'m7', codename:'DRAGON', title:'Cognitive Biases', summary:'Avoiding the traps that destroy forecasts.', lesson:{ title:'The Architecture of Rationality', body: 'Forecasting is as much about avoiding errors as it is about making correct predictions. Cognitive biases are systematic errors in thinking.\n\n## Confirmation Bias\n\nWe seek information that confirms our beliefs and ignore information that contradicts them. This leads to belief perseverance (dragons) that are immune to evidence.\n\n## Availability Heuristic\n\nWe judge probability by how easily examples come to mind. Shark attacks are vivid, so we overestimate their probability. Heart disease is boring, so we underestimate it.\n\n## Anchoring\n\nWe latch onto the first number we hear, even if it is irrelevant. "Is the population of Turkey more or less than 100 million?" anchors your guess.\n\n## The Method\n\n1. **Seek Disconfirming Evidence:** Actively look for reasons you might be wrong.\n2. **Use Base Rates:** Combat the availability heuristic with data.\n3. **Blind Your Anchors:** Generate your own estimate before hearing others.\n4. **Pre-mortems:** Imagine the prediction failed. Why did it fail?', takeaways:['Confirmation bias: seeking evidence that confirms beliefs, ignoring disconfirming evidence.','Availability heuristic: judging probability by ease of recall, not frequency.','Anchoring: latching onto the first number heard, even if irrelevant.','Seek disconfirming evidence actively.','Pre-mortems: imagine failure, then diagnose why.'] } },
+  { id:'m8', codename:'PACK', title:'The Wisdom of Crowds', summary:'Aggregating independent forecasts.', lesson:{ title:'The Architecture of Aggregation', body: 'A diverse crowd is often smarter than the smartest individual. But only if the crowd is diverse and independent.\n\n## The Galton Experiment\n\nIn 1906, Francis Galton observed a weight-judging contest. 800 people guessed the weight of an ox. No individual got it exactly right, but the median guess (1,197 lbs) was within 1% of the true weight (1,198 lbs). The crowd was perfectly calibrated.\n\n## The Conditions\n\nFor aggregation to work:\n1. **Diversity:** People must have different information/models.\n2. **Independence:** People must not influence each other before guessing.\n3. **Decentralization:** People must use local knowledge, not a central command.\n\n## Prediction Markets\n\nMarkets (like stock markets or prediction platforms) aggregate information continuously. The price reflects the crowd\'s current probability estimate.\n\n## The Method\n\n1. **Don\'t rely on one expert.** Average multiple forecasts.\n2. **Ensure independence.** Forecasts must be made without seeing others.\n3. **Weight by track record.** Give more weight to better forecasters, but don\'t exclude the rest.\n\n> "The many are smarter than the few." - James Surowiecki', takeaways:['A diverse, independent crowd is smarter than the smartest individual.','Median of guesses is often more accurate than the average individual guess.','Conditions: Diversity, Independence, Decentralization.','Prediction markets aggregate information continuously via price.','Average multiple independent forecasts; weight by track record.'] } },
+  { id:'m9', codename:'HORIZON', title:'Time Horizons', summary:'Forecast decay and the limits of prediction.', lesson:{ title:'The Architecture of Time', body: 'Forecast accuracy decays with time. Weather forecasts are accurate for 3 days, useless for 30 days. Why?\n\n## Chaos and Sensitivity\n\nSmall initial differences compound over time (the Butterfly Effect). In weather, a 1% error in today\'s temperature becomes a 10% error in next week\'s forecast.\n\n## The Forecast Horizon\n\nEvery system has a predictability horizon. Beyond it, the forecast is no better than chance. For weather, it is ~2 weeks. For politics, it is ~1 year. For technology, it is ~5 years.\n\n## The Method\n\n1. **Identify the horizon.** How far out can you reasonably predict?\n2. **Don\'t forecast beyond the horizon.** If you must, return to base rates (50/50).\n3. **Shorten the loop.** If you need to predict 1 year out, predict 1 month out and iterate.\n\n> "The future is clear. It is just not known." - Yogi Berra', takeaways:['Forecast accuracy decays with time due to compounding errors (Chaos).','Every system has a predictability horizon (weather: 2 weeks, politics: 1 year).','Don\'t forecast beyond the horizon; revert to base rates.','Shorten the loop: predict short-term and iterate.','The future is clear, but not known.'] } },
+  { id:'m10', codename:'SUPRA', title:'The Superforecaster Mindset', summary:'The traits of the top 2% of forecasters.', lesson:{ title:'The Architecture of the Elite', body: 'In the Good Judgment Project, Tetlock found that the top 2% of forecasters ("superforecasters") were not necessarily smarter or more credentialed. They had a specific mindset.\n\n## The Traits\n\n1. **Open-mindedness:** Willing to update beliefs.\n2. **Intelligence:** Above average, but not genius.\n3. **Growth Mindset:** Belief that forecasting skill can be improved.\n4. **Teamwork:** Collaborating and learning from others.\n5. **Perpetual Beta:** Never satisfied; always looking for errors.\n\n## The Method\n\n1. **Break problems down.** (Fermi-ize).\n2. **Balance inside and outside views.** (Base rates).\n3. **Update incrementally.** (Bayes).\n4. **Seek disconfirming evidence.** (Dragons).\n5. **Aggregate.** (Wisdom of Crowds).\n6. **Track accuracy.** (Brier scores).\n\n> "Beliefs are hypotheses to be tested, not treasures to be guarded." - Philip Tetlock', takeaways:['Superforecasters are not geniuses; they have a specific mindset.','Traits: Open-minded, growth mindset, teamwork, perpetual beta.','Beliefs are hypotheses to be tested, not treasures to be guarded.','Combine all axes: Decompose, Base Rates, Bayes, Dragons, Aggregate, Brier.','Forecasting is a skill that can be trained and improved.'] } }
+];
+
+// ============== DATA: FLASHCARDS (120 Total) ==============
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the core difference between a Fox and a Hedgehog?',back:'Hedgehogs know one big thing (ideology). Foxes know many small things (eclecticism) and aggregate them.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'What is the "Dragon Effect"?',back:'When a hedgehog makes a bold prediction and is right, they are celebrated as a prophet. When wrong, they are forgotten. The media rewards confidence, not calibration.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Who was more accurate in Tetlock\'s study: experts or dart-throwing chimps?',back:'Roughly equal. The average expert was as accurate as random chance.'},
+  {id:'c4',moduleId:'m1',core:false,category:'quote',front:'Complete the phrase: "The fox knows many things..."',back:'"...but the hedgehog knows one big thing." - Archilochus'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'Why are hedgehogs often wrong but still popular?',back:'They are confident, articulate, and tell a compelling story. The media prefers entertainment over calibration.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'How should a forecaster deal with ideology?',back:'Embrace eclecticism. Don\'t fall in love with one theory. Aggregate information from multiple sources.'},
+  
+  {id:'c7',moduleId:'m2',core:true,category:'concept',front:'What is probabilistic calibration?',back:'The alignment between subjective confidence and objective accuracy. 90% confidence means you are right 90% of the time.'},
+  {id:'c8',moduleId:'m2',core:true,category:'application',front:'If you say "90% sure" but are right only 75% of the time, what is your error?',back:'Overconfidence. You should lower your confidence levels to match your accuracy.'},
+  {id:'c9',moduleId:'m2',core:false,category:'concept',front:'What is the overconfidence trap?',back:'Most people are miscalibrated. Their 100% predictions are right 85% of the time. Their 90% predictions are right 75% of the time.'},
+  {id:'c10',moduleId:'m2',core:false,category:'application',front:'How do you improve calibration?',back:'Force specific probabilities (0.70 instead of "probably"). Track accuracy. Adjust confidence to match historical accuracy.'},
+  {id:'c11',moduleId:'m2',core:false,category:'quote',front:'Complete the Feynman principle: "The first principle is..."',back:'"...that you must not fool yourself - and you are the easiest person to fool."'},
+  {id:'c12',moduleId:'m2',core:false,category:'concept',front:'What does a perfect calibration curve look like?',back:'It lies on the 45-degree line. If you forecast at 70%, you are right 70% of the time.'},
+  
+  {id:'c13',moduleId:'m3',core:true,category:'concept',front:'What is the formula for a Brier Score?',back:'(Forecast Probability - Outcome)^2. Outcome is 1 (happened) or 0 (did not happen).'},
+  {id:'c14',moduleId:'m3',core:true,category:'application',front:'If you forecast 100% (1.0) and the event happens (1), what is the Brier Score?',back:'0. Perfect score. (1-1)^2 = 0.'},
+  {id:'c15',moduleId:'m3',core:false,category:'application',front:'If you forecast 100% (1.0) and the event fails (0), what is the Brier Score?',back:'1. Perfectly wrong. (1-0)^2 = 1.'},
+  {id:'c16',moduleId:'m3',core:false,category:'concept',front:'What is the baseline Brier Score for a coin flip (50/50)?',back:'0.25. (0.5 - 1)^2 = 0.25. Scores above 0.25 are worse than guessing.'},
+  {id:'c17',moduleId:'m3',core:false,category:'concept',front:'Why does the Brier Score use a quadratic formula?',back:'To heavily penalize confident wrong predictions. A 0.9 forecast that fails scores 0.81. A 0.6 forecast that fails scores 0.36.'},
+  {id:'c18',moduleId:'m3',core:false,category:'application',front:'What is the target Brier Score for a superforecaster?',back:'Below 0.25 (better than chance), ideally approaching 0.1 or lower for specific domains.'},
+  
+  {id:'c19',moduleId:'m4',core:true,category:'concept',front:'What does "Fermi-izing the future" mean?',back:'Breaking down a vague, complex question into a chain of necessary conditions (an "and" chain) and estimating each probability.'},
+  {id:'c20',moduleId:'m4',core:true,category:'application',front:'How do you combine probabilities in a necessary condition chain ("A AND B")?',back:'Multiply them. P(A and B) = P(A) * P(B).'},
+  {id:'c21',moduleId:'m4',core:false,category:'application',front:'If P(A)=0.8 and P(B|A)=0.4, what is P(A and B)?',back:'0.32. 0.8 * 0.4 = 0.32.'},
+  {id:'c22',moduleId:'m4',core:false,category:'concept',front:'Why is decomposition powerful?',back:'It forces you to identify the underlying drivers and exposes hidden assumptions, enabling targeted research.'},
+  {id:'c23',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "A problem well-stated is..."',back:'"...half-solved." - Charles Kettering'},
+  {id:'c24',moduleId:'m4',core:false,category:'concept',front:'Should you guess the final outcome or the intermediate steps?',back:'The intermediate steps. Estimating components is easier and more accurate than guessing the final outcome directly.'},
+  
+  {id:'c25',moduleId:'m5',core:true,category:'concept',front:'What is the difference between the inside view and the outside view?',back:'Inside view focuses on specifics of the case. Outside view looks at the base rate (reference class) first.'},
+  {id:'c26',moduleId:'m5',core:true,category:'application',front:'What is the base rate for startup failure?',back:'~90%. Start there, then adjust for the specific startup\'s advantages.'},
+  {id:'c27',moduleId:'m5',core:false,category:'concept',front:'What is the Planning Fallacy?',back:'Underestimating time/cost due to using the inside view ("This time is different").'},
+  {id:'c28',moduleId:'m5',core:false,category:'application',front:'How do you apply the outside view?',back:'1. Identify reference class. 2. Find base rate. 3. Adjust for specifics using the inside view.'},
+  {id:'c29',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "The view from inside is intoxicating..."',back:'"...the view from outside is clarifying." - Daniel Kahneman'},
+  {id:'c30',moduleId:'m5',core:false,category:'concept',front:'Why do we ignore base rates?',back:'Specifics feel more salient and compelling than abstract statistics (the inside view trap).'},
+  
+  {id:'c31',moduleId:'m6',core:true,category:'concept',front:'What is Bayesian Updating?',back:'Adjusting probabilities incrementally as new evidence arrives using Bayes\' Theorem.'},
+  {id:'c32',moduleId:'m6',core:true,category:'application',front:'What are the components of Bayes\' Theorem?',back:'Prior (initial belief), Evidence (new data), Likelihood (probability of evidence given hypothesis), Posterior (updated belief).'},
+  {id:'c33',moduleId:'m6',core:false,category:'concept',front:'Should you overturn beliefs with every new data point?',back:'No. Update incrementally. A 70% prior shouldn\'t become 0% or 100% with one piece of evidence.'},
+  {id:'c34',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "When the facts change..."',back:'"...I change my mind. What do you do, sir?" - John Maynard Keynes'},
+  {id:'c35',moduleId:'m6',core:false,category:'application',front:'If Prior=0.7, Likelihood=0.8, what is the rough Posterior?',back:'~0.9. (0.8 * 0.7) / [ (0.8 * 0.7) + (0.2 * 0.3) ] = 0.56 / 0.62 = 0.903.'},
+  {id:'c36',moduleId:'m6',core:false,category:'concept',front:'What is the "Likelihood" in Bayes?',back:'The probability of seeing the evidence IF the hypothesis is true. P(Evidence | Hypothesis).'},
+  
+  {id:'c37',moduleId:'m7',core:true,category:'concept',front:'What is Confirmation Bias?',back:'Seeking information that confirms beliefs and ignoring information that contradicts them.'},
+  {id:'c38',moduleId:'m7',core:true,category:'application',front:'How do you combat Confirmation Bias?',back:'Seek disconfirming evidence actively. Look for reasons you might be wrong.'},
+  {id:'c39',moduleId:'m7',core:false,category:'concept',front:'What is the Availability Heuristic?',back:'Judging probability by how easily examples come to mind, not by actual frequency.'},
+  {id:'c40',moduleId:'m7',core:false,category:'application',front:'Why do we overestimate shark attacks?',back:'They are vivid and memorable (high availability). Heart disease is boring (low availability).'},
+  {id:'c41',moduleId:'m7',core:false,category:'concept',front:'What is Anchoring?',back:'Latching onto the first number heard, even if irrelevant, and adjusting insufficiently from it.'},
+  {id:'c42',moduleId:'m7',core:false,category:'application',front:'What is a Pre-mortem?',back:'Imagine the prediction failed. Diagnose why it failed. This reveals blind spots before they happen.'},
+  
+  {id:'c43',moduleId:'m8',core:true,category:'concept',front:'What is the Wisdom of Crowds?',back:'A diverse, independent crowd is often smarter than the smartest individual.'},
+  {id:'c44',moduleId:'m8',core:true,category:'application',front:'What are the 3 conditions for crowd wisdom?',back:'Diversity, Independence, Decentralization.'},
+  {id:'c45',moduleId:'m8',core:false,category:'application',front:'In Galton\'s ox experiment, how accurate was the median guess?',back:'Within 1% of the true weight. The crowd was perfectly calibrated.'},
+  {id:'c46',moduleId:'m8',core:false,category:'concept',front:'Why must the crowd be independent?',back:'If people influence each other, they herd. Diversity of models is lost.'},
+  {id:'c47',moduleId:'m8',core:false,category:'application',front:'How do prediction markets aggregate information?',back:'Via price. The price reflects the crowd\'s current probability estimate.'},
+  {id:'c48',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "The many are..."',back:'"...smarter than the few." - James Surowiecki'},
+  
+  {id:'c49',moduleId:'m9',core:true,category:'concept',front:'What happens to forecast accuracy over time?',back:'It decays. Compounding errors make long-term forecasts useless.'},
+  {id:'c50',moduleId:'m9',core:true,category:'concept',front:'What is the Butterfly Effect?',back:'Small initial differences compound over time, leading to massive divergence (Chaos).'},
+  {id:'c51',moduleId:'m9',core:false,category:'application',front:'What is the predictability horizon for weather?',back:'~2 weeks. Beyond that, forecasts are no better than climatology (base rates).'},
+  {id:'c52',moduleId:'m9',core:false,category:'application',front:'What is the predictability horizon for politics?',back:'~1 year. Beyond that, chaos dominates.'},
+  {id:'c53',moduleId:'m9',core:false,category:'concept',front:'What should you do if asked to forecast beyond the horizon?',back:'Return to base rates (50/50 or historical average). Don\'t pretend to see the future.'},
+  {id:'c54',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "The future is clear..."',back:'"...It is just not known." - Yogi Berra'},
+  
+  {id:'c55',moduleId:'m10',core:true,category:'concept',front:'Are superforecasters geniuses?',back:'No. They have above-average intelligence, but their edge is mindset, not IQ.'},
+  {id:'c56',moduleId:'m10',core:true,category:'quote',front:'Complete the principle: "Beliefs are hypotheses to be tested..."',back:'"...not treasures to be guarded." - Philip Tetlock'},
+  {id:'c57',moduleId:'m10',core:false,category:'concept',front:'What is "Perpetual Beta"?',back:'A growth mindset applied to forecasting. Never satisfied; always looking for errors and improvements.'},
+  {id:'c58',moduleId:'m10',core:false,category:'application',front:'Name the 6 steps of the superforecaster method.',back:'1. Decompose. 2. Base rates. 3. Bayes. 4. Dragons. 5. Aggregate. 6. Brier.'},
+  {id:'c59',moduleId:'m10',core:false,category:'concept',front:'Why is teamwork important for superforecasters?',back:'It forces articulation, exposes blind spots, and allows aggregation of diverse models.'},
+  {id:'c60',moduleId:'m10',core:false,category:'concept',front:'Can forecasting skill be trained?',back:'Yes. It is a learnable skill, not an innate talent. Practice and feedback improve accuracy.'}
+];
+
+// ============== DATA: ARENA PROBLEMS (40 Total - 4 per module) ==============
+const ARENA = [
+  // M1: FOXY
+  { id:'p1', moduleId:'m1', title:'Q1: The Expert', difficulty:1, reward:50, timeLimit:60, body:'A TV pundit confidently predicts a market crash based on his Marxist ideology. He is wrong for 5 years, then a crash happens. He claims victory. What is this?', options:['He is a prophet.','The Dragon Effect. He was rewarded for boldness, not calibration.','He is a fox.','Confirmation bias.'], correct:1, explanation:'The Dragon Effect. The media rewards confident, extreme predictions and forgets the misses. The pundit is a hedgehog (one big ideology) and miscalibrated.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Style', difficulty:2, reward:100, timeLimit:60, body:'Which thinking style aggregates multiple small pieces of information and is comfortable with ambiguity?', options:['Hedgehog','Fox',' ideologue','Prophet'], correct:1, explanation:'The Fox knows many small things. They are eclectic, aggregate data, and update incrementally. The Hedgehog knows one big thing.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Chimp', difficulty:3, reward:200, timeLimit:90, body:'In Tetlock\'s study, how did the average expert compare to a dart-throwing chimpanzee?', options:['Experts were vastly superior.','The chimp was vastly superior.','They were roughly equal.','Experts were better at long-term, chimp at short-term.'], correct:2, explanation:'Roughly equal. The average expert was as accurate as random chance. Confidence and credentials did not translate to accuracy.' },
+  { id:'p4', moduleId:'m1', title:'Q4: The Trap', difficulty:4, reward:500, timeLimit:120, body:'Why are hedgehogs often more popular than foxes, despite being less accurate?', options:['They are smarter.','They tell a simpler, more compelling story. Confidence sells.','They have better data.','They use Bayesian updating.'], correct:1, explanation:'Confidence and ideological simplicity sell. The media and audiences prefer a clear, bold narrative over a nuanced, probabilistic "maybe".' },
+  
+  // M2: CALIB
+  { id:'p5', moduleId:'m2', title:'Q1: The Meaning', difficulty:1, reward:50, timeLimit:45, body:'If you are "90% sure" an event will happen, what does that mean objectively?', options:['It will almost certainly happen.','If you make 10 similar predictions, you should be right 9 times.','It is just a feeling.','It will happen 90% of the time today.'], correct:1, explanation:'Calibration. 90% confidence means that out of 10 times you say 90%, you should be right 9 times. Most people are overconfident and right only 7-8 times.' },
+  { id:'p6', moduleId:'m2', title:'Q2: The Error', difficulty:2, reward:100, timeLimit:60, body:'You say "100% sure" but are right only 85% of the time. What is your error?', options:['Underconfidence','Overconfidence','Perfect calibration','Random chance'], correct:1, explanation:'Overconfidence. Your subjective confidence (100%) exceeds your objective accuracy (85%). You should lower your confidence.' },
+  { id:'p7', moduleId:'m2', title:'Q3: The Fix', difficulty:3, reward:200, timeLimit:90, body:'How do you improve probabilistic calibration?', options:['Be more confident.','Use vague words like "probably".','Track your accuracy and adjust confidence to match history.','Read more news.'], correct:2, explanation:'Track your predictions. If your 90% forecasts are right 80% of the time, lower your future confidence to 80%. Force specific numbers.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Curve', difficulty:4, reward:500, timeLimit:120, body:'What does a perfect calibration curve look like?', options:['A flat line at 50%.','A 45-degree line where confidence equals accuracy.','A curve that bows upward.','A random scatter plot.'], correct:1, explanation:'The 45-degree line. If you forecast at 70%, you are right 70% of the time. Deviations indicate over- or under-confidence.' },
+  
+  // M3: BRIER
+  { id:'p9', moduleId:'m3', title:'Q1: The Formula', difficulty:1, reward:50, timeLimit:45, body:'What is the formula for a Brier Score?', options:['(Forecast - Outcome)','(Forecast - Outcome)^2','Forecast * Outcome','Forecast / Outcome'], correct:1, explanation:'(Forecast - Outcome)^2. The quadratic nature penalizes confident wrong predictions heavily.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Range', difficulty:2, reward:100, timeLimit:60, body:'What is the range of a Brier Score?', options:['0 to 1','-1 to 1','0 to 100','1 to 10'], correct:0, explanation:'0 (perfect) to 1 (perfectly wrong). A score of 0.25 is the baseline for a coin flip.' },
+  { id:'p11', moduleId:'m3', title:'Q3: The Baseline', difficulty:3, reward:200, timeLimit:90, body:'If you forecast 50% (0.5) and the event happens (1), what is your Brier Score?', options:['0','0.25','0.5','1'], correct:1, explanation:'(0.5 - 1)^2 = (-0.5)^2 = 0.25. This is the baseline score for a coin flip. Scores above 0.25 are worse than guessing.' },
+  { id:'p12', moduleId:'m3', title:'Q4: The Penalty', difficulty:4, reward:500, timeLimit:120, body:'Why does the Brier Score square the error?', options:['To make the math easier.','To heavily penalize confident wrong predictions.','To keep the score positive.','To reward extreme forecasts.'], correct:1, explanation:'Squaring amplifies large errors. A forecast of 0.9 that fails (error 0.9) scores 0.81. A forecast of 0.6 that fails (error 0.4) scores 0.36. The confident wrong prediction is penalized disproportionately.' },
+  
+  // M4: DECOMP
+  { id:'p13', moduleId:'m4', title:'Q1: The Method', difficulty:1, reward:50, timeLimit:45, body:'How do you "Fermi-ize" a forecast question?', options:['Guess the final number directly.','Break it into a chain of necessary conditions and estimate each.','Look up the answer on Google.','Ask an expert.'], correct:1, explanation:'Break the vague question into a chain of necessary conditions (an "and" chain). Estimate the probability of each, then multiply.' },
+  { id:'p14', moduleId:'m4', title:'Q2: The Chain', difficulty:2, reward:100, timeLimit:60, body:'In a necessary condition chain (A AND B), how do you combine probabilities?', options:['Add them','Multiply them','Average them','Take the maximum'], correct:1, explanation:'Multiply. P(A and B) = P(A) * P(B). If A is 0.8 and B is 0.4, the joint probability is 0.32.' },
+  { id:'p15', moduleId:'m4', title:'Q3: The Benefit', difficulty:3, reward:200, timeLimit:90, body:'Why is decomposition more accurate than guessing the final outcome?', options:['It is faster.','It exposes hidden assumptions and allows targeted research.','It requires less math.','It guarantees a correct answer.'], correct:1, explanation:'By breaking the problem down, you identify the underlying drivers. You can research each component independently, exposing assumptions you would have missed by guessing the final number.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Example', difficulty:4, reward:500, timeLimit:120, body:'Question: "Will the referendum pass?" You estimate: P(Vote happens)=0.9, P(Yes wins)=0.4, P(Gov implements)=0.8. What is the final probability?', options:['0.288 (28.8%)','0.36 (36%)','0.72 (72%)','0.40 (40%)'], correct:0, explanation:'0.9 * 0.4 * 0.8 = 0.288. The joint probability of all three necessary conditions is 28.8%.' },
+  
+  // M5: BASE
+  { id:'p17', moduleId:'m5', title:'Q1: The View', difficulty:1, reward:50, timeLimit:45, body:'Which view looks at the reference class first?', options:['Inside view','Outside view','Top-down view','Bottom-up view'], correct:1, explanation:'The outside view looks at the base rate (reference class) first. The inside view focuses on the specifics of the case.' },
+  { id:'p18', moduleId:'m5', title:'Q2: The Fallacy', difficulty:2, reward:100, timeLimit:60, body:'Why do we underestimate how long projects take?', options:['We are lazy.','Planning Fallacy: we use the inside view ("This time is different").','We don\'t use calendars.','Parkinson\'s Law.'], correct:1, explanation:'The Planning Fallacy. We focus on the specific details of our project and ignore that 90% of similar projects took 2 years. We should start with the base rate.' },
+  { id:'p19', moduleId:'m5', title:'Q3: The Rate', difficulty:3, reward:200, timeLimit:90, body:'What is the base rate for startup failure?', options:['~10%','~50%','~90%','~100%'], correct:2, explanation:'~90% of startups fail. Start there, then adjust for the specific startup\'s team, market, and capital.' },
+  { id:'p20', moduleId:'m5', title:'Q4: The Method', difficulty:4, reward:500, timeLimit:120, body:'How do you balance the inside and outside views?', options:['Ignore the outside view.','Ignore the inside view.','Start with the base rate (outside), then adjust for specifics (inside).','Average the two.'], correct:2, explanation:'Start with the outside view (base rate). Then use the inside view to adjust slightly up or down, but do not abandon the base rate entirely.' },
+  
+  // M6: BAYES
+  { id:'p21', moduleId:'m6', title:'Q1: The Theorem', difficulty:1, reward:50, timeLimit:45, body:'What is Bayes\' Theorem used for?', options:['Proving you are right.','Updating probabilities based on new evidence.','Calculating base rates.','Measuring overconfidence.'], correct:1, explanation:'Bayes\' Theorem updates your prior belief to a posterior belief based on the likelihood of new evidence.' },
+  { id:'p22', moduleId:'m6', title:'Q2: The Components', difficulty:2, reward:100, timeLimit:60, body:'What are the components of Bayes\' Theorem?', options:['Hypothesis, Test, Result','Prior, Evidence, Likelihood, Posterior','Base rate, Fallacy, Bias','Forecast, Outcome, Score'], correct:1, explanation:'Prior (initial belief) + Evidence (new data) + Likelihood (P(Evidence|Hypothesis)) = Posterior (updated belief).' },
+  { id:'p23', moduleId:'m6', title:'Q3: The Update', difficulty:3, reward:200, timeLimit:90, body:'Should you overturn your belief with every new data point?', options:['Yes, if the data is surprising.','No. Update incrementally.','Only if an expert says so.','Only if the data confirms your prior.'], correct:1, explanation:'Update incrementally. A 70% prior shouldn\'t become 0% or 100% with one piece of evidence. Move to 75% or 65%, depending on the likelihood.' },
+  { id:'p24', moduleId:'m6', title:'Q4: The Quote', difficulty:4, reward:500, timeLimit:120, body:'Complete the Keynes principle: "When the facts change..."', options:['"...I double down."','"...I change my mind. What do you do, sir?"','"...I ignore them."','"...I wait for consensus."'], correct:1, explanation:'"...I change my mind. What do you do, sir?" - John Maynard Keynes. This is the essence of Bayesian updating.' },
+  
+  // M7: DRAGON
+  { id:'p25', moduleId:'m7', title:'Q1: The Bias', difficulty:1, reward:50, timeLimit:45, body:'What is Confirmation Bias?', options:['Seeking evidence that confirms beliefs, ignoring disconfirming evidence.','Changing your mind too often.','Trusting experts.','Using base rates.'], correct:0, explanation:'Confirmation Bias. We seek information that confirms our beliefs and ignore or rationalize away information that contradicts them.' },
+  { id:'p26', moduleId:'m7', title:'Q2: The Heuristic', difficulty:2, reward:100, timeLimit:60, body:'Why do we overestimate shark attacks?', options:['They are common.','Availability Heuristic: they are vivid and memorable.','We are afraid of water.','Sharks are dangerous.'], correct:1, explanation:'Availability Heuristic. We judge probability by how easily examples come to mind. Shark attacks are vivid; heart disease is boring, so we underestimate the latter.' },
+  { id:'p27', moduleId:'m7', title:'Q3: The Anchor', difficulty:3, reward:200, timeLimit:90, body:'What is Anchoring?', options:['Latching onto the first number heard and adjusting insufficiently.','Trusting the first expert you meet.','Refusing to change your mind.','Using base rates.'], correct:0, explanation:'Anchoring. If asked "Is the population of Turkey more or less than 100 million?", your guess will hover near 100 million, even though it is irrelevant.' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Pre-mortem', difficulty:4, reward:500, timeLimit:120, body:'What is a Pre-mortem?', options:['An autopsy.','Imagining the prediction failed, then diagnosing why.','Firing the forecaster.','A post-prediction review.'], correct:1, explanation:'A Pre-mortem: Imagine the prediction failed. Diagnose why it failed. This reveals blind spots and disconfirming evidence before they happen.' },
+  
+  // M8: PACK
+  { id:'p29', moduleId:'m8', title:'Q1: The Wisdom', difficulty:1, reward:50, timeLimit:45, body:'What is the Wisdom of Crowds?', back:'A diverse, independent crowd is often smarter than the smartest individual.', options:['A crowd is always right.','A diverse, independent crowd is smarter than the smartest individual.','Crowds are irrational.','Crowds follow leaders.'], correct:1, explanation:'A diverse, independent crowd aggregates information better than any single expert. The median guess is often highly accurate.' },
+  { id:'p30', moduleId:'m8', title:'Q2: The Conditions', difficulty:2, reward:100, timeLimit:60, body:'What are the 3 conditions for crowd wisdom?', options:['Size, Wealth, Power','Diversity, Independence, Decentralization','Education, Experience, Authority','Confidence, Speed, Consensus'], correct:1, explanation:'Diversity (different models), Independence (no influence), Decentralization (local knowledge). Without these, crowds herd and fail.' },
+  { id:'p31', moduleId:'m8', title:'Q3: The Ox', difficulty:3, reward:200, timeLimit:90, body:'In Galton\'s experiment, how accurate was the crowd\'s median guess of the ox\'s weight?', options:['Off by 50%.','Off by 10%.','Within 1%.','Exactly correct.'], correct:2, explanation:'Within 1%. The median guess (1,197 lbs) was within 1% of the true weight (1,198 lbs). The crowd was perfectly calibrated.' },
+  { id:'p32', moduleId:'m8', title:'Q4: The Market', difficulty:4, reward:500, timeLimit:120, body:'How do prediction markets aggregate information?', options:['Via voting.','Via price.','Via expert panels.','Via polls.'], correct:1, explanation:'Via price. The price of a contract in a prediction market reflects the crowd\'s current probability estimate. It updates continuously.' },
+  
+  // M9: HORIZON
+  { id:'p33', moduleId:'m9', title:'Q1: The Decay', difficulty:1, reward:50, timeLimit:45, body:'What happens to forecast accuracy over time?', options:['It improves.','It stays the same.','It decays.','It becomes perfect.'], correct:2, explanation:'It decays. Compounding errors (the Butterfly Effect) make long-term forecasts useless.' },
+  { id:'p34', moduleId:'m9', title:'Q2: The Horizon', difficulty:2, reward:100, timeLimit:60, body:'What is the predictability horizon for weather?', options:['1 day','2 weeks','1 year','10 years'], correct:1, explanation:'~2 weeks. Beyond that, chaos dominates and forecasts are no better than climatology (base rates).' },
+  { id:'p35', moduleId:'m9', title:'Q3: The Horizon (Politics)', difficulty:3, reward:200, timeLimit:90, body:'What is the predictability horizon for politics?', options:['1 month','1 year','10 years','100 years'], correct:1, explanation:'~1 year. Beyond that, the number of interacting variables is too high for accurate prediction.' },
+  { id:'p36', moduleId:'m9', title:'Q4: The Limit', difficulty:4, reward:500, timeLimit:120, body:'What should you do if asked to forecast beyond the horizon?', options:['Make a bold guess.','Refuse.','Return to base rates (50/50 or historical average).','Use more data.'], correct:2, explanation:'Return to base rates. If you cannot predict the specifics, default to the historical average. Do not pretend to see the future.' },
+  
+  // M10: SUPRA
+  { id:'p37', moduleId:'m10', title:'Q1: The Profile', difficulty:1, reward:50, timeLimit:45, body:'Are superforecasters geniuses?', options:['Yes, they have IQs over 150.','No, they have above-average intelligence, but their edge is mindset.','Yes, they have PhDs.','No, they are just lucky.'], correct:1, explanation:'No. They have above-average intelligence, but their edge is mindset: open-mindedness, growth mindset, and perpetual beta.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Mindset', difficulty:2, reward:100, timeLimit:60, body:'What is "Perpetual Beta"?', options:['Always being unsure.','A growth mindset applied to forecasting. Never satisfied; always looking for errors.','Using software to forecast.','A type of probability distribution.'], correct:1, explanation:'Perpetual Beta: A growth mindset applied to forecasting. Never satisfied; always looking for errors and improvements.' },
+  { id:'p39', moduleId:'m10', title:'Q3: The Belief', difficulty:3, reward:200, timeLimit:90, body:'How should a superforecaster view their beliefs?', options:['As treasures to be guarded.','As hypotheses to be tested.','As immutable facts.','As opinions.'], correct:1, explanation:'Beliefs are hypotheses to be tested, not treasures to be guarded. (Tetlock).' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Method', difficulty:4, reward:500, timeLimit:120, body:'Which is NOT part of the superforecaster method?', options:['Decompose','Base Rates','Bayesian Updating','Dogmatic persistence'], correct:3, explanation:'Dogmatic persistence is the opposite of the superforecaster method. The method is: Decompose, Base Rates, Bayes, Dragons, Aggregate, Brier.' }
+];
+
+// ============== DATA: PROJECT ORACLE ==============
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Tournament', scenario:'You are hired to run a geopolitical forecasting tournament. A pundit claims a 90% chance of war in Region X based on ideology. How do you evaluate this?', options:['Trust the pundit; he is on TV.','Recognize the Dragon Effect. Demand probabilistic decomposition and track his Brier score.','Fire the pundit.','Ask another pundit.'], correct:1, explanation:'The Dragon Effect rewards bold predictions, not calibration. Demand probabilities, decompose the claim, and track accuracy. Hedgehogs fail tournaments.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Calibration', scenario:'A forecaster says "100% sure" the treaty will pass. It fails. How do you correct their calibration?', options:['Tell them to try harder.','Track their accuracy. If their 100% predictions are right 85% of the time, force them to use 85% confidence in the future.','Fire them.','Tell them 100% is impossible.'], correct:1, explanation:'Calibration is measured. If their 100% predictions hit 85%, they are overconfident. Force them to align confidence with historical accuracy.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Score', scenario:'Forecaster A predicted 0.9, event failed (0). Forecaster B predicted 0.6, event failed (0). Who scored better?', options:['Forecaster A','Forecaster B','They tied','Cannot determine'], correct:1, explanation:'Brier Score = (Forecast - Outcome)^2. A: (0.9-0)^2 = 0.81. B: (0.6-0)^2 = 0.36. Forecaster B scored better (lower). The quadratic formula punishes confident wrong predictions.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Question', scenario:'Question: "Will Country Y develop a nuclear weapon by 2025?" How do you approach this?', options:['Guess yes or no.','Decompose: P(意图) * P(Capability) * P(No intervention). Estimate each.','Ask an intelligence agency.','Flip a coin.'], correct:1, explanation:'Fermi-ize the future. Break it into necessary conditions: intention, capability, and lack of intervention. Estimate each probability and multiply.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Project', scenario:'Your team estimates a new forecasting platform will launch in 6 months. How do you apply the outside view?', options:['Trust the team\'s inside view.','Find the base rate for software launches (often 12-18 months). Start there, then adjust.','Demand it be done in 3 months.','Cancel the project.'], correct:1, explanation:'The Planning Fallacy makes us underestimate time. The outside view says most software projects take 12-18 months. Start there.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Evidence', scenario:'A forecast predicted a 30% chance of a coup. New intelligence suggests military movement. How do you update?', options:['Jump to 100%.','Ignore it.','Use Bayes: Prior (30%) + Likelihood of movement given coup vs no coup -> Posterior.','Lower the probability.'], correct:2, explanation:'Bayesian Updating. Calculate the likelihood of the evidence under both hypotheses (coup vs no coup). Update the 30% prior to a new posterior.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The Bias', scenario:'Your team is convinced the leader of Country Z will be assassinated. They keep finding evidence supporting it. What trap are they in?', options:['Availability Heuristic','Anchoring','Confirmation Bias','Planning Fallacy'], correct:2, explanation:'Confirmation Bias. They seek disconfirming evidence? Actively look for reasons the assassination might NOT happen.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Crowd', scenario:'You have 100 forecasters. How do you aggregate their predictions?', options:['Pick the smartest one.','Take the average (or median) of all independent forecasts.','Take a vote.','Let them debate until consensus.'], correct:1, explanation:'The Wisdom of Crowds. The median of independent, diverse forecasts is often more accurate than the smartest individual. Do not let them influence each other first.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Horizon', scenario:'A client asks for a forecast of the 2050 election. What do you do?', options:['Make a detailed model.','Refuse; it is beyond the horizon. Return to base rates (50/50).','Ask an AI.','Predict the incumbent wins.'], correct:1, explanation:'Forecast accuracy decays with time. 2050 is beyond the political horizon (~1 year). Return to base rates. Do not pretend to see 25 years into the future.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Mindset', scenario:'Your tournament is a success. How do you maintain the edge?', options:['Hire only PhDs.','Cultivate "Perpetual Beta". Always review misses, update methods, and test beliefs.','Rest on your laurels.','Fire the bottom 50%.'], correct:1, explanation:'Perpetual Beta. Beliefs are hypotheses to be tested. Always review misses, update methods, and never stop improving. Forecasting is a trainable skill.' }
+];
+
+// ============== DATA: REAL-WORLD MISSIONS ==============
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Fox Audit', body:'Identify a prediction you heard today. Was the pundit a fox (nuanced) or a hedgehog (ideological)?' },
+  { id:'rw2', title:'The Calibration Track', body:'Make 3 predictions today with specific probabilities (e.g., 70% chance). Write them down. Check them later.' },
+  { id:'rw3', title:'The Brier Calc', body:'Take a past prediction you made. Calculate your Brier score. Were you overconfident?' },
+  { id:'rw4', title:'The Decomposition', body:'Take a vague question ("Will the project finish on time?"). Decompose it into 3 necessary conditions. Estimate each.' },
+  { id:'rw5', title:'The Base Rate', body:'What is the base rate for the outcome you are predicting? (e.g., 90% of startups fail). Start there.' },
+  { id:'rw6', title:'The Bayesian', body:'Take a belief you hold. What evidence would change your mind? Seek that evidence actively.' },
+  { id:'rw7', title:'The Pre-mortem', body:'Imagine a project you are working on fails. Write down 3 reasons why it failed.' },
+  { id:'rw8', title:'The Crowd', body:'Ask 3 friends to estimate a quantity (e.g., height of a building). Average their guesses. Is it accurate?' },
+  { id:'rw9', title:'The Horizon', body:'What is the predictability horizon for your industry? (e.g., 1 year, 5 years). Don\'t forecast beyond it.' },
+  { id:'rw10', title:'The Dragon', body:'Find a news article celebrating a "prophet." Did they track their misses? Or is it the Dragon Effect?' },
+  { id:'rw11', title:'The Hedgehog', body:'Listen to a political pundit. Do they explain everything through one lens (ideology)? That is a hedgehog.' },
+  { id:'rw12', title:'The 90% Rule', body:'If you say "90% sure," force yourself to imagine the 10% scenario where you are wrong.' },
+  { id:'rw13', title:'The Penalty', body:'Why are confident wrong predictions so painful? Calculate the Brier score: (0.9-0)^2 = 0.81.' },
+  { id:'rw14', title:'The Chain', body:'Multiply probabilities today. If A=0.5 and B=0.5, the joint is 0.25. Most people intuit 0.5.' },
+  { id:'rw15', title:'The Reference Class', body:'What reference class does your current project belong to? What % of that class fails?' },
+  { id:'rw16', title:'The Update', body:'Did you change your mind today? If not, you might be suffering from belief perseverance.' },
+  { id:'rw17', title:'The Disconfirm', body:'Google "reasons I am wrong about [my belief]." Read the first 3 results.' },
+  { id:'rw18', title:'The Anchor', body:'Before asking for a price, write down your own estimate. Don\'t let the first number anchor you.' },
+  { id:'rw19', title:'The Independence', body:'Are your forecasters independent? If they talk to each other first, they herd.' },
+  { id:'rw20', title:'The Market', body:'Look at a prediction market (e.g., PredictIt). The price is the crowd\'s probability.' },
+  { id:'rw21', title:'The Decay', body:'How accurate is a 10-year weather forecast? (It isn\'t). Apply this to your own long-term plans.' },
+  { id:'rw22', title:'The 50/50', body:'If you have no data, what is the base rate? 50/50. Don\'t pretend to know.' },
+  { id:'rw23', title:'The Perpetual Beta', body:'What did you get wrong this week? Review it. Don\'t hide it.' },
+  { id:'rw24', title:'The Hypothesis', body:'Treat a belief as a hypothesis. What test would falsify it?' },
+  { id:'rw25', title:'The Inside View', body:'Are you underestimating time because "this time is different"? Use the outside view.' },
+  { id:'rw26', title:'The Shark', body:'Are you afraid of sharks but smoke cigarettes? Availability heuristic vs base rate.' },
+  { id:'rw27', title:'The Team', body:'Does your team have diverse models? Or do they all think the same? Diversity improves aggregation.' },
+  { id:'rw28', title:'The 45-Degree Line', body:'Plot your confidence vs accuracy. Are you on the 45-degree line? Or overconfident?' },
+  { id:'rw29', title:'The Vague Word', body:'Ban the word "probably." Force a number. 0.6? 0.8?' },
+  { id:'rw30', title:'The Superforecaster', body:'You don\'t need a PhD. You need open-mindedness, Bayes, and perpetual beta. Train the skill.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your calibration profile.' },
+  { threshold: 500, title: 'NOVICE', desc: 'You understand the fox and the hedgehog. Calibration begins.' },
+  { threshold: 1500, title: 'ANALYST', desc: 'You decompose problems and check base rates. Accuracy improves.' },
+  { threshold: 3000, title: 'FORECASTER', desc: 'You update beliefs Bayesianly and track Brier scores.' },
+  { threshold: 6000, title: 'SUPERFORECASTER', desc: 'You aggregate crowds, slay dragons, and view beliefs as hypotheses.' }
+];
+
+// ============== STATE ==============
+const STORAGE_KEY = 'tetlock-v1-clean';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){
+    console.error("Failed to load save, resetting.", e);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+  return defaultState();
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+// ============== PROGRESSION ==============
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){
+  const lvl = level(S.xp);
+  const cur = xpForLevel(lvl);
+  const next = xpForLevel(lvl+1);
+  return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 };
+}
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){
+    toast('LEVEL UP — LVL '+newLvl, 'success');
+    flashCombo('LVL '+newLvl);
+  }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){
+    S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null };
+  }
+  if(!S.daily.rtMissionId){
+    const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length);
+    S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id;
+  }
+}
+
+function unlockNextModule(moduleId){
+  const idx = MODULES.findIndex(m=>m.id===moduleId);
+  if(idx >= 0 && idx < MODULES.length - 1){
+    S.modules[MODULES[idx+1].id].unlocked = true;
+  }
+}
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){
+  let current = PROFILES[0];
+  for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; }
+  return current;
+}
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// SUPERFORECASTER UNLOCKED</h2>';
+      html += '<p>You have completed all 10 axes and successfully run Project ORACLE. You now possess the complete forecasting architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Forecasting is not prophecy; it is calibration. The future is not a mystery to be solved by a guru, but a probability distribution to be estimated by a fox. By decomposing problems, seeking base rates, updating Bayesianly, and slaying dragons, you achieve terrifyingly accurate predictions. Beliefs are hypotheses to be tested, not treasures to be guarded. You are now a Superforecaster.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+// ============== SPACED REPETITION (SM-2) ==============
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){
+    card.repetitions = 0; card.interval = 0; card.wrong += 1;
+  }else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else {
+      const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8);
+      card.interval = Math.max(1, Math.round(card.interval * factor));
+    }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){
+    card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    if(card.ease < 1.3) card.ease = 1.3;
+  }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else {
+    const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8);
+    interval = Math.max(1, Math.round(interval * factor));
+  }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => {
+    if(a.core !== b.core) return a.core ? -1 : 1;
+    return S.cards[a.id].due - S.cards[b.id].due;
+  });
+}
+
+// ============== UI: HELPERS ==============
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+// ============== VIEWS ==============
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) {
+        const prevPhaseId = PROJECT_PHASES[i-1].id;
+        if (!S.project[prevPhaseId].solved) canUnlock = false;
+      }
+      if (canUnlock) {
+        nextProjectPhase = p;
+        break;
+      }
+    }
+  }
+  
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project ORACLE: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your forecasting architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary + ' Start with the lesson, then test yourself in the Arena.';
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module. Finish the remaining items to unlock the next axis.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery. The work is never done — only sharpened.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){
+      rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5';
+    } else {
+      rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1';
+    }
+  }
+
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100);
+      totalMaturity += maturity;
+    });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length;
+  const R = 95;
+  
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){
+      const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+      points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r));
+    }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => {
+      const card = S.cards[c.id];
+      const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30));
+      totalMaturity += maturity;
+    });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="TETLOCK.show(\'modules\')"><- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="TETLOCK.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="TETLOCK.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  
+  html += '</div>';
+  
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){
+      html += '<button class="btn success mt-1" onclick="TETLOCK.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>';
+    }
+    html += '<button class="btn secondary mt-1" onclick="TETLOCK.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  
+  let html = '<div class="lesson-back" onclick="TETLOCK.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){
+    html += '<button class="btn" onclick="TETLOCK.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>';
+  }else{
+    html += '<button class="btn secondary" disabled>Checked Read</button>';
+  }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    html += '<button class="btn secondary" onclick="TETLOCK.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>';
+  }
+  html += '</div>';
+  
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    
+    if(moduleProgress(moduleId).completed){
+      unlockNextModule(moduleId);
+      toast('Next axis unlocked', 'success');
+    }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+// ============== PROJECT ORACLE ==============
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Tournament:</span><span class="val">Active</span></div>';
+  html += '<div class="hud-stat"><span class="label">Phases:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'CALIBRATED' : 'FORECASTING') + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each forecasting axis to run a geopolitical tournament. Phases unlock sequentially.</p>';
+  
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) {
+      const prevPhaseId = PROJECT_PHASES[i-1].id;
+      if (!S.project[prevPhaseId].solved) {
+        unlocked = false;
+      }
+    }
+    
+    const active = !solved && unlocked;
+    
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="TETLOCK.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info">';
+    html += '<div class="phase-title">' + p.title + '</div>';
+    html += '<div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div>';
+    html += '</div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  
+  let html = '<div class="lesson-back" onclick="TETLOCK.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div>';
+  html += '</div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="TETLOCK.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'oracle: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="TETLOCK.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){
+      actions.innerHTML = '<button class="btn success" onclick="TETLOCK.show(\'dashboard\')">View Final Report -></button>';
+    }
+    else { actions.innerHTML = '<button class="btn" onclick="TETLOCK.show(\'modules\')">Continue Training -></button>'; }
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="TETLOCK.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="TETLOCK.showProjectPhase(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== DRILLS ==============
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => {
+    btn.onclick = () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderDrills();
+    };
+  });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="TETLOCK.show(\'arena\')">Arena -></button></div>';
+    return;
+  }
+  
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="TETLOCK.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div>';
+  html += '<div>Axis: <b>' + module.codename + '</b></div>';
+  html += '<div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="TETLOCK.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="TETLOCK.rateDrill(1)">Again<span class="interval"><1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="TETLOCK.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="TETLOCK.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="TETLOCK.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+// ============== ARENA ==============
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  
+  let html = '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div>';
+  html += '</div>';
+  
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="TETLOCK.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content">';
+      html += '<div class="arena-num">' + String(i+1).padStart(2,'0') + '</div>';
+      html += '<div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div>';
+      html += '<div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div>';
+      html += '</div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  
+  let html = '<div class="lesson-back" onclick="TETLOCK.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud">';
+  html += '<div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div>';
+  html += '<div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div>';
+  html += '</div>';
+  
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    html += '<div class="option" onclick="TETLOCK.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>';
+  });
+  html += '</div>';
+  
+  html += '<div class="outcome" id="outcome"></div>';
+  
+  if(solved){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>';
+  }
+  
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){
+      clearInterval(arenaTimer);
+      if(problemState === 'idle'){ answerProblem(-1); }
+    }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if(i === p.correct) opt.classList.add('correct');
+    else if(i === idx && !correct) opt.classList.add('wrong');
+  });
+  
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){
+          unlockNextModule(p.moduleId);
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
+        }else{
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        }
+      }else{
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+      }
+      flashCombo('+' + p.reward + ' XP');
+    }else{
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
+    }
+  }else{
+    html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>';
+  }
+  
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    actions.innerHTML = '<button class="btn" onclick="TETLOCK.show(\'arena\')">Back to Arena -></button>';
+  }else{
+    actions.innerHTML = '<button class="btn secondary" onclick="TETLOCK.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="TETLOCK.showArenaProblem(\''+p.id+'\')">Try Again</button>';
+  }
+  container.appendChild(actions);
+}
+
+// ============== STATS ==============
+function renderStats(){
+  renderTopbar();
+  
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => {
+    if(c.interval >= 21) mature++;
+    else if(c.interval >= 7) young++;
+    else if(c.interval >= 1) learning++;
+    else newCards++;
+  });
+  
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){
+    const correctCount = recent.filter(h => h.correct).length;
+    document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%';
+  }else{ document.getElementById('statRetention').textContent = '--'; }
+  
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(157,78,221,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){
+    log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>';
+  }else{
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+// ============== PARTICLES ==============
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')';
+      ctx.fill();
+    });
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(255, 45, 156, ' + (0.1 * (1 - d/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ============== KEYBOARD ==============
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){
+    if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; }
+  }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){
+    const map = { '1': 1, '2': 3, '3': 4, '4': 5 };
+    if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); }
+  }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); }
+  }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); }
+  }
+});
+
+// ============== THEME SWITCHER ==============
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme);
+  document.getElementById('themeMenu').classList.remove('active');
+}
+
+document.getElementById('themeBtn').onclick = (e) => {
+  e.stopPropagation();
+  document.getElementById('themeMenu').classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.theme-dropdown')) {
+    document.getElementById('themeMenu').classList.remove('active');
+  }
+});
+
+// ============== BACKUP & RESTORE ==============
+document.getElementById('exportBtn').onclick = () => {
+  const dataStr = JSON.stringify(S, null, 2);
+  const blob = new Blob([dataStr], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tetlock_save.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Save file exported', 'success');
+};
+
+document.getElementById('importBtn').onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      S = JSON.parse(event.target.result);
+      saveState();
+      showView('dashboard');
+      toast('Save file imported successfully', 'success');
+    } catch(err) {
+      toast('Invalid save file', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
+// ============== RESET & NAV ==============
+document.getElementById('resetBtn').onclick = () => {
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error');
+  }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => { showView(item.dataset.view); });
+});
+
+// ============== BOOT ==============
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = [
+    'Initializing forecasting architecture v1.0...',
+    'Loading calibration kernel...',
+    'Calibrating SM-2 spaced repetition engine...',
+    'Mounting Pareto priority queue...',
+    'Indexing 10 axes / 60 cards / 40 arena scenarios...',
+    'Initializing Project ORACLE...',
+    'TETLOCK online.'
+  ];
+  
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){
+      setTimeout(() => {
+        document.getElementById('boot').classList.add('fade');
+        document.getElementById('app').classList.add('active');
+        setTimeout(() => {
+          document.getElementById('boot').style.display = 'none';
+          showView('dashboard');
+        }, 800);
+      }, 300);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+// ============== PUBLIC API ==============
+window.TETLOCK = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+// ============== INIT ==============
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  
+  // Global Activity Tracker for Hub Heatmap
+  try {
+    let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
+    const todayDate = new Date().toISOString().split('T')[0];
+    if(!act.includes(todayDate)) { 
+      act.push(todayDate); 
+      localStorage.setItem('cogito-activity', JSON.stringify(act)); 
+    }
+  } catch(e) {}
+
+  saveState();
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
