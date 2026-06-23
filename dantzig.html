@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // DANTZIG v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220;
+  --cyan:#00D9FF; --cyan-dim:#008FB3; --magenta:#FF2D9C; --amber:#FFB800; --green:#00FFA3; --red:#FF3355;
+  --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#3A4759;
+  --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,45,156,0.06),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,217,255,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,217,255,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(5,8,16,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,217,255,0.08),rgba(0,217,255,0.02));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.5);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,217,255,0.1);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.5);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,255,163,0.5);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,217,255,0.1);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,217,255,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,217,255,0.03);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.05);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,255,163,0.05);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,217,255,0.03);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,255,163,0.06);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.06);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,217,255,0.04);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,217,255,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,217,255,0.3);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.3);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,255,163,0.3);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,217,255,0.15);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.2);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.05);}
+.profile-card{background:linear-gradient(135deg,rgba(255,45,156,0.05),rgba(0,217,255,0.05));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,45,156,0.4);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,51,85,0.1),rgba(255,179,0,0.05));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,179,0,0.1);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,179,0,0.3);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,45,156,0.1);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.15);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.15);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,45,156,0.15);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.15);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div id="boot"><div class="boot-logo">DANTZIG</div><div class="boot-sub">Cogito // Operations Research Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">DANTZIG</div><div class="brand-tag">LINEAR OPTIMIZATION</div></div><a href="index.html" class="hub-link">← COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="DANTZIG.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="DANTZIG.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="DANTZIG.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="DANTZIG.setTheme('light')">Light</button><button class="theme-option" onclick="DANTZIG.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Apex</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin →</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue →</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="DANTZIG.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of linear optimization. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: APEX</h1><p class="section-sub">A cumulative scenario. Optimize a factory under resource constraints.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About DANTZIG</h1><p class="section-sub">Methodology and design principles.</p>
+      <div class="about-content">
+        <p>DANTZIG is a cognitive training simulator designed to install the optimization thinking patterns used by operations researchers and linear programmers. It trains you to find the absolute mathematical maximum (profit, speed, output) when bound by finite constraints.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Apex require applying concepts to novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>FEASIBLE</strong> — The feasible region (graphing constraints, corner points)</li>
+          <li><strong>OBJECTIVE</strong> — Objective functions (maximize/minimize)</li>
+          <li><strong>SIMPLEX</strong> — The Simplex method (pivoting, basic variables)</li>
+          <li><strong>DUALITY</strong> — Primal-dual relationships (shadow prices)</li>
+          <li><strong>BINDING</strong> — Binding vs non-binding constraints (slack)</li>
+          <li><strong>SHADOW</strong> — Shadow prices and reduced costs (marginal value)</li>
+          <li><strong>NETWORK</strong> — Network flow and transportation (max flow, min cut)</li>
+          <li><strong>INTEGER</strong> — Integer programming (branch and bound, binary vars)</li>
+          <li><strong>SENSITIVITY</strong> — Sensitivity analysis (ranges of optimality)</li>
+          <li><strong>SCARCITY</strong> — Optimization under scarcity (resource allocation)</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'FEASIBLE', title:'The Feasible Region', summary:'Graphing constraints to find the corner points.', lesson:{ title:'The Architecture of the Possible', body: 'Every linear program (LP) has constraints. You have 40 hours of labor, 100 units of wood, and $500 budget. These are inequalities: Labor <= 40, Wood <= 100, Budget <= 500.\n\n## The Feasible Region\n\nWhen you graph these inequalities on a 2D plane (for two variables), they intersect to form a polygon. This polygon is the "feasible region." Any point inside it is a valid plan. Any point outside it violates a constraint (e.g., you cannot spend $600 if your budget is $500).\n\n## The Fundamental Theorem\n\nThe Fundamental Theorem of Linear Programming states: If an optimal solution exists, it will always be found at one of the vertices (corner points) of the feasible region.\n\nThis is profound. It means you do not need to search the infinite points inside the polygon. You only need to calculate the coordinates of the corners and test them. The optimal profit is at one of those points.\n\n## The Method\n\n1. **Graph the constraints** as equalities to find intersection lines.\n2. **Shade the feasible region** (the area satisfying all inequalities).\n3. **Identify the corner points** (vertices of the polygon).\n4. **Evaluate the objective function** at each corner. The best one is your optimum.', takeaways:['Constraints form a polygon called the feasible region.','Any point inside the region is a valid plan; outside is invalid.','The Fundamental Theorem: The optimal solution is always at a corner point (vertex).','You do not search the interior; you only test the vertices.','Calculate corner points by solving the intersecting lines simultaneously.'] } },
+  { id:'m2', codename:'OBJECTIVE', title:'Objective Functions', summary:'Maximizing profit or minimizing cost.', lesson:{ title:'The Architecture of the Goal', body: 'The objective function is what you are trying to optimize. Usually, it is Maximize Profit or Minimize Cost.\n\nIf you make Chairs (profit $20) and Tables (profit $50), your objective function is: Maximize Z = 20x + 50y.\n\n## Isoprofit Lines\n\nIf you want to make $1,000, you can make 50 chairs and 0 tables (20*50 + 50*0), or 0 chairs and 20 tables. Both points lie on the line 20x + 50y = 1000. This is an isoprofit line.\n\nAs you increase the target profit, the line moves outward, parallel to itself. The optimal solution is the point where the isoprofit line just barely touches the feasible region before leaving it entirely. This will always happen at a corner point.\n\n## The Method\n\n1. **Define the objective:** Maximize Z = c1*x + c2*y.\n2. **Draw isoprofit lines:** Lines of constant Z.\n3. **Push the line outward** (for max) or inward (for min) until it intersects the feasible region at exactly one point.\n4. **That point is the optimum.**', takeaways:['Objective Function = what you optimize (Max Profit, Min Cost).','Isoprofit lines represent all combinations yielding the same profit.','Push the isoprofit line outward until it barely touches the feasible region.','The optimal point is the last intersection before the line leaves the feasible region.'] } },
+  { id:'m3', codename:'SIMPLEX', title:'The Simplex Method', summary:'Algebraic pivoting for high-dimensional LPs.', lesson:{ title:'The Architecture of the Pivot', body: 'Graphing works for 2 variables. But what if you have 50 products? You cannot graph in 50 dimensions. You need algebra.\n\n## The Simplex Method\n\nGeorge Dantzig invented the Simplex Method in 1947. It is an algorithm that moves from one corner point of the feasible region to an adjacent one, always increasing the objective function, until it cannot increase anymore.\n\n## The Tableau\n\nYou set up a matrix (tableau) representing the constraints and objective. You look for "entering variables" (the one that increases profit the most per unit) and "leaving variables" (the one that hits a constraint limit first).\n\n## Pivot\n\nYou perform row operations (like Gaussian elimination) to pivot the matrix. This moves you to a new corner point. You repeat until no entering variable can improve the objective. You have found the optimum.\n\n## Why It Works\n\nThe feasible region is a convex polytope. A convex shape has no local maximums, only a global maximum. If you always walk uphill, you will eventually reach the peak.', takeaways:['Simplex Method solves LPs with many variables algebraically.','It moves from corner to corner, always improving the objective.','Entering variable: increases profit most. Leaving variable: hits limit first.','Convexity guarantees no local maximums; uphill walk reaches global peak.','Pivoting uses matrix row operations (Gaussian elimination).'] } },
+  { id:'m4', codename:'DUALITY', title:'Primal-Dual Relationships', summary:'Every LP has a mirror problem.', lesson:{ title:'The Architecture of the Mirror', body: 'Every linear program (the Primal) has a mirror problem called the Dual. If the Primal is Maximize Profit, the Dual is Minimize Cost.\n\n## The Concept\n\nImagine you are a furniture maker maximizing profit. An investor offers to buy your resources (wood, labor). The Dual question is: What is the minimum price you would accept for your resources such that you are indifferent between making furniture or selling the resources?\n\n## Strong Duality\n\nThe optimal value of the Primal equals the optimal value of the Dual. (Max Profit = Min Resource Value). This is profound. If you solve one, you have implicitly solved the other.\n\n## The Method\n\n1. **Transpose the constraints:** Primal constraints (<=) become Dual variables (>=).\n2. **Objective coefficients swap:** Primal costs become Dual constraints.\n3. **Solve the Dual** if it is easier (fewer constraints).\n4. **The optimal Z is the same** for both.', takeaways:['Every LP (Primal) has a mirror problem (Dual).','Max Profit problems become Min Cost problems.','Strong Duality: Optimal Primal value = Optimal Dual value.','Solving the Dual gives you the same answer as the Primal.','Transpose constraints and swap coefficients to convert.'] } },
+  { id:'m5', codename:'BINDING', title:'Binding Constraints', summary:'Slack variables and active limits.', lesson:{ title:'The Architecture of the Limit', body: 'A binding constraint is one that holds with equality at the optimal solution. If your budget is $500, and the optimal plan spends exactly $500, the budget constraint is binding. If it only spends $400, the budget constraint has "slack" (it is non-binding).\n\n## Slack Variables\n\nWe add slack variables to convert inequalities to equalities. Budget <= 500 becomes Budget + Slack = 500. If Slack is 0, the constraint is binding. If Slack > 0, it is non-binding.\n\n## Why It Matters\n\nIf a constraint is non-binding, loosening it does not improve the objective. If you have leftover wood, buying more wood will not increase profit. You are limited by something else (labor or budget).\n\nOnly binding constraints limit your optimum. To improve, you must relax the binding constraints.\n\n## The Method\n\n1. **Solve the LP.**\n2. **Calculate slack** for each constraint: Slack = Limit - Used.\n3. **If Slack = 0:** Binding. Relaxing this constraint improves the objective.\n4. **If Slack > 0:** Non-binding. Relaxing this does nothing.', takeaways:['Binding constraint = holds with equality at optimum (Slack = 0).','Non-binding = has leftover resources (Slack > 0).','Loosening a non-binding constraint does not improve the objective.','To improve the optimum, you must relax the binding constraints.','Slack variables convert inequalities to equalities.'] } },
+  { id:'m6', codename:'SHADOW', title:'Shadow Prices', summary:'The marginal value of an extra unit of resource.', lesson:{ title:'The Architecture of Marginal Value', body: 'A shadow price (or dual value) is how much the optimal objective improves if you increase a constraint by 1 unit.\n\n## The Question\n\nIf your optimal profit is $1,000 using 40 hours of labor, what happens if you get 1 more hour of labor (41)? If profit increases to $1,025, the shadow price of labor is $25.\n\n## Economic Interpretation\n\nThe shadow price tells you the maximum you should be willing to pay for an extra unit of resource. If an overtime hour costs $20, and the shadow price is $25, you should buy it (net gain $5). If overtime costs $30, you should not.\n\n## Reduced Cost\n\nFor variables (products), the "reduced cost" is similar. If a product is not made in the optimal plan, its reduced cost tells you how much its profit must increase before it becomes worth making.\n\n## The Method\n\n1. **Solve the LP.**\n2. **Look at the dual values** for the constraints.\n3. **Shadow Price = Marginal Value.**\n4. **Compare to market price.** Buy resource if Market Price < Shadow Price.', takeaways:['Shadow Price = improvement in objective per unit increase in constraint.','It is the marginal value of a resource.','Buy resource if Market Price < Shadow Price.','Reduced Cost = profit increase needed to make a product viable.','Shadow prices come from the Dual variables.'] } },
+  { id:'m7', codename:'NETWORK', title:'Network Flow', summary:'Max flow, min cut, and transportation.', lesson:{ title:'The Architecture of Routing', body: 'Many optimization problems are network problems. You have nodes (cities, servers, warehouses) and edges (roads, cables, routes) with capacities.\n\n## Max Flow / Min Cut\n\nThe maximum amount of flow from a source to a sink is equal to the minimum capacity of a "cut" separating them. A cut is a partition of nodes. If you cut 3 cables with capacities 10, 20, 30, the max flow is at most 60.\n\n## Transportation Problem\n\nYou have 3 factories (supply) and 4 warehouses (demand). How do you route trucks to minimize shipping cost? This is an LP where variables are routes, constraints are supply/demand, and the objective is min cost.\n\n## The Method\n\n1. **Model as a graph:** Nodes, edges, capacities/costs.\n2. **For Max Flow:** Find the bottleneck (min cut).\n3. **For Transportation:** Set up LP with supply/demand constraints.\n4. **Solve using Simplex or specialized algorithms** (e.g., Ford-Fulkerson).', takeaways:['Network flow problems model routing, supply chains, and bandwidth.','Max Flow = Min Cut. The bottleneck determines the max.','Transportation Problem: minimize shipping cost given supply and demand.','Model as graph: Nodes (cities), Edges (routes), Capacities (limits).','Network LPs are solved with Simplex or specialized algorithms.'] } },
+  { id:'m8', codename:'INTEGER', title:'Integer Programming', summary:'Branch and bound, and binary variables.', lesson:{ title:'The Architecture of Discreteness', body: 'Standard LP assumes variables can be fractions (2.5 chairs). But you cannot build half a chair. Integer Programming (IP) restricts variables to integers.\n\n## The LP Relaxation Trap\n\nIf you solve the LP and round the answer, you might get an infeasible or suboptimal result. Rounding 2.9 to 3 might violate a constraint. Rounding to 2 might miss profit.\n\n## Branch and Bound\n\nThe standard algorithm is Branch and Bound. You solve the LP relaxation. If the answer is fractional (e.g., 2.5), you branch into two sub-problems: x <= 2 and x >= 3. You solve each, bounding the best possible solution, until you find an integer optimum.\n\n## Binary Variables\n\n0-1 variables allow yes/no decisions. Build factory (1) or not (0). These are powerful for scheduling, assignment, and capital budgeting.\n\n## The Method\n\n1. **Relax integer constraints** and solve as LP.\n2. **If integer:** Done.\n3. **If fractional:** Branch on the fractional variable.\n4. **Bound:** Keep track of best integer solution. Prune branches worse than the bound.', takeaways:['Integer Programming (IP) restricts variables to whole numbers.','Rounding LP solutions often fails (infeasible or suboptimal).','Branch and Bound: split problem into x <= floor and x >= ceil.','Binary (0-1) variables model yes/no decisions.','IP is NP-Hard, but modern solvers handle thousands of variables.'] } },
+  { id:'m9', codename:'SENSITIVITY', title:'Sensitivity Analysis', summary:'How robust is the optimum to changes?', lesson:{ title:'The Architecture of Robustness', body: 'You calculated the optimal plan. But the future is uncertain. What if wood costs 5% more? What if demand drops 10%? Sensitivity analysis tells you how much the parameters can change before the optimal plan changes.\n\n## Range of Optimality\n\nFor objective coefficients (profit per chair): How much can the profit drop before you stop making chairs? If the range is [$15, $25], and current profit is $20, you are safe if it fluctuates within that range. The optimal plan (make 10 chairs, 5 tables) stays the same.\n\n## Range of Feasibility\n\nFor constraint limits (budget): How much can the budget increase before a non-binding constraint becomes binding, or a binding constraint becomes non-binding?\n\n## The Method\n\n1. **Identify the ranges** from the LP solver output.\n2. **Check actual variations** against the ranges.\n3. **If within range:** Optimal plan is stable. Just recalculate Z.\n4. **If outside range:** Re-solve the LP. The optimal plan changes.', takeaways:['Sensitivity Analysis checks robustness of the optimum.','Range of Optimality: range of profit/cost where the plan stays optimal.','Range of Feasibility: range of resource limits where the basis stays valid.','If actual changes are within ranges, no need to re-solve.','If outside ranges, the optimal corner point changes; re-solve.'] } },
+  { id:'m10', codename:'SCARCITY', title:'Optimization Under Scarcity', summary:'Resource allocation and the manager\'s math.', lesson:{ title:'The Architecture of Allocation', body: 'Operations Research is the ultimate manager\'s math. You never have enough time, money, or people. Scarcity is the default. LP is the tool to navigate it.\n\n## The Manager\'s Problem\n\nYou have 5 engineers, 2 months, and $100k. You have 10 features you could build. Which do you choose? This is an LP (or IP). Variables = features. Constraints = time, money, dependencies. Objective = Maximize user value or revenue.\n\n## Opportunity Cost\n\nThe shadow price of a resource is its opportunity cost. If an engineer\'s shadow price is $10k/week, that is what you are giving up by not having them on the optimal project. If you can hire one for $8k, you should.\n\n## The Synthesis\n\nTo optimize under scarcity:\n1. **List the constraints** (time, budget, headcount).\n2. **Define the objective** (maximize revenue, minimize churn).\n3. **Model as LP/IP.**\n4. **Solve.**\n5. **Use shadow prices** to decide where to invest marginal resources.\n6. **Use sensitivity analysis** to plan for uncertainty.', takeaways:['Scarcity is the default; optimization is the tool to navigate it.','Managerial decisions are IP problems: features, resources, constraints.','Shadow prices represent opportunity cost.','Allocate resources to the highest shadow price.','Use LP to make data-driven resource allocation decisions.'] } }
+];
+
+const CARDS = [
+  {id:'c1',moduleId:'m1',core:true,category:'concept',front:'What is the Feasible Region?',back:'The polygon formed by the intersection of constraint inequalities. Any point inside it is a valid plan.'},
+  {id:'c2',moduleId:'m1',core:true,category:'application',front:'State the Fundamental Theorem of Linear Programming.',back:'If an optimal solution exists, it will always be found at one of the vertices (corner points) of the feasible region.'},
+  {id:'c3',moduleId:'m1',core:false,category:'concept',front:'Why do we only test corner points?',back:'Because the feasible region is convex. There are no local maximums, only a global maximum at a vertex.'},
+  {id:'c4',moduleId:'m1',core:false,category:'application',front:'How do you find corner points?',back:'Solve the intersecting constraint lines simultaneously (treat inequalities as equalities).'},
+  {id:'c5',moduleId:'m1',core:false,category:'concept',front:'What is an infeasible LP?',back:'A problem where constraints contradict each other, so the feasible region is empty.'},
+  {id:'c6',moduleId:'m1',core:false,category:'application',front:'Labor <= 40, Wood <= 100. Is the point (Labor=50, Wood=80) feasible?',back:'No. Labor=50 violates the Labor <= 40 constraint.'},
+  {id:'c7',moduleId:'m1',core:false,category:'concept',front:'What is an unbounded LP?',back:'A problem where the feasible region extends infinitely, so profit can increase forever. Usually a missing constraint.'},
+  {id:'c8',moduleId:'m1',core:false,category:'quote',front:'Complete the principle: "The optimal solution is always at a..."',back:'"...corner point (vertex) of the feasible region."'},
+  {id:'c9',moduleId:'m1',core:false,category:'application',front:'Constraints: x+y <= 10, x=4, y=4. Is this feasible?',back:'Yes. 4+4=8 <= 10. It is inside the region.'},
+  {id:'c10',moduleId:'m1',core:false,category:'concept',front:'What shape is the feasible region in 2D?',back:'A convex polygon.'},
+  {id:'c11',moduleId:'m1',core:false,category:'application',front:'Constraints: x+y<=10, x>=0, y>=0. What are the corner points?',back:'(0,0), (10,0), (0,10).'},
+  {id:'c12',moduleId:'m1',core:false,category:'concept',front:'Can an LP have multiple optimal solutions?',back:'Yes. If the isoprofit line is parallel to a constraint edge, every point on that edge is optimal.'},
+
+  {id:'c13',moduleId:'m2',core:true,category:'concept',front:'What is an Objective Function?',back:'The mathematical expression you want to maximize (e.g., Profit) or minimize (e.g., Cost). Z = c1*x + c2*y.'},
+  {id:'c14',moduleId:'m2',core:true,category:'application',front:'Profit = $20/chair, $50/table. Objective function?',back:'Maximize Z = 20x + 50y.'},
+  {id:'c15',moduleId:'m2',core:false,category:'concept',front:'What is an isoprofit line?',back:'A line representing all combinations of variables that yield the same total profit.'},
+  {id:'c16',moduleId:'m2',core:false,category:'application',front:'How do you find the optimum graphically?',back:'Push the isoprofit line outward (for max) until it barely touches the feasible region at one point.'},
+  {id:'c17',moduleId:'m2',core:false,category:'concept',front:'What does "Minimize Z = 5x + 8y" mean?',back:'Find the combination of x and y that results in the lowest possible total cost.'},
+  {id:'c18',moduleId:'m2',core:false,category:'application',front:'If Z = 10x + 30y, and x=2, y=4. What is Z?',back:'10(2) + 30(4) = 20 + 120 = 140.'},
+  {id:'c19',moduleId:'m2',core:false,category:'concept',front:'What are decision variables?',back:'The unknowns you are trying to solve for (e.g., x = number of chairs, y = number of tables).'},
+  {id:'c20',moduleId:'m2',core:false,category:'application',front:'Isoprofit line: 20x + 50y = 1000. If x=0, y=?',back:'y = 1000/50 = 20.'},
+  {id:'c21',moduleId:'m2',core:false,category:'quote',front:'Complete the principle: "The optimal point is the last intersection before the isoprofit line..."',back:'"...leaves the feasible region."'},
+  {id:'c22',moduleId:'m2',core:false,category:'concept',front:'What are non-negativity constraints?',back:'x >= 0, y >= 0. You cannot produce negative quantities.'},
+  {id:'c23',moduleId:'m2',core:false,category:'application',front:'Max Z = 5x + 2y. Corner A=(0,10), B=(5,5), C=(10,0). Which is optimal?',back:'C: Z = 5(10) + 2(0) = 50. A=20, B=35. C is highest.'},
+  {id:'c24',moduleId:'m2',core:false,category:'concept',front:'What happens if the objective function coefficients change?',back:'The slope of the isoprofit line changes, potentially shifting the optimal corner point.'},
+
+  {id:'c25',moduleId:'m3',core:true,category:'concept',front:'What is the Simplex Method?',back:'An algebraic algorithm that moves from corner to corner, improving the objective until optimum is found.'},
+  {id:'c26',moduleId:'m3',core:true,category:'application',front:'Why use Simplex instead of graphing?',back:'Graphing only works for 2 variables. Simplex handles 50+ variables algebraically.'},
+  {id:'c27',moduleId:'m3',core:false,category:'concept',front:'What is an "entering variable" in Simplex?',back:'The variable that increases the objective the most per unit. It enters the solution basis.'},
+  {id:'c28',moduleId:'m3',core:false,category:'concept',front:'What is a "leaving variable" in Simplex?',back:'The variable that hits a constraint limit (becomes 0) first as the entering variable increases.'},
+  {id:'c29',moduleId:'m3',core:false,category:'application',front:'What is a pivot in Simplex?',back:'Matrix row operations that swap the entering and leaving variables, moving to a new corner point.'},
+  {id:'c30',moduleId:'m3',core:false,category:'concept',front:'What is a tableau?',back:'The matrix representation of constraints and objective used to perform Simplex pivots.'},
+  {id:'c31',moduleId:'m3',core:false,category:'concept',front:'When does Simplex stop?',back:'When no entering variable can improve the objective (all reduced costs <= 0 for max).'},
+  {id:'c32',moduleId:'m3',core:false,category:'quote',front:'Complete the principle: "Simplex moves from corner to corner, always..."',back:'"...improving the objective."'},
+  {id:'c33',moduleId:'m3',core:false,category:'application',front:'Who invented the Simplex Method?',back:'George Dantzig in 1947.'},
+  {id:'c34',moduleId:'m3',core:false,category:'concept',front:'Is Simplex guaranteed to find the global optimum?',back:'Yes, because the feasible region is convex (no local maximums).'},
+  {id:'c35',moduleId:'m3',core:false,category:'application',front:'Simplex moves along edges of the feasible region. What are these edges?',back:'Intersections of constraint boundaries.'},
+  {id:'c36',moduleId:'m3',core:false,category:'concept',front:'What is degeneracy in Simplex?',back:'When a pivot does not improve the objective. Can cause cycling, but rarely happens in practice.'},
+
+  {id:'c37',moduleId:'m4',core:true,category:'concept',front:'What is Duality in LP?',back:'Every Primal LP has a mirror Dual problem. Max Profit becomes Min Resource Value.'},
+  {id:'c38',moduleId:'m4',core:true,category:'application',front:'State Strong Duality.',back:'The optimal value of the Primal equals the optimal value of the Dual. (Max Z = Min W).'},
+  {id:'c39',moduleId:'m4',core:false,category:'concept',front:'If Primal is Maximize, what is Dual?',back:'Minimize.'},
+  {id:'c40',moduleId:'m4',core:false,category:'application',front:'Primal constraints are <=. What are Dual variables?',back:'>= (non-negative).'},
+  {id:'c41',moduleId:'m4',core:false,category:'concept',front:'What does the Dual problem represent economically?',back:'The minimum price you would accept to sell your resources instead of producing goods.'},
+  {id:'c42',moduleId:'m4',core:false,category:'application',front:'Why solve the Dual?',back:'Sometimes it has fewer constraints, making it computationally easier.'},
+  {id:'c43',moduleId:'m4',core:false,category:'concept',front:'What is Complementary Slackness?',back:'If a Primal variable is > 0, the corresponding Dual constraint is binding (=).'},
+  {id:'c44',moduleId:'m4',core:false,category:'quote',front:'Complete the principle: "Optimal Primal value equals..."',back:'"...Optimal Dual value."'},
+  {id:'c45',moduleId:'m4',core:false,category:'application',front:'Primal: 3 variables, 5 constraints. Dual:?',back:'5 variables, 3 constraints.'},
+  {id:'c46',moduleId:'m4',core:false,category:'concept',front:'What is Weak Duality?',back:'The Dual objective provides a bound on the Primal. (Min W >= Max Z).'},
+  {id:'c47',moduleId:'m4',core:false,category:'application',front:'If Primal Max Z = 100, what is Dual Min W?',back:'100.'},
+  {id:'c48',moduleId:'m4',core:false,category:'concept',front:'What are Dual variables often called?',back:'Shadow prices.'},
+
+  {id:'c49',moduleId:'m5',core:true,category:'concept',front:'What is a binding constraint?',back:'A constraint that holds with equality at the optimal solution (Slack = 0).'},
+  {id:'c50',moduleId:'m5',core:true,category:'application',front:'Budget <= 500. Optimal plan spends 500. Slack?',back:'0. The constraint is binding.'},
+  {id:'c51',moduleId:'m5',core:false,category:'concept',front:'What is a slack variable?',back:'A variable added to an inequality to convert it to an equality. (Budget + Slack = 500).'},
+  {id:'c52',moduleId:'m5',core:false,category:'application',front:'Labor <= 40. Optimal uses 35. Slack?',back:'5. The constraint is non-binding.'},
+  {id:'c53',moduleId:'m5',core:false,category:'concept',front:'If a constraint has slack, what happens if you loosen it?',back:'Nothing. The objective does not improve. You are limited by something else.'},
+  {id:'c54',moduleId:'m5',core:false,category:'application',front:'Wood <= 100. Optimal uses 100. You buy 10 more wood. What happens?',back:'Profit might increase, because wood was binding. Need to re-solve.'},
+  {id:'c55',moduleId:'m5',core:false,category:'concept',front:'What is a surplus variable?',back:'Like slack, but for >= constraints. (Demand >= 100 becomes Demand - Surplus = 100).'},
+  {id:'c56',moduleId:'m5',core:false,category:'quote',front:'Complete the principle: "To improve the optimum, you must relax the..."',back:'"...binding constraints."'},
+  {id:'c57',moduleId:'m5',core:false,category:'application',front:'How many constraints are binding at a corner point in 2D?',back:'Exactly 2 (the two lines that intersect to form the corner).'},
+  {id:'c58',moduleId:'m5',core:false,category:'concept',front:'What is a redundant constraint?',back:'A constraint that does not affect the feasible region. It is completely inside other constraints.'},
+  {id:'c59',moduleId:'m5',core:false,category:'application',front:'If all constraints are non-binding, what is the problem?',back:'The LP is unbounded. Profit can grow infinitely.'},
+  {id:'c60',moduleId:'m5',core:false,category:'concept',front:'Can a constraint be binding but not limit the objective?',back:'No. If it is binding, it is by definition part of the active limit.'},
+
+  {id:'c61',moduleId:'m6',core:true,category:'concept',front:'What is a Shadow Price?',back:'The improvement in the optimal objective per unit increase in a constraint limit.'},
+  {id:'c62',moduleId:'m6',core:true,category:'application',front:'Shadow price of labor is $25/hr. Overtime costs $20/hr. Buy?',back:'Yes. Net gain is $5/hr.'},
+  {id:'c63',moduleId:'m6',core:false,category:'concept',front:'What does a shadow price of 0 mean?',back:'The constraint is non-binding. Extra resources do not help.'},
+  {id:'c64',moduleId:'m6',core:false,category:'application',front:'Shadow price of wood is $10. Market price is $15. Buy?',back:'No. You lose $5 per unit.'},
+  {id:'c65',moduleId:'m6',core:false,category:'concept',front:'What is Reduced Cost?',back:'For a variable not in the optimal solution, how much its profit must increase before it becomes viable.'},
+  {id:'c66',moduleId:'m6',core:false,category:'application',front:'Product X has reduced cost of -$5. Current profit is $20. What profit makes it viable?',back:'$25. ($20 + $5).'},
+  {id:'c67',moduleId:'m6',core:false,category:'concept',front:'Where do shadow prices come from?',back:'The optimal values of the Dual variables.'},
+  {id:'c68',moduleId:'m6',core:false,category:'quote',front:'Complete the principle: "Buy resource if Market Price is..."',back:'"...less than Shadow Price."'},
+  {id:'c69',moduleId:'m6',core:false,category:'application',front:'Shadow price of budget is $1.20. Spend $1k more on ads?',back:'Yes, if ROI > $1.20 per $1 spent.'},
+  {id:'c70',moduleId:'m6',core:false,category:'concept',front:'Are shadow prices constant?',back:'No. They are valid only within the "Range of Feasibility".'},
+  {id:'c71',moduleId:'m6',core:false,category:'application',front:'Shadow price of server capacity is $0. Why?',back:'Because server capacity is non-binding. You have leftover servers.'},
+  {id:'c72',moduleId:'m6',core:false,category:'concept',front:'What is the economic interpretation of shadow price?',back:'The marginal value or opportunity cost of a resource.'},
+
+  {id:'c73',moduleId:'m7',core:true,category:'concept',front:'What is the Max Flow / Min Cut theorem?',back:'The maximum flow from source to sink equals the minimum capacity of a cut separating them.'},
+  {id:'c74',moduleId:'m7',core:true,category:'application',front:'What is the Transportation Problem?',back:'Minimizing shipping cost from multiple factories (supply) to warehouses (demand).'},
+  {id:'c75',moduleId:'m7',core:false,category:'concept',front:'What is a cut in a network?',back:'A partition of nodes into two sets, one containing the source, the other the sink.'},
+  {id:'c76',moduleId:'m7',core:false,category:'application',front:'Edges cut have capacities 10, 20, 30. Max flow?',back:'60. (Sum of cut capacities).'},
+  {id:'c77',moduleId:'m7',core:false,category:'concept',front:'What is the bottleneck in a network?',back:'The min cut. It limits the max flow.'},
+  {id:'c78',moduleId:'m7',core:false,category:'application',front:'Factory 1 supply 100, Factory 2 supply 200. Total supply?',back:'300. Total supply must equal total demand in a balanced problem.'},
+  {id:'c79',moduleId:'m7',core:false,category:'concept',front:'What is the Assignment Problem?',back:'A special transportation problem where supply/demand = 1 (e.g., assigning workers to jobs).'},
+  {id:'c80',moduleId:'m7',core:false,category:'quote',front:'Complete the principle: "Max Flow equals..."',back:'"...Min Cut."'},
+  {id:'c81',moduleId:'m7',core:false,category:'application',front:'You route 50 units through a pipe with capacity 40. What happens?',back:'Infeasible. Flow cannot exceed capacity.'},
+  {id:'c82',moduleId:'m7',core:false,category:'concept',front:'What is a transshipment problem?',back:'A network problem where nodes can be both sources and sinks (intermediate warehouses).'},
+  {id:'c83',moduleId:'m7',core:false,category:'application',front:'Network has 5 nodes, 7 edges. How many variables in the LP?',back:'7 (one flow variable per edge).'},
+  {id:'c84',moduleId:'m7',core:false,category:'concept',front:'How is network flow an LP?',back:'Variables = edge flows. Constraints = flow conservation at nodes, capacity on edges.'},
+
+  {id:'c85',moduleId:'m8',core:true,category:'concept',front:'What is Integer Programming (IP)?',back:'An LP where variables must be whole numbers (cannot build 2.5 chairs).'},
+  {id:'c86',moduleId:'m8',core:true,category:'application',front:'What is the LP Relaxation?',back:'Solving the IP by ignoring the integer constraints. Often a starting point.'},
+  {id:'c87',moduleId:'m8',core:false,category:'concept',front:'Why does rounding the LP solution fail?',back:'The rounded solution might be infeasible (violates constraints) or suboptimal.'},
+  {id:'c88',moduleId:'m8',core:false,category:'application',front:'LP solution is x=2.5. How do you branch in Branch & Bound?',back:'Create two sub-problems: x <= 2 and x >= 3.'},
+  {id:'c89',moduleId:'m8',core:false,category:'concept',front:'What is a binary (0-1) variable?',back:'A variable restricted to 0 or 1. Used for yes/no decisions (build factory or not).'},
+  {id:'c90',moduleId:'m8',core:false,category:'application',front:'What is the Knapsack Problem?',back:'An IP where you maximize value subject to a weight constraint. (Packing items).'},
+  {id:'c91',moduleId:'m8',core:false,category:'concept',front:'What is Branch and Bound?',back:'An algorithm that splits the problem into sub-problems (branch) and tracks best solution (bound) to prune.'},
+  {id:'c92',moduleId:'m8',core:false,category:'quote',front:'Complete the principle: "Rounding LP solutions often..."',back:'"...fails (infeasible or suboptimal)."'},
+  {id:'c93',moduleId:'m8',core:false,category:'application',front:'Binary var: Build NYC office? 1=Yes, 0=No. This is an example of?',back:'A 0-1 Integer Program.'},
+  {id:'c94',moduleId:'m8',core:false,category:'concept',front:'Is IP harder than LP?',back:'Yes. IP is NP-Hard. LP is solvable in polynomial time.'},
+  {id:'c95',moduleId:'m8',core:false,category:'application',front:'LP Relaxation gives Z=100. Best integer found is 90. Can you prune a branch with LP bound 85?',back:'Yes. 85 < 90. It cannot beat the current best.'},
+  {id:'c96',moduleId:'m8',core:false,category:'concept',front:'What is a Mixed Integer Program (MIP)?',back:'An LP where some variables are continuous, and some are integers.'},
+
+  {id:'c97',moduleId:'m9',core:true,category:'concept',front:'What is Sensitivity Analysis?',back:'Checking how much parameters can change before the optimal plan changes.'},
+  {id:'c98',moduleId:'m9',core:true,category:'application',front:'What is Range of Optimality?',back:'The range of objective coefficients (profit) where the optimal plan remains the same.'},
+  {id:'c99',moduleId:'m9',core:false,category:'concept',front:'What is Range of Feasibility?',back:'The range of constraint limits (resources) where the current basis (binding set) remains valid.'},
+  {id:'c100',moduleId:'m9',core:false,category:'application',front:'Profit/chair is $20. Range of optimality is [$15, $25]. If profit drops to $18, what happens?',back:'Nothing. The optimal plan stays the same. Only total Z changes.'},
+  {id:'c101',moduleId:'m9',core:false,category:'concept',front:'If actual change is within the range, do you need to re-solve?',back:'No. Just recalculate the objective value Z.'},
+  {id:'c102',moduleId:'m9',core:false,category:'application',front:'If profit drops to $14 (outside range), what happens?',back:'The optimal corner point changes. You must re-solve the LP.'},
+  {id:'c103',moduleId:'m9',core:false,category:'concept',front:'What does sensitivity analysis tell managers?',back:'How robust the plan is. Which estimates are critical, which can be ignored.'},
+  {id:'c104',moduleId:'m9',core:false,category:'quote',front:'Complete the principle: "If within range, no need to re-solve. Just recalculate..."',back:'"...the objective Z."'},
+  {id:'c105',moduleId:'m9',core:false,category:'application',front:'Shadow price is valid within what?',back:'The Range of Feasibility for that constraint.'},
+  {id:'c106',moduleId:'m9',core:false,category:'concept',front:'What is a parameter in an LP?',back:'A known constant (profit per unit, resource limit, cost).'},
+  {id:'c107',moduleId:'m9',core:false,category:'application',front:'Budget limit is $500. Range of feasibility is [400, 600]. If budget is $450, is shadow price valid?',back:'Yes. 450 is within the range.'},
+  {id:'c108',moduleId:'m9',core:false,category:'concept',front:'Why is sensitivity analysis crucial?',back:'Because input data (costs, demands) are estimates. The plan must survive uncertainty.'},
+
+  {id:'c109',moduleId:'m10',core:true,category:'concept',front:'What is the core problem of Operations Research?',back:'Optimizing an objective (profit, speed) under constraints (scarcity of time, money, materials).'},
+  {id:'c110',moduleId:'m10',core:true,category:'application',front:'Shadow price of an engineer is $10k/week. Overtime cost is $8k. Do it?',back:'Yes. Net gain is $2k.'},
+  {id:'c111',moduleId:'m10',core:false,category:'concept',front:'What is Opportunity Cost?',back:'The value of the next best alternative. In LP, it is the shadow price of a resource.'},
+  {id:'c112',moduleId:'m10',core:false,category:'application',front:'You have 5 engineers, 2 months. Which features to build?',back:'Model as IP: Maximize value subject to time and dependency constraints.'},
+  {id:'c113',moduleId:'m10',core:false,category:'concept',front:'Why is scarcity the default?',back:'Because wants are infinite, but resources (time, budget, headcount) are finite.'},
+  {id:'c114',moduleId:'m10',core:false,category:'application',front:'How to allocate resources?',back:'To the highest shadow price. That is where marginal value is greatest.'},
+  {id:'c115',moduleId:'m10',core:false,category:'concept',front:'What is the "Manager\'s Math"?',back:'Using LP/IP to make data-driven resource allocation decisions instead of gut feelings.'},
+  {id:'c116',moduleId:'m10',core:false,category:'quote',front:'Complete the principle: "Allocate resources to the highest..."',back:'"...shadow price."'},
+  {id:'c117',moduleId:'m10',core:false,category:'application',front:'You can hire 1 more worker or buy 1 more machine. How to decide?',back:'Compare the shadow prices (marginal value) of labor vs capital.'},
+  {id:'c118',moduleId:'m10',core:false,category:'concept',front:'What is capital budgeting?',back:'An IP problem: selecting which projects to fund to maximize NPV subject to a budget.'},
+  {id:'c119',moduleId:'m10',core:false,category:'application',front:'Shadow price of ads is $1.20. Spend $1m more?',back:'Yes, if ROI > $1.20 per $1 spent.'},
+  {id:'c120',moduleId:'m10',core:false,category:'concept',front:'What is the synthesis of DANTZIG?',back:'Use LP to model scarcity, Simplex to solve, Shadow Prices to allocate, Sensitivity to survive uncertainty.'}
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: Feasible Region', difficulty:1, reward:50, timeLimit:45, body:'Constraints: x+y <= 10, x >= 0, y >= 0. Is point (4, 4) feasible?', options:['No, 4+4=8 < 10','Yes, 4+4=8 <= 10, and both are >= 0','No, x and y cannot be equal','Yes, because 10 is the max'], correct:1, explanation:'A point is feasible if it satisfies ALL constraints. 4+4=8 <= 10, and 4>=0, 4>=0. All are true. It is feasible.' },
+  { id:'p2', moduleId:'m1', title:'Q2: Corner Points', difficulty:2, reward:100, timeLimit:60, body:'Constraints: x+y <= 10, x=0, y=0. What are the corner points of the feasible region?', options:['(0,0) only','(10,10) only','(0,0), (10,0), (0,10)','-10 to 10'], correct:2, explanation:'The region is a triangle bounded by axes and the line x+y=10. Corners are (0,0), intersection with x-axis (10,0), and intersection with y-axis (0,10).' },
+  { id:'p3', moduleId:'m1', title:'Q3: Infeasible LP', difficulty:3, reward:200, timeLimit:90, body:'Constraints: x >= 5, x <= 3. What is the feasible region?', options:['A line between 3 and 5','Empty (infeasible)','Infinite','x = 4'], correct:1, explanation:'x cannot be simultaneously >= 5 and <= 3. The constraints contradict. The feasible region is empty.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Unbounded LP', difficulty:4, reward:500, timeLimit:120, body:'Max Z = 5x + 2y. Constraints: x >= 0, y >= 0. (No upper bounds). What is the optimal Z?', options:['10','100','Infinite (unbounded)','0'], correct:2, explanation:'Without upper constraints, x and y can grow to infinity. Profit Z grows infinitely. This is an unbounded LP, usually indicating a missing constraint.' },
+
+  { id:'p5', moduleId:'m2', title:'Q1: Objective Function', difficulty:1, reward:50, timeLimit:45, body:'Profit: $20/chair, $50/table. Maximize Z. What is the objective function?', options:['20x + 50y = Z','Min Z = 20x + 50y','Max Z = 20x + 50y','Z = 20 + 50'], correct:2, explanation:'Z is profit. x=chairs, y=tables. Maximize Z = 20x + 50y.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Isoprofit Line', difficulty:2, reward:100, timeLimit:60, body:'Isoprofit line: 20x + 50y = 1000. If x=0, what is y?', options:['20','50','100','10'], correct:0, explanation:'20(0) + 50y = 1000 -> y = 1000/50 = 20.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Finding Optimum', difficulty:3, reward:200, timeLimit:90, body:'Max Z = 5x + 2y. Corners: A(0,10), B(5,5), C(10,0). Which is optimal?', options:['A (Z=20)','B (Z=35)','C (Z=50)','They are all optimal'], correct:2, explanation:'Calculate Z at each: A=5(0)+2(10)=20. B=5(5)+2(5)=35. C=5(10)+2(0)=50. C is highest.' },
+  { id:'p8', moduleId:'m2', title:'Q4: Multiple Optima', difficulty:4, reward:500, timeLimit:120, body:'When does an LP have multiple optimal solutions?', options:['When the feasible region is empty','When the isoprofit line is parallel to a binding constraint edge','When there are no constraints','When Z=0'], correct:1, explanation:'If the isoprofit line has the same slope as a constraint edge, it overlaps the edge. Every point on that edge yields the same optimal Z. There are infinite optimal solutions.' },
+
+  { id:'p9', moduleId:'m3', title:'Q1: Simplex Use Case', difficulty:1, reward:50, timeLimit:45, body:'When must you use the Simplex Method instead of graphing?', options:['When there are 2 variables','When there are 3 or more variables','When Z=0','When constraints are integers'], correct:1, explanation:'Graphing only works in 2D. For 3+ variables, you need algebra (Simplex) to move between corners.' },
+  { id:'p10', moduleId:'m3', title:'Q2: Entering Variable', difficulty:2, reward:100, timeLimit:60, body:'In Simplex (Maximization), what is the "entering variable"?', options:['The one that hits zero first','The one that increases profit most per unit','The one with negative slack','The one in row 1'], correct:1, explanation:'The entering variable is the one that improves the objective the fastest. It "enters" the basis.' },
+  { id:'p11', moduleId:'m3', title:'Q3: Simplex Termination', difficulty:3, reward:200, timeLimit:90, body:'When does the Simplex Method stop?', options:['When all variables are integers','When no entering variable can improve the objective','When the tableau is full','When slack = 0'], correct:1, explanation:'It stops when no column has a positive reduced cost (for max). No variable can improve Z. Optimum found.' },
+  { id:'p12', moduleId:'m3', title:'Q4: Convexity', difficulty:4, reward:500, timeLimit:120, body:'Why is Simplex guaranteed to find the global optimum?', options:['Because it checks every point','Because the feasible region is convex (no local maximums)','Because it uses matrices','Because George Dantzig proved it'], correct:1, explanation:'A convex polytope has no "hills and valleys." If you always walk uphill, you reach the single global peak. There are no local maxima to get stuck in.' },
+
+  { id:'p13', moduleId:'m4', title:'Q1: Primal-Dual', difficulty:1, reward:50, timeLimit:45, body:'If the Primal is Maximize Profit, what is the Dual?', options:['Maximize Cost','Minimize Cost (Resource Value)','Maximize Resources','Minimize Profit'], correct:1, explanation:'The Dual of Max Profit is Min Cost. It asks: what is the minimum value of resources used?' },
+  { id:'p14', moduleId:'m4', title:'Q2: Strong Duality', difficulty:2, reward:100, timeLimit:60, body:'If optimal Primal Z = 500, what is optimal Dual W?', options:['250','500','1000','0'], correct:1, explanation:'Strong Duality: Optimal Primal value = Optimal Dual value. If Max Z = 500, Min W = 500.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Why Solve Dual?', difficulty:3, reward:200, timeLimit:90, body:'Primal: 50 variables, 3 constraints. Dual: 3 variables, 50 constraints. Which is easier?', options:['Primal','Dual','They are identical','Neither'], correct:1, explanation:'Simplex time depends heavily on constraints. 3 constraints is much faster. The Dual is easier here.' },
+  { id:'p16', moduleId:'m4', title:'Q4: Complementary Slackness', difficulty:4, reward:500, timeLimit:120, body:'Complementary Slackness: If a Primal constraint has Slack > 0, what is the Dual variable?', options:['0','Positive','Negative','Infinite'], correct:0, explanation:'If you have leftover resources (slack), the shadow price (Dual var) of that resource is 0. It has no marginal value.' },
+
+  { id:'p17', moduleId:'m5', title:'Q1: Binding Constraint', difficulty:1, reward:50, timeLimit:45, body:'Budget <= 500. Optimal plan spends 500. Is this binding?', options:['Yes (Slack = 0)','No (Slack > 0)','Cannot tell','Only if profit is maxed'], correct:0, explanation:'Slack = Limit - Used = 500 - 500 = 0. It is binding. It actively limits the solution.' },
+  { id:'p18', moduleId:'m5', title:'Q2: Slack Variable', difficulty:2, reward:100, timeLimit:60, body:'Labor <= 40. Optimal uses 30. What is the slack?', options:['0','10','40','70'], correct:1, explanation:'Slack = Limit - Used = 40 - 30 = 10. You have 10 unused hours. It is non-binding.' },
+  { id:'p19', moduleId:'m5', title:'Q3: Relaxing Constraints', difficulty:3, reward:200, timeLimit:90, body:'You have leftover wood (non-binding). You buy more wood. What happens?', options:['Profit increases','Nothing. You are limited by something else.','Profit decreases','The LP becomes infeasible'], correct:1, explanation:'If wood is non-binding, you already have enough. More wood does not help. Labor or budget is the bottleneck (binding). You must relax the binding constraint.' },
+  { id:'p20', moduleId:'m5', title:'Q4: Redundant Constraint', difficulty:4, reward:500, timeLimit:120, body:'Constraint 1: x <= 10. Constraint 2: x <= 5. What is Constraint 1?', options:['Binding','Non-binding','Redundant','Infeasible'], correct:2, explanation:'Constraint 2 is stricter. Constraint 1 is completely inside Constraint 2 and never limits the region. It is redundant.' },
+
+  { id:'p21', moduleId:'m6', title:'Q1: Shadow Price', difficulty:1, reward:50, timeLimit:45, body:'What does a Shadow Price represent?', options:['The cost of a resource','The improvement in Z per unit increase in resource','The total profit','The slack'], correct:1, explanation:'Shadow Price = Marginal Value. How much does Z improve if you get 1 more unit of resource?' },
+  { id:'p22', moduleId:'m6', title:'Q2: Buy Decision', difficulty:2, reward:100, timeLimit:60, body:'Shadow price of labor is $25/hr. Overtime costs $30/hr. Should you buy?', options:['Yes, net gain $5','No, net loss $5','Yes, profit is $25','Cannot tell'], correct:1, explanation:'You gain $25 in Z, but pay $30. Net = -$5. Do not buy. Only buy if Market Price < Shadow Price.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Zero Shadow Price', difficulty:3, reward:200, timeLimit:90, body:'Shadow price of server capacity is $0. Why?', options:['Servers are free','Server capacity is non-binding (you have leftovers)','The LP is wrong','Servers are too expensive'], correct:1, explanation:'If you have leftover servers, more servers do not improve profit. The constraint is non-binding. Shadow price = 0.' },
+  { id:'p24', moduleId:'m6', title:'Q4: Reduced Cost', difficulty:4, reward:500, timeLimit:120, body:'Product X is not made. Profit is $20. Reduced cost is -$5. What profit makes it viable?', options:['$15','$20','$25','$5'], correct:2, explanation:'Reduced cost is the penalty for making X. Profit must increase by $5 to offset the penalty. $20 + $5 = $25.' },
+
+  { id:'p25', moduleId:'m7', title:'Q1: Max Flow', difficulty:1, reward:50, timeLimit:45, body:'What does Max Flow equal?', options:['Max Capacity','Min Cut','Total Nodes','Total Edges'], correct:1, explanation:'Max Flow / Min Cut Theorem: The maximum flow from source to sink equals the capacity of the minimum cut.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Transportation', difficulty:2, reward:100, timeLimit:60, body:'What is the Transportation Problem?', options:['Maximizing truck speed','Minimizing shipping cost from factories to warehouses','Maximizing factory output','Minimizing warehouse size'], correct:1, explanation:'It minimizes the cost of routing goods from supply nodes (factories) to demand nodes (warehouses).' },
+  { id:'p27', moduleId:'m7', title:'Q3: Bottleneck', difficulty:3, reward:200, timeLimit:90, body:'Edges in a cut have capacities 10, 20, 30. What is the Max Flow?', options:['10','30','60','20'], correct:2, explanation:'Max Flow = Min Cut capacity = 10 + 20 + 30 = 60. No more than 60 units can cross this cut.' },
+  { id:'p28', moduleId:'m7', title:'Q4: Assignment Problem', difficulty:4, reward:500, timeLimit:120, body:'What is special about the Assignment Problem?', options:['It has no constraints','Supply and Demand are exactly 1 for each node','It cannot be solved by Simplex','It is always unbounded'], correct:1, explanation:'It is a Transportation Problem where each supply node has 1 unit (e.g., 1 worker) and each demand node needs 1 unit (e.g., 1 job). Binary assignment.' },
+
+  { id:'p29', moduleId:'m8', title:'Q1: Integer Programming', difficulty:1, reward:50, timeLimit:45, body:'Why do we need Integer Programming?', back:'Because you cannot build 2.5 chairs.', options:['Because decimals are hard','Because you cannot build 2.5 chairs. Variables must be whole numbers.','Because Simplex fails','Because constraints are integers'], correct:1, explanation:'Standard LP allows fractions. IP restricts variables to integers for discrete items (chairs, trucks, people).' },
+  { id:'p30', moduleId:'m8', title:'Q2: Rounding Failure', difficulty:2, reward:100, timeLimit:60, body:'LP solution is (2.5, 3.2). You round to (3, 3). What is the risk?', options:['No risk','It might be infeasible (violate constraints) or suboptimal','It becomes an IP','It is always correct'], correct:1, explanation:'Rounding up might violate a constraint (e.g., budget). Rounding down might miss profit. Rounding is a heuristic, not an optimization.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Branch and Bound', difficulty:3, reward:200, timeLimit:90, body:'LP gives x=2.5. How do you branch?', options:['x = 2.5','x <= 2 OR x >= 3','x = 2','x = 3'], correct:1, explanation:'Branch splits the problem. x cannot be 2.5, so it must be <= 2 or >= 3. Solve both sub-problems.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Binary Variables', difficulty:4, reward:500, timeLimit:120, body:'What do 0-1 (binary) variables model?', options:['Fractions','Yes/No decisions (Build or Not Build)','Negative numbers','Large quantities'], correct:1, explanation:'0 = No, 1 = Yes. Used for capital budgeting (fund project?), scheduling, and facility location.' },
+
+  { id:'p33', moduleId:'m9', title:'Q1: Sensitivity Analysis', difficulty:1, reward:50, timeLimit:45, body:'What is Sensitivity Analysis?', options:['Changing the objective','Checking how much parameters can change before the plan changes','Adding slack','Solving the Dual'], correct:1, explanation:'It tests robustness. If wood costs 5% more, does the optimal plan change?' },
+  { id:'p34', moduleId:'m9', title:'Q2: Range of Optimality', difficulty:2, reward:100, timeLimit:60, body:'Profit/chair is $20. Range is [$15, $25]. Profit drops to $18. What happens?', options:['Plan changes. Re-solve.','Plan stays same. Recalculate Z.','LP becomes infeasible','Profit becomes 0'], correct:1, explanation:'$18 is within the range. The optimal corner point stays the same. You just multiply new profit by quantity to get new Z.' },
+  { id:'p35', moduleId:'m9', title:'Q3: Outside Range', difficulty:3, reward:200, timeLimit:90, body:'Profit/chair is $20. Range is [$15, $25]. Profit drops to $10. What happens?', options:['Plan stays same','Plan changes. Re-solve the LP.','Nothing','Z increases'], correct:1, explanation:'$10 is outside the range. The slope of the isoprofit line changed enough that a different corner is now optimal. Re-solve.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Shadow Price Validity', difficulty:4, reward:500, timeLimit:120, body:'Shadow price of budget is $1.20. Budget is $500. Range of feasibility is [400, 600]. If budget is $450, what is shadow price?', options:['$0','$1.20','Cannot tell','$1.50'], correct:1, explanation:'$450 is within the range [400, 600]. The shadow price remains valid at $1.20.' },
+
+  { id:'p37', moduleId:'m10', title:'Q1: Manager\'s Math', difficulty:1, reward:50, timeLimit:45, body:'What is the core problem Operations Research solves?', options:['Maximizing without limits','Optimizing an objective under constraints (scarcity)','Graphing lines','Solving equations'], correct:1, explanation:'OR is the manager\'s math. You never have enough resources. OR finds the best plan given scarcity.' },
+  { id:'p38', moduleId:'m10', title:'Q2: Opportunity Cost', difficulty:2, reward:100, timeLimit:60, body:'In LP, what represents Opportunity Cost?', options:['The objective Z','The Shadow Price of a resource','The slack variable','The Simplex tableau'], correct:1, explanation:'If an engineer\'s shadow price is $10k/week, that is the value you lose by not having them on the optimal project. It is the opportunity cost.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Resource Allocation', difficulty:3, reward:200, timeLimit:90, body:'You can hire 1 engineer or buy 1 machine. How to decide?', options:['Hire engineer (humans are better)','Compare shadow prices (marginal value)','Flip a coin','Buy machine (capital is better)'], correct:1, explanation:'Allocate resources to the highest shadow price. Whichever gives more marginal value per dollar is the choice.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Synthesis', difficulty:4, reward:500, timeLimit:120, body:'What is the complete DANTZIG workflow?', options:['Graph -> Guess -> Check','Model scarcity -> Simplex -> Shadow Prices -> Sensitivity','Buy resources -> Hope for profit','LP Relaxation -> Round -> Pray'], correct:1, explanation:'Model scarcity (LP), solve (Simplex), allocate (Shadow Prices), survive uncertainty (Sensitivity). Data-driven management.' }
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Factory Floor', scenario:'You run a factory making Chairs (x) and Tables (y). Profit: $20/chair, $50/table. Constraints: Wood <= 100 (1 per chair, 2 per table), Labor <= 40 hrs (0.5 per chair, 1 per table). What is the objective function?', options:['Min Cost = 20x + 50y','Max Z = 20x + 50y','Max Z = x + y','Max Z = 100x + 40y'], correct:1, explanation:'Objective is Maximize Profit. Profit is $20 per chair (x) and $50 per table (y). So Max Z = 20x + 50y.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: Finding the Apex', scenario:'Corners: A(0,0), B(40,0), C(20,20), D(0,40). Max Z = 20x + 50y. Which corner is optimal?', options:['A (Z=0)','B (Z=800)','C (Z=1400)','D (Z=2000)'], correct:3, explanation:'Calculate Z: A=0, B=20(40)+0=800, C=20(20)+50(20)=400+1000=1400, D=0+50(40)=2000. D is optimal.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: Scaling Up', scenario:'You add a 3rd product: Stools (z, profit $10). Graphing in 3D is impossible. What do you use?', options:['Guess and check','The Simplex Method','Excel Solver only','Monte Carlo simulation'], correct:1, explanation:'For 3+ variables, use Simplex. It algebraically pivots between corners to find the optimum.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Buyout Offer', scenario:'A competitor offers to buy your resources. Wood market price is $5/unit, Labor is $15/hr. You need to find the minimum price to accept. What is this called?', options:['The Primal','The Dual (Min Resource Value)','Infeasible','Sensitivity'], correct:1, explanation:'The Dual problem minimizes the value of resources such that you are indifferent between producing or selling. Strong Duality says Min W = Max Z.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Bottleneck', scenario:'At optimal D(0,40): Wood used = 80 (limit 100). Labor used = 40 (limit 40). Which constraint is binding?', options:['Wood (Slack=20)','Labor (Slack=0)','Both','Neither'], correct:1, explanation:'Labor Slack = 40-40=0. Binding. Wood Slack = 100-80=20. Non-binding. Labor is the bottleneck.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: Overtime Decision', scenario:'Shadow price of Labor is $50/hr. Overtime costs $25/hr. Should you buy more labor?', options:['No, profit decreases','Yes, net gain $25/hr','Yes, gain $50/hr','No, shadow price is irrelevant'], correct:1, explanation:'Market Price ($25) < Shadow Price ($50). Net gain = $25. Buy the overtime.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: Supply Chain', scenario:'You open 2 factories and 3 warehouses. You need to route products to minimize shipping cost. What is this?', options:['Max Flow Problem','Transportation Problem','Assignment Problem','Knapsack Problem'], correct:1, explanation:'Minimizing shipping cost from multiple sources (factories) to multiple destinations (warehouses) is the Transportation Problem.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Discrete Choice', scenario:'You cannot build 2.5 chairs. LP gives x=2.5. What algorithm finds the true integer optimum?', options:['Rounding','Branch and Bound','Simplex','Newton\'s Method'], correct:1, explanation:'Branch and Bound splits the problem: x<=2 and x>=3. It bounds and prunes to find the best integer solution.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Uncertain Future', scenario:'Table profit is $50. Range of optimality is [$30, $60]. Market shifts, profit drops to $40. What do you do?', options:['Re-solve the LP','Nothing. Plan stays optimal, just recalculate Z.','Panic','Switch to chairs only'], correct:1, explanation:'$40 is within the range. The optimal plan (make 40 tables, 0 chairs) remains optimal. Just calculate new Z: 50*40=2000 -> 40*40=1600.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: Apex', scenario:'You have $10k budget. Shadow price of Ads is $1.20. Shadow price of R&D is $0.80. Where do you allocate?', options:['R&D (long term)','Ads (higher marginal value)','Split 50/50','Save the money'], correct:1, explanation:'Allocate to the highest shadow price. Ads give $1.20 per $1 spent. R&D gives $0.80. Ads have higher marginal value. Maximize ROI.' }
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Constraints', body:'List 3 constraints in your life (time, money, energy). How do they interact to limit your options?' },
+  { id:'rw2', title:'The Objective', body:'Define an objective function for your week. Maximize what? (Output, learning, rest)' },
+  { id:'rw3', title:'The Corner Points', body:'Identify the "corner points" of your daily schedule. Which combination of activities yields the best outcome?' },
+  { id:'rw4', title:'The Bottleneck', body:'Find the binding constraint in your work. What is the one resource that, if increased, would improve output?' },
+  { id:'rw5', title:'The Shadow Price', body:'What is the marginal value of an extra hour of your time? Would you pay $20 for an extra hour?' },
+  { id:'rw6', title:'The Slack', body:'Where do you have slack (wasted resources)? Why are you not using them? (Because something else is binding).' },
+  { id:'rw7', title:'The Dual', body:'If someone offered to buy your time, what is the minimum price you would accept? That is your Dual value.' },
+  { id:'rw8', title:'The Sensitivity', body:'How much can your budget change before your lifestyle plan must change? What is your range of feasibility?' },
+  { id:'rw9', title:'The Binary Choice', body:'Identify a yes/no decision. (Take a job? Move?). Model it as a 0-1 variable.' },
+  { id:'rw10', title:'The Network', body:'Map your commute or errands as a network. Find the shortest path or bottleneck.' },
+  { id:'rw11', title:'The Transportation', body:'How do you route tasks to minimize friction? (Batching similar tasks).' },
+  { id:'rw12', title:'The Scarcity', body:'Acknowledge that time is finite. You cannot do everything. Optimize the allocation.' },
+  { id:'rw13', title:'The Graph', body:'Draw a 2D graph of two constraints in your life. Find the feasible region.' },
+  { id:'rw14', title:'The Isoprofit', body:'Draw lines of constant "happiness" or "value". Push them outward.' },
+  { id:'rw15', title:'The Simplex', body:'How do you algebraically move from one daily routine to a better one? Change one variable at a time.' },
+  { id:'rw16', title:'The Opportunity Cost', body:'What are you giving up by doing X instead of Y? That is the shadow price of X.' },
+  { id:'rw17', title:'The Relaxation', body:'If you relaxed a binding constraint (e.g., hired help), how would output change?' },
+  { id:'rw18', title:'The Redundancy', body:'Find a rule you follow that is redundant. It never actually limits you.' },
+  { id:'rw19', title:'The Branch', body:'When faced with a fractional decision (e.g., 2.5 hours), branch: 2 or 3? Evaluate both.' },
+  { id:'rw20', title:'The Range', body:'Estimate the range of optimality for your salary. How much can it drop before you change jobs?' },
+  { id:'rw21', title:'The Feasible Plan', body:'Check if your daily plan is feasible. Does it violate any hard constraints (sleep, budget)?' },
+  { id:'rw22', title:'The Optimal Corner', body:'Are you operating at a corner point, or stuck in the middle (suboptimal)?' },
+  { id:'rw23', title:'The Entering Variable', body:'What is the one activity that, if increased, improves your objective the most?' },
+  { id:'rw24', title:'The Leaving Variable', body:'What must you stop doing to make room for the entering variable?' },
+  { id:'rw25', title:'The Slack Audit', body:'Audit your resources. Which have slack? Which are binding?' },
+  { id:'rw26', title:'The Max Flow', body:'What is the bottleneck in your information flow or work pipeline? Find the min cut.' },
+  { id:'rw27', title:'The Knapsack', body:'Pack your bag for a trip. Maximize value subject to weight. That is an IP.' },
+  { id:'rw28', title:'The Allocation', body:'You have $100 to spend on ads or content. Allocate based on shadow prices (ROI).' },
+  { id:'rw29', title:'The Robustness', body:'Is your plan robust? If an assumption changes by 10%, does the plan break?' },
+  { id:'rw30', title:'The Manager\'s Math', body:'Stop guessing. Model the problem, define constraints, and solve algebraically.' }
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your optimization profile.' },
+  { threshold: 500, title: 'PLANNER', desc: 'You see the feasible region.' },
+  { threshold: 1500, title: 'OPTIMIZER', desc: 'You find the corner points and maximize the objective.' },
+  { threshold: 3000, title: 'OPERATIONS LEAD', desc: 'You use Simplex and shadow prices to allocate resources.' },
+  { threshold: 6000, title: 'DANTZIG OPERATOR', desc: 'You optimize under scarcity with mathematical precision.' }
+];
+
+const STORAGE_KEY = 'dantzig-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP — LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// APEX ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully optimized Project Apex. You now possess the complete operations research architecture.</p>';
+      html += '<p><strong>The Secret:</strong> Optimization is not just math; it is a philosophy of scarcity. By modeling constraints explicitly and finding the vertices, you bypass the illusion of "trade-offs" and find the mathematically optimal path. You do not guess; you pivot. You do not hope; you solve. You are now a Dantzig Operator.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review. Spaced repetition is most effective when you clear the queue daily.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Apex: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked. Apply your optimization architecture to the scenario.';
+    missionBtn.textContent = 'Open Project →';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue →';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill →';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = '✓ Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete · +25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span>'+
+      '<div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div>'+
+      '<span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete · +25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' '));
+    ring.setAttribute('class', 'radar-ring');
+    svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis');
+    svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' '));
+  poly.setAttribute('class', 'radar-poly');
+  svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR;
+    const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label');
+    text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = 
+      '<div class="codename">// ' + m.codename + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.summary + '</p>' +
+      '<div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div>' +
+      '<div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="DANTZIG.show(\'modules\')">← Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="DANTZIG.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read ✓' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="DANTZIG.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved ✓' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="DANTZIG.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' →</button>'; }
+    html += '<button class="btn secondary mt-1" onclick="DANTZIG.show(\'project\')">Go to Project →</button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="DANTZIG.showModuleDetail(\''+moduleId+'\')">← ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 · ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="DANTZIG.markLessonRead(\''+moduleId+'\')">Mark as Read · +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>✓ Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="DANTZIG.showArenaProblem(\''+problem.id+'\')">Arena Problem →</button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete · +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud">';
+  html += '<div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'APEX' : 'EXECUTING') + '</span></div>';
+  html += '</div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each optimization axis to the factory scenario. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="DANTZIG.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div>';
+    html += '<div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div>';
+    html += '<div class="phase-status">' + (solved ? 'Solved ✓' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="DANTZIG.show(\'project\')">← Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="DANTZIG.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ ARCHITECTURALLY SOUND' : '✗ SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'apex: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate the scenario and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="DANTZIG.showProjectPhase(\''+next.id+'\')">Next Phase →</button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="DANTZIG.show(\'dashboard\')">View Final Report →</button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="DANTZIG.show(\'modules\')">Continue Training →</button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="DANTZIG.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="DANTZIG.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="DANTZIG.show(\'arena\')">Arena →</button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed. Spaced repetition complete for today.</p><button class="btn" onclick="DANTZIG.show(\'dashboard\')">Dashboard →</button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta">';
+  html += '<div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">★ Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="DANTZIG.revealDrill()">▸ Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="DANTZIG.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="DANTZIG.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="DANTZIG.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="DANTZIG.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="DANTZIG.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' · +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? '✓' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="DANTZIG.show(\'arena\')">← Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="DANTZIG.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? '✓ STRATEGIC' : '✗ SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,255,163,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP · Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete · Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="DANTZIG.show(\'arena\')">Back to Arena →</button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="DANTZIG.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="DANTZIG.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' · ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,217,255,0.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 217, 255, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 217, 255, ' + (0.1 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'dantzig_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Initializing cognitive architecture v1.0...', 'Loading optimization kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 scenarios...', 'Initializing Project Apex...', 'DANTZIG online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    i++;
+    setTimeout(nextLine, 220 + Math.random() * 180);
+  }
+  nextLine();
+}
+
+window.DANTZIG = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); if(!act.includes(new Date().toISOString().split('T')[0])) { act.push(new Date().toISOString().split('T')[0]); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initParticles();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
