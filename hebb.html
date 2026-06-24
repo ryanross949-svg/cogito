@@ -273,7 +273,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Synapse</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Synapse</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Synapse Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -307,6 +307,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Synapse Lab</h1>
+      <p class="section-sub">Neurons that fire together wire together. Fire the two cells at the same time and the synapse between them strengthens; fire them apart and it slowly fades. Build the connection up past threshold, then fire A alone — and watch B light up on its own.</p>
+      <div style="display:flex;gap:2.5rem;align-items:center;justify-content:center;margin:1.4rem 0;font-family:var(--display);"><div style="text-align:center;"><div id="hbA" style="width:54px;height:54px;border-radius:50%;border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--cyan);">A</div></div><div style="text-align:center;"><div id="hbLink" style="height:6px;width:90px;background:var(--border);border-radius:3px;"></div><div id="hbW" style="font-size:0.7rem;color:var(--text-faint);margin-top:0.3rem;"></div></div><div style="text-align:center;"><div id="hbB" style="width:54px;height:54px;border-radius:50%;border:2px solid var(--magenta);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--magenta);">B</div></div></div>
+      <div style="text-align:center;margin-bottom:1rem;"><button class="btn" id="hbFire">Fire A + B together</button> <button class="btn" id="hbA1" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Fire A alone</button> <button class="btn" id="hbReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset</button></div>
+      <div id="hbInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About HEBB</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1391,6 +1398,19 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var w=0.05; var elA=document.getElementById("hbA"),elB=document.getElementById("hbB"),link=document.getElementById("hbLink");
+  function flash(el){ var c=el.style.borderColor; el.style.background=el.id==="hbB"?"rgba(157,78,221,0.5)":"rgba(0,217,255,0.5)"; setTimeout(function(){el.style.background="none";},260); }
+  function show(){ link.style.background="linear-gradient(90deg,var(--cyan),var(--magenta))"; link.style.opacity=Math.max(0.15,w);
+    document.getElementById("hbW").textContent="weight "+w.toFixed(2); }
+  function render(msg){ show(); document.getElementById("hbInfo").innerHTML=msg||("Synaptic weight is now <b>"+w.toFixed(2)+"</b>. "+(w>=0.6?"Strong enough that A alone can drive B.":"Keep firing them together to wire the link.")); }
+  document.getElementById("hbFire").onclick=function(){ flash(elA); flash(elB); w=Math.min(1,w+0.13); render(); };
+  document.getElementById("hbA1").onclick=function(){ flash(elA); if(w>=0.6){ setTimeout(function(){flash(elB);},120); render("A fired — and the wired-in link carried the signal to B on its own."); } else { w=Math.max(0,w-0.04); render("A fired, but the link is too weak to trigger B yet (and unpaired firing lets it decay)."); } };
+  document.getElementById("hbReset").onclick=function(){ w=0.05; render("Synapse reset to baseline."); };
+  render();
 })();
 </script>
 </body>

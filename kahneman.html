@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Blind Spot</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Blind Spot</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Decision Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Decision Lab</h1>
+      <p class="section-sub">Kahneman and Tversky found we do not weigh outcomes objectively. Losses loom larger than equivalent gains — about twice as large — and we are more sensitive near zero than far out. Slide an outcome and watch the subjective value the mind actually assigns.</p>
+      <canvas id="khCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Objective outcome <span id="khXV" style="color:var(--cyan)"></span><input type="range" id="khX" min="-100" max="100" value="40" step="1" style="width:100%;"></label></div>
+      <div id="khInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About KAHNEMAN</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1413,6 +1420,25 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("khCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function val(x){ var a=0.88,lam=2.25; return x>=0?Math.pow(x,a):-lam*Math.pow(-x,a); }
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var cx=W/2, cy=H/2, sx=(W-40)/200, mxv=val(100), sy=(H-40)/(2*2.25*Math.pow(100,0.88));
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(20,cy); ctx.lineTo(W-20,cy); ctx.moveTo(cx,20); ctx.lineTo(cx,H-20); ctx.stroke();
+    ctx.strokeStyle="#00D9FF"; ctx.lineWidth=2; ctx.beginPath();
+    for(var x=-100;x<=100;x++){ var px=cx+x*sx, py=cy-val(x)*sy; (x===-100)?ctx.moveTo(px,py):ctx.lineTo(px,py); } ctx.stroke();
+    var X=+document.getElementById("khX").value, V=val(X), pxX=cx+X*sx, pyX=cy-V*sy;
+    ctx.fillStyle=X>=0?"#00FFA3":"#FF6B6B"; ctx.beginPath(); ctx.arc(pxX,pyX,5,0,7); ctx.fill();
+    document.getElementById("khXV").textContent=(X>0?"+":"")+X;
+    var opp=val(-X);
+    document.getElementById("khInfo").innerHTML = X===0?"At zero, nothing is felt." :
+      "Subjective value = <b style=\""+(X>=0?"color:#00FFA3":"color:#FF6B6B")+"\">"+V.toFixed(1)+"</b>. The mirror outcome of "+(X>0?"-":"+")+Math.abs(X)+" would feel <b>"+Math.abs(opp).toFixed(1)+"</b> — "+(X>0?"the matching loss stings far more than this gain pleases.":"the matching gain pleases far less than this loss stings.");
+  }
+  document.getElementById("khX").oninput=render; window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
