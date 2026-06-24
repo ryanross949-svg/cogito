@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Replication</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Replication</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Inheritance Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Inheritance Lab</h1>
+      <p class="section-sub">Gregor Mendel cracked heredity by counting pea plants. Pick each parent&rsquo;s two alleles (B is dominant, b recessive) and the Punnett square fills in every equally likely offspring — along with the phenotype ratio you would expect across a big enough brood.</p>
+      <div style="display:flex;gap:2rem;flex-wrap:wrap;margin:1.2rem 0;"><div><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.4rem;">Parent 1</div><button class="btn" id="mdP1a">B</button> <button class="btn" id="mdP1b">b</button></div><div><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.4rem;">Parent 2</div><button class="btn" id="mdP2a">B</button> <button class="btn" id="mdP2b">b</button></div></div>
+      <table id="mdGrid" style="border-collapse:collapse;font-family:var(--display);font-size:1.3rem;margin-bottom:1rem;"></table>
+      <div id="mdRatio" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MENDEL</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1406,6 +1413,29 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var p1=["B","b"],p2=["B","b"];
+  function dom(g){ return g.indexOf("B")>-1?"dominant":"recessive"; }
+  function render(){
+    document.getElementById("mdP1a").textContent=p1[0]; document.getElementById("mdP1b").textContent=p1[1];
+    document.getElementById("mdP2a").textContent=p2[0]; document.getElementById("mdP2b").textContent=p2[1];
+    var cells=[],domc=0;
+    var html="<tr><td style=\"padding:0.5rem 0.9rem\"></td><td style=\"padding:0.5rem 0.9rem;color:var(--text-faint)\">"+p2[0]+"</td><td style=\"padding:0.5rem 0.9rem;color:var(--text-faint)\">"+p2[1]+"</td></tr>";
+    for(var i=0;i<2;i++){ html+="<tr><td style=\"padding:0.5rem 0.9rem;color:var(--text-faint)\">"+p1[i]+"</td>";
+      for(var j=0;j<2;j++){ var g=[p1[i],p2[j]].sort().join(""); cells.push(g); var d=g.indexOf("B")>-1; if(d)domc++;
+        html+="<td style=\"padding:0.5rem 0.9rem;border:1px solid var(--border);color:"+(d?"var(--cyan)":"var(--text-dim)")+"\">"+g+"</td>"; }
+      html+="</tr>"; }
+    document.getElementById("mdGrid").innerHTML=html;
+    document.getElementById("mdRatio").textContent="Phenotype ratio — "+domc+" dominant : "+(4-domc)+" recessive   (genotypes: "+cells.join(", ")+")";
+  }
+  document.getElementById("mdP1a").onclick=function(){p1[0]=p1[0]==="B"?"b":"B";render();};
+  document.getElementById("mdP1b").onclick=function(){p1[1]=p1[1]==="B"?"b":"B";render();};
+  document.getElementById("mdP2a").onclick=function(){p2[0]=p2[0]==="B"?"b":"B";render();};
+  document.getElementById("mdP2b").onclick=function(){p2[1]=p2[1]==="B"?"b":"B";render();};
+  render();
 })();
 </script>
 </body>

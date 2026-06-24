@@ -378,7 +378,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project GENESIS</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Kin Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -523,6 +523,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Kin Lab</h1>
+      <p class="section-sub">Why would an animal sacrifice for another? Hamilton&rsquo;s rule gives the answer: altruism spreads when relatedness times benefit exceeds cost — rb &gt; c. Slide who you are helping, how much it helps them, and what it costs you.</p>
+      <div style="display:grid;gap:0.7rem;max-width:440px;margin:1.2rem 0;"><label style="font-size:0.8rem;color:var(--text-dim);">Relatedness r <span id="hmRV" style="color:var(--cyan)"></span><input type="range" id="hmR" min="0" max="100" value="50" style="width:100%;"><span id="hmRWho" style="font-size:0.72rem;color:var(--text-faint);"></span></label><label style="font-size:0.8rem;color:var(--text-dim);">Benefit to recipient b <span id="hmBV" style="color:var(--cyan)"></span><input type="range" id="hmB" min="0" max="10" value="5" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Cost to actor c <span id="hmCV" style="color:var(--cyan)"></span><input type="range" id="hmC" min="0" max="10" value="2" step="1" style="width:100%;"></label></div>
+      <div id="hmVerdict" style="font-family:var(--display);font-size:1.5rem;font-weight:700;margin:0.5rem 0;"></div>
+      <div id="hmInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About HAMILTON</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -2013,6 +2020,19 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  function whoR(r){ if(r>=0.95)return "(identical twin / clone)"; if(r>=0.45)return "(full sibling, parent or child)"; if(r>=0.20)return "(half-sib, niece / nephew)"; if(r>=0.10)return "(first cousin)"; if(r>0)return "(distant kin)"; return "(unrelated stranger)"; }
+  function render(){ var r=+document.getElementById("hmR").value/100, b=+document.getElementById("hmB").value, c=+document.getElementById("hmC").value;
+    document.getElementById("hmRV").textContent=r.toFixed(2); document.getElementById("hmRWho").textContent=" "+whoR(r);
+    document.getElementById("hmBV").textContent=b; document.getElementById("hmCV").textContent=c;
+    var lhs=r*b, ok=lhs>c, v=document.getElementById("hmVerdict");
+    v.textContent=ok?"rb > c  —  altruism evolves":"rb < c  —  selfishness wins"; v.style.color=ok?"#00FFA3":"#FF6B6B";
+    document.getElementById("hmInfo").textContent="r·b = "+lhs.toFixed(2)+"  vs  c = "+c.toFixed(2)+". "+(ok?"The gene for helping is favoured: enough copies survive in the relative you saved.":"The cost outweighs the shared genes rescued — natural selection removes the helping gene.");
+  }
+  ["hmR","hmB","hmC"].forEach(function(id){document.getElementById(id).oninput=render;}); render();
 })();
 </script>
 </body>

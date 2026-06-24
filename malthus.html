@@ -358,7 +358,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project GAIA</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Growth Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -503,6 +503,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Growth Lab</h1>
+      <p class="section-sub">Malthus warned that populations grow geometrically while resources do not. The logistic curve tells the fuller story: fast exponential lift-off, then a slow bend as the population presses against its carrying capacity. Drag the rate and ceiling and watch the shape change.</p>
+      <canvas id="mlCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Growth rate r <span id="mlRV" style="color:var(--cyan)"></span><input type="range" id="mlR" min="1" max="80" value="30" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Carrying capacity K <span id="mlKV" style="color:var(--cyan)"></span><input type="range" id="mlK" min="20" max="100" value="80" step="1" style="width:100%;"></label></div>
+      <div id="mlInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MALTHUS</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -2003,6 +2010,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("mlCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var r=+document.getElementById("mlR").value/100, K=+document.getElementById("mlK").value/100;
+    document.getElementById("mlRV").textContent=(r).toFixed(2); document.getElementById("mlKV").textContent=Math.round(K*100)+"%";
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(40,10); ctx.lineTo(40,H-24); ctx.lineTo(W-10,H-24); ctx.stroke();
+    var Kx=H-24-(K*(H-40)); ctx.setLineDash([4,4]); ctx.strokeStyle="rgba(255,184,0,0.5)"; ctx.beginPath(); ctx.moveTo(40,Kx); ctx.lineTo(W-10,Kx); ctx.stroke(); ctx.setLineDash([]);
+    var P=0.02,steps=120,dt=0.5; ctx.strokeStyle="#00D9FF"; ctx.lineWidth=2; ctx.beginPath();
+    for(var i=0;i<=steps;i++){ var x=40+(W-50)*i/steps, y=H-24-(P*(H-40));
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y); P=P+r*P*(1-P/K)*dt; if(P<0)P=0; }
+    ctx.stroke();
+    ctx.fillStyle="rgba(255,184,0,0.8)"; ctx.font="11px monospace"; ctx.fillText("K",W-22,Kx-4);
+    document.getElementById("mlInfo").textContent="Higher r steepens the climb; the curve always levels off at K. Resources, not appetite, set the ceiling.";
+  }
+  ["mlR","mlK"].forEach(function(id){document.getElementById(id).oninput=render;}); window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
