@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Black Chamber</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Black Chamber</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Signal Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,15 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Signal Lab</h1>
+      <p class="section-sub">Claude Shannon measured information as surprise. Set how likely each of four symbols is and read the entropy in bits: equal odds means maximum surprise (2 bits); a dominant symbol means low entropy and easy compression.</p>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:1.2rem 0;"><label style="font-size:0.8rem;color:var(--text-dim);">Symbol A weight<input type="range" id="kp0" min="0" max="100" value="25" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Symbol B weight<input type="range" id="kp1" min="0" max="100" value="25" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Symbol C weight<input type="range" id="kp2" min="0" max="100" value="25" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Symbol D weight<input type="range" id="kp3" min="0" max="100" value="25" style="width:100%;"></label></div>
+      <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em;">Shannon entropy</div>
+      <div id="kH" style="font-family:var(--display);font-size:2.6rem;font-weight:700;color:var(--cyan);text-shadow:0 0 15px rgba(0,217,255,0.4);"></div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;max-width:420px;"><div id="kBar" style="height:100%;background:var(--cyan);width:0;transition:width 0.2s;"></div></div>
+      <div id="kNote" style="font-size:0.85rem;color:var(--text-dim);margin-top:0.8rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About KAFKA</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1422,6 +1431,18 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  function render(){ var ps=[0,1,2,3].map(function(i){return +document.getElementById("kp"+i).value;});
+    var sum=ps.reduce(function(a,b){return a+b;},0)||1,H=0;
+    ps.forEach(function(p){ var pr=p/sum; if(pr>0)H-=pr*Math.log(pr)/Math.log(2); });
+    document.getElementById("kH").textContent=H.toFixed(2)+" bits";
+    document.getElementById("kBar").style.width=(H/2*100)+"%";
+    document.getElementById("kNote").textContent= H>1.95?"Maximum entropy — all four equally likely; every symbol is a full surprise.":(H<0.6?"Very low entropy — one symbol dominates; highly predictable and compresses well.":"Moderate entropy — some predictability remains.");
+  }
+  [0,1,2,3].forEach(function(i){document.getElementById("kp"+i).oninput=render;}); render();
 })();
 </script>
 </body>

@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Nexus</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Nexus</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Pathfinding Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Pathfinding Lab</h1>
+      <p class="section-sub">Shortest paths, visualized. Green is start, amber is goal. Click cells to drop walls, then Find Path — the search fans out (breadth-first) and the shortest route lights up in cyan.</p>
+      <canvas id="dkCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="dkInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+      <button class="btn" id="dkFind">Find Path</button> <button class="btn" id="dkClear" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Clear Walls</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About DIJKSTRA</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1423,6 +1430,31 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("dkCanvas"); if(!cv)return; var ctx=cv.getContext("2d"); var COLS=26,ROWS=13,cell=20,walls={},running=false;
+  function k(c,r){return c+","+r;}
+  function size(){ var W=cv.width=cv.clientWidth||600; cell=Math.floor(W/COLS); cv.height=ROWS*cell; }
+  function draw(vis,path){ size(); ctx.clearRect(0,0,cv.width,cv.height);
+    for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++){ var kk=k(c,r); ctx.fillStyle="rgba(255,255,255,0.04)";
+      if(walls[kk])ctx.fillStyle="#9D4EDD"; else if(path&&path[kk])ctx.fillStyle="#00D9FF"; else if(vis&&vis[kk])ctx.fillStyle="rgba(0,217,255,0.18)";
+      if(c===0&&r===0)ctx.fillStyle="#00FFA3"; if(c===COLS-1&&r===ROWS-1)ctx.fillStyle="#FFB800";
+      ctx.fillRect(c*cell+1,r*cell+1,cell-2,cell-2); } }
+  cv.addEventListener("click",function(e){ if(running)return; var b=cv.getBoundingClientRect(); var c=Math.floor((e.clientX-b.left)/b.width*COLS),r=Math.floor((e.clientY-b.top)/b.height*ROWS);
+    if((c===0&&r===0)||(c===COLS-1&&r===ROWS-1))return; var kk=k(c,r); if(walls[kk])delete walls[kk]; else walls[kk]=1; draw(); });
+  document.getElementById("dkFind").onclick=function(){ running=true; var q=[[0,0]],prev={},vis={},order=[]; vis[k(0,0)]=1;
+    while(q.length){ var cur=q.shift(); order.push(cur); if(cur[0]===COLS-1&&cur[1]===ROWS-1)break;
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){ var nc=cur[0]+d[0],nr=cur[1]+d[1],nk=k(nc,nr);
+        if(nc<0||nr<0||nc>=COLS||nr>=ROWS||walls[nk]||vis[nk])return; vis[nk]=1; prev[nk]=cur; q.push([nc,nr]); }); }
+    var ek=k(COLS-1,ROWS-1),found=vis[ek],path={};
+    if(found){ var cur=[COLS-1,ROWS-1]; while(cur){ path[k(cur[0],cur[1])]=1; cur=prev[k(cur[0],cur[1])]; } }
+    var shown={},i=0,t=setInterval(function(){ if(i>=order.length){ clearInterval(t); draw(shown,found?path:null);
+        document.getElementById("dkInfo").textContent=found?"Shortest path: "+(Object.keys(path).length-1)+" steps.":"No path — walls block every route."; running=false; return; }
+      shown[k(order[i][0],order[i][1])]=1; if(i%2===0)draw(shown,null); i++; },10); };
+  document.getElementById("dkClear").onclick=function(){ if(running)return; walls={}; draw(); };
+  window.addEventListener("resize",function(){draw();}); draw();
 })();
 </script>
 </body>

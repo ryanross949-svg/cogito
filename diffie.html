@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Zero-Trust</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Zero-Trust</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Crypto Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Crypto Lab</h1>
+      <p class="section-sub">Diffie-Hellman key exchange. Alice and Bob each keep a secret number, swap only public mixtures, and arrive at the same shared key — without ever sending it. An eavesdropper who sees everything still cannot reconstruct it.</p>
+      <div style="display:grid;gap:0.7rem;max-width:420px;margin:1.2rem 0;"><label style="font-size:0.8rem;color:var(--text-dim);">Alice secret a: <span id="dfAV" style="color:var(--cyan)"></span><input type="range" id="dfA" min="1" max="20" value="6" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Bob secret b: <span id="dfBV" style="color:var(--cyan)"></span><input type="range" id="dfB" min="1" max="20" value="15" style="width:100%;"></label></div>
+      <div id="dfOut" style="font-size:0.88rem;color:var(--text-dim);line-height:1.8;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About DIFFIE</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1396,6 +1402,17 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  function mp(b,e,m){ var r=1; b%=m; while(e>0){ if(e&1)r=(r*b)%m; e=Math.floor(e/2); b=(b*b)%m; } return r; }
+  function render(){ var g=5,p=23,a=+document.getElementById("dfA").value,b=+document.getElementById("dfB").value;
+    var A=mp(g,a,p),B=mp(g,b,p),sA=mp(B,a,p),sB=mp(A,b,p);
+    document.getElementById("dfAV").textContent=a; document.getElementById("dfBV").textContent=b;
+    document.getElementById("dfOut").innerHTML="Public: g="+g+", p="+p+"<br>Alice sends g^a mod p = <b style=\"color:var(--cyan)\">"+A+"</b>   ·   Bob sends g^b mod p = <b style=\"color:var(--cyan)\">"+B+"</b><br>Alice: B^a mod p = <b style=\"color:var(--green)\">"+sA+"</b>   ·   Bob: A^b mod p = <b style=\"color:var(--green)\">"+sB+"</b><br><b style=\"color:var(--green)\">Shared key "+sA+"</b> — same on both sides, never transmitted. An eavesdropper sees only "+A+", "+B+", "+g+", "+p+".";
+  }
+  ["dfA","dfB"].forEach(function(id){document.getElementById(id).oninput=render;}); render();
 })();
 </script>
 </body>

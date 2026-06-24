@@ -378,7 +378,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project PROBE</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Automata Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -523,6 +523,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Automata Lab</h1>
+      <p class="section-sub">Von Neumann founded the study of cellular automata — and self-reproducing machines. Here a single row evolves by one local rule applied everywhere at once. Tiny rules, vast structure; Rule 110 is even Turing-complete.</p>
+      <canvas id="nmCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="nmInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+      <label style="font-size:0.8rem;color:var(--text-dim);">Rule: <span id="nmRuleV" style="color:var(--cyan)"></span></label>
+      <input type="range" id="nmRule" min="0" max="255" value="90" style="width:100%;max-width:420px;display:block;">
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About VON NEUMANN</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -2005,6 +2013,20 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("nmCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function render(){ var W=cv.width=cv.clientWidth||600; var cells=Math.min(199,Math.floor(W/3)); cells+=(cells%2?0:1); var px=W/cells;
+    var rows=Math.min(Math.floor(300/px),Math.floor(cells/2)); cv.height=rows*px; ctx.clearRect(0,0,W,cv.height);
+    var rule=+document.getElementById("nmRule").value; document.getElementById("nmRuleV").textContent=rule;
+    var line=[]; for(var i=0;i<cells;i++)line.push(0); line[Math.floor(cells/2)]=1;
+    for(var y=0;y<rows;y++){ for(var x=0;x<cells;x++) if(line[x]){ ctx.fillStyle="#00D9FF"; ctx.fillRect(x*px,y*px,px+0.5,px+0.5); }
+      var nl=[]; for(var x=0;x<cells;x++){ var idx=(line[(x-1+cells)%cells]<<2)|(line[x]<<1)|line[(x+1)%cells]; nl.push((rule>>idx)&1); } line=nl; }
+    document.getElementById("nmInfo").textContent="Rule "+rule+" — one local rule, complex global pattern.";
+  }
+  document.getElementById("nmRule").oninput=render; window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
