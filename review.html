@@ -110,9 +110,21 @@ function getState(key){
   return states[key];
 }
 
+// A course only joins the global queue once its full initial pass is done
+// in-course (every card reviewed at least once -> lastReviewed set).
+const passedCache = {};
+function coursePassed(key){
+  if (key in passedCache) return passedCache[key];
+  const S = getState(key);
+  const cards = S && S.cards ? Object.values(S.cards) : [];
+  passedCache[key] = cards.length > 0 && cards.every(c => c && c.lastReviewed != null);
+  return passedCache[key];
+}
+
 const now = Date.now();
-// All due cards across courses, joined with their live scheduling.
+// All due cards across courses that have completed their initial pass.
 let due = (window.REVIEW_CARDS || []).map(c => {
+  if (!coursePassed(c.key)) return null;
   const S = getState(c.key);
   if (!S || !S.cards || !S.cards[c.id]) return null;
   const cs = S.cards[c.id];

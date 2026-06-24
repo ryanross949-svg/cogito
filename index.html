@@ -531,8 +531,11 @@ function renderReview() {
   window.REVIEW_INDEX.forEach(c => {
     let S; try { S = JSON.parse(localStorage.getItem(c.key)); } catch(e) { S = null; }
     if (!S || !S.cards) return;
+    const cardList = Object.values(S.cards);
+    // Only count a course once its full initial pass is done in-course.
+    if (!cardList.length || !cardList.every(cs => cs && cs.lastReviewed != null)) return;
     let n = 0;
-    Object.values(S.cards).forEach(cs => { if (cs && typeof cs.due === 'number' && cs.due <= now) n++; });
+    cardList.forEach(cs => { if (cs && typeof cs.due === 'number' && cs.due <= now) n++; });
     if (n > 0) { total += n; courses++; byDisc[c.disc] = (byDisc[c.disc] || 0) + n; }
   });
   document.getElementById('reviewDue').textContent = total;
