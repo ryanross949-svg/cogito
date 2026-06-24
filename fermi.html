@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Critical Mass</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Critical Mass</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Estimation Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,20 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Estimation Lab</h1>
+      <p class="section-sub">How many piano tuners are in Chicago? Nobody knows it exactly — but you can multiply a chain of rough guesses and land within a factor of a few. Adjust the inputs and watch your estimate form.</p>
+      <div style="display:grid;gap:0.7rem;max-width:460px;margin:1.2rem 0;font-size:0.82rem;color:var(--text-dim);">
+        <label>City population <input type="number" id="fPop" value="9000000" style="width:120px;background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.3rem;border-radius:4px;"></label>
+        <label>People per household <input type="number" id="fHouse" value="2.5" step="0.1" style="width:80px;background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.3rem;border-radius:4px;"></label>
+        <label>Households with a piano (%) <input type="number" id="fPct" value="5" style="width:80px;background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.3rem;border-radius:4px;"></label>
+        <label>Tunings per piano / year <input type="number" id="fTune" value="1" step="0.1" style="width:80px;background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.3rem;border-radius:4px;"></label>
+        <label>Tunings one tuner does / year <input type="number" id="fCap" value="1000" style="width:100px;background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.3rem;border-radius:4px;"></label>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em;">Your estimate</div>
+      <div id="fOut" style="font-family:var(--display);font-size:2.6rem;font-weight:700;color:var(--cyan);text-shadow:0 0 15px rgba(0,217,255,0.4);"></div>
+      <div id="fNote" style="font-size:0.8rem;color:var(--text-dim);"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About FERMI</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1467,6 +1481,21 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  function v(id){ return parseFloat(document.getElementById(id).value)||0; }
+  function render(){
+    var households=v("fPop")/(v("fHouse")||1);
+    var pianos=households*(v("fPct")/100);
+    var tunings=pianos*v("fTune");
+    var est=Math.round(tunings/(v("fCap")||1));
+    document.getElementById("fOut").textContent=est.toLocaleString()+" tuners";
+    document.getElementById("fNote").textContent="Census records list roughly 100-300 piano tuners in Chicago. If you are in that range, your chain of guesses worked.";
+  }
+  ["fPop","fHouse","fPct","fTune","fCap"].forEach(function(id){ document.getElementById(id).oninput=render; });
+  render();
 })();
 </script>
 </body>

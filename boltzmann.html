@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Dissipation</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Dissipation</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Entropy Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Entropy Lab</h1>
+      <p class="section-sub">Why does time have an arrow? Start every gas molecule crammed into the left half (low entropy, very ordered). Release the partition and they spread to fill the box — and never spontaneously crowd back. Disorder only grows.</p>
+      <canvas id="ezCanvas" style="width:100%;height:240px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="ezInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <button class="btn" id="ezRelease">Release Partition</button>
+      <button class="btn" id="ezReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset (all left)</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About BOLTZMANN</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1407,6 +1415,26 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("ezCanvas"); var ctx=cv.getContext("2d"); var H=240, W=600, P=[], timer=null, open=false;
+  function reset(){ if(timer){cancelAnimationFrame(timer);timer=null;} open=false; W=cv.width=cv.clientWidth||600; cv.height=H;
+    P=[]; for(var i=0;i<160;i++) P.push({x:Math.random()*(W/2-10)+5,y:Math.random()*(H-10)+5,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3});
+    draw(); document.getElementById("ezRelease").textContent="Release Partition"; }
+  function step(){ for(var i=0;i<P.length;i++){ var p=P[i]; p.x+=p.vx; p.y+=p.vy;
+      if(p.x<3){p.x=3;p.vx*=-1;} if(p.x>W-3){p.x=W-3;p.vx*=-1;} if(p.y<3){p.y=3;p.vy*=-1;} if(p.y>H-3){p.y=H-3;p.vy*=-1;}
+      if(!open && p.x>W/2-3){ p.x=W/2-3; p.vx*=-1; } }
+    draw(); timer=requestAnimationFrame(step); }
+  function draw(){ ctx.clearRect(0,0,W,H);
+    if(!open){ ctx.strokeStyle="rgba(255,45,156,0.5)"; ctx.setLineDash([5,5]); ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]); }
+    var left=0; for(var i=0;i<P.length;i++){ var p=P[i]; if(p.x<W/2)left++; ctx.fillStyle="rgba(0,217,255,0.8)"; ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,7); ctx.fill(); }
+    var pct=Math.round(left/P.length*100);
+    document.getElementById("ezInfo").textContent="Left half: "+pct+"%   ·   "+(pct>85?"low entropy (ordered)":(pct>60?"spreading...":"high entropy (mixed, 50/50)")); }
+  document.getElementById("ezRelease").onclick=function(){ if(!open){ open=true; this.textContent="Released"; if(!timer)step(); } };
+  document.getElementById("ezReset").onclick=reset;
+  window.addEventListener("resize",reset); reset();
 })();
 </script>
 </body>

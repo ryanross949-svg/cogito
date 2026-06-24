@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Strange</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Strange</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Chaos Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Chaos Lab</h1>
+      <p class="section-sub">The butterfly effect, drawn. Two points start almost identical (a difference of 0.001). They trace the Lorenz attractor together... then diverge completely. Deterministic, yet unpredictable.</p>
+      <canvas id="lzCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="lzInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <button class="btn" id="lzRun">Run</button>
+      <button class="btn" id="lzReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About LORENZ</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1406,6 +1414,28 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("lzCanvas"); var ctx=cv.getContext("2d"); var H=300, W=600, timer=null, steps=0;
+  var sig=10, rho=28, bet=8/3, dt=0.008;
+  var A,B;
+  function reset(){ if(timer){clearInterval(timer);timer=null;document.getElementById("lzRun").textContent="Run";}
+    W=cv.width=cv.clientWidth||600; cv.height=H; ctx.clearRect(0,0,W,H); steps=0;
+    A={x:1,y:1,z:20}; B={x:1.001,y:1,z:20}; info(); }
+  function proj(p){ return { px:W/2+p.x*7, py:H-10-p.z*7 }; }
+  function adv(p){ var dx=sig*(p.y-p.x), dy=p.x*(rho-p.z)-p.y, dz=p.x*p.y-bet*p.z; p.x+=dx*dt; p.y+=dy*dt; p.z+=dz*dt; }
+  function info(){ var d=Math.sqrt((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y)+(A.z-B.z)*(A.z-B.z));
+    document.getElementById("lzInfo").textContent="Step "+steps+"   ·   gap between the two paths "+d.toFixed(3); }
+  function tick(){ for(var k=0;k<6;k++){ var a0=proj(A), b0=proj(B); adv(A); adv(B); steps++;
+      var a1=proj(A), b1=proj(B);
+      ctx.strokeStyle="rgba(0,217,255,0.7)"; ctx.beginPath(); ctx.moveTo(a0.px,a0.py); ctx.lineTo(a1.px,a1.py); ctx.stroke();
+      ctx.strokeStyle="rgba(255,45,156,0.7)"; ctx.beginPath(); ctx.moveTo(b0.px,b0.py); ctx.lineTo(b1.px,b1.py); ctx.stroke(); }
+    info(); }
+  document.getElementById("lzRun").onclick=function(){ if(timer){clearInterval(timer);timer=null;this.textContent="Run";} else {timer=setInterval(tick,16);this.textContent="Pause";} };
+  document.getElementById("lzReset").onclick=reset;
+  window.addEventListener("resize",reset); reset();
 })();
 </script>
 </body>

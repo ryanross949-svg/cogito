@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Quantum Leap</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Quantum Leap</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Quantum Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Quantum Lab</h1>
+      <p class="section-sub">The double-slit experiment. Fire photons one at a time and they build an interference pattern — as if each went through both slits. Turn on the detector to measure which slit, and the wave behaviour collapses into two plain clumps. Observation changes the outcome.</p>
+      <canvas id="qCanvas" style="width:100%;height:240px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.3);margin:1rem 0;"></canvas>
+      <div id="qInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <button class="btn" id="qObserve">Detector: OFF</button>
+      <button class="btn" id="qReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Clear</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About PLANCK</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1407,6 +1415,25 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("qCanvas"); var ctx=cv.getContext("2d"); var H=240, W=600, timer=null, observed=false;
+  function reset(){ W=cv.width=cv.clientWidth||600; cv.height=H; ctx.fillStyle="rgba(5,8,16,1)"; ctx.fillRect(0,0,W,H); info(); }
+  function info(){ document.getElementById("qInfo").textContent= observed ? "Detector ON — which-path known: two particle clumps, no interference." : "Detector OFF — unmeasured: wave interference fringes."; }
+  function sample(){
+    if(observed){ var c=(Math.random()<0.5?0.36:0.64); return (c+(Math.random()-0.5)*0.12)*W; }
+    // interference: rejection sample cos^2 under a gaussian envelope
+    for(var i=0;i<40;i++){ var x=Math.random(); var u=(x-0.5)*12; var inten=Math.cos(u)*Math.cos(u)*Math.exp(-u*u/18); if(Math.random()<inten) return x*W; }
+    return Math.random()*W;
+  }
+  function drop(){ for(var k=0;k<6;k++){ var x=sample(); var y=20+Math.random()*(H-40);
+      ctx.fillStyle="rgba(0,217,255,0.5)"; ctx.beginPath(); ctx.arc(x,y,1.4,0,7); ctx.fill(); } }
+  document.getElementById("qObserve").onclick=function(){ observed=!observed; this.textContent="Detector: "+(observed?"ON":"OFF"); reset(); info(); };
+  document.getElementById("qReset").onclick=reset;
+  timer=setInterval(drop,40);
+  window.addEventListener("resize",reset); reset();
 })();
 </script>
 </body>
