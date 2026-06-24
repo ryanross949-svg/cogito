@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Oracle</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Oracle</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Bayes Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,19 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Bayes Lab</h1>
+      <p class="section-sub">A test is 99% accurate — so a positive result means you almost certainly have the condition, right? Drag the sliders and watch the base rate wreck that intuition.</p>
+      <div style="display:grid;gap:0.9rem;max-width:460px;margin:1.5rem 0;">
+        <label style="font-size:0.8rem;color:var(--text-dim);">Prior — how common it is: <span id="bPriorV" style="color:var(--cyan);"></span><input type="range" id="bPrior" min="0" max="100" value="1" style="width:100%;"></label>
+        <label style="font-size:0.8rem;color:var(--text-dim);">True-positive rate (sensitivity): <span id="bTprV" style="color:var(--cyan);"></span><input type="range" id="bTpr" min="0" max="100" value="99" style="width:100%;"></label>
+        <label style="font-size:0.8rem;color:var(--text-dim);">False-positive rate: <span id="bFprV" style="color:var(--cyan);"></span><input type="range" id="bFpr" min="0" max="100" value="5" style="width:100%;"></label>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2em;">Chance you actually have it, given a positive test</div>
+      <div id="bPost" style="font-family:var(--display);font-size:3rem;font-weight:700;color:var(--cyan);text-shadow:0 0 15px rgba(0,217,255,0.4);line-height:1.2;"></div>
+      <div id="bBar" style="height:10px;border-radius:5px;margin:0.5rem 0 1rem;background:var(--border);"></div>
+      <div id="bBreak" style="font-size:0.85rem;color:var(--text-dim);line-height:1.7;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About BAYES</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1493,6 +1506,29 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var post=document.getElementById('bPost'); if(!post) return;
+  function v(id){ return +document.getElementById(id).value; }
+  function render(){
+    var prior=v('bPrior')/100, tpr=v('bTpr')/100, fpr=v('bFpr')/100;
+    document.getElementById('bPriorV').textContent=v('bPrior')+'%';
+    document.getElementById('bTprV').textContent=v('bTpr')+'%';
+    document.getElementById('bFprV').textContent=v('bFpr')+'%';
+    var N=10000, have=prior*N, notHave=N-have, tp=have*tpr, fp=notHave*fpr;
+    var p=(tp+fp)>0 ? tp/(tp+fp) : 0;
+    post.textContent=(p*100).toFixed(1)+'%';
+    var w=(tp+fp)>0 ? tp/(tp+fp)*100 : 0;
+    document.getElementById('bBar').style.background='linear-gradient(90deg, var(--green) '+w+'%, var(--red) '+w+'%)';
+    document.getElementById('bBreak').innerHTML=
+      'Out of 10,000 people: <b style="color:var(--text)">'+Math.round(have)+'</b> have it, <b style="color:var(--text)">'+Math.round(notHave)+'</b> do not.<br>'+
+      'A positive test flags <b style="color:var(--green)">'+Math.round(tp)+'</b> who truly have it and <b style="color:var(--red)">'+Math.round(fp)+'</b> who do not.<br>'+
+      'So a positive result is right only <b style="color:var(--cyan)">'+(p*100).toFixed(1)+'%</b> of the time.';
+  }
+  ['bPrior','bTpr','bFpr'].forEach(function(id){ document.getElementById(id).oninput=render; });
+  render();
 })();
 </script>
 </body>
