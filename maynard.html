@@ -304,7 +304,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project DARWIN</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Strategy Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -362,6 +362,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">★ Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
     <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
     <section class="view" id="view-stats"><h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p><div class="stats-grid"><div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div><div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div><div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div><div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div></div><div class="panel mt-2"><div class="panel-label">// Backup & Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div><div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div><div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div><div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div></section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Strategy Lab</h1>
+      <p class="section-sub">John Maynard Smith brought game theory to biology. In the Hawk-Dove game, aggressive Hawks beat passive Doves one-on-one but pay dearly when two Hawks collide. Set the resource value and the cost of injury, and find the evolutionarily stable mix where no mutant can invade.</p>
+      <div style="display:grid;gap:0.7rem;max-width:420px;margin:1.2rem 0;"><label style="font-size:0.8rem;color:var(--text-dim);">Value of resource V <span id="mnVV" style="color:var(--cyan)"></span><input type="range" id="mnV" min="1" max="20" value="10" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Cost of injury C <span id="mnCV" style="color:var(--cyan)"></span><input type="range" id="mnC" min="1" max="40" value="20" step="1" style="width:100%;"></label></div>
+      <div style="height:26px;background:var(--border);border-radius:6px;overflow:hidden;max-width:420px;display:flex;font-family:var(--display);font-size:0.78rem;"><div id="mnHawk" style="background:#FF6B6B;color:#150006;display:flex;align-items:center;justify-content:center;width:50%;">Hawk</div><div id="mnDove" style="background:#00D9FF;color:#001a1f;display:flex;align-items:center;justify-content:center;flex:1;">Dove</div></div>
+      <div id="mnInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+    </section>
     <section class="view" id="view-about"><h1 class="section-title">About MAYNARD</h1><p class="section-sub">Methodology and design principles.</p><div class="about-content"><p>MAYNARD SMITH is a cognitive training simulator designed to install the strategic thinking patterns used in evolutionary game theory. It is the missing link between NASH (Strategy) and DARWIN (Evolution).</p><h2>// Core Pedagogy</h2><p>The system uses four evidence-based learning mechanisms, applied in concert:</p><ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix concepts across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project DARWIN require applying concepts to novel scenarios.</li></ul><h2>// The Ten Axes</h2><ul><li><strong>ESS</strong> — Evolutionarily Stable Strategies</li><li><strong>HAWK</strong> — Hawk-Dove Game</li><li><strong>FREQ</strong> — Frequency-Dependent Selection</li><li><strong>FITNESS</strong> — Direct & Inclusive Fitness</li><li><strong>MUTATE</strong> — Mutations and Invasion</li><li><strong>REPLICATOR</strong> — Replicator Dynamics</li><li><strong>KIN</strong> — Kin Selection & Hamilton's Rule</li><li><strong>SEX</strong> — Sexual Selection & Fisher's Principle</li><li><strong>COOP</strong> — Reciprocal Altruism & Tit-for-Tat</li><li><strong>EVOLVE</strong> — Coevolution & Niche Construction</li></ul></div></section>
   </main>
 </div>
@@ -1798,6 +1805,22 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  function render(){ var V=+document.getElementById("mnV").value, C=+document.getElementById("mnC").value;
+    document.getElementById("mnVV").textContent=V; document.getElementById("mnCV").textContent=C;
+    var hawk = C>V ? V/C : 1; // ESS fraction of hawks
+    var hp=Math.round(hawk*100);
+    document.getElementById("mnHawk").style.width=hp+"%";
+    document.getElementById("mnHawk").textContent= hp>14?"Hawk "+hp+"%":"";
+    document.getElementById("mnDove").textContent= (100-hp)>14?"Dove "+(100-hp)+"%":"";
+    document.getElementById("mnInfo").textContent = C>V
+      ? "Stable mix: "+hp+"% Hawk, "+(100-hp)+"% Dove. When injury costs more than the prize, pure aggression self-limits — too many Hawks means Hawks keep maiming each other."
+      : "Resource is worth more than injury costs, so Hawk dominates entirely (100%). There is no advantage to backing down.";
+  }
+  ["mnV","mnC"].forEach(function(id){document.getElementById(id).oninput=render;}); render();
 })();
 </script>
 </body>
