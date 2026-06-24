@@ -4,7 +4,7 @@
    (The hub keeps its own inline copy of this logic.) */
 (function () {
   // Course save keys the hub sums for global level (keep in sync with APPS).
-  var KEYS = ['prima-v7','nash-v7','oracle-v7','fermi-v1','darwin-v1','maestro-v1','kafka-v1','mach-v1','turing-v1','kahneman-v1','hebb-v1','lorenz-v1','hayek-v1','gibbon-v1','diffie-v1','dijkstra-v1','popper-v1','chomsky-v1','morgan-v1','bayes-v1','erdos-v1','euclid-v1','altshuller-v1','mendel-v1','wiener-v1','mandelbrot-v1','loci-v1','conway-v1','planck-v1','prigogine-v1','dantzig-v1','klein-v1','lebon-v1','wittgenstein-v1','seneca-v1','boltzmann-v1','axelrod-v1-clean','godel-v1-clean','tetlock-v1','fourier-v1','einstein-v1-clean','schumpeter-v1-clean','lakoff-v1-clean','vonbertalanffy-v1-clean','malthus-v1','neumann-v1','hamilton-v1-clean','maynard-v1','margulis-v1','pasteur-v1-clean'];
+  var KEYS = ['prima-v7','nash-v7','oracle-v7','fermi-v1','darwin-v1','maestro-v1','kafka-v1','mach-v1','turing-v1','kahneman-v1','hebb-v1','lorenz-v1','hayek-v1','gibbon-v1','diffie-v1','dijkstra-v1','popper-v1','chomsky-v1','morgan-v1','bayes-v1','erdos-v1','euclid-v1','altshuller-v1','mendel-v1','wiener-v1','mandelbrot-v1','loci-v1','conway-v1','planck-v1','prigogine-v1','dantzig-v1','klein-v1','lebon-v1','wittgenstein-v1','seneca-v1','boltzmann-v1','axelrod-v1-clean','godel-v1-clean','tetlock-v1','fourier-v1','einstein-v1-clean','schumpeter-v1-clean','lakoff-v1-clean','vonbertalanffy-v1-clean','malthus-v1','neumann-v1','hamilton-v1-clean','maynard-v1','margulis-v1','pasteur-v1-clean','machiavelli-v1'];
 
   function getLevel(xp) { return Math.floor(Math.sqrt(xp / 100)) + 1; }
   function globalXP() {

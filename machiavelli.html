@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // MACHIAVELLI v1.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A0F0A; --void-2:#0F1A0F; --panel:rgba(10,20,10,0.7); --panel-solid:#0A140A;
+  --cyan:#00FF88; --cyan-dim:#008F44; --magenta:#FF6B35; --amber:#FFD700; --green:#00D9FF; --red:#FF3355;
+  --text:#E0FFE0; --text-dim:#6B8F6B; --text-faint:#3A5A3A;
+  --border:rgba(0,255,136,0.15); --border-bright:rgba(0,255,136,0.4);
+  --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --cyan:#00FF41; --cyan-dim:#008F11; --magenta:#00FF41; --amber:#39FF14; --green:#00FF41; --red:#FF3355; --text:#00FF41; --text-dim:#008F11; --text-faint:#004D00; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --cyan-dim:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --cyan-dim:#1A5A8A; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --cyan-dim:#5E81AC; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
+body{background:radial-gradient(ellipse at 20% 10%,rgba(0,255,136,0.06),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,107,53,0.04),transparent 50%),var(--void);min-height:100vh;position:relative;font-size:14px;line-height:1.6;transition:background 0.3s,color 0.3s;}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,255,136,0.01) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 400ms ease;}
+.boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,255,136,0.5);margin-bottom:1rem;position:relative;}
+.boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.boot-sub{color:var(--text-dim);font-size:0.8rem;letter-spacing:0.4em;text-transform:uppercase;margin-bottom:3rem;}
+.boot-log{font-family:var(--mono);font-size:0.75rem;color:var(--cyan-dim);max-width:600px;width:100%;height:140px;margin-bottom:2rem;}
+.boot-log-line{opacity:0;animation:bootLog 0.3s forwards;}
+@keyframes bootLog{to{opacity:1;}}
+.boot-bar{width:100%;max-width:400px;height:2px;background:rgba(0,255,136,0.1);position:relative;overflow:hidden;}
+.boot-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 0.3s ease;}
+#app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(10,15,10,0.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:1rem;}
+.brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--cyan);text-shadow:0 0 10px rgba(0,255,136,0.4);}
+.brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
+.hub-link{font-size:0.6rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;}
+.hub-link:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-dropdown{position:relative;}
+.theme-btn{font-size:0.6rem;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:0.3rem 0.5rem;border-radius:2px;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-family:var(--mono);}
+.theme-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.theme-menu{position:absolute;right:0;top:120%;background:var(--panel-solid);border:1px solid var(--border-bright);border-radius:4px;display:none;flex-direction:column;z-index:100;min-width:120px;}
+.theme-menu.active{display:flex;}
+.theme-option{padding:0.5rem 1rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;border:none;background:none;text-align:left;font-family:var(--mono);text-transform:uppercase;}
+.theme-option:hover{background:var(--panel);color:var(--cyan);}
+.stats-strip{display:flex;gap:1.5rem;font-size:0.7rem;align-items:center;}
+.stat-pill{display:flex;align-items:center;gap:0.4rem;color:var(--text-dim);letter-spacing:0.1em;}
+.stat-pill b{color:var(--cyan);font-weight:500;font-variant-numeric:tabular-nums;font-family:var(--display);font-size:0.95rem;}
+.stat-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+.stat-pill .dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.nav{display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(10,15,10,0.6);overflow-x:auto;backdrop-filter:blur(10px);}
+.nav-item{padding:0.75rem 1.25rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;white-space:nowrap;}
+.nav-item:hover{color:var(--text);}
+.nav-item.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.nav-item.active::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.view{display:none;padding:2rem;max-width:1400px;margin:0 auto;width:100%;flex:1;animation:viewIn 0.4s ease;}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:0.05em;margin-bottom:0.5rem;}
+.section-sub{color:var(--text-dim);font-size:0.8rem;margin-bottom:2rem;letter-spacing:0.05em;}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;backdrop-filter:blur(8px);border-radius:4px;}
+.panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.panel::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.panel-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mission{background:linear-gradient(135deg,rgba(0,255,136,0.06),rgba(0,255,136,0.01));border:1px solid var(--border-bright);}
+.mission h2{font-family:var(--display);font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.mission p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.7;}
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.25rem;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:500;border-radius:2px;}
+.btn:hover{background:var(--cyan);color:var(--void);box-shadow:0 0 20px rgba(0,255,136,0.4);}
+.btn.secondary{border-color:var(--border-bright);color:var(--text-dim);}
+.btn.secondary:hover{background:rgba(0,255,136,0.08);color:var(--text);box-shadow:none;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:var(--void);box-shadow:0 0 20px rgba(255,51,85,0.4);}
+.btn.success{border-color:var(--green);color:var(--green);}
+.btn.success:hover{background:var(--green);color:var(--void);box-shadow:0 0 20px rgba(0,217,255,0.4);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;}
+.module-card{background:var(--panel);border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;border-radius:4px;}
+.module-card:hover:not(.locked){border-color:var(--border-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,136,0.08);}
+.module-card.locked{opacity:0.35;cursor:not-allowed;}
+.module-card.locked::after{content:'LOCKED';position:absolute;top:1rem;right:1rem;font-size:0.6rem;letter-spacing:0.2em;color:var(--text-faint);}
+.module-card.completed::before{content:'';position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 30px 30px 0;border-color:transparent var(--green) transparent transparent;opacity:0.5;}
+.module-card .codename{font-family:var(--display);font-size:0.7rem;letter-spacing:0.3em;color:var(--cyan-dim);margin-bottom:0.5rem;}
+.module-card h3{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;}
+.module-card p{color:var(--text-dim);font-size:0.78rem;line-height:1.6;margin-bottom:1rem;}
+.module-progress{height:2px;background:rgba(0,255,136,0.1);position:relative;}
+.module-progress-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);transition:width 0.5s;}
+.module-card.completed .module-progress-fill{background:var(--green);box-shadow:0 0 8px var(--green);}
+.lesson-back{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.7rem;color:var(--text-dim);cursor:pointer;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-back:hover{color:var(--cyan);}
+.lesson-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.lesson-codename{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;color:var(--cyan);}
+.lesson-title{font-family:var(--display);font-size:2.3rem;font-weight:700;line-height:1.1;margin:0.5rem 0;}
+.lesson-meta{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-body{font-size:0.92rem;line-height:1.85;max-width:720px;}
+.lesson-body h2{font-family:var(--display);font-size:1.25rem;margin:2rem 0 1rem;color:var(--cyan);font-weight:600;letter-spacing:0.05em;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body strong{color:var(--text);font-weight:600;}
+.lesson-body em{color:var(--amber);font-style:normal;font-weight:500;}
+.lesson-body ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.lesson-body li{margin-bottom:0.5rem;position:relative;padding-left:1rem;}
+.lesson-body li::before{content:'▸';position:absolute;left:-0.5rem;color:var(--cyan);}
+.lesson-body blockquote{border-left:2px solid var(--cyan);padding:0.75rem 1rem;margin:1.5rem 0;color:var(--text-dim);font-style:italic;background:rgba(0,255,136,0.02);border-radius:0 4px 4px 0;}
+.takeaways{margin-top:3rem;padding:1.5rem;background:rgba(0,255,136,0.03);border-left:2px solid var(--cyan);border-radius:0 4px 4px 0;}
+.takeaways h3{font-family:var(--display);font-size:0.8rem;letter-spacing:0.2em;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.takeaways ul{list-style:none;margin-left:0;}
+.takeaways li{margin-bottom:0.6rem;font-size:0.85rem;padding-left:1.2rem;position:relative;}
+.takeaways li::before{content:'◆';position:absolute;left:0;color:var(--cyan);font-size:0.7rem;top:0.2rem;}
+.lesson-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.module-detail-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.module-detail-header .codename{font-family:var(--display);font-size:0.85rem;letter-spacing:0.3em;color:var(--cyan);}
+.module-detail-header h1{font-family:var(--display);font-size:2.5rem;font-weight:700;margin:0.5rem 0;}
+.module-detail-header p{color:var(--text-dim);font-size:0.9rem;max-width:600px;}
+.module-detail-grid{display:grid;grid-template-columns:1fr;gap:1rem;}
+.lesson-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.lesson-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.lesson-row.read{border-left:3px solid var(--green);}
+.lesson-row .num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.lesson-row .title{flex:1;font-size:0.95rem;font-weight:500;}
+.lesson-row .status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.lesson-row.read .status{color:var(--green);}
+.problem-row{background:linear-gradient(135deg,rgba(255,107,53,0.04),rgba(0,255,136,0.04));border:1px solid var(--border-bright);padding:1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:4px;}
+.problem-row .info h3{font-family:var(--display);font-size:1.1rem;margin-bottom:0.3rem;}
+.problem-row .info p{font-size:0.78rem;color:var(--text-dim);}
+.drill-container{max-width:800px;margin:0 auto;}
+.drill-meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;letter-spacing:0.15em;text-transform:uppercase;flex-wrap:wrap;gap:0.5rem;}
+.drill-meta b{color:var(--cyan);font-family:var(--display);}
+.drill-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;min-height:380px;display:flex;flex-direction:column;position:relative;border-radius:4px;}
+.drill-card::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.drill-card::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan);}
+.drill-prompt{font-size:0.65rem;letter-spacing:0.3em;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;}
+.drill-question{font-family:var(--display);font-size:1.35rem;font-weight:500;line-height:1.5;margin-bottom:2rem;}
+.drill-answer{font-size:0.95rem;line-height:1.8;color:var(--text);display:none;border-left:2px solid var(--cyan);padding-left:1rem;}
+.drill-answer.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.drill-tag{display:inline-block;font-size:0.6rem;letter-spacing:0.2em;color:var(--amber);border:1px solid var(--amber);padding:0.15rem 0.5rem;margin-bottom:1rem;text-transform:uppercase;border-radius:2px;}
+.drill-hint{font-size:0.7rem;color:var(--text-faint);text-align:center;margin-top:auto;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.drill-hint:hover{color:var(--cyan);}
+.drill-rating{display:none;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:1.5rem;}
+.drill-rating.active{display:grid;}
+.rate-btn{padding:0.85rem 0.5rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;text-transform:uppercase;text-align:center;border-radius:2px;}
+.rate-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,136,0.04);}
+.rate-btn .interval{display:block;font-size:0.65rem;color:var(--text-faint);margin-top:0.3rem;letter-spacing:0.1em;}
+.rate-btn.again:hover{border-color:var(--red);color:var(--red);background:rgba(255,51,85,0.04);}
+.rate-btn.easy:hover{border-color:var(--green);color:var(--green);background:rgba(0,217,255,0.04);}
+.drill-empty{text-align:center;padding:4rem 2rem;border:1px dashed var(--border);border-radius:4px;}
+.drill-empty h3{font-family:var(--display);font-size:1.4rem;margin-bottom:0.5rem;color:var(--cyan);}
+.drill-empty p{color:var(--text-dim);font-size:0.85rem;margin-bottom:1.5rem;}
+.arena-container,.project-container{max-width:900px;margin:0 auto;}
+.arena-hud,.project-hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--panel);border:1px solid var(--border);flex-wrap:wrap;gap:1rem;border-radius:4px;}
+.hud-stat{display:flex;align-items:center;gap:0.5rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;}
+.hud-stat .label{color:var(--text-dim);}
+.hud-stat .val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;}
+.scenario{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:1.5rem;position:relative;border-radius:4px;}
+.scenario::before{content:'SCENARIO';position:absolute;top:-0.55rem;left:1rem;background:var(--void);padding:0 0.5rem;font-size:0.6rem;letter-spacing:0.3em;color:var(--cyan);}
+.scenario-title{font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:1rem;}
+.scenario-body{font-size:0.92rem;line-height:1.8;color:var(--text);}
+.options{display:grid;gap:0.75rem;}
+.option{background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;display:flex;gap:1rem;align-items:flex-start;border-radius:4px;}
+.option:hover:not(.disabled){border-color:var(--border-bright);transform:translateX(4px);background:rgba(0,255,136,0.02);}
+.option.disabled{cursor:not-allowed;}
+.option.correct{border-color:var(--green);background:rgba(0,217,255,0.05);}
+.option.wrong{border-color:var(--red);background:rgba(255,51,85,0.05);}
+.option-letter{font-family:var(--display);color:var(--cyan);font-weight:700;font-size:1rem;min-width:20px;}
+.option-text{font-size:0.88rem;line-height:1.6;flex:1;}
+.outcome{margin-top:1.5rem;padding:1.5rem;background:rgba(0,255,136,0.03);border-left:2px solid var(--cyan);display:none;animation:slideIn 0.4s ease;border-radius:0 4px 4px 0;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.outcome.active{display:block;}
+.outcome-label{font-family:var(--display);font-size:0.75rem;letter-spacing:0.3em;margin-bottom:0.6rem;text-transform:uppercase;}
+.outcome-label.correct{color:var(--green);}
+.outcome-label.wrong{color:var(--red);}
+.outcome-text{font-size:0.88rem;line-height:1.75;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem;}
+.big-stat{background:var(--panel);border:1px solid var(--border);padding:1.5rem;position:relative;border-radius:4px;}
+.big-stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+.big-stat-label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.5rem;}
+.big-stat-value{font-family:var(--display);font-size:2.3rem;font-weight:700;color:var(--cyan);line-height:1;font-variant-numeric:tabular-nums;}
+.big-stat-sub{font-size:0.65rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;}
+.mastery-list{display:grid;gap:0.85rem;}
+.mastery-row{display:grid;grid-template-columns:160px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem;}
+.mastery-name{color:var(--text);letter-spacing:0.05em;}
+.mastery-bar{height:4px;background:rgba(0,255,136,0.1);position:relative;border-radius:2px;}
+.mastery-fill{position:absolute;left:0;top:0;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.6s;border-radius:2px;}
+.mastery-fill.low{background:var(--red);box-shadow:0 0 6px var(--red);}
+.mastery-fill.mid{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.mastery-val{color:var(--text-dim);font-variant-numeric:tabular-nums;text-align:right;font-family:var(--display);}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-solid);border:1px solid var(--cyan);padding:0.75rem 1.5rem;font-size:0.75rem;color:var(--cyan);z-index:200;transition:transform 0.3s ease;letter-spacing:0.1em;box-shadow:0 0 30px rgba(0,255,136,0.2);text-transform:uppercase;border-radius:2px;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 0 30px rgba(255,51,85,0.2);}
+#toast.success{border-color:var(--green);color:var(--green);box-shadow:0 0 30px rgba(0,217,255,0.2);}
+.about-content{max-width:720px;font-size:0.92rem;line-height:1.8;}
+.about-content h2{font-family:var(--display);color:var(--cyan);font-size:1.15rem;margin:2rem 0 0.75rem;letter-spacing:0.05em;}
+.about-content p{margin-bottom:1rem;color:var(--text);}
+.about-content ul{margin:1rem 0 1rem 1.5rem;list-style:none;}
+.about-content li{margin-bottom:0.5rem;padding-left:1rem;position:relative;}
+.about-content li::before{content:'▸';position:absolute;left:0;color:var(--cyan);}
+.about-content strong{color:var(--text);font-weight:600;}
+.about-content em{color:var(--amber);font-style:normal;}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:4rem;font-weight:700;color:var(--cyan);text-shadow:0 0 30px var(--cyan);z-index:150;pointer-events:none;opacity:0;letter-spacing:0.1em;}
+.combo-flash.show{animation:comboFlash 0.9s ease;}
+@keyframes comboFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6);}}
+.radar-wrap{display:flex;align-items:center;justify-content:center;padding:1rem 0;}
+.radar-svg{width:100%;max-width:340px;height:auto;}
+.radar-axis{stroke:var(--border);stroke-width:1;}
+.radar-ring{fill:none;stroke:var(--border);stroke-width:1;opacity:0.5;}
+.radar-poly{fill:rgba(0,255,136,0.1);stroke:var(--cyan);stroke-width:2;filter:drop-shadow(0 0 8px var(--cyan));transition:all 0.8s ease;}
+.radar-label{font-family:var(--display);font-size:9px;fill:var(--text-dim);letter-spacing:0.1em;}
+.radar-label.active{fill:var(--cyan);}
+.flex{display:flex;}.gap-1{gap:1rem;}.gap-2{gap:2rem;}
+.mt-1{margin-top:1rem;}.mt-2{margin-top:2rem;}
+.text-dim{color:var(--text-dim);}
+.text-cyan{color:var(--cyan);}
+.text-sm{font-size:0.78rem;}
+.text-xs{font-size:0.65rem;}
+.center{text-align:center;}
+.danger-bar{height:4px;background:rgba(255,51,85,0.15);position:relative;overflow:hidden;border-radius:2px;}
+.danger-bar-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--red);box-shadow:0 0 8px var(--red);transition:width 0.2s linear;}
+.filter-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.filter-btn{padding:0.5rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.filter-btn:hover{border-color:var(--border-bright);color:var(--text);}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,255,136,0.04);}
+.profile-card{background:linear-gradient(135deg,rgba(255,107,53,0.04),rgba(0,255,136,0.04));border:1px solid var(--border-bright);padding:1.5rem;text-align:center;border-radius:4px;}
+.profile-title{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--magenta);letter-spacing:0.1em;margin-bottom:0.5rem;text-shadow:0 0 10px rgba(255,107,53,0.3);}
+.profile-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.6;}
+.secret-panel{background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(255,215,0,0.03));border:1px solid var(--amber);padding:2rem;margin-top:1.5rem;box-shadow:0 0 30px rgba(255,215,0,0.08);border-radius:4px;}
+.secret-panel h2{font-family:var(--display);color:var(--amber);font-size:1.5rem;margin-bottom:1rem;letter-spacing:0.1em;text-shadow:0 0 10px rgba(255,215,0,0.2);}
+.secret-panel p{color:var(--text);font-size:0.9rem;line-height:1.8;margin-bottom:1rem;}
+.phase-list{display:grid;gap:1rem;margin-top:1.5rem;}
+.phase-row{background:var(--panel);border:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.phase-row:hover:not(.locked){border-color:var(--border-bright);transform:translateX(4px);}
+.phase-row.locked{opacity:0.4;cursor:not-allowed;}
+.phase-row.solved{border-left:3px solid var(--green);}
+.phase-row.active-phase{border-color:var(--magenta);box-shadow:0 0 15px rgba(255,107,53,0.08);}
+.phase-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;letter-spacing:0.2em;width:40px;}
+.phase-info{flex:1;}
+.phase-title{font-size:0.95rem;font-weight:500;}
+.phase-desc{font-size:0.7rem;color:var(--text-dim);margin-top:0.2rem;}
+.phase-status{font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;}
+.phase-row.solved .phase-status{color:var(--green);}
+.phase-row.active-phase .phase-status{color:var(--magenta);}
+.arena-group-header{font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin-top:2rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);letter-spacing:0.1em;}
+.arena-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s;border-radius:4px;}
+.arena-row:hover{border-color:var(--border-bright);transform:translateX(4px);}
+.arena-row.solved{border-left:3px solid var(--green);}
+.arena-row-content{display:flex;align-items:center;gap:1rem;flex:1;}
+.arena-num{font-family:var(--display);color:var(--cyan-dim);font-size:0.85rem;width:30px;}
+.arena-info{flex:1;}
+.arena-title-text{font-size:0.9rem;font-weight:500;}
+.diff-badge{padding:0.3rem 0.6rem;border-radius:2px;font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.diff-1{background:rgba(0,255,163,0.12);color:var(--green);border:1px solid var(--green);}
+.diff-2{background:rgba(255,184,0,0.12);color:var(--amber);border:1px solid var(--amber);}
+.diff-3{background:rgba(255,107,53,0.12);color:var(--magenta);border:1px solid var(--magenta);}
+.diff-4{background:rgba(255,51,85,0.12);color:var(--red);border:1px solid var(--red);}
+@media(max-width:700px){.topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}.stats-strip{flex-wrap:wrap;gap:0.85rem;}.nav{padding:0 1rem;}.nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}.view{padding:1rem;}.lesson-title{font-size:1.7rem;}.drill-card{padding:1.75rem 1.25rem;min-height:340px;}.drill-question{font-size:1.1rem;}.scenario{padding:1.5rem;}.mastery-row{grid-template-columns:100px 1fr 40px;font-size:0.7rem;}.big-stat-value{font-size:1.8rem;}.section-title{font-size:1.5rem;}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<script src="cogito-bg.js?v=2"></script>
+<script src="cogito-theme.js?v=1"></script>
+<div id="boot"><div class="boot-logo">MACHIAVELLI</div><div class="boot-sub">Cogito // The Dark Arts Protocol v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left"><div><div class="brand">MACHIAVELLI</div><div class="brand-tag">THE DARK ARTS</div></div><a href="index.html" class="hub-link">&larr; COGITO</a></div>
+    <div class="stats-strip">
+      <div class="theme-dropdown"><button class="theme-btn" id="themeBtn">Theme</button><div class="theme-menu" id="themeMenu"><button class="theme-option" onclick="MACHIAVELLI.setTheme('quantum')">Quantum</button><button class="theme-option" onclick="MACHIAVELLI.setTheme('matrix')">Matrix</button><button class="theme-option" onclick="MACHIAVELLI.setTheme('cyberpunk')">Cyberpunk</button><button class="theme-option" onclick="MACHIAVELLI.setTheme('light')">Light</button><button class="theme-option" onclick="MACHIAVELLI.setTheme('nord')">Nord</button></div></div>
+      <div class="stat-pill"><span class="dot"></span>LVL <b id="topLevel">1</b></div><div class="stat-pill">XP <b id="topXp">0</b></div><div class="stat-pill"><span class="dot warn"></span>DUE <b id="topDue">0</b></div><div class="stat-pill">STREAK <b id="topStreak">0</b>d</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Iago</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Influence Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+  </nav>
+  <main>
+    <section class="view active" id="view-dashboard">
+      <h1 class="section-title">Operator Dashboard</h1><p class="section-sub">Pareto-optimal training surface. 20% of drills yield 80% of retention.</p>
+      <div class="dash-grid">
+        <div class="panel mission"><div class="panel-label">// Next Mission</div><h2 id="missionTitle">Initialize Training</h2><p id="missionBody">Loading cognitive architecture...</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn" id="missionBtn">Begin &rarr;</button><button class="btn secondary" id="missionBtn2" style="display:none">Drill Queue &rarr;</button></div></div>
+        <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="MACHIAVELLI.completeRTMission()">Mark Complete &middot; +25 XP</button></div>
+        <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
+      </div>
+      <div id="secretUnlockContainer"></div>
+      <div class="panel"><div class="panel-label">// Ten-Axis Mastery</div><div class="dash-grid" style="margin:0"><div class="radar-wrap"><svg class="radar-svg" viewBox="-130 -130 260 260" id="radarSvg"></svg></div><div class="mastery-list" id="masteryList"></div></div></div>
+    </section>
+    <section class="view" id="view-modules"><h1 class="section-title">Training Modules</h1><p class="section-sub">Ten axes of systems thinking. Sequential unlock.</p><div class="modules-grid" id="modulesGrid"></div></section>
+    <section class="view" id="view-project"><h1 class="section-title">Project: IAGO</h1><p class="section-sub">A cumulative scenario. Detect and neutralize a master manipulator before he seizes control.</p><div class="project-container" id="projectContainer"></div></section>
+    <section class="view" id="view-module"><div id="moduleDetail"></div></section>
+    <section class="view" id="view-lesson"><div id="lessonContent"></div></section>
+    <section class="view" id="view-drills"><h1 class="section-title">Spaced Repetition Drills</h1><p class="section-sub">Active recall. SM-2 algorithm. Interleaved across modules.</p><div class="filter-bar" id="drillFilters"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="core">&#9733; Core Only</button><button class="filter-btn" data-filter="concept">Concepts</button><button class="filter-btn" data-filter="application">Application</button><button class="filter-btn" data-filter="quote">Quotes</button></div><div class="drill-container" id="drillContainer"></div></section>
+    <section class="view" id="view-arena"><h1 class="section-title">Combat Arena</h1><p class="section-sub">40 scenario problems. 4 difficulty tiers. Scale your XP by mastering higher difficulties.</p><div class="arena-container" id="arenaContainer"></div></section>
+    <section class="view" id="view-stats">
+      <h1 class="section-title">Operator Statistics</h1><p class="section-sub">Track retention. Identify weaknesses. Calibrate effort.</p>
+      <div class="stats-grid">
+        <div class="big-stat"><div class="big-stat-label">Total XP</div><div class="big-stat-value" id="statXp">0</div><div class="big-stat-sub" id="statLevel">Level 1</div></div>
+        <div class="big-stat"><div class="big-stat-label">Cards Mature</div><div class="big-stat-value" id="statMature">0</div><div class="big-stat-sub" id="statMatureSub">of 0 total</div></div>
+        <div class="big-stat"><div class="big-stat-label">Retention Rate</div><div class="big-stat-value" id="statRetention">--</div><div class="big-stat-sub">last 100 reviews</div></div>
+        <div class="big-stat"><div class="big-stat-label">Longest Streak</div><div class="big-stat-value" id="statLongStreak">0</div><div class="big-stat-sub" id="statCurStreak">current: 0d</div></div>
+      </div>
+      <div class="panel mt-2"><div class="panel-label">// Backup &amp; Restore</div><p class="text-sm text-dim" style="margin-bottom:1rem">Export your progress to a file to keep it safe, or import a previous save file.</p><div class="flex gap-1" style="flex-wrap:wrap"><button class="btn secondary" id="exportBtn">Export Save File</button><label class="btn secondary" style="cursor:pointer">Import Save File<input type="file" id="importBtn" accept=".json" style="display:none"></label></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
+      <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Influence Lab</h1>
+      <p class="section-sub">The fastest way to become unmanipulable is to recognize the move in real time. Read each scenario and name the tactic being used. Daylight disarms manipulation &mdash; this is target practice.</p>
+      <div id="ilScenario" style="font-size:1.05rem;color:var(--text);background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:8px;padding:1.3rem;margin:1.2rem 0;line-height:1.6;min-height:2rem;"></div>
+      <div id="ilOptions" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:1rem;"></div>
+      <div id="ilFeedback" style="font-size:0.92rem;color:var(--text-dim);line-height:1.7;min-height:1.5rem;"></div>
+      <div id="ilScore" style="font-family:var(--display);color:var(--cyan);margin-top:1rem;"></div>
+    </section>
+    <section class="view" id="view-about">
+      <h1 class="section-title">About MACHIAVELLI</h1><p class="section-sub">A field manual for the dark arts &mdash; built for defense.</p>
+      <div class="about-content">
+        <p>MACHIAVELLI is a hidden cognitive training simulator that maps the architecture of influence and manipulation &mdash; reciprocity, commitment, social proof, authority, liking, scarcity, fear, the Dark Triad, and covert language. It is taught from the defenders chair: you learn exactly how each lever is pulled so that it can never be pulled on you.</p>
+        <h2>// Core Pedagogy</h2>
+        <p>The system uses four evidence-based learning mechanisms, applied in concert:</p>
+        <ul><li><strong>Spaced Repetition (SM-2):</strong> Cards reappear at expanding intervals based on recall quality.</li><li><strong>Active Recall:</strong> Every drill requires generation, not recognition.</li><li><strong>Interleaving:</strong> Drills mix tactics across modules.</li><li><strong>Elaboration:</strong> Arena problems and Project Iago require spotting and countering manipulation in novel scenarios.</li></ul>
+        <h2>// The Ten Axes</h2>
+        <ul>
+          <li><strong>RECIPROCITY</strong> &mdash; Manufactured debt, free samples, door-in-the-face</li>
+          <li><strong>COMMITMENT</strong> &mdash; Foot-in-the-door, public commitments, sunk cost</li>
+          <li><strong>PROOF</strong> &mdash; Manufactured consensus, fake reviews, bandwagons</li>
+          <li><strong>AUTHORITY</strong> &mdash; Milgram, titles, uniforms, the expert frame</li>
+          <li><strong>LIKING</strong> &mdash; Mirroring, flattery, the halo effect</li>
+          <li><strong>SCARCITY</strong> &mdash; Urgency, FOMO, exclusivity, loss aversion</li>
+          <li><strong>FOG</strong> &mdash; Fear, obligation, guilt, gaslighting, trauma bonds</li>
+          <li><strong>TRIAD</strong> &mdash; Narcissism, Machiavellianism, psychopathy</li>
+          <li><strong>LANGUAGE</strong> &mdash; Framing, presupposition, false dichotomy, anchoring</li>
+          <li><strong>DEFENSE</strong> &mdash; The pause, naming tactics, boundaries, gray rock</li>
+        </ul>
+        <p style="margin-top:1rem;color:var(--text-faint);font-size:0.85rem;">This material is provided for awareness and self-defense. Recognizing manipulation is the surest protection against it.</p>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="combo-flash" id="comboFlash"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const MODULES = [
+  { id:'m1', codename:'RECIPROCITY', title:'The Reciprocity Trap', summary:'Unsolicited gifts, favors, and concessions that manufacture a sense of debt.', lesson:{ title:'The Debt You Never Agreed To', body:'Reciprocity is the oldest lever in the book: when someone gives us something, we feel a gnawing obligation to give back. The instinct is so deep that it fires even when the gift was unwanted, trivial, or a deliberate setup.\n\n## How it is used on you\n\nThe free sample, the unexpected compliment, the favor you did not ask for. None of it is generosity; it is an opening move. The giver is buying future compliance at a discount. A small gift now extracts a large concession later, because the debt feels heavier than the gift was worth.\n\n## The concession variant\n\nThe rejection-then-retreat (door-in-the-face) tactic weaponizes reciprocity through concessions. The manipulator makes an outrageous request, you refuse, then they "back down" to the smaller request they wanted all along. Their retreat feels like a gift, so you concede in return.\n\n## How to resist\n\nName the transaction. A gift given to obligate you is not a gift; it is a sale, and you never agreed to buy. You are free to accept a kindness and still owe nothing. Redefining the favor as a manipulation tactic dissolves the debt instantly.', takeaways:['Receiving triggers an automatic, often disproportionate urge to repay.','Free samples and unsolicited favors are opening moves, not generosity.','Door-in-the-face: an extreme ask, then a "concession" you feel obliged to match.','A gift given to obligate you is a sale you never agreed to.','Reframing a favor as a tactic dissolves the felt debt.'] } },
+  { id:'m2', codename:'COMMITMENT', title:'The Consistency Lock', summary:'Foot-in-the-door, public commitments, and the sunk-cost lever.', lesson:{ title:'The Cage You Build Yourself', body:'People have a near-pathological need to appear consistent with what they have already said and done. Once you commit, especially in public, pressure mounts to behave in line with that commitment even when it no longer serves you.\n\n## Foot-in-the-door\n\nGet someone to agree to something tiny, and a larger request later becomes far easier. The first small yes reshapes the persons self-image ("I am the kind of person who does this"), and the bigger yes follows to protect that image.\n\n## Public and written commitments\n\nThe more public, effortful, or voluntary a commitment feels, the harder it locks. Manipulators get you to state your position aloud, in writing, or in front of others precisely so retreat becomes costly to your identity.\n\n## The sunk-cost lever\n\n"You have already put in so much..." Escalation of commitment keeps people pouring resources into losing courses of action because quitting would admit the prior investment was wasted. The manipulator points at the cage you already built and dares you to stay.\n\n## How to resist\n\nAsk: if I were deciding fresh today, knowing what I know now, would I choose this? Consistency with a past self who had less information is not a virtue. The freedom to change your mind is the antidote to the consistency lock.', takeaways:['We feel intense pressure to act consistently with prior words and deeds.','Foot-in-the-door: a tiny yes rewrites self-image and unlocks bigger asks.','Public, written, voluntary commitments lock hardest.','Sunk-cost / escalation traps you into defending past investment.','Antidote: decide as if fresh today; changing your mind is allowed.'] } },
+  { id:'m3', codename:'PROOF', title:'Manufactured Consensus', summary:'Social proof, fabricated reviews, bandwagons, and herd cues.', lesson:{ title:'Everyone Is Doing It (Or So It Seems)', body:'When uncertain, people look to others to decide what is correct. Social proof is a cognitive shortcut: if many are doing it, it must be right. The manipulator does not need a real crowd, only the appearance of one.\n\n## Manufactured crowds\n\nFake reviews, bot followers, paid testimonials, laugh tracks, salted tip jars, "most popular" badges. Each fabricates the impression of consensus. The herd you are following may be entirely staged.\n\n## Uncertainty and similarity amplify it\n\nSocial proof bites hardest when you are unsure and when the crowd resembles you. "People like you bought this" is more potent than a generic crowd, because we copy those we identify with.\n\n## The pluralistic ignorance trap\n\nIn a crisis, everyone looks to everyone else for the right reaction, sees calm, and concludes there is no emergency, while privately each person is alarmed. Manipulators (and inert bystanders) exploit this paralysis.\n\n## How to resist\n\nAsk where the evidence actually comes from. Is the consensus real or staged? Would the action make sense if no one else were doing it? Decoupling the merits of a choice from the crowd around it neutralizes manufactured proof.', takeaways:['Under uncertainty we copy the crowd to decide what is correct.','Reviews, followers, and "popular" cues are easily fabricated.','Social proof is strongest when we are unsure and the crowd is like us.','Pluralistic ignorance: collective calm masks private alarm.','Antidote: trace the evidence; judge the choice as if alone.'] } },
+  { id:'m4', codename:'AUTHORITY', title:'The Authority Gradient', summary:'Titles, uniforms, credentials, and the manufactured expert frame.', lesson:{ title:'Obedience on Autopilot', body:'We are trained from childhood to defer to authority, and the deference runs on autopilot. Milgrams experiments showed ordinary people would deliver apparently lethal shocks simply because a man in a lab coat told them to. The symbol of authority, not its substance, does the work.\n\n## Symbols over substance\n\nTitles, uniforms, badges, suits, jargon, and expensive trappings trigger compliance. Manipulators borrow the costume without the competence: a fake title, a confident tone, a wall of credentials you never verify.\n\n## The expert frame\n\n"As a doctor / lawyer / engineer, I can tell you..." reframes opinion as settled fact and discourages questioning. The frame is often legitimate, but it is also the easiest to counterfeit and the hardest to challenge in the moment.\n\n## Authority by proximity\n\nStanding near power, name-dropping, borrowed logos, and "I work with..." transfer credibility that was never earned.\n\n## How to resist\n\nSeparate the message from the messenger. Ask: is this person actually an authority on THIS specific question, and is their advice in MY interest or theirs? Verify credentials rather than inferring them from costume. Legitimate authority withstands a polite question; counterfeit authority bristles at it.', takeaways:['Deference to authority is automatic and triggered by symbols.','Milgram: the lab coat, not the logic, drove obedience.','Titles, uniforms, and jargon are easily counterfeited.','The expert frame recasts opinion as unquestionable fact.','Antidote: verify real, relevant authority and whose interest it serves.'] } },
+  { id:'m5', codename:'LIKING', title:'The Liking Lever', summary:'Similarity, flattery, familiarity, and the friend frame.', lesson:{ title:'We Say Yes to People We Like', body:'We comply far more readily with people we like, and liking is shockingly easy to manufacture. The manipulator does not need to be your friend; they need only to seem like one.\n\n## The ingredients of liking\n\nSimilarity ("we are so alike"), praise (even transparent flattery works), familiarity through repeated exposure, cooperation toward a shared goal, and physical attractiveness all increase compliance. Each can be faked or engineered.\n\n## Mirroring and the false friend\n\nManipulators mirror your posture, vocabulary, pace, and values to fabricate similarity. They manufacture rapport quickly, then cash it in. The "we are on the same team" frame makes refusal feel like betrayal.\n\n## Flattery is a tool, not a tribute\n\nPraise lowers your guard even when you know it is strategic. The halo effect then bleeds: because you like them, you assume they are honest, competent, and well-intentioned.\n\n## How to resist\n\nSeparate the person from the proposal. Notice when liking has spiked unusually fast, that is a red flag, not a connection. Ask: would I accept this deal from someone I found unpleasant? If the answer is no, the liking, not the merits, is steering you.', takeaways:['We comply more with people we like, and liking is easily manufactured.','Similarity, praise, familiarity, and attractiveness all raise compliance.','Mirroring fabricates rapport that is then cashed in.','The halo effect spreads liking into assumed honesty and competence.','Antidote: judge the proposal as if it came from someone you disliked.'] } },
+  { id:'m6', codename:'SCARCITY', title:'Scarcity and Urgency', summary:'FOMO, deadlines, exclusivity, and weaponized loss aversion.', lesson:{ title:'Now Or Never (Usually Never)', body:'Opportunities seem more valuable when their availability is limited. Scarcity hijacks loss aversion, the fact that losing hurts roughly twice as much as gaining feels good, to short-circuit deliberation and force a fast, fear-driven decision.\n\n## The artificial deadline\n\n"Offer ends tonight." "Only 3 left." The countdown timer, the low-stock warning, the limited edition. Most are manufactured. Their job is to collapse your decision window so you act before you think.\n\n## Exclusivity and forbidden fruit\n\n"Members only," "by invitation," "not for everyone." Restricting access raises desire independent of the items actual worth. We want what we might not be allowed to have.\n\n## Loss framing\n\nThe same offer framed as a loss ("do not miss out," "you will lose access") outpulls one framed as a gain. Manipulators always frame the cost of inaction, not the benefit of action.\n\n## How to resist\n\nUrgency is the tell. Real opportunities rarely require you to abandon thought. When you feel the clock pressure, slow down on purpose, that is exactly when you are meant to speed up. Ask: would I want this if it were freely available tomorrow?', takeaways:['Limited availability inflates perceived value via loss aversion.','Deadlines and low-stock cues are usually manufactured to rush you.','Exclusivity and "forbidden fruit" raise desire independent of worth.','Loss framing ("do not miss out") outpulls gain framing.','Antidote: treat urgency as a red flag and deliberately slow down.'] } },
+  { id:'m7', codename:'FOG', title:'Fear, Obligation, Guilt', summary:'FOG, gaslighting, intermittent reinforcement, and trauma bonds.', lesson:{ title:'The Engine of Coercion', body:'The darkest manipulation runs on three fuels: Fear, Obligation, and Guilt (FOG). Where the lighter tactics nudge, FOG coerces, and it is the signature of abusive relationships, not just bad sales pitches.\n\n## Fear\n\nManufactured threats, implied consequences, walking on eggshells. The manipulator does not need to state the threat; an unpredictable temper trains you to comply preemptively.\n\n## Obligation and guilt\n\n"After everything I have done for you." "A good person would..." Guilt-tripping converts your conscience into a remote control. Obligation is reciprocity turned coercive.\n\n## Gaslighting\n\nDenying your reality ("that never happened," "you are too sensitive," "you are imagining things") until you distrust your own memory and judgment, and depend on the manipulator to define what is real.\n\n## Intermittent reinforcement and trauma bonds\n\nUnpredictable cycles of cruelty and affection are more addictive than steady kindness, the same schedule that hooks gamblers. The relief when the cruelty pauses bonds the victim to the abuser.\n\n## How to resist\n\nName the pattern; coercion loses power in daylight. Keep an external record so gaslighting cannot rewrite your memory. Trust the friends who are worried. FOG demands isolation, breaking it is the exit.', takeaways:['Coercion runs on Fear, Obligation, and Guilt (FOG).','Unpredictable anger trains preemptive compliance.','Gaslighting makes you distrust your own reality and memory.','Intermittent reward (cruelty/affection cycles) forges addictive trauma bonds.','Antidote: name the pattern, keep external records, break isolation.'] } },
+  { id:'m8', codename:'TRIAD', title:'The Dark Triad', summary:'Narcissism, Machiavellianism, and psychopathy as operating systems.', lesson:{ title:'Knowing the Predator', body:'Some people manipulate occasionally; others are wired for it. The Dark Triad, narcissism, Machiavellianism, and psychopathy, describes three overlapping personality patterns behind chronic, strategic manipulation. Recognizing the operating system lets you predict the behavior.\n\n## Narcissism\n\nGrandiosity, entitlement, a hunger for admiration, and fragile self-worth that lashes out when challenged. The narcissist manipulates to feed supply: attention, status, validation. Charm on the way in, devaluation once you are secured.\n\n## Machiavellianism\n\nCold, strategic, long-game manipulation. The Machiavellian sees relationships as instrumental, deception as a tool, and morality as negotiable. Unlike the narcissist, they are not driven by ego but by advantage; patient, calculating, and image-managing.\n\n## Psychopathy\n\nShallow affect, impulsivity, fearlessness, and a near-total absence of empathy or remorse. The psychopath manipulates without the friction of conscience, which makes them disarmingly bold and convincing.\n\n## The shared core\n\nAll three share low empathy and a willingness to exploit. The common tells: a charm that seems too fast, a trail of "crazy" exes and betrayed partners, words that never match actions, and a strange flatness behind the performance.\n\n## How to resist\n\nWatch patterns over time, not charm in the moment. Predators rely on first impressions; their history is the truth. When actions and words diverge, believe the actions.', takeaways:['The Dark Triad: narcissism, Machiavellianism, psychopathy.','Narcissists manipulate for admiration and lash out when challenged.','Machiavellians run cold, patient, instrumental long-games.','Psychopaths exploit without empathy, remorse, or fear.','Antidote: judge patterns and history over momentary charm; believe actions.'] } },
+  { id:'m9', codename:'LANGUAGE', title:'Covert Language', summary:'Framing, presupposition, false dichotomy, anchoring, loaded questions.', lesson:{ title:'The Words Beneath the Words', body:'Manipulation often hides in syntax. Covert language patterns smuggle assumptions past your critical faculty by burying them in the structure of a sentence, where you accept them without examining them.\n\n## Presupposition\n\n"When you sign up, will you choose monthly or annual?" The question presupposes you will sign up; you only get to pick how. Embedding the desired conclusion as a given makes it feel already decided.\n\n## Framing and anchoring\n\nThe same fact framed as "90% survive" versus "10% die" produces opposite decisions. An opening number (the anchor) drags every later estimate toward it, even when the anchor is arbitrary. Whoever sets the frame controls the conclusion.\n\n## The false dichotomy\n\n"Either you are with us or against us." Collapsing a spectrum of options into two forces a choice on the manipulators terms and hides every alternative.\n\n## Loaded questions and embedded commands\n\n"Why are you so defensive?" presupposes guilt. "You might find yourself agreeing..." slips an instruction inside an observation. The grammar does the persuading while you debate the surface.\n\n## How to resist\n\nReject the frame, do not just answer within it. Surface the hidden assumption: "Wait, I have not agreed to sign up at all." Expand false choices: "Those are not the only two options." Whoever questions the frame takes back control.', takeaways:['Covert language smuggles assumptions through sentence structure.','Presupposition embeds the conclusion as an unexamined given.','Framing and anchoring steer decisions with wording and opening numbers.','False dichotomies hide every option but the two offered.','Antidote: reject and surface the frame instead of answering within it.'] } },
+  { id:'m10', codename:'DEFENSE', title:'The Counter-Game', summary:'Recognition, boundaries, gray rock, tempo control, and naming the tactic.', lesson:{ title:'Becoming Unmanipulable', body:'You cannot stop people from trying to manipulate you, but you can become a target that does not pay off. Defense is not paranoia; it is pattern recognition plus a few reliable moves.\n\n## Slow the tempo\n\nNearly every tactic needs speed, urgency, momentum, an answer now. The single most powerful defense is the pause. "I will think about it and get back to you" defuses scarcity, reciprocity, and pressure at once. Manipulators hate delay because deliberation is their enemy.\n\n## Name the tactic\n\nSaying the technique out loud ("this feels like a guilt trip," "that is a false choice") collapses it. Manipulation depends on operating beneath awareness; daylight disarms it.\n\n## Boundaries and the broken record\n\nA boundary is a limit you enforce, not a request you negotiate. Repeat it calmly without justifying ("No. ... No. ... I have given my answer."). Over-explaining hands the manipulator threads to pull.\n\n## Gray rock\n\nWith high-conflict and Dark Triad manipulators, become boring. Deny them emotional reactions, drama, and supply. A predator starves when there is nothing to feed on.\n\n## The core question\n\nFor any request, ask: who benefits, why now, and what happens if I simply say no? If saying no triggers punishment, pressure, or guilt, you have found a manipulator, and your answer should be no.', takeaways:['You cannot prevent manipulation, but you can stop being a payoff.','The pause defeats urgency, reciprocity, and pressure at once.','Naming a tactic out loud collapses it; manipulation needs the dark.','Boundaries are enforced limits, not negotiations; do not over-explain.','Gray rock starves high-conflict predators of emotional supply.'] } },
+];
+
+const CARDS = [
+  { id:'c1', moduleId:'m1', core:true, category:'concept', front:'What is the reciprocity principle?', back:'The deep-seated urge to repay what another has given us, often disproportionately and even when the gift was unwanted.' },
+  { id:'c2', moduleId:'m1', core:true, category:'concept', front:'Why is a free sample an opening move, not generosity?', back:'It plants a sense of debt that the giver intends to collect later as compliance, buying future cooperation at a discount.' },
+  { id:'c3', moduleId:'m1', core:true, category:'application', front:'What is the door-in-the-face tactic?', back:'An extreme request you refuse, followed by a smaller "concession" you feel obliged to match, exploiting reciprocity of concessions.' },
+  { id:'c4', moduleId:'m1', core:true, category:'concept', front:'Does reciprocity fire even for unwanted gifts?', back:'Yes. The obligation triggers automatically regardless of whether you asked for or valued the gift.' },
+  { id:'c5', moduleId:'m1', core:true, category:'application', front:'How do you dissolve a manufactured debt?', back:'Name it: a gift given to obligate you is a sale you never agreed to, so you owe nothing.' },
+  { id:'c6', moduleId:'m1', core:false, category:'concept', front:'Why does a concession trigger a return concession?', back:'A retreat from a big ask feels like a gift, so reciprocity pressures you to give a concession back.' },
+  { id:'c7', moduleId:'m1', core:false, category:'concept', front:'What makes the reciprocity rule so powerful?', back:'It is culturally universal and trained from childhood, making it feel like a moral duty rather than a choice.' },
+  { id:'c8', moduleId:'m1', core:false, category:'application', front:'How does a salted tip jar use reciprocity?', back:'It pairs social proof with implied reciprocity for service, nudging you to "repay" with a tip.' },
+  { id:'c9', moduleId:'m1', core:true, category:'concept', front:'Can you accept a kindness and owe nothing?', back:'Yes. Genuine kindness asks for nothing; only a transactional "gift" manufactures debt.' },
+  { id:'c10', moduleId:'m1', core:false, category:'application', front:'What is the giver actually purchasing with a favor?', back:'Your future compliance, usually a concession far larger than the favor was worth.' },
+  { id:'c11', moduleId:'m1', core:false, category:'concept', front:'Why do unsolicited favors feel heavier than they are?', back:'Loss-of-standing aversion: owing someone feels uncomfortable, so we overpay to discharge the debt.' },
+  { id:'c12', moduleId:'m1', core:true, category:'application', front:'What question defuses a reciprocity play?', back:'"Would I agree to this if no gift had been given?" If not, the debt, not the merits, is steering you.' },
+  { id:'c13', moduleId:'m2', core:true, category:'concept', front:'What is the commitment and consistency principle?', back:'The strong drive to act consistently with what we have already said, done, or committed to publicly.' },
+  { id:'c14', moduleId:'m2', core:true, category:'application', front:'What is the foot-in-the-door tactic?', back:'Securing a tiny initial yes that reshapes self-image, making a much larger later request easier to obtain.' },
+  { id:'c15', moduleId:'m2', core:true, category:'concept', front:'Why do public commitments lock hardest?', back:'Visibility raises the identity cost of retreating, so people defend public positions even against their interest.' },
+  { id:'c16', moduleId:'m2', core:true, category:'application', front:'What is escalation of commitment (sunk cost)?', back:'Continuing to invest in a losing course to avoid admitting prior investment was wasted.' },
+  { id:'c17', moduleId:'m2', core:true, category:'application', front:'What is the antidote to the consistency lock?', back:'Ask: deciding fresh today with what I now know, would I choose this? Past consistency is not a virtue.' },
+  { id:'c18', moduleId:'m2', core:false, category:'concept', front:'How does a small yes change self-image?', back:'It makes you label yourself ("I am the kind of person who...") and act to protect that label.' },
+  { id:'c19', moduleId:'m2', core:false, category:'application', front:'Why do manipulators want commitments in writing?', back:'Written, effortful, voluntary commitments feel more binding and are harder to walk back.' },
+  { id:'c20', moduleId:'m2', core:true, category:'concept', front:'How is sunk cost used as a lever?', back:'"You have already put in so much" points at the cage you built to keep you investing.' },
+  { id:'c21', moduleId:'m2', core:false, category:'concept', front:'Why is changing your mind framed as weakness?', back:'Because the manipulator profits from your consistency; reframing flexibility as failure keeps you trapped.' },
+  { id:'c22', moduleId:'m2', core:false, category:'application', front:'What is a low-ball tactic?', back:'Getting agreement on a deal, then changing the terms; the initial commitment keeps you in.' },
+  { id:'c23', moduleId:'m2', core:false, category:'concept', front:'Why does voluntariness strengthen a commitment?', back:'We feel most bound by choices we believe we made freely, owning them as part of our identity.' },
+  { id:'c24', moduleId:'m2', core:true, category:'application', front:'What reframe breaks escalation of commitment?', back:'Treat past spending as gone regardless; decide only on future costs versus future benefits.' },
+  { id:'c25', moduleId:'m3', core:true, category:'concept', front:'What is social proof?', back:'Under uncertainty, copying what others do to decide what is correct.' },
+  { id:'c26', moduleId:'m3', core:true, category:'application', front:'Why do not manipulators need a real crowd?', back:'Only the appearance of consensus is required; fake reviews and bots fabricate it.' },
+  { id:'c27', moduleId:'m3', core:true, category:'concept', front:'When does social proof bite hardest?', back:'When we are uncertain and when the crowd resembles us ("people like you").' },
+  { id:'c28', moduleId:'m3', core:true, category:'concept', front:'What is pluralistic ignorance?', back:'Everyone privately alarmed but outwardly calm, so each concludes there is no emergency.' },
+  { id:'c29', moduleId:'m3', core:true, category:'application', front:'How do you neutralize manufactured proof?', back:'Trace the evidence and judge the choice as if no one else were doing it.' },
+  { id:'c30', moduleId:'m3', core:false, category:'application', front:'Name three ways crowds are faked.', back:'Bot followers, paid testimonials, and "most popular" or "bestseller" badges.' },
+  { id:'c31', moduleId:'m3', core:false, category:'concept', front:'Why are laugh tracks effective?', back:'They supply social proof that something is funny, prompting us to laugh along.' },
+  { id:'c32', moduleId:'m3', core:false, category:'application', front:'How does "join 10,000 others" work?', back:'It manufactures a bandwagon, implying correctness through sheer numbers.' },
+  { id:'c33', moduleId:'m3', core:true, category:'concept', front:'Why does similarity amplify social proof?', back:'We copy those we identify with, so a crowd "like us" is far more persuasive.' },
+  { id:'c34', moduleId:'m3', core:false, category:'application', front:'What is the bystander effect link to proof?', back:'Seeing others not act, we read inaction as proof no help is needed, and freeze too.' },
+  { id:'c35', moduleId:'m3', core:false, category:'concept', front:'Can social proof override personal judgment?', back:'Yes; strong apparent consensus can make people doubt clear evidence of their own senses.' },
+  { id:'c36', moduleId:'m3', core:true, category:'application', front:'What question exposes staged consensus?', back:'"Where does this consensus actually come from, and is it real?"' },
+  { id:'c37', moduleId:'m4', core:true, category:'concept', front:'What did Milgrams experiment reveal?', back:'Ordinary people would deliver apparently lethal shocks simply because an authority figure instructed them.' },
+  { id:'c38', moduleId:'m4', core:true, category:'concept', front:'Why do symbols of authority work without substance?', back:'Deference runs on autopilot, triggered by titles, uniforms, and trappings rather than verified competence.' },
+  { id:'c39', moduleId:'m4', core:true, category:'application', front:'What is the expert frame?', back:'"As a [profession], I can tell you..." recasts opinion as settled fact and discourages questioning.' },
+  { id:'c40', moduleId:'m4', core:true, category:'application', front:'How is authority counterfeited?', back:'With fake titles, confident tone, jargon, borrowed logos, and unverified walls of credentials.' },
+  { id:'c41', moduleId:'m4', core:true, category:'application', front:'How do you resist false authority?', back:'Separate message from messenger; verify real, relevant authority and ask whose interest it serves.' },
+  { id:'c42', moduleId:'m4', core:false, category:'application', front:'What is authority by proximity?', back:'Borrowing credibility by name-dropping or standing near power without earning it.' },
+  { id:'c43', moduleId:'m4', core:false, category:'concept', front:'Why does a uniform increase compliance?', back:'It is a fast visual cue of legitimate power that bypasses scrutiny.' },
+  { id:'c44', moduleId:'m4', core:true, category:'concept', front:'Does legitimate authority fear questions?', back:'No. Counterfeit authority bristles at polite questions; real authority withstands them.' },
+  { id:'c45', moduleId:'m4', core:false, category:'concept', front:'Why is the expert frame easy to abuse?', back:'It is hard to challenge in the moment and easy to fake with confident delivery.' },
+  { id:'c46', moduleId:'m4', core:false, category:'application', front:'How does jargon enforce authority?', back:'It signals insider expertise and makes the listener reluctant to admit they do not understand.' },
+  { id:'c47', moduleId:'m4', core:false, category:'concept', front:'What is the halo of titles?', back:'A title in one domain leaks unwarranted credibility into unrelated domains.' },
+  { id:'c48', moduleId:'m4', core:true, category:'application', front:'What is the key authority question?', back:'"Is this person an authority on THIS question, and is their advice in my interest or theirs?"' },
+  { id:'c49', moduleId:'m5', core:true, category:'concept', front:'Why do we comply more with people we like?', back:'Liking lowers our guard and biases us to assume honesty and good intent (the halo effect).' },
+  { id:'c50', moduleId:'m5', core:true, category:'concept', front:'Name the main ingredients of liking.', back:'Similarity, praise, familiarity, cooperation, and physical attractiveness.' },
+  { id:'c51', moduleId:'m5', core:true, category:'application', front:'What is mirroring used for?', back:'Copying posture, words, and pace to fabricate similarity and fast rapport that is later cashed in.' },
+  { id:'c52', moduleId:'m5', core:true, category:'application', front:'Why is fast-spiking liking a red flag?', back:'Manufactured rapport (love-bombing) builds artificial closeness to lower defenses quickly.' },
+  { id:'c53', moduleId:'m5', core:true, category:'application', front:'How do you resist the liking lever?', back:'Judge the proposal as if it came from someone you disliked; separate person from offer.' },
+  { id:'c54', moduleId:'m5', core:false, category:'concept', front:'Does flattery work even when obvious?', back:'Yes; transparent praise still raises liking and lowers resistance.' },
+  { id:'c55', moduleId:'m5', core:true, category:'concept', front:'What is the halo effect?', back:'One positive trait (likability, looks) spills over into assumptions of honesty and competence.' },
+  { id:'c56', moduleId:'m5', core:false, category:'application', front:'How does the "same team" frame manipulate?', back:'It makes refusal feel like betrayal of the group rather than a reasonable no.' },
+  { id:'c57', moduleId:'m5', core:false, category:'concept', front:'Why does familiarity breed compliance?', back:'Repeated exposure increases liking and trust even without any real relationship.' },
+  { id:'c58', moduleId:'m5', core:false, category:'application', front:'How do salespeople fake similarity?', back:'By claiming shared hobbies, hometowns, or values to trigger "we are alike" compliance.' },
+  { id:'c59', moduleId:'m5', core:false, category:'concept', front:'Why is attractiveness persuasive?', back:'It triggers the halo effect, leading us to over-trust and over-comply with good-looking people.' },
+  { id:'c60', moduleId:'m5', core:true, category:'application', front:'What question checks for the liking trap?', back:'"Would I accept this exact deal from someone unpleasant?"' },
+  { id:'c61', moduleId:'m6', core:true, category:'concept', front:'What is the scarcity principle?', back:'Opportunities seem more valuable as they become less available.' },
+  { id:'c62', moduleId:'m6', core:true, category:'concept', front:'Which bias does scarcity hijack?', back:'Loss aversion, losing hurts about twice as much as an equal gain feels good.' },
+  { id:'c63', moduleId:'m6', core:true, category:'application', front:'Why are countdown timers and low-stock warnings used?', back:'To collapse your decision window so you act on fear before you deliberate.' },
+  { id:'c64', moduleId:'m6', core:true, category:'concept', front:'How does exclusivity raise desire?', back:'"Members only" and forbidden-fruit framing increase wanting independent of real worth.' },
+  { id:'c65', moduleId:'m6', core:true, category:'application', front:'What is the antidote to urgency?', back:'Treat urgency as a red flag and deliberately slow down; ask if you would want it freely tomorrow.' },
+  { id:'c66', moduleId:'m6', core:true, category:'concept', front:'Why is loss framing stronger than gain framing?', back:'"Do not miss out" outpulls "you will gain" because we are wired to avoid losses.' },
+  { id:'c67', moduleId:'m6', core:false, category:'application', front:'Are most deadlines real?', back:'No; the majority are manufactured to manipulate tempo.' },
+  { id:'c68', moduleId:'m6', core:false, category:'concept', front:'What is FOMO and why does it work?', back:'Fear of missing out, an anticipated loss that pressures impulsive action.' },
+  { id:'c69', moduleId:'m6', core:false, category:'application', front:'Why does "only 3 left" boost sales?', back:'Perceived scarcity signals value and triggers urgency to avoid losing the chance.' },
+  { id:'c70', moduleId:'m6', core:false, category:'concept', front:'How does newly imposed scarcity affect desire?', back:'A freedom or item that becomes suddenly restricted is craved more than one always scarce (reactance).' },
+  { id:'c71', moduleId:'m6', core:true, category:'application', front:'What does urgency reveal about an offer?', back:'That you are meant to act before thinking, real opportunities rarely forbid deliberation.' },
+  { id:'c72', moduleId:'m6', core:true, category:'application', front:'What pause-question defuses scarcity?', back:'"Would I still want this if it were available freely tomorrow?"' },
+  { id:'c73', moduleId:'m7', core:true, category:'concept', front:'What three fuels power coercive manipulation?', back:'Fear, Obligation, and Guilt (FOG).' },
+  { id:'c74', moduleId:'m7', core:true, category:'concept', front:'What is gaslighting?', back:'Systematically denying someones reality until they distrust their own memory and judgment.' },
+  { id:'c75', moduleId:'m7', core:true, category:'concept', front:'What is intermittent reinforcement?', back:'Unpredictable cycles of cruelty and affection that are more addictive than steady kindness.' },
+  { id:'c76', moduleId:'m7', core:true, category:'concept', front:'What is a trauma bond?', back:'An attachment to an abuser forged by relief when intermittent cruelty pauses.' },
+  { id:'c77', moduleId:'m7', core:true, category:'application', front:'How do you resist FOG and gaslighting?', back:'Name the pattern, keep external records of events, and break the isolation it requires.' },
+  { id:'c78', moduleId:'m7', core:true, category:'application', front:'How is guilt used as a remote control?', back:'"After all I have done for you" converts your conscience into leverage for compliance.' },
+  { id:'c79', moduleId:'m7', core:false, category:'application', front:'Why does an unpredictable temper produce compliance?', back:'It trains you to walk on eggshells and obey preemptively to avoid the threat.' },
+  { id:'c80', moduleId:'m7', core:true, category:'concept', front:'Why does isolation matter to coercion?', back:'It removes outside reality checks, leaving the manipulator to define what is true.' },
+  { id:'c81', moduleId:'m7', core:false, category:'concept', front:'What gambling schedule mirrors trauma bonding?', back:'Variable-ratio reinforcement, the same intermittent reward that hooks slot-machine players.' },
+  { id:'c82', moduleId:'m7', core:false, category:'application', front:'What is a common gaslighting phrase?', back:'"That never happened" or "you are too sensitive," aimed at rewriting your perception.' },
+  { id:'c83', moduleId:'m7', core:false, category:'concept', front:'How is obligation related to reciprocity?', back:'Obligation is reciprocity turned coercive: a manufactured debt you are punished for not repaying.' },
+  { id:'c84', moduleId:'m7', core:true, category:'application', front:'Why keep a written record in a FOG dynamic?', back:'So gaslighting cannot rewrite your memory; the record anchors objective reality.' },
+  { id:'c85', moduleId:'m8', core:true, category:'concept', front:'What is the Dark Triad?', back:'Three overlapping manipulative personality patterns: narcissism, Machiavellianism, and psychopathy.' },
+  { id:'c86', moduleId:'m8', core:true, category:'concept', front:'What drives the narcissist?', back:'A hunger for admiration and validation (supply), with grandiosity masking fragile self-worth.' },
+  { id:'c87', moduleId:'m8', core:true, category:'concept', front:'What characterizes Machiavellianism?', back:'Cold, strategic, instrumental manipulation; relationships as tools and morality as negotiable.' },
+  { id:'c88', moduleId:'m8', core:true, category:'concept', front:'What defines psychopathy?', back:'Shallow affect, impulsivity, fearlessness, and near-total absence of empathy or remorse.' },
+  { id:'c89', moduleId:'m8', core:true, category:'concept', front:'What is the shared core of the Dark Triad?', back:'Low empathy plus willingness to exploit others for personal advantage.' },
+  { id:'c90', moduleId:'m8', core:false, category:'application', front:'What is narcissistic devaluation?', back:'Charm during pursuit, then contempt and criticism once you are secured.' },
+  { id:'c91', moduleId:'m8', core:true, category:'application', front:'Why judge patterns over momentary charm?', back:'Predators engineer first impressions; their history and consistency reveal the truth.' },
+  { id:'c92', moduleId:'m8', core:true, category:'application', front:'What is a reliable tell of a manipulator?', back:'Words that chronically fail to match actions.' },
+  { id:'c93', moduleId:'m8', core:false, category:'concept', front:'How does the Machiavellian differ from the narcissist?', back:'Driven by advantage rather than ego; patient, calculating, and focused on outcomes over admiration.' },
+  { id:'c94', moduleId:'m8', core:false, category:'concept', front:'Why is the psychopath disarmingly convincing?', back:'No conscience-friction means no tells of guilt, enabling bold, fluent deception.' },
+  { id:'c95', moduleId:'m8', core:false, category:'application', front:'What does a trail of "crazy exes" suggest?', back:'A possible pattern of the speaker manipulating and then discrediting former partners.' },
+  { id:'c96', moduleId:'m8', core:true, category:'application', front:'When words and actions diverge, which do you trust?', back:'The actions, always.' },
+  { id:'c97', moduleId:'m9', core:true, category:'concept', front:'What is presupposition in persuasion?', back:'Embedding the desired conclusion as a given ("when you sign up...") so it goes unexamined.' },
+  { id:'c98', moduleId:'m9', core:true, category:'concept', front:'How do framing and wording change decisions?', back:'"90% survive" versus "10% die" describe the same fact but produce opposite choices.' },
+  { id:'c99', moduleId:'m9', core:true, category:'concept', front:'What is anchoring?', back:'An opening number that drags all later estimates toward it, even when arbitrary.' },
+  { id:'c100', moduleId:'m9', core:true, category:'concept', front:'What is a false dichotomy?', back:'Collapsing many options into two ("with us or against us") to force a choice on set terms.' },
+  { id:'c101', moduleId:'m9', core:true, category:'application', front:'How do you counter covert language?', back:'Reject the frame and surface the hidden assumption rather than answering within it.' },
+  { id:'c102', moduleId:'m9', core:true, category:'application', front:'What is a loaded question?', back:'One that smuggles in an unproven assumption ("why are you so defensive?").' },
+  { id:'c103', moduleId:'m9', core:false, category:'application', front:'What is an embedded command?', back:'An instruction hidden inside an observation ("you might find yourself agreeing...").' },
+  { id:'c104', moduleId:'m9', core:true, category:'concept', front:'Why is whoever sets the frame powerful?', back:'The frame predetermines the range of acceptable conclusions.' },
+  { id:'c105', moduleId:'m9', core:true, category:'application', front:'How do you defeat a false dichotomy?', back:'Expand it: "Those are not the only two options."' },
+  { id:'c106', moduleId:'m9', core:false, category:'application', front:'How does anchoring help a negotiator?', back:'The first number stated pulls the final agreement toward the anchor.' },
+  { id:'c107', moduleId:'m9', core:false, category:'concept', front:'Why does grammar persuade while you debate content?', back:'Assumptions buried in structure are accepted automatically while attention stays on the surface.' },
+  { id:'c108', moduleId:'m9', core:true, category:'application', front:'What sentence reclaims a presupposed frame?', back:'"Wait, I have not agreed to that at all."' },
+  { id:'c109', moduleId:'m10', core:true, category:'application', front:'What is the single most powerful defense against manipulation?', back:'The pause, delay defeats urgency, reciprocity, and pressure at once.' },
+  { id:'c110', moduleId:'m10', core:true, category:'application', front:'Why does naming a tactic out loud disarm it?', back:'Manipulation depends on operating beneath awareness; daylight collapses it.' },
+  { id:'c111', moduleId:'m10', core:true, category:'concept', front:'What is a boundary, really?', back:'An enforced limit you keep, not a request you negotiate or justify.' },
+  { id:'c112', moduleId:'m10', core:true, category:'application', front:'What is the gray rock method?', back:'Becoming boring and unreactive to starve high-conflict predators of emotional supply.' },
+  { id:'c113', moduleId:'m10', core:true, category:'application', front:'What three questions screen any request?', back:'Who benefits, why now, and what happens if I simply say no?' },
+  { id:'c114', moduleId:'m10', core:false, category:'application', front:'What is the broken-record technique?', back:'Calmly repeating your no without new justifications the manipulator can attack.' },
+  { id:'c115', moduleId:'m10', core:true, category:'concept', front:'Why does over-explaining a no backfire?', back:'Each reason hands the manipulator a new thread to pull and negotiate.' },
+  { id:'c116', moduleId:'m10', core:true, category:'concept', front:'Why do manipulators hate delay?', back:'Deliberation is their enemy; their tactics need speed and momentum.' },
+  { id:'c117', moduleId:'m10', core:true, category:'application', front:'What does it mean if saying no triggers punishment?', back:'You have identified a manipulator, and your answer should remain no.' },
+  { id:'c118', moduleId:'m10', core:false, category:'concept', front:'Is defensive awareness the same as paranoia?', back:'No; it is pattern recognition plus a few reliable moves, not suspicion of everyone.' },
+  { id:'c119', moduleId:'m10', core:false, category:'application', front:'Why deny a high-conflict person a reaction?', back:'A predator starves when there is no drama or emotional supply to feed on.' },
+  { id:'c120', moduleId:'m10', core:true, category:'application', front:'What phrase buys you decision time?', back:'"I will think about it and get back to you."' },
+];
+
+const ARENA = [
+  { id:'p1', moduleId:'m1', title:'Q1: The Free Trial', difficulty:2, reward:100, timeLimit:60, body:'A company sends you a free gift then asks for a donation. What is happening?', options:['Pure generosity with no expectation','Reciprocity: the gift manufactures a debt to extract a larger donation','A coincidence','Social proof'], correct:1, explanation:'The unsolicited gift is an opening move designed to trigger the obligation to repay, usually with far more than the gift was worth.' },
+  { id:'p2', moduleId:'m1', title:'Q2: The Big Ask', difficulty:3, reward:150, timeLimit:60, body:'A colleague asks to borrow $500. You refuse. They say "fine, can I borrow $50?" Why might you say yes?', options:['Because $50 is objectively reasonable','Door-in-the-face: their concession pressures you to concede in return','Social proof','Scarcity'], correct:1, explanation:'The retreat from $500 to $50 feels like a gift, so reciprocity of concessions pressures you to give a concession back, the $50 they wanted all along.' },
+  { id:'p3', moduleId:'m1', title:'Q3: The Discharge Urge', difficulty:4, reward:200, timeLimit:60, body:'You feel uncomfortable owing a near-stranger who did you a favor. What drives the discomfort?', options:['Genuine friendship','Aversion to standing in debt, which we overpay to discharge','Scarcity','Authority'], correct:1, explanation:'Owing feels heavier than the favor was worth, so people repay disproportionately just to be free of the debt.' },
+  { id:'p4', moduleId:'m1', title:'Q4: Defusing It', difficulty:2, reward:250, timeLimit:60, body:'A vendor gives you a "gift" then makes a pitch. What question protects you?', options:['"Is this person likable?"','"Would I agree to this if no gift had been given?"','"Are others buying?"','"Is it almost sold out?"'], correct:1, explanation:'Decoupling the offer from the gift reveals whether the debt, not the merits, is steering your decision.' },
+  { id:'p5', moduleId:'m2', title:'Q1: The Tiny Yes', difficulty:2, reward:100, timeLimit:60, body:'A charity first asks you to sign a harmless petition, then asks for a large donation. The tactic is?', options:['Scarcity','Foot-in-the-door','Authority','Social proof'], correct:1, explanation:'The small initial commitment reshapes self-image ("I support this cause"), making the larger request consistent and harder to refuse.' },
+  { id:'p6', moduleId:'m2', title:'Q2: Sunk Time', difficulty:3, reward:150, timeLimit:60, body:'You have spent two years on a failing venture. An advisor says "you have come too far to quit." This is?', options:['Sound advice','The sunk-cost lever exploiting consistency','Reciprocity','Liking'], correct:1, explanation:'Past investment is gone regardless. Rational choice weighs only future costs against future benefits; "too far to quit" is a manipulation.' },
+  { id:'p7', moduleId:'m2', title:'Q3: Going Public', difficulty:4, reward:200, timeLimit:60, body:'A manipulator pushes you to announce a decision publicly before you are sure. Why?', options:['To celebrate with you','Public commitments lock hardest, raising the identity cost of changing your mind','Scarcity','Authority'], correct:1, explanation:'Visibility makes retreat costly to your self-image, so you defend the public position even against your interest.' },
+  { id:'p8', moduleId:'m2', title:'Q4: The Antidote', difficulty:2, reward:250, timeLimit:60, body:'What best protects you from the consistency lock?', options:['Always finish what you start','Ask: deciding fresh today, would I still choose this?','Never make commitments','Trust your first instinct'], correct:1, explanation:'Consistency with a less-informed past self is not a virtue; the freedom to update on new information is the defense.' },
+  { id:'p9', moduleId:'m3', title:'Q1: The Reviews', difficulty:2, reward:100, timeLimit:60, body:'A product shows 5,000 glowing reviews, but they are vague and repetitive. What should you suspect?', options:['It is genuinely the best','Manufactured social proof (fake or paid reviews)','Scarcity','Reciprocity'], correct:1, explanation:'Consensus is easily fabricated. Trace where the proof comes from rather than trusting the apparent crowd.' },
+  { id:'p10', moduleId:'m3', title:'Q2: The Frozen Crowd', difficulty:3, reward:150, timeLimit:60, body:'In a smoky room, everyone stays calm, so you do too, though you are worried. This is?', options:['Correct risk assessment','Pluralistic ignorance','Authority','Liking'], correct:1, explanation:'Each person reads others outward calm as evidence of no emergency, while privately alarmed, producing collective paralysis.' },
+  { id:'p11', moduleId:'m3', title:'Q3: People Like You', difficulty:4, reward:200, timeLimit:60, body:'"Customers like you also bought this" is more persuasive than a generic crowd because?', options:['It is cheaper','Similarity amplifies social proof; we copy those we identify with','It is scarcer','It is an authority'], correct:1, explanation:'Social proof bites hardest when the crowd resembles us, so "people like you" outperforms a generic majority.' },
+  { id:'p12', moduleId:'m3', title:'Q4: The Check', difficulty:2, reward:250, timeLimit:60, body:'What question best neutralizes manufactured consensus?', options:['"Is it popular?"','"Where does this consensus actually come from, and is it real?"','"Is it almost gone?"','"Do I like the brand?"'], correct:1, explanation:'Decoupling the merits of a choice from the surrounding crowd defeats staged social proof.' },
+  { id:'p13', moduleId:'m4', title:'Q1: The Lab Coat', difficulty:2, reward:100, timeLimit:60, body:'Milgrams subjects shocked strangers because an experimenter in a coat told them to. The lesson?', options:['People are evil','Symbols of authority trigger near-automatic obedience','Social proof','Scarcity'], correct:1, explanation:'It was the costume and command of authority, not reasoning, that drove compliance, deference runs on autopilot.' },
+  { id:'p14', moduleId:'m4', title:'Q2: The Confident Stranger', difficulty:3, reward:150, timeLimit:60, body:'Someone with a vague title and lots of jargon pressures a decision. What protects you?', options:['Defer to their expertise','Verify whether they are an authority on THIS question and whose interest it serves','Assume they are right','Follow the crowd'], correct:1, explanation:'Separate message from messenger; counterfeit authority relies on costume and bristles when politely questioned.' },
+  { id:'p15', moduleId:'m4', title:'Q3: Borrowed Credibility', difficulty:4, reward:200, timeLimit:60, body:'A salesperson name-drops famous clients and displays logos they have no real ties to. This is?', options:['Authority by proximity','Reciprocity','Scarcity','Commitment'], correct:0, explanation:'Standing near power and borrowing logos transfers credibility that was never earned.' },
+  { id:'p16', moduleId:'m4', title:'Q4: The Expert Frame', difficulty:2, reward:250, timeLimit:60, body:'"As a doctor, I can tell you this supplement works." Why is this powerful and risky?', options:['Doctors are never wrong','It recasts opinion as fact, is hard to question live, and easy to counterfeit','It is social proof','It is scarcity'], correct:1, explanation:'The expert frame discourages scrutiny; verify real, relevant expertise rather than accepting the frame.' },
+  { id:'p17', moduleId:'m5', title:'Q1: Instant Best Friend', difficulty:2, reward:100, timeLimit:60, body:'Someone mirrors your words and claims you have everything in common, then makes an ask. Red flag?', options:['No, you clicked','Yes, fast-spiking liking (manufactured rapport) lowers defenses','It is authority','It is scarcity'], correct:1, explanation:'Mirroring fabricates similarity and fast rapport that is then cashed in; unusually fast liking is a warning, not a connection.' },
+  { id:'p18', moduleId:'m5', title:'Q2: The Flattery', difficulty:3, reward:150, timeLimit:60, body:'A vendor showers you with praise before pitching. Does obvious flattery still work?', options:['No, you see through it','Yes, praise raises liking and lowers resistance even when transparent','Only on strangers','Only in writing'], correct:1, explanation:'Flattery reliably increases liking and compliance even when you know it is strategic.' },
+  { id:'p19', moduleId:'m5', title:'Q3: The Halo', difficulty:4, reward:200, timeLimit:60, body:'You assume an attractive, charming person is also honest and competent. This is?', options:['Accurate judgment','The halo effect','Social proof','Reciprocity'], correct:1, explanation:'One positive trait spills over into unrelated assumptions, biasing you to over-trust and over-comply.' },
+  { id:'p20', moduleId:'m5', title:'Q4: The Test', difficulty:2, reward:250, timeLimit:60, body:'What question checks whether liking is steering you?', options:['"Do I like them?"','"Would I accept this exact deal from someone unpleasant?"','"Is it scarce?"','"Who else bought it?"'], correct:1, explanation:'Separating the proposal from the person reveals whether the merits or the manufactured liking is driving you.' },
+  { id:'p21', moduleId:'m6', title:'Q1: The Countdown', difficulty:2, reward:100, timeLimit:60, body:'A checkout page shows "offer expires in 9:59" with a ticking clock. The most likely purpose?', options:['Honest scheduling','Collapse your decision window via manufactured urgency','Social proof','Authority'], correct:1, explanation:'Artificial deadlines hijack loss aversion to force a fast, fear-driven decision before you deliberate.' },
+  { id:'p22', moduleId:'m6', title:'Q2: Members Only', difficulty:3, reward:150, timeLimit:60, body:'An offer is framed as "exclusive, by invitation." Why does this raise desire?', options:['It is cheaper','Exclusivity and forbidden-fruit framing increase wanting independent of worth','It is social proof','It is reciprocity'], correct:1, explanation:'Restricting access inflates desire regardless of the items real value.' },
+  { id:'p23', moduleId:'m6', title:'Q3: Loss vs Gain', difficulty:4, reward:200, timeLimit:60, body:'Which framing usually drives more action: "save $50" or "do not lose your $50 discount"?', options:['Save $50','Do not lose your discount (loss framing)','They are equal','Neither works'], correct:1, explanation:'Loss aversion makes the threat of losing outpull the promise of gaining.' },
+  { id:'p24', moduleId:'m6', title:'Q4: The Pause', difficulty:2, reward:250, timeLimit:60, body:'You feel intense urgency to buy now. What is the disciplined response?', options:['Act immediately','Slow down deliberately and ask if you would want it freely tomorrow','Ask a friend to decide','Buy two'], correct:1, explanation:'Urgency is the tell. Real opportunities rarely forbid thought; the pause defuses scarcity.' },
+  { id:'p25', moduleId:'m7', title:'Q1: Rewriting Reality', difficulty:2, reward:100, timeLimit:60, body:'A partner insists events you clearly remember "never happened" and calls you too sensitive. This is?', options:['An honest disagreement','Gaslighting','Social proof','Reciprocity'], correct:1, explanation:'Systematically denying your reality erodes trust in your own memory, making you depend on them to define what is real.' },
+  { id:'p26', moduleId:'m7', title:'Q2: Hot and Cold', difficulty:3, reward:150, timeLimit:60, body:'Someone alternates unpredictably between cruelty and affection, and you feel hooked. The mechanism?', options:['True love','Intermittent reinforcement forming a trauma bond','Authority','Scarcity'], correct:1, explanation:'Variable cycles of pain and relief are more addictive than steady kindness, the same schedule that hooks gamblers.' },
+  { id:'p27', moduleId:'m7', title:'Q3: The Guilt Lever', difficulty:4, reward:200, timeLimit:60, body:'"After everything I have done for you, you owe me this." Which fuel is being used?', options:['Fear','Obligation and guilt (FOG)','Social proof','Liking'], correct:1, explanation:'Guilt converts your conscience into a remote control; obligation is reciprocity turned coercive.' },
+  { id:'p28', moduleId:'m7', title:'Q4: The Exit', difficulty:2, reward:250, timeLimit:60, body:'What best protects you in a FOG dynamic?', options:['Argue harder','Name the pattern, keep external records, and break the isolation','Comply to keep peace','Wait for change'], correct:1, explanation:'Coercion needs isolation and control of reality; records anchor the truth and outside contact breaks the spell.' },
+  { id:'p29', moduleId:'m8', title:'Q1: The Charmer', difficulty:2, reward:100, timeLimit:60, body:'A new acquaintance is dazzlingly charming but has a trail of betrayed partners. What should guide you?', options:['First impressions','Patterns and history over momentary charm','Their confidence','Their titles'], correct:1, explanation:'Predators engineer charm; consistent behavior over time, not the first impression, reveals the truth.' },
+  { id:'p30', moduleId:'m8', title:'Q2: Admiration Supply', difficulty:3, reward:150, timeLimit:60, body:'A person needs constant praise and rages when criticized, manipulating to feed it. This pattern is?', options:['Psychopathy','Narcissism','Machiavellianism','Healthy esteem'], correct:1, explanation:'Grandiosity masking fragile self-worth and a hunger for admiration is the narcissistic pattern.' },
+  { id:'p31', moduleId:'m8', title:'Q3: Cold Strategy', difficulty:4, reward:200, timeLimit:60, body:'Someone treats relationships purely as tools, deceiving patiently for advantage without ego. This is?', options:['Narcissism','Machiavellianism','Psychopathy','Liking'], correct:1, explanation:'Instrumental, calculating, image-managed manipulation driven by advantage rather than admiration is Machiavellian.' },
+  { id:'p32', moduleId:'m8', title:'Q4: Words vs Actions', difficulty:2, reward:250, timeLimit:60, body:'A manipulators promises never match their behavior. Which do you trust?', options:['The promises','The actions','Whichever is kinder','Neither matters'], correct:1, explanation:'When words and actions diverge, the actions are the truth.' },
+  { id:'p33', moduleId:'m9', title:'Q1: The Hidden Given', difficulty:2, reward:100, timeLimit:60, body:'"When you upgrade, do you want monthly or annual billing?" What has been smuggled in?', options:['Nothing','The presupposition that you will upgrade at all','A discount','Social proof'], correct:1, explanation:'Presupposition embeds the conclusion as a given; you are only offered a choice of how, not whether.' },
+  { id:'p34', moduleId:'m9', title:'Q2: Same Fact, Two Frames', difficulty:3, reward:150, timeLimit:60, body:'"90% survive" versus "10% die" produce different choices because of?', options:['Different facts','Framing effects','Scarcity','Authority'], correct:1, explanation:'Identical information framed as gain or loss steers decisions; whoever sets the frame steers the outcome.' },
+  { id:'p35', moduleId:'m9', title:'Q3: With Us or Against Us', difficulty:4, reward:200, timeLimit:60, body:'A leader says you are either fully loyal or an enemy. This rhetorical move is?', options:['A fair summary','A false dichotomy','Social proof','Reciprocity'], correct:1, explanation:'Collapsing a spectrum into two options forces a choice on the manipulators terms and hides alternatives.' },
+  { id:'p36', moduleId:'m9', title:'Q4: Reclaiming the Frame', difficulty:2, reward:250, timeLimit:60, body:'A loaded question assumes your guilt ("why are you so defensive?"). Best response?', options:['Defend yourself','Surface and reject the assumption rather than answering within it','Apologize','Stay silent'], correct:1, explanation:'Naming the hidden presupposition ("I reject the premise that I am defensive") takes back control of the frame.' },
+  { id:'p37', moduleId:'m10', title:'Q1: The Pressure Close', difficulty:2, reward:100, timeLimit:60, body:'A salesperson demands a decision "right now." What is the strongest counter-move?', options:['Decide quickly','"I will think about it and get back to you"','Ask the price again','Bring a friend'], correct:1, explanation:'The pause defeats urgency, reciprocity, and pressure simultaneously; manipulators hate delay because deliberation kills their tactics.' },
+  { id:'p38', moduleId:'m10', title:'Q2: The Repeated No', difficulty:3, reward:150, timeLimit:60, body:'A manipulator keeps demanding reasons for your no. Best technique?', options:['Explain in detail','Broken record: calmly repeat the no without new justifications','Give one reason','Concede a little'], correct:1, explanation:'Every added justification hands the manipulator a thread to pull; a calm, repeated no offers nothing to attack.' },
+  { id:'p39', moduleId:'m10', title:'Q3: Starving the Predator', difficulty:4, reward:200, timeLimit:60, body:'With a high-conflict, drama-seeking manipulator, what reduces their leverage?', options:['Fight back hard','Gray rock: become boring and deny emotional supply','Plead','Match their energy'], correct:1, explanation:'Predators feed on reactions and drama; an unreactive target starves them of supply.' },
+  { id:'p40', moduleId:'m10', title:'Q4: The Screen', difficulty:2, reward:250, timeLimit:60, body:'What three questions screen any suspicious request?', options:['Cost, color, brand','Who benefits, why now, and what happens if I say no?','Is it popular, scarce, endorsed?','None needed'], correct:1, explanation:'If saying no triggers punishment, pressure, or guilt, you have found a manipulator, and the answer should be no.' },
+];
+
+const PROJECT_PHASES = [
+  { id:'ph1', moduleId:'m1', title:'Phase 1: The Generous Investor', scenario:'A would-be investor showers your startup with unsolicited favors, intros, and a lavish dinner before any deal, then asks for board control "as a formality." Your read?', options:['Accept; he has been so generous','Recognize reciprocity: the favors manufacture a debt to extract outsized control','Refuse all help forever','Match his gifts'], correct:1, explanation:'The lavish run-up is an opening move, not generosity. A gift given to obligate you is a sale. Accept kindness if you wish, but owe nothing on the actual terms.' },
+  { id:'ph2', moduleId:'m2', title:'Phase 2: The Small Yes', scenario:'He gets you to publicly announce a partnership "in principle," then leverages it: "you already committed." What protects you?', options:['Honor the public statement no matter what','Note foot-in-the-door + public-commitment pressure; decide as if fresh today','Announce something bigger','Apologize publicly'], correct:1, explanation:'A tiny public yes is being used to lock you into far more. Consistency with a less-informed past self is not a virtue; reassess on current information.' },
+  { id:'ph3', moduleId:'m3', title:'Phase 3: The Manufactured Crowd', scenario:'He claims "every other founder in the portfolio took these terms" and shows glowing but vague testimonials. Your move?', options:['Follow the crowd','Trace the consensus, suspect manufactured social proof, and judge the terms alone','Demand more testimonials','Sign to fit in'], correct:1, explanation:'Apparent consensus is easily fabricated. Decouple the merits of the terms from the staged crowd around them.' },
+  { id:'ph4', moduleId:'m4', title:'Phase 4: The Borrowed Authority', scenario:'He name-drops famous mentors and flashes logos to imply unquestionable expertise on your valuation. What do you do?', options:['Defer to his expertise','Verify real, relevant authority and ask whose interest the advice serves','Assume he is right','Drop your own counsel'], correct:1, explanation:'Authority by proximity transfers unearned credibility. Separate the message from the messenger and verify rather than infer.' },
+  { id:'ph5', moduleId:'m5', title:'Phase 5: The Fast Friend', scenario:'He mirrors your values, flatters you constantly, and frames refusal as betraying "our team." Red flag?', options:['No, you bonded','Yes, manufactured liking and the same-team frame are lowering your guard','Reciprocate the flattery','Sign to keep the friendship'], correct:1, explanation:'Fast-spiking liking and the halo effect bias you to over-trust. Judge the deal as if it came from someone you disliked.' },
+  { id:'ph6', moduleId:'m6', title:'Phase 6: The Exploding Offer', scenario:'The term sheet "expires at midnight, only this one chance." How do you respond?', options:['Sign before midnight','Treat urgency as a red flag and deliberately slow the tempo','Ask for two hours','Panic-sign'], correct:1, explanation:'Artificial deadlines hijack loss aversion to force a fast, fear-driven yes. Real opportunities rarely forbid deliberation.' },
+  { id:'ph7', moduleId:'m7', title:'Phase 7: The FOG Rolls In', scenario:'When you hesitate, he turns cold, implies your team will suffer, and says you are "paranoid and ungrateful." This is?', options:['Fair feedback','Fear, Obligation, Guilt plus gaslighting, name it and document it','Proof you are wrong','A reason to comply'], correct:1, explanation:'Coercion runs on FOG and reality-denial. Name the pattern, keep written records, and break the isolation he is engineering.' },
+  { id:'ph8', moduleId:'m8', title:'Phase 8: The Pattern', scenario:'You learn he has a trail of founders he charmed, controlled, and ousted, all dismissed as "crazy." What guides your judgment?', options:['His charm with you','Patterns and history over momentary charm; words versus actions','His confidence','His credentials'], correct:1, explanation:'The Dark Triad reveals itself in history, not first impressions. When his words and actions diverge, believe the actions.' },
+  { id:'ph9', moduleId:'m9', title:'Phase 9: The Loaded Term Sheet', scenario:'The contract asks "do you want standard or premium control transfer?", presupposing any transfer. How do you answer?', options:['Pick premium','Reject the frame: "I have not agreed to transfer control at all"','Pick standard','Negotiate the premium'], correct:1, explanation:'Presupposition smuggles the conclusion in as a given. Surface and reject the hidden assumption instead of choosing within it.' },
+  { id:'ph10', moduleId:'m10', title:'Phase 10: The Counter-Game', scenario:'You decide to neutralize him for good. What is the strongest closing strategy?', options:['Out-manipulate him','Slow the tempo, name the tactics, hold firm boundaries, and walk if no triggers punishment','Explain your reasons at length','Quietly comply'], correct:1, explanation:'Defense beats counter-manipulation. The pause, naming tactics, enforced boundaries, and gray rock starve the predator. If a clear no triggers punishment, you have your answer.' },
+];
+
+const REAL_WORLD_MISSIONS = [
+  { id:'rw1', title:'The Reciprocity Watch', body:'Spot one "free" gift, sample, or favor offered to you today. Ask what compliance it is quietly buying.' },
+  { id:'rw2', title:'The Concession Trap', body:'Notice a negotiation where someone makes a big ask, then "backs down." Name the door-in-the-face move.' },
+  { id:'rw3', title:'The Tiny Yes', body:'Catch one foot-in-the-door request today, a small ask meant to set up a bigger one. Decline the second on its own merits.' },
+  { id:'rw4', title:'The Sunk Cost', body:'Find one thing you continue only because you "have already invested." Decide it fresh, on future value alone.' },
+  { id:'rw5', title:'The Manufactured Crowd', body:'Examine one "bestseller" or "thousands love it" claim. Ask where the consensus actually comes from.' },
+  { id:'rw6', title:'The Frozen Room', body:'Recall a time you stayed calm because others did. Was it judgment, or pluralistic ignorance?' },
+  { id:'rw7', title:'The Costume', body:'Notice one message that borrows authority (title, uniform, jargon). Ask if it is authority on THIS question.' },
+  { id:'rw8', title:'The Expert Frame', body:'Catch an "as a [profession]..." claim today. Separate the opinion from the credential.' },
+  { id:'rw9', title:'The Fast Friend', body:'Notice anyone whose liking for you spiked unusually fast. Ask what comes after the rapport.' },
+  { id:'rw10', title:'The Flattery Check', body:'Receive a compliment that precedes a request. Judge the request as if from someone you disliked.' },
+  { id:'rw11', title:'The Countdown', body:'Find one artificial deadline or "only X left" today. Pause and ask if you would want it freely tomorrow.' },
+  { id:'rw12', title:'The Loss Frame', body:'Spot one message framing inaction as a loss ("do not miss out"). Reframe it as a neutral choice.' },
+  { id:'rw13', title:'The Guilt Lever', body:'Notice one "after all I have done for you." Name it as obligation, not a real debt.' },
+  { id:'rw14', title:'The Reality Check', body:'If anyone tells you an event you remember "never happened," write down what actually occurred.' },
+  { id:'rw15', title:'The Pattern Read', body:'Pick one person and compare their words to their actions this week. Trust the actions.' },
+  { id:'rw16', title:'The Hidden Given', body:'Find one question that presupposes a conclusion ("when you upgrade..."). Surface the assumption.' },
+  { id:'rw17', title:'The Two-Box Trap', body:'Catch a false dichotomy today ("with us or against us"). Name a third option aloud.' },
+  { id:'rw18', title:'The Anchor', body:'Notice the first number in a negotiation. Watch how it pulls every later figure.' },
+  { id:'rw19', title:'The Pause', body:'Practice "I will think about it and get back to you" on one pressured decision today.' },
+  { id:'rw20', title:'The Broken Record', body:'Hold one boundary by repeating your no calmly, with zero added justification.' },
+  { id:'rw21', title:'The Gray Rock', body:'With one drama-seeking person, stay boring and unreactive. Note how it starves the dynamic.' },
+  { id:'rw22', title:'The Three Questions', body:'For one request today ask: who benefits, why now, and what happens if I say no?' },
+  { id:'rw23', title:'The Mirror', body:'Watch for someone mirroring your posture or words to fabricate similarity. Note the technique.' },
+  { id:'rw24', title:'The Forbidden Fruit', body:'Notice an "exclusive, members only" pitch. Ask if restriction, not value, is driving your interest.' },
+  { id:'rw25', title:'The Eggshells', body:'Identify any relationship where you comply preemptively to avoid a temper. Name the fear lever.' },
+  { id:'rw26', title:'The Isolation Test', body:'Notice if anyone discourages you from consulting outside friends. Treat it as a warning sign.' },
+  { id:'rw27', title:'The Embedded Command', body:'Catch an instruction hidden in an observation ("you might find yourself agreeing"). Spot the smuggle.' },
+  { id:'rw28', title:'The Halo', body:'Notice when you assume an attractive or charming person is also honest. Separate the traits.' },
+  { id:'rw29', title:'The Supply', body:'Observe someone who needs constant admiration and rages when denied it. Note the narcissistic pattern.' },
+  { id:'rw30', title:'The Walk-Away', body:'Identify one situation where a clear no triggers punishment. That is your signal to leave.' },
+];
+
+const PROFILES = [
+  { threshold: 0, title: 'UNRANKED', desc: 'Complete drills to determine your influence profile.' },
+  { threshold: 500, title: 'OBSERVER', desc: 'You are starting to notice the levers being pulled around you.' },
+  { threshold: 1500, title: 'INTERPRETER', desc: 'You read tactics in real time and rarely take the bait.' },
+  { threshold: 3000, title: 'OPERATOR', desc: 'You see the whole game board and steer your own decisions.' },
+  { threshold: 6000, title: 'MACHIAVELLI', desc: 'You understand the dark arts completely, so they can never be used on you.' },
+];
+
+const STORAGE_KEY = 'machiavelli-v1';
+let S = null;
+
+function defaultState(){
+  const modules = {};
+  MODULES.forEach((m,i)=>{ modules[m.id] = { unlocked: i===0, lessonsRead: [], problemSolved: false }; });
+  const cards = {};
+  CARDS.forEach(c=>{ cards[c.id] = { ease:2.5, interval:0, repetitions:0, due:Date.now(), lastReviewed:null, correct:0, wrong:0 }; });
+  const project = {};
+  PROJECT_PHASES.forEach(p=>{ project[p.id] = { solved: false, choice: null }; });
+  const arena = {};
+  ARENA.forEach(p=>{ arena[p.id] = false; });
+  return {
+    xp:0, streak:0, longestStreak:0, lastVisit:null,
+    modules, cards, project, arena,
+    daily: { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null },
+    history: [], sessionLog: []
+  };
+}
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      const def = defaultState();
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
+    }
+  }catch(e){ localStorage.removeItem(STORAGE_KEY); }
+  return defaultState();
+}
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(t1, t2){ return Math.floor((t2 - t1) / 86400000); }
+
+function level(xp){ return Math.floor(Math.sqrt(xp/100)) + 1; }
+function xpForLevel(lvl){ return Math.pow(lvl-1, 2) * 100; }
+function xpProgress(){ const lvl = level(S.xp); const cur = xpForLevel(lvl); const next = xpForLevel(lvl+1); return { lvl, cur, next, pct: ((S.xp - cur) / (next - cur)) * 100 }; }
+
+function addXP(amount, reason){
+  const oldLvl = level(S.xp);
+  S.xp += amount;
+  const newLvl = level(S.xp);
+  S.daily.xpGained += amount;
+  if(newLvl > oldLvl){ toast('LEVEL UP - LVL '+newLvl, 'success'); flashCombo('LVL '+newLvl); }
+  S.sessionLog.unshift({ t: Date.now(), type:'xp', amount, reason });
+  if(S.sessionLog.length > 50) S.sessionLog.pop();
+}
+
+function updateStreak(){
+  const now = Date.now();
+  if(S.lastVisit){
+    const diff = daysBetween(S.lastVisit, now);
+    if(diff <= 0){}
+    else if(diff === 1){ S.streak += 1; }
+    else { S.streak = 1; }
+  }else{ S.streak = 1; }
+  S.lastVisit = now;
+  if(S.streak > S.longestStreak) S.longestStreak = S.streak;
+}
+
+function checkDailyReset(){
+  if(S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+  if(!S.daily.rtMissionId){ const idx = Math.floor(Math.random() * REAL_WORLD_MISSIONS.length); S.daily.rtMissionId = REAL_WORLD_MISSIONS[idx].id; }
+}
+
+function unlockNextModule(moduleId){ const idx = MODULES.findIndex(m=>m.id===moduleId); if(idx >= 0 && idx < MODULES.length - 1){ S.modules[MODULES[idx+1].id].unlocked = true; } }
+
+function moduleProgress(moduleId){
+  const m = S.modules[moduleId];
+  const lessonsTotal = 1;
+  const lessonsDone = m.lessonsRead.length;
+  const problemDone = m.problemSolved ? 1 : 0;
+  const total = lessonsTotal + 1;
+  const done = lessonsDone + problemDone;
+  return { done, total, pct: (done/total)*100, completed: done === total };
+}
+
+function getProfile(){ let current = PROFILES[0]; for(let p of PROFILES){ if(S.xp >= p.threshold) current = p; } return current; }
+
+function checkSecretUnlock(){
+  const allModulesComplete = MODULES.every(m => moduleProgress(m.id).completed);
+  const allProjectComplete = PROJECT_PHASES.every(p => S.project[p.id].solved);
+  if(allModulesComplete && allProjectComplete){
+    const container = document.getElementById('secretUnlockContainer');
+    if(container && !container.innerHTML){
+      let html = '<div class="secret-panel">';
+      html += '<h2>// PANARCHY ACHIEVED</h2>';
+      html += '<p>You have completed all 10 axes and successfully navigated Project Iago. You now possess the complete systems architecture.</p>';
+      html += '<p><strong>The Secret:</strong> The world is not a collection of parts; it is a web of interactions. By mapping boundaries, feedback loops, and bottlenecks, you see the system instead of the symptoms. You design for emergence, resilience, and adaptation. You are now a Maestro.</p>';
+      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '</div>';
+      container.innerHTML = html;
+      flashCombo('UNLOCKED');
+    }
+  }
+}
+
+function scheduleCard(cardId, quality){
+  const card = S.cards[cardId];
+  if(quality < 3){ card.repetitions = 0; card.interval = 0; card.wrong += 1; }
+  else{
+    if(card.repetitions === 0){ card.interval = quality === 5 ? 3 : 1; }
+    else if(card.repetitions === 1){ card.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? card.ease : card.ease * 0.8); card.interval = Math.max(1, Math.round(card.interval * factor)); }
+    card.repetitions += 1; card.correct += 1;
+  }
+  if(quality >= 3){ card.ease = card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if(card.ease < 1.3) card.ease = 1.3; }
+  card.lastReviewed = Date.now();
+  card.due = Date.now() + card.interval * 86400000;
+  S.history.push({ t: Date.now(), correct: quality >= 3 });
+  if(S.history.length > 500) S.history.shift();
+  return card.interval;
+}
+
+function previewInterval(cardId, quality){
+  const card = S.cards[cardId];
+  let reps = card.repetitions, interval = card.interval, ease = card.ease;
+  if(quality < 3) return 0;
+  if(reps === 0){ interval = quality === 5 ? 3 : 1; }
+  else if(reps === 1){ interval = quality === 5 ? 7 : 3; }
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? ease : ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+
+function getDueCards(filter){
+  const now = Date.now();
+  let due = CARDS.filter(c => S.cards[c.id].due <= now);
+  if(filter && filter !== 'all'){
+    if(filter === 'core') due = due.filter(c => c.core);
+    else due = due.filter(c => c.category === filter);
+  }
+  return due.sort((a,b) => { if(a.core !== b.core) return a.core ? -1 : 1; return S.cards[a.id].due - S.cards[b.id].due; });
+}
+
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = '';
+  if(type) el.classList.add(type);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function flashCombo(text){
+  const el = document.getElementById('comboFlash');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function parseLesson(text){
+  let html = text;
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = html.split('\n');
+  let inList = false; let out = [];
+  lines.forEach(line => {
+    if(line.match(/^\d+\. /)){
+      if(!inList){ out.push('<ul>'); inList = true; }
+      out.push('<li>'+line.replace(/^\d+\. /, '')+'</li>');
+    }else{
+      if(inList){ out.push('</ul>'); inList = false; }
+      out.push(line);
+    }
+  });
+  if(inList) out.push('</ul>');
+  html = out.join('\n');
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if(!p) return '';
+    if(p.startsWith('<h2>') || p.startsWith('<ul>') || p.startsWith('<blockquote>')) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return html;
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if(view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if(nav) nav.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'modules') renderModules();
+  else if(name === 'project') renderProject();
+  else if(name === 'drills') renderDrills();
+  else if(name === 'arena') renderArena();
+  else if(name === 'stats') renderStats();
+}
+
+function renderTopbar(){
+  const prog = xpProgress();
+  document.getElementById('topLevel').textContent = prog.lvl;
+  document.getElementById('topXp').textContent = S.xp;
+  document.getElementById('topStreak').textContent = S.streak;
+  document.getElementById('topDue').textContent = getDueCards().length;
+}
+
+function renderDashboard(){
+  renderTopbar();
+  checkSecretUnlock();
+  const missionTitle = document.getElementById('missionTitle');
+  const missionBody = document.getElementById('missionBody');
+  const missionBtn = document.getElementById('missionBtn');
+  const nextModule = MODULES.find(m => !moduleProgress(m.id).completed);
+  const dueCards = getDueCards();
+  let nextProjectPhase = null;
+  for (let i = 0; i < PROJECT_PHASES.length; i++) {
+    const p = PROJECT_PHASES[i];
+    if (!S.project[p.id].solved && S.modules[p.moduleId].unlocked) {
+      let canUnlock = true;
+      if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) canUnlock = false; }
+      if (canUnlock) { nextProjectPhase = p; break; }
+    }
+  }
+  if(dueCards.length > 0){
+    missionTitle.textContent = 'Clear Drill Queue';
+    missionBody.textContent = dueCards.length + ' cards due for review.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }else if(nextProjectPhase){
+    missionTitle.textContent = 'Project Iago: ' + nextProjectPhase.title;
+    missionBody.textContent = 'New project phase unlocked.';
+    missionBtn.textContent = 'Open Project ->';
+    missionBtn.onclick = () => showView('project');
+  }else if(nextModule){
+    const prog = moduleProgress(nextModule.id);
+    if(prog.done === 0){
+      missionTitle.textContent = 'Begin ' + nextModule.codename;
+      missionBody.textContent = nextModule.summary;
+      missionBtn.textContent = 'Start Module ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }else{
+      missionTitle.textContent = 'Continue ' + nextModule.codename;
+      missionBody.textContent = 'You are ' + Math.round(prog.pct) + '% through this module.';
+      missionBtn.textContent = 'Continue ->';
+      missionBtn.onclick = () => { showModuleDetail(nextModule.id); };
+    }
+  }else{
+    missionTitle.textContent = 'Architecture Complete';
+    missionBody.textContent = 'All ten axes are operational. Continue drilling to deepen mastery.';
+    missionBtn.textContent = 'Drill ->';
+    missionBtn.onclick = () => showView('drills');
+  }
+  document.getElementById('dailyStudied').textContent = S.daily.reviews;
+  const acc = S.daily.reviews > 0 ? Math.round((S.daily.correct / S.daily.reviews) * 100) + '%' : '--';
+  document.getElementById('dailyAccuracy').textContent = acc;
+  document.getElementById('dailySolved').textContent = S.daily.solved;
+  document.getElementById('dailyXp').textContent = S.daily.xpGained;
+  const rtMission = REAL_WORLD_MISSIONS.find(m => m.id === S.daily.rtMissionId);
+  if(rtMission){
+    document.getElementById('rtTitle').textContent = rtMission.title;
+    document.getElementById('rtBody').textContent = rtMission.body;
+    const rtBtn = document.getElementById('rtBtn');
+    if(S.daily.rtMissionCompleted){ rtBtn.textContent = 'Checked Completed'; rtBtn.disabled = true; rtBtn.style.opacity = '0.5'; }
+    else { rtBtn.textContent = 'Mark Complete + 25 XP'; rtBtn.disabled = false; rtBtn.style.opacity = '1'; }
+  }
+  const profile = getProfile();
+  document.getElementById('profTitle').textContent = profile.title;
+  document.getElementById('profDesc').textContent = profile.desc;
+  const masteryList = document.getElementById('masteryList');
+  masteryList.innerHTML = '';
+  MODULES.forEach(m => {
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(100, Math.log(card.interval + 1) / Math.log(30) * 100); totalMaturity += maturity; });
+    const avg = Math.round(totalMaturity / moduleCards.length);
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    const cls = avg < 30 ? 'low' : (avg < 70 ? 'mid' : '');
+    row.innerHTML = '<span class="mastery-name">'+m.codename+'</span><div class="mastery-bar"><div class="mastery-fill '+cls+'" style="width:'+avg+'%"></div></div><span class="mastery-val">'+avg+'%</span>';
+    masteryList.appendChild(row);
+  });
+  drawRadar();
+}
+
+function completeRTMission(){
+  if(!S.daily.rtMissionCompleted){
+    S.daily.rtMissionCompleted = true;
+    addXP(25, 'real-world mission');
+    toast('Mission complete + 25 XP', 'success');
+    saveState();
+    renderDashboard();
+  }
+}
+
+function drawRadar(){
+  const svg = document.getElementById('radarSvg');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const n = MODULES.length, R = 95;
+  [0.25, 0.5, 0.75, 1].forEach(r => {
+    const points = [];
+    for(let i = 0; i < n; i++){ const angle = -Math.PI/2 + (i / n) * Math.PI * 2; points.push((Math.cos(angle) * R * r) + ',' + (Math.sin(angle) * R * r)); }
+    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    ring.setAttribute('points', points.join(' ')); ring.setAttribute('class', 'radar-ring'); svg.appendChild(ring);
+  });
+  for(let i = 0; i < n; i++){
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', Math.cos(angle) * R); line.setAttribute('y2', Math.sin(angle) * R);
+    line.setAttribute('class', 'radar-axis'); svg.appendChild(line);
+  }
+  const points = [];
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const moduleCards = CARDS.filter(c => c.moduleId === m.id);
+    let totalMaturity = 0;
+    moduleCards.forEach(c => { const card = S.cards[c.id]; const maturity = Math.min(1, Math.log(card.interval + 1) / Math.log(30)); totalMaturity += maturity; });
+    const avg = totalMaturity / moduleCards.length;
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const r = R * avg;
+    points.push((Math.cos(angle) * r) + ',' + (Math.sin(angle) * r));
+  }
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', points.join(' ')); poly.setAttribute('class', 'radar-poly'); svg.appendChild(poly);
+  for(let i = 0; i < n; i++){
+    const m = MODULES[i];
+    const angle = -Math.PI/2 + (i / n) * Math.PI * 2;
+    const labelR = R + 18;
+    const x = Math.cos(angle) * labelR; const y = Math.sin(angle) * labelR;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x); text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'middle');
+    text.setAttribute('class', 'radar-label'); text.textContent = m.codename;
+    if(moduleProgress(m.id).completed) text.classList.add('active');
+    svg.appendChild(text);
+  }
+}
+
+function renderModules(){
+  renderTopbar();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const state = S.modules[m.id];
+    const prog = moduleProgress(m.id);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (state.unlocked ? '' : ' locked') + (prog.completed ? ' completed' : '');
+    card.innerHTML = '<div class="codename">// ' + m.codename + '</div><h3>' + m.title + '</h3><p>' + m.summary + '</p><div class="module-progress"><div class="module-progress-fill" style="width:'+prog.pct+'%"></div></div><div class="text-xs text-dim" style="margin-top:0.5rem;letter-spacing:0.15em">'+prog.done+'/'+prog.total+' COMPLETE</div>';
+    if(state.unlocked){ card.onclick = () => showModuleDetail(m.id); }
+    grid.appendChild(card);
+  });
+}
+
+function showModuleDetail(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  const state = S.modules[moduleId];
+  const prog = moduleProgress(moduleId);
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-module').classList.add('active');
+  let html = '<div class="lesson-back" onclick="MACHIAVELLI.show(\'modules\')"><- Modules</div>';
+  html += '<div class="module-detail-header"><div class="codename">// ' + m.codename + '</div><h1>' + m.title + '</h1><p>' + m.summary + '</p></div>';
+  html += '<div class="module-detail-grid">';
+  const lessonDone = state.lessonsRead.includes('l1');
+  html += '<div class="lesson-row' + (lessonDone ? ' read' : '') + '" onclick="MACHIAVELLI.showLesson(\''+moduleId+'\')"><div class="num">01</div><div class="title">Lesson: ' + m.lesson.title + '</div><div class="status">' + (lessonDone ? 'Read' : 'Read') + '</div></div>';
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){
+    const problemDone = state.problemSolved;
+    html += '<div class="lesson-row problem-row' + (problemDone ? ' read' : '') + '" onclick="MACHIAVELLI.showArenaProblem(\''+problem.id+'\')"><div class="num">02</div><div class="info" style="flex:1"><h3>Arena: ' + problem.title + '</h3><p>Apply the principle under pressure.</p></div><div class="status">' + (problemDone ? 'Solved' : 'Solve') + '</div></div>';
+  }
+  html += '</div>';
+  if(prog.completed){
+    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational.</p>';
+    const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
+    if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="MACHIAVELLI.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>'; }
+    html += '<button class="btn secondary mt-1" onclick="MACHIAVELLI.show(\'project\')">Go to Project -></button>';
+    html += '</div>';
+  }
+  document.getElementById('moduleDetail').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLesson(moduleId){
+  const m = MODULES.find(x => x.id === moduleId);
+  if(!m) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-lesson').classList.add('active');
+  let html = '<div class="lesson-back" onclick="MACHIAVELLI.showModuleDetail(\''+moduleId+'\')"><- ' + m.codename + '</div>';
+  html += '<div class="lesson-header"><div class="lesson-codename">// ' + m.codename + '</div><div class="lesson-title">' + m.lesson.title + '</div><div class="lesson-meta">Module ' + (MODULES.findIndex(x=>x.id===moduleId)+1) + ' of 10 - ' + m.title + '</div></div>';
+  html += '<div class="lesson-body">' + parseLesson(m.lesson.body) + '</div>';
+  html += '<div class="takeaways"><h3>// Core Takeaways</h3><ul>';
+  m.lesson.takeaways.forEach(t => { html += '<li>' + t + '</li>'; });
+  html += '</ul></div>';
+  const isRead = S.modules[moduleId].lessonsRead.includes('l1');
+  html += '<div class="lesson-actions">';
+  if(!isRead){ html += '<button class="btn" onclick="MACHIAVELLI.markLessonRead(\''+moduleId+'\')">Mark as Read - +50 XP</button>'; }
+  else { html += '<button class="btn secondary" disabled>Checked Read</button>'; }
+  const problem = ARENA.find(p => p.moduleId === moduleId);
+  if(problem){ html += '<button class="btn secondary" onclick="MACHIAVELLI.showArenaProblem(\''+problem.id+'\')">Arena Problem -></button>'; }
+  html += '</div>';
+  document.getElementById('lessonContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markLessonRead(moduleId){
+  if(!S.modules[moduleId].lessonsRead.includes('l1')){
+    S.modules[moduleId].lessonsRead.push('l1');
+    addXP(50, 'lesson read');
+    toast('Lesson complete - +50 XP', 'success');
+    if(moduleProgress(moduleId).completed){ unlockNextModule(moduleId); toast('Next axis unlocked', 'success'); }
+  }
+  saveState();
+  showLesson(moduleId);
+}
+
+let currentPhase = null;
+let phaseState = 'idle';
+
+function renderProject(){
+  renderTopbar();
+  const container = document.getElementById('projectContainer');
+  const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
+  const totalPhases = PROJECT_PHASES.length;
+  let html = '<div class="project-hud"><div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div><div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'PANARCHY' : 'EXECUTING') + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each systems axis to the platform scenario. Phases unlock sequentially.</p>';
+  html += '<div class="phase-list">';
+  PROJECT_PHASES.forEach((p, i) => {
+    const m = MODULES.find(x => x.id === p.moduleId);
+    const solved = S.project[p.id].solved;
+    let unlocked = S.modules[p.moduleId].unlocked;
+    if (i > 0) { const prevPhaseId = PROJECT_PHASES[i-1].id; if (!S.project[prevPhaseId].solved) { unlocked = false; } }
+    const active = !solved && unlocked;
+    html += '<div class="phase-row ' + (solved ? 'solved' : '') + ' ' + (active ? 'active-phase' : '') + ' ' + (unlocked ? '' : 'locked') + '" ' + (unlocked ? 'onclick="MACHIAVELLI.showProjectPhase(\''+p.id+'\')"' : '') + '>';
+    html += '<div class="phase-num">' + String(i+1).padStart(2,'0') + '</div><div class="phase-info"><div class="phase-title">' + p.title + '</div><div class="phase-desc">// ' + m.codename + ': ' + m.title + '</div></div><div class="phase-status">' + (solved ? 'Solved' : (unlocked ? 'Active' : 'Locked')) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showProjectPhase(phaseId){
+  const p = PROJECT_PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  currentPhase = p;
+  phaseState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('projectContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.project[p.id].solved;
+  let html = '<div class="lesson-back" onclick="MACHIAVELLI.show(\'project\')"><- Project</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+150 XP</span></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.scenario + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MACHIAVELLI.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answerPhase(idx){
+  if(phaseState === 'answered') return;
+  phaseState = 'answered';
+  const p = currentPhase;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked ARCHITECTURALLY SOUND' : 'X SUBOPTIMAL PLAY') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.project[p.id].solved){
+      S.project[p.id].solved = true;
+      S.project[p.id].choice = idx;
+      addXP(150, 'panarchy: ' + p.id);
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      flashCombo('+150 XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate and try again.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  checkSecretUnlock();
+  const container = document.getElementById('projectContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){
+    const next = PROJECT_PHASES.find(ph => !S.project[ph.id].solved && S.modules[ph.moduleId].unlocked);
+    if(next){ actions.innerHTML = '<button class="btn" onclick="MACHIAVELLI.showProjectPhase(\''+next.id+'\')">Next Phase -></button>'; }
+    else if(PROJECT_PHASES.every(ph => S.project[ph.id].solved)){ actions.innerHTML = '<button class="btn success" onclick="MACHIAVELLI.show(\'dashboard\')">View Final Report -></button>'; }
+    else { actions.innerHTML = '<button class="btn" onclick="MACHIAVELLI.show(\'modules\')">Continue Training -></button>'; }
+  }else{ actions.innerHTML = '<button class="btn secondary" onclick="MACHIAVELLI.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MACHIAVELLI.showProjectPhase(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+let currentDrill = null;
+let drillQueue = [];
+let drillRevealed = false;
+let activeFilter = 'all';
+
+function setupDrillFilters(){
+  const filters = document.querySelectorAll('.filter-btn');
+  filters.forEach(btn => { btn.onclick = () => { filters.forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderDrills(); }; });
+}
+
+function renderDrills(){
+  renderTopbar();
+  setupDrillFilters();
+  const container = document.getElementById('drillContainer');
+  const due = getDueCards(activeFilter);
+  if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review.</p><button class="btn" onclick="MACHIAVELLI.show(\'arena\')">Arena -></button></div>'; return; }
+  drillQueue = due.slice();
+  showNextDrill();
+}
+
+function showNextDrill(){
+  renderTopbar();
+  if(drillQueue.length === 0){
+    const container = document.getElementById('drillContainer');
+    container.innerHTML = '<div class="drill-empty"><h3>Queue Cleared</h3><p>All due cards reviewed.</p><button class="btn" onclick="MACHIAVELLI.show(\'dashboard\')">Dashboard -></button></div>';
+    return;
+  }
+  currentDrill = drillQueue.shift();
+  const cardState = S.cards[currentDrill.id];
+  const module = MODULES.find(m => m.id === currentDrill.moduleId);
+  const total = drillQueue.length + 1;
+  const container = document.getElementById('drillContainer');
+  let html = '<div class="drill-meta"><div>Queue: <b>' + total + '</b> remaining</div><div>Axis: <b>' + module.codename + '</b></div><div>Reps: <b>' + cardState.repetitions + '</b></div>';
+  if(cardState.interval > 0){ html += '<div>Last interval: <b>' + cardState.interval + 'd</b></div>'; }
+  html += '</div>';
+  html += '<div class="drill-card">';
+  if(currentDrill.core){ html += '<div class="drill-tag">* Pareto Core</div>'; }
+  html += '<div class="drill-prompt">// Recall (' + currentDrill.category + ')</div>';
+  html += '<div class="drill-question">' + currentDrill.front + '</div>';
+  html += '<div class="drill-answer" id="drillAnswer">' + currentDrill.back + '</div>';
+  html += '<div class="drill-hint" id="drillReveal" onclick="MACHIAVELLI.revealDrill()">-> Reveal answer (Space)</div>';
+  html += '<div class="drill-rating" id="drillRating">';
+  html += '<button class="rate-btn again" onclick="MACHIAVELLI.rateDrill(1)">Again<span class="interval">&lt;1m</span></button>';
+  html += '<button class="rate-btn hard" onclick="MACHIAVELLI.rateDrill(3)">Hard<span class="interval">'+previewInterval(currentDrill.id,3)+'d</span></button>';
+  html += '<button class="rate-btn good" onclick="MACHIAVELLI.rateDrill(4)">Good<span class="interval">'+previewInterval(currentDrill.id,4)+'d</span></button>';
+  html += '<button class="rate-btn easy" onclick="MACHIAVELLI.rateDrill(5)">Easy<span class="interval">'+previewInterval(currentDrill.id,5)+'d</span></button>';
+  html += '</div></div>';
+  container.innerHTML = html;
+  drillRevealed = false;
+}
+
+function revealDrill(){
+  if(drillRevealed) return;
+  drillRevealed = true;
+  document.getElementById('drillAnswer').classList.add('active');
+  document.getElementById('drillReveal').style.display = 'none';
+  document.getElementById('drillRating').classList.add('active');
+}
+
+function rateDrill(quality){
+  if(!currentDrill) return;
+  scheduleCard(currentDrill.id, quality);
+  S.daily.reviews += 1;
+  if(quality >= 3) S.daily.correct += 1;
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = currentDrill.core ? baseXP * 2 : baseXP;
+  addXP(xp, 'drill: ' + currentDrill.id);
+  saveState();
+  setTimeout(() => showNextDrill(), 200);
+}
+
+let currentProblem = null;
+let problemState = 'idle';
+let arenaTimer = null;
+
+function renderArena(){
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  let html = '<div class="arena-hud"><div class="hud-stat"><span class="label">Problems Solved:</span><span class="val">' + ARENA.filter(p => S.arena[p.id]).length + '/' + ARENA.length + '</span></div></div>';
+  html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Solve any 1 problem per module to unlock the next. Higher difficulties yield massive XP.</p>';
+  MODULES.forEach(m => {
+    const moduleProblems = ARENA.filter(p => p.moduleId === m.id);
+    if(moduleProblems.length === 0) return;
+    html += '<div class="arena-group-header">// ' + m.codename + ': ' + m.title + '</div>';
+    moduleProblems.forEach((p, i) => {
+      const solved = S.arena[p.id];
+      const unlocked = S.modules[p.moduleId].unlocked;
+      const diffClass = 'diff-' + p.difficulty;
+      const diffText = p.difficulty === 1 ? 'Easy' : (p.difficulty === 2 ? 'Medium' : (p.difficulty === 3 ? 'Hard' : 'Expert'));
+      html += '<div class="arena-row ' + (solved ? 'solved' : '') + '" ' + (unlocked ? 'onclick="MACHIAVELLI.showArenaProblem(\''+p.id+'\')"' : 'style="opacity:0.4; cursor:not-allowed;"') + '>';
+      html += '<div class="arena-row-content"><div class="arena-num">' + String(i+1).padStart(2,'0') + '</div><div class="arena-info"><div class="arena-title-text">' + p.title + '</div></div><div class="diff-badge ' + diffClass + '">' + diffText + ' - +' + p.reward + ' XP</div></div>';
+      html += '<div class="status" style="margin-left:1rem;">' + (solved ? 'Checked' : (unlocked ? 'Start' : 'Locked')) + '</div>';
+      html += '</div>';
+    });
+  });
+  container.innerHTML = html;
+}
+
+function showArenaProblem(problemId){
+  const p = ARENA.find(x => x.id === problemId);
+  if(!p) return;
+  currentProblem = p;
+  problemState = 'idle';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const container = document.getElementById('arenaContainer');
+  container.parentElement.classList.add('active');
+  const m = MODULES.find(x => x.id === p.moduleId);
+  const solved = S.arena[p.id];
+  const diffText = p.difficulty === 1 ? 'EASY' : (p.difficulty === 2 ? 'MEDIUM' : (p.difficulty === 3 ? 'HARD' : 'EXPERT'));
+  const diffClass = 'diff-' + p.difficulty;
+  let html = '<div class="lesson-back" onclick="MACHIAVELLI.show(\'arena\')"><- Arena</div>';
+  html += '<div class="arena-hud"><div class="hud-stat"><span class="label">Axis:</span><span class="val" style="font-size:0.9rem">' + m.codename + '</span></div><div class="hud-stat"><span class="label">Reward:</span><span class="val">+' + p.reward + ' XP</span></div><div class="hud-stat"><span class="label">Difficulty:</span><span class="diff-badge ' + diffClass + '" style="margin-left:0.5rem;">' + diffText + '</span></div></div>';
+  html += '<div class="danger-bar mt-1" style="margin-bottom:1rem"><div class="danger-bar-fill" id="dangerBar" style="width:100%"></div></div>';
+  html += '<div class="scenario"><div class="scenario-title">' + p.title + '</div><div class="scenario-body">' + p.body + '</div></div>';
+  html += '<div class="options" id="optionsList">';
+  p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MACHIAVELLI.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
+  html += '</div>';
+  html += '<div class="outcome" id="outcome"></div>';
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>'; }
+  container.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  let timeLeft = p.timeLimit;
+  const bar = document.getElementById('dangerBar');
+  clearInterval(arenaTimer);
+  arenaTimer = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = (timeLeft / p.timeLimit) * 100;
+    if(bar) bar.style.width = pct + '%';
+    if(timeLeft <= 0){ clearInterval(arenaTimer); if(problemState === 'idle'){ answerProblem(-1); } }
+  }, 100);
+}
+
+function answerProblem(idx){
+  if(problemState === 'answered') return;
+  problemState = 'answered';
+  clearInterval(arenaTimer);
+  const p = currentProblem;
+  const correct = idx === p.correct;
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => { opt.classList.add('disabled'); if(i === p.correct) opt.classList.add('correct'); else if(i === idx && !correct) opt.classList.add('wrong'); });
+  const outcome = document.getElementById('outcome');
+  let html = '<div class="outcome-label ' + (correct ? 'correct' : 'wrong') + '">' + (correct ? 'Checked STRATEGIC' : 'X SUBOPTIMAL') + '</div>';
+  html += '<div class="outcome-text">' + p.explanation + '</div>';
+  if(correct){
+    if(!S.arena[p.id]){
+      S.arena[p.id] = true;
+      S.daily.solved += 1;
+      addXP(p.reward, 'arena: ' + p.id);
+      if(!S.modules[p.moduleId].problemSolved){
+        S.modules[p.moduleId].problemSolved = true;
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.08);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+      flashCombo('+' + p.reward + ' XP');
+    }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved.</div>'; }
+  }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson.</div>'; }
+  outcome.innerHTML = html;
+  outcome.classList.add('active');
+  saveState();
+  renderTopbar();
+  const container = document.getElementById('arenaContainer');
+  const actions = document.createElement('div');
+  actions.className = 'lesson-actions';
+  actions.style.marginTop = '1.5rem';
+  if(correct){ actions.innerHTML = '<button class="btn" onclick="MACHIAVELLI.show(\'arena\')">Back to Arena -></button>'; }
+  else { actions.innerHTML = '<button class="btn secondary" onclick="MACHIAVELLI.showLesson(\''+p.moduleId+'\')">Re-read Lesson</button><button class="btn" onclick="MACHIAVELLI.showArenaProblem(\''+p.id+'\')">Try Again</button>'; }
+  container.appendChild(actions);
+}
+
+function renderStats(){
+  renderTopbar();
+  const prog = xpProgress();
+  document.getElementById('statXp').textContent = S.xp;
+  document.getElementById('statLevel').textContent = 'Level ' + prog.lvl + ' - ' + (prog.next - S.xp) + ' XP to Lvl ' + (prog.lvl+1);
+  let mature = 0, total = CARDS.length, learning = 0, young = 0, newCards = 0;
+  Object.values(S.cards).forEach(c => { if(c.interval >= 21) mature++; else if(c.interval >= 7) young++; else if(c.interval >= 1) learning++; else newCards++; });
+  document.getElementById('statMature').textContent = mature;
+  document.getElementById('statMatureSub').textContent = 'of ' + total + ' total';
+  const recent = S.history.slice(-100);
+  if(recent.length > 0){ const correctCount = recent.filter(h => h.correct).length; document.getElementById('statRetention').textContent = Math.round((correctCount/recent.length)*100) + '%'; }
+  else { document.getElementById('statRetention').textContent = '--'; }
+  document.getElementById('statLongStreak').textContent = S.longestStreak;
+  document.getElementById('statCurStreak').textContent = 'current: ' + S.streak + 'd';
+  const chart = document.getElementById('maturityChart');
+  const cats = [
+    { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+  ];
+  chart.innerHTML = '';
+  cats.forEach(cat => {
+    const pct = total > 0 ? (cat.count / total) * 100 : 0;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 50px;gap:1rem;align-items:center;font-size:0.78rem';
+    row.innerHTML = '<span style="color:var(--text-dim)">' + cat.name + '</span><div style="height:6px;background:rgba(0,255,136,0.06);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:'+pct+'%;background:'+cat.color+';box-shadow:0 0 6px '+cat.color+';transition:width 0.6s"></div></div><span style="text-align:right;color:var(--text);font-variant-numeric:tabular-nums;font-family:var(--display)">' + cat.count + '</span>';
+    chart.appendChild(row);
+  });
+  const log = document.getElementById('sessionLog');
+  if(S.sessionLog.length === 0){ log.innerHTML = '<p class="text-sm text-dim">No activity yet.</p>'; }
+  else {
+    log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
+      const d = new Date(entry.t);
+      const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+    }).join('');
+  }
+}
+
+function initParticles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const count = Math.min(60, Math.floor(w * h / 25000));
+  for(let i = 0; i < count; i++){ particles.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15, r: Math.random() * 1.2 + 0.3, o: Math.random() * 0.5 + 0.1 }); }
+  function loop(){
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; if(p.x < 0) p.x = w; if(p.x > w) p.x = 0; if(p.y < 0) p.y = h; if(p.y > h) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 255, 136, ' + p.o + ')'; ctx.fill(); });
+    for(let i = 0; i < particles.length; i++){ for(let j = i + 1; j < particles.length; j++){ const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const d = Math.sqrt(dx*dx + dy*dy); if(d < 120){ ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = 'rgba(0, 255, 136, ' + (0.08 * (1 - d/120)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); } } }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.code === 'Space' && document.getElementById('view-drills').classList.contains('active')){ if(!drillRevealed && currentDrill){ e.preventDefault(); revealDrill(); return; } }
+  if(document.getElementById('view-drills').classList.contains('active') && drillRevealed && currentDrill){ const map = { '1': 1, '2': 3, '3': 4, '4': 5 }; if(map[e.key]){ e.preventDefault(); rateDrill(map[e.key]); } }
+  if(document.getElementById('view-arena').classList.contains('active') && currentProblem && problemState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentProblem.options.length){ e.preventDefault(); answerProblem(idx); } }
+  if(document.getElementById('view-project').classList.contains('active') && currentPhase && phaseState === 'idle'){ const idx = parseInt(e.key) - 1; if(idx >= 0 && idx < currentPhase.options.length){ e.preventDefault(); answerPhase(idx); } }
+});
+
+function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
+document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) { document.getElementById('themeMenu').classList.remove('active'); } });
+
+document.getElementById('exportBtn').onclick = () => { const dataStr = JSON.stringify(S, null, 2); const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'machiavelli_save.json'; a.click(); URL.revokeObjectURL(url); toast('Save file exported', 'success'); };
+document.getElementById('importBtn').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (event) => { try { S = JSON.parse(event.target.result); saveState(); showView('dashboard'); toast('Save file imported successfully', 'success'); } catch(err) { toast('Invalid save file', 'error'); } }; reader.readAsText(file); };
+document.getElementById('resetBtn').onclick = () => { if(confirm('Reset ALL progress? This cannot be undone.')){ S = defaultState(); saveState(); showView('dashboard'); toast('Progress reset', 'error'); } };
+document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => { showView(item.dataset.view); }); });
+
+function bootSequence(){
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const lines = ['Decrypting forbidden archive...', 'Loading influence engine...', 'Calibrating SM-2 spaced repetition engine...', 'Mapping the dark triad...', 'Indexing 10 axes / 120 cards / 40 scenarios...', 'Arming Project Iago...', 'MACHIAVELLI online.'];
+  let i = 0;
+  function nextLine(){
+    if(i >= lines.length){ showView('dashboard'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').classList.add('fade'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; }, 400); }, 120); return; }
+    const line = document.createElement('div');
+    line.className = 'boot-log-line';
+    line.textContent = '> ' + lines[i];
+    log.appendChild(line);
+    if(i===0 && bar){ bar.style.transition = 'width ' + (lines.length*55+200) + 'ms linear'; requestAnimationFrame(function(){ bar.style.width = '100%'; }); }
+    i++;
+    setTimeout(nextLine, 55);
+  }
+  nextLine();
+}
+
+window.MACHIAVELLI = {
+  show: showView, showModuleDetail, showLesson, markLessonRead,
+  showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission,
+  showProjectPhase, answerPhase, setTheme
+};
+
+function init(){
+  const savedTheme = localStorage.getItem('cogito-theme') || 'quantum';
+  document.body.dataset.theme = savedTheme;
+  S = loadState();
+  checkDailyReset();
+  updateStreak();
+  saveState();
+  try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const today = new Date().toISOString().split('T')[0]; if(!act.includes(today)) { act.push(today); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {}
+  initBackground();
+  bootSequence();
+}
+
+init();
+
+})();
+</script>
+<script>
+(function(){
+  var TACTICS=["Reciprocity","Commitment","Social Proof","Authority","Liking","Scarcity","Fear/Guilt (FOG)","Covert Language"];
+  var Q=[
+    {s:"A stranger hands you a free flower, then immediately asks for a donation.",a:"Reciprocity",why:"The unsolicited gift manufactures a debt the giver intends to collect."},
+    {s:"\"You already told everyone you would do this, so you cannot back out now.\"",a:"Commitment",why:"Public commitment is being used to lock you in against your current judgment."},
+    {s:"\"Join the 50,000 smart shoppers who switched this month.\"",a:"Social Proof",why:"A manufactured crowd is offered as evidence that the choice is correct."},
+    {s:"\"As a doctor, I am telling you this supplement is essential.\"",a:"Authority",why:"The expert frame recasts opinion as unquestionable fact."},
+    {s:"Someone mirrors your words, says you have everything in common, then asks a favor.",a:"Liking",why:"Fast manufactured rapport is being cashed in for compliance."},
+    {s:"\"This price disappears at midnight, only 2 spots left.\"",a:"Scarcity",why:"An artificial deadline hijacks loss aversion to rush your decision."},
+    {s:"\"After everything I have done for you, you owe me this.\"",a:"Fear/Guilt (FOG)",why:"Guilt is being used to convert your conscience into leverage."},
+    {s:"\"When you upgrade, do you want monthly or annual billing?\"",a:"Covert Language",why:"Presupposition smuggles in that you will upgrade at all."},
+    {s:"A vendor refuses a big request, then \"settles\" for the smaller one they wanted.",a:"Reciprocity",why:"Door-in-the-face: a concession that pressures you to concede back."},
+    {s:"\"You are either with us or against us.\"",a:"Covert Language",why:"A false dichotomy collapses every option into two on their terms."},
+    {s:"\"Members only. By invitation. Not for everyone.\"",a:"Scarcity",why:"Exclusivity and forbidden-fruit framing inflate desire regardless of worth."},
+    {s:"They insist an event you clearly remember \"never happened\" and call you too sensitive.",a:"Fear/Guilt (FOG)",why:"Gaslighting denies your reality so you depend on them to define the truth."},
+    {s:"\"Just sign this tiny petition\" today; next week a large donation is requested.",a:"Commitment",why:"Foot-in-the-door: a small yes is engineered to unlock a much bigger one."},
+    {s:"A salesperson name-drops famous clients and flashes logos they have no ties to.",a:"Authority",why:"Authority by proximity transfers credibility that was never earned."},
+    {s:"Constant flattery precedes every request they make of you.",a:"Liking",why:"Praise lowers your guard via the halo effect, even when transparent."}
+  ];
+  var order=[],idx=0,score=0,answered=0;
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function start(){ order=shuffle(Q); idx=0; score=0; answered=0; render(); }
+  function render(){
+    var sc=document.getElementById("ilScenario"), op=document.getElementById("ilOptions"), fb=document.getElementById("ilFeedback");
+    if(!sc) return;
+    if(idx>=order.length){ sc.textContent="Set complete."; op.innerHTML=""; fb.innerHTML="You scored <b style=\"color:var(--cyan)\">"+score+" / "+order.length+"</b>. The more fluently you name the move, the less it works on you."; var b=document.createElement("button"); b.className="btn"; b.textContent="Run again"; b.onclick=start; op.appendChild(b); document.getElementById("ilScore").textContent=""; return; }
+    var q=order[idx]; sc.textContent=q.s; fb.innerHTML=""; op.innerHTML="";
+    TACTICS.forEach(function(t){ var b=document.createElement("button"); b.className="btn"; b.textContent=t;
+      b.style.cssText="background:transparent;border:1px solid var(--border);color:var(--text-dim);font-size:0.78rem;";
+      b.onclick=function(){ var btns=op.querySelectorAll("button"); btns.forEach(function(x){x.disabled=true;});
+        answered++;
+        if(t===q.a){ b.style.borderColor="#00FFA3"; b.style.color="#00FFA3"; score++; fb.innerHTML="<b style=\"color:#00FFA3\">Correct &mdash; "+q.a+".</b> "+q.why; }
+        else { b.style.borderColor="#FF6B6B"; b.style.color="#FF6B6B"; btns.forEach(function(x){ if(x.textContent===q.a){x.style.borderColor="#00FFA3";x.style.color="#00FFA3";} }); fb.innerHTML="<b style=\"color:#FF6B6B\">Not quite &mdash; this is "+q.a+".</b> "+q.why; }
+        document.getElementById("ilScore").textContent="Score: "+score+" / "+answered;
+        var nb=document.createElement("button"); nb.className="btn"; nb.textContent="Next \u2192"; nb.style.marginTop="0.8rem"; nb.onclick=function(){ idx++; render(); }; fb.appendChild(document.createElement("br")); fb.appendChild(nb);
+      };
+      op.appendChild(b); });
+  }
+  start();
+})();
+</script>
+</body>
+</html>
