@@ -113,7 +113,7 @@
 </head>
 <body>
   <canvas id="particles"></canvas>
-  <script src="cogito-bg.js"></script>
+  <script src="cogito-bg.js?v=2"></script>
   <script src="review-index.js"></script>
   <header>
     <h1>Cogito</h1>
@@ -167,7 +167,7 @@
         <div class="panel-label">// Activity Heatmap (Last 150 Days)</div>
         <div class="heatmap-grid" id="heatmapGrid"></div>
       </div>
-      <div class="panel">
+      <div class="panel" style="flex:1;">
         <div class="panel-label">// Background Shop</div>
         <div class="shop-grid" id="shopGrid"></div>
       </div>
@@ -288,8 +288,8 @@ function disciplineStats() {
   });
 }
 
-const GH_USER = 'YOUR_GITHUB_USERNAME'; 
-const GH_REPO = 'Cogito';
+const GH_USER = 'ryanross949-svg'; 
+const GH_REPO = 'cogito';
 
 function getLevel(xp) { return Math.floor(Math.sqrt(xp/100)) + 1; }
 function getMaturity(interval) { return Math.min(100, Math.log(interval + 1) / Math.log(30) * 100); }
