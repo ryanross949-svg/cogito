@@ -97,11 +97,13 @@
   .shop-name { font-size: 0.62rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
   .shop-status { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
   .shop-tile.equipped .shop-status { color: var(--green); }
+  .rv-chip { font-size: 0.6rem; color: var(--text-dim); border: 1px solid var(--border); padding: 0.2rem 0.55rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
 </style>
 </head>
 <body>
   <canvas id="particles"></canvas>
   <script src="cogito-bg.js"></script>
+  <script src="review-index.js"></script>
   <header>
     <h1>Cogito</h1>
     <div class="sub">Interactive Training Simulators</div>
@@ -116,6 +118,17 @@
       </div>
     </div>
   </header>
+
+  <div id="reviewBanner" style="max-width:1000px; margin:0 auto 2rem; position:relative; z-index:1;">
+    <div class="panel" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+      <div>
+        <div class="panel-label">// Daily Review — Spaced Repetition</div>
+        <div><span class="global-value" id="reviewDue" style="font-size:2.2rem;">0</span> <span style="color:var(--text-dim); font-size:0.85rem;">cards due across <span id="reviewCourses">0</span> courses</span></div>
+        <div id="reviewBreakdown" style="margin-top:0.6rem; display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
+      </div>
+      <button id="reviewBtn" onclick="location.href='review.html'" class="theme-btn" style="border-color:var(--cyan); color:var(--cyan); padding:0.7rem 1.4rem; font-size:0.8rem; white-space:nowrap;">Review All &rarr;</button>
+    </div>
+  </div>
 
   <div class="hub-grid">
     <div class="panel global-stats">
@@ -509,6 +522,27 @@ function renderShop() {
   });
 }
 renderShop();
+function renderReview() {
+  const banner = document.getElementById('reviewBanner');
+  if (!banner || !window.REVIEW_INDEX) { if (banner) banner.style.display = 'none'; return; }
+  const now = Date.now();
+  const DN = { physics:'Physics', math:'Math', compute:'Compute', life:'Life', mind:'Mind', strategy:'Strategy', systems:'Systems' };
+  let total = 0, courses = 0; const byDisc = {};
+  window.REVIEW_INDEX.forEach(c => {
+    let S; try { S = JSON.parse(localStorage.getItem(c.key)); } catch(e) { S = null; }
+    if (!S || !S.cards) return;
+    let n = 0;
+    Object.values(S.cards).forEach(cs => { if (cs && typeof cs.due === 'number' && cs.due <= now) n++; });
+    if (n > 0) { total += n; courses++; byDisc[c.disc] = (byDisc[c.disc] || 0) + n; }
+  });
+  document.getElementById('reviewDue').textContent = total;
+  document.getElementById('reviewCourses').textContent = courses;
+  const bd = document.getElementById('reviewBreakdown'); bd.innerHTML = '';
+  Object.keys(DN).forEach(k => { if (byDisc[k]) { const s = document.createElement('span'); s.className = 'rv-chip'; s.textContent = DN[k] + ' ' + byDisc[k]; bd.appendChild(s); } });
+  const btn = document.getElementById('reviewBtn');
+  if (total === 0) { btn.textContent = 'All caught up ✓'; btn.style.opacity = '0.6'; }
+}
+renderReview();
 if (window.initBackground) window.initBackground();
 
 let maturities = disciplineStats().map(d => d.maturity);

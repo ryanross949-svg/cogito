@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cogito // Daily Review</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<style>
+  :root {
+    --void:#050810; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24;
+    --cyan:#00D9FF; --magenta:#FF2D9C; --green:#00FFA3; --amber:#FFB800; --red:#FF3355;
+    --text:#E6E6FA; --text-dim:#7A6E94; --text-faint:#4A4060;
+    --border:rgba(157,78,221,0.2); --border-bright:rgba(157,78,221,0.5);
+    --display:'Segoe UI',Helvetica,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  [data-theme="matrix"]{--void:#000;--panel:rgba(0,20,0,0.8);--panel-solid:#050505;--cyan:#00FF41;--magenta:#00FF41;--amber:#39FF14;--green:#00FF41;--red:#FF3366;--text:#00FF41;--text-dim:#008F11;--text-faint:#004D00;--border:rgba(0,255,65,0.2);--border-bright:rgba(0,255,65,0.5);}
+  [data-theme="cyberpunk"]{--void:#1A0A1A;--panel:rgba(40,10,40,0.8);--panel-solid:#1A051A;--cyan:#FCEE09;--magenta:#FF003C;--amber:#00FFF0;--green:#FF003C;--red:#FF003C;--text:#F8F8F8;--text-dim:#A0A0A0;--text-faint:#606060;--border:rgba(255,0,60,0.3);--border-bright:rgba(255,0,60,0.6);}
+  [data-theme="light"]{--void:#FDF6E3;--panel:rgba(253,246,227,0.9);--panel-solid:#FFFFFF;--cyan:#268BD2;--magenta:#D33682;--amber:#B58900;--green:#859900;--red:#DC322F;--text:#073642;--text-dim:#586E75;--text-faint:#93A1A1;--border:rgba(7,54,66,0.15);--border-bright:rgba(7,54,66,0.3);}
+  [data-theme="nord"]{--void:#2E3440;--panel:rgba(46,52,64,0.8);--panel-solid:#2E3440;--cyan:#88C0D0;--magenta:#B48EAD;--amber:#EBCB8B;--green:#A3BE8C;--red:#BF616A;--text:#ECEFF4;--text-dim:#D8DEE9;--text-faint:#4C566A;--border:rgba(216,222,233,0.15);--border-bright:rgba(216,222,233,0.3);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:radial-gradient(ellipse at top,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at bottom,rgba(157,78,221,0.08),transparent 50%),var(--void);color:var(--text);font-family:var(--mono);min-height:100vh;padding:2rem;}
+  #particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  .wrap{position:relative;z-index:5;max-width:760px;margin:0 auto;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;}
+  .back{font-size:0.75rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.4rem 0.8rem;border-radius:4px;text-transform:uppercase;letter-spacing:0.1em;}
+  .back:hover{border-color:var(--cyan);color:var(--cyan);}
+  h1{font-family:var(--display);font-size:1.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);text-shadow:0 0 20px rgba(0,217,255,0.4);}
+  .panel{background:var(--panel);border:1px solid var(--border);padding:2rem;border-radius:6px;backdrop-filter:blur(8px);position:relative;}
+  .panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
+  .big{font-family:var(--display);font-size:3rem;font-weight:700;color:var(--cyan);text-shadow:0 0 15px rgba(0,217,255,0.5);line-height:1;}
+  .label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.75rem;}
+  .chips{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1.5rem 0;}
+  .chip{font-size:0.7rem;color:var(--text-dim);border:1px solid var(--border);padding:0.35rem 0.7rem;border-radius:20px;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;}
+  .chip.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.08);}
+  .btn{background:var(--cyan);color:var(--void);border:none;padding:0.85rem 2rem;font-family:var(--mono);font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px;letter-spacing:0.1em;font-size:0.85rem;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .progress{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;margin-bottom:1.5rem;}
+  .progress-fill{height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.3s;}
+  .meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.1em;}
+  .tag{color:var(--magenta);}
+  .card-front{font-family:var(--display);font-size:1.5rem;line-height:1.5;color:var(--text);margin:1.5rem 0;min-height:4rem;}
+  .card-back{font-size:1rem;line-height:1.7;color:var(--text-dim);border-top:1px solid var(--border);padding-top:1.5rem;margin-top:1.5rem;white-space:pre-wrap;}
+  .rate{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-top:1.5rem;}
+  .rate button{padding:0.8rem 0.4rem;border:1px solid var(--border);background:transparent;color:var(--text);font-family:var(--mono);border-radius:4px;cursor:pointer;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;transition:all 0.15s;}
+  .rate button small{display:block;font-size:0.6rem;color:var(--text-faint);font-weight:400;margin-top:0.25rem;letter-spacing:0;}
+  .rate button[data-q="1"]:hover{border-color:var(--red);color:var(--red);}
+  .rate button[data-q="3"]:hover{border-color:var(--amber);color:var(--amber);}
+  .rate button[data-q="4"]:hover{border-color:var(--cyan);color:var(--cyan);}
+  .rate button[data-q="5"]:hover{border-color:var(--green);color:var(--green);}
+  .hidden{display:none;}
+  .hint{font-size:0.65rem;color:var(--text-faint);margin-top:1.5rem;text-align:center;letter-spacing:0.05em;}
+  .stat-row{display:flex;justify-content:space-around;margin:1.5rem 0;}
+  .stat-row .big{font-size:2.2rem;}
+</style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <script src="cogito-bg.js"></script>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>Daily Review</h1>
+      <a class="back" href="index.html">&larr; Hub</a>
+    </div>
+
+    <div id="start" class="panel">
+      <div class="label">// Cross-Discipline Spaced Repetition</div>
+      <div><span class="big" id="dueTotal">0</span> <span style="color:var(--text-dim)">cards due across <span id="dueCourses">0</span> courses</span></div>
+      <div class="chips" id="discChips"></div>
+      <button class="btn" id="startBtn">Start Review</button>
+      <div class="hint">Space / Enter to reveal &middot; 1–4 to rate</div>
+    </div>
+
+    <div id="review" class="panel hidden">
+      <div class="progress"><div class="progress-fill" id="pfill" style="width:0%"></div></div>
+      <div class="meta"><span id="rCount">0 / 0</span><span class="tag" id="rTag"></span></div>
+      <div class="card-front" id="cFront"></div>
+      <div class="card-back hidden" id="cBack"></div>
+      <button class="btn" id="revealBtn" style="width:100%">Show Answer</button>
+      <div class="rate hidden" id="rateRow">
+        <button data-q="1">Again<small>&lt;1d</small></button>
+        <button data-q="3">Hard<small id="iHard"></small></button>
+        <button data-q="4">Good<small id="iGood"></small></button>
+        <button data-q="5">Easy<small id="iEasy"></small></button>
+      </div>
+    </div>
+
+    <div id="done" class="panel hidden">
+      <div class="label">// Session Complete</div>
+      <div class="stat-row">
+        <div><div class="big" id="sReviewed">0</div><div class="label" style="margin-top:0.5rem">Reviewed</div></div>
+        <div><div class="big" id="sCorrect" style="color:var(--green)">0</div><div class="label" style="margin-top:0.5rem">Recalled</div></div>
+        <div><div class="big" id="sXp" style="color:var(--amber)">0</div><div class="label" style="margin-top:0.5rem">XP</div></div>
+      </div>
+      <button class="btn" onclick="location.href='index.html'">Back to Hub</button>
+    </div>
+  </div>
+
+<script src="review-cards.js"></script>
+<script>
+document.body.dataset.theme = localStorage.getItem('cogito-theme') || 'quantum';
+if (window.initBackground) window.initBackground();
+
+function today(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const DISC_NAMES = { physics:'Physics', math:'Math', compute:'Compute', life:'Life', mind:'Mind', strategy:'Strategy', systems:'Systems' };
+
+const states = {};            // key -> parsed course save (cached)
+function getState(key){
+  if (key in states) return states[key];
+  try { states[key] = JSON.parse(localStorage.getItem(key)); } catch(e){ states[key] = null; }
+  return states[key];
+}
+
+const now = Date.now();
+// All due cards across courses, joined with their live scheduling.
+let due = (window.REVIEW_CARDS || []).map(c => {
+  const S = getState(c.key);
+  if (!S || !S.cards || !S.cards[c.id]) return null;
+  const cs = S.cards[c.id];
+  if (typeof cs.due !== 'number' || cs.due > now) return null;
+  return c;
+}).filter(Boolean).sort((a,b) => getState(a.key).cards[a.id].due - getState(b.key).cards[b.id].due);
+
+// discipline filter
+let activeDisc = 'all';
+function filtered(){ return activeDisc === 'all' ? due : due.filter(c => c.disc === activeDisc); }
+
+// ---- SM-2, faithful to the course rateDrill/scheduleCard ----
+function scheduleCard(cs, quality){
+  if (quality < 3){ cs.repetitions = 0; cs.interval = 0; cs.wrong = (cs.wrong||0) + 1; }
+  else {
+    if (cs.repetitions === 0){ cs.interval = quality === 5 ? 3 : 1; }
+    else if (cs.repetitions === 1){ cs.interval = quality === 5 ? 7 : 3; }
+    else { const factor = quality === 5 ? 1.5 : (quality === 4 ? cs.ease : cs.ease * 0.8); cs.interval = Math.max(1, Math.round(cs.interval * factor)); }
+    cs.repetitions += 1; cs.correct = (cs.correct||0) + 1;
+  }
+  if (quality >= 3){ cs.ease = cs.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)); if (cs.ease < 1.3) cs.ease = 1.3; }
+  cs.lastReviewed = Date.now();
+  cs.due = Date.now() + cs.interval * 86400000;
+  return cs.interval;
+}
+function previewInterval(cs, quality){
+  if (quality < 3) return 0;
+  let interval = cs.interval;
+  if (cs.repetitions === 0) interval = quality === 5 ? 3 : 1;
+  else if (cs.repetitions === 1) interval = quality === 5 ? 7 : 3;
+  else { const factor = quality === 5 ? 1.5 : (quality === 4 ? cs.ease : cs.ease * 0.8); interval = Math.max(1, Math.round(interval * factor)); }
+  return interval;
+}
+function markActivity(){
+  try {
+    const act = JSON.parse(localStorage.getItem('cogito-activity') || '[]');
+    const t = today();
+    if (!act.includes(t)){ act.push(t); localStorage.setItem('cogito-activity', JSON.stringify(act)); }
+  } catch(e){}
+}
+function applyRating(card, quality){
+  const S = getState(card.key); if (!S) return;
+  const cs = S.cards[card.id];
+  scheduleCard(cs, quality);
+  if (S.daily){
+    if (S.daily.date !== today()){ S.daily = { date: today(), reviews:0, correct:0, solved:0, xpGained:0, rtMissionCompleted:false, rtMissionId:null }; }
+    S.daily.reviews += 1; if (quality >= 3) S.daily.correct += 1;
+  }
+  const baseXP = quality >= 4 ? 10 : (quality === 3 ? 5 : 2);
+  const xp = card.core ? baseXP * 2 : baseXP;
+  S.xp = (S.xp || 0) + xp;
+  if (S.daily) S.daily.xpGained += xp;
+  if (Array.isArray(S.history)){ S.history.push({ t: Date.now(), correct: quality >= 3 }); if (S.history.length > 500) S.history.shift(); }
+  localStorage.setItem(card.key, JSON.stringify(S));
+  markActivity();
+  return xp;
+}
+
+// ---- UI ----
+const el = id => document.getElementById(id);
+function buildStart(){
+  el('dueTotal').textContent = due.length;
+  el('dueCourses').textContent = new Set(due.map(c => c.key)).size;
+  const counts = {};
+  due.forEach(c => counts[c.disc] = (counts[c.disc]||0)+1);
+  const chips = el('discChips'); chips.innerHTML = '';
+  const mk = (key, txt) => { const d = document.createElement('div'); d.className='chip'+(activeDisc===key?' active':''); d.textContent = txt; d.onclick = () => { activeDisc = key; buildStart(); }; chips.appendChild(d); };
+  mk('all', 'All (' + due.length + ')');
+  Object.keys(DISC_NAMES).forEach(k => { if (counts[k]) mk(k, DISC_NAMES[k] + ' (' + counts[k] + ')'); });
+  el('startBtn').disabled = filtered().length === 0;
+  el('startBtn').textContent = filtered().length ? 'Start Review (' + filtered().length + ')' : 'Nothing due';
+}
+
+let queue = [], pos = 0, revealed = false, sess = { reviewed:0, correct:0, xp:0 };
+function startSession(){
+  queue = filtered(); pos = 0; sess = { reviewed:0, correct:0, xp:0 };
+  if (!queue.length) return;
+  el('start').classList.add('hidden'); el('review').classList.remove('hidden');
+  showCard();
+}
+function showCard(){
+  if (pos >= queue.length) return finish();
+  revealed = false;
+  const c = queue[pos];
+  el('pfill').style.width = (pos / queue.length * 100) + '%';
+  el('rCount').textContent = (pos + 1) + ' / ' + queue.length;
+  el('rTag').textContent = c.course.toUpperCase() + (c.core ? ' · CORE' : '');
+  el('cFront').textContent = c.front;
+  el('cBack').textContent = c.back;
+  el('cBack').classList.add('hidden');
+  el('rateRow').classList.add('hidden');
+  el('revealBtn').classList.remove('hidden');
+}
+function reveal(){
+  if (revealed) return;
+  revealed = true;
+  const c = queue[pos], cs = getState(c.key).cards[c.id];
+  el('cBack').classList.remove('hidden');
+  el('revealBtn').classList.add('hidden');
+  el('rateRow').classList.remove('hidden');
+  const fmt = d => d >= 1 ? d + 'd' : '<1d';
+  el('iHard').textContent = fmt(previewInterval(cs, 3));
+  el('iGood').textContent = fmt(previewInterval(cs, 4));
+  el('iEasy').textContent = fmt(previewInterval(cs, 5));
+}
+function rate(quality){
+  if (!revealed) return;
+  const c = queue[pos];
+  const xp = applyRating(c, quality) || 0;
+  sess.reviewed += 1; if (quality >= 3) sess.correct += 1; sess.xp += xp;
+  pos += 1; showCard();
+}
+function finish(){
+  el('review').classList.add('hidden'); el('done').classList.remove('hidden');
+  el('sReviewed').textContent = sess.reviewed;
+  el('sCorrect').textContent = sess.correct;
+  el('sXp').textContent = '+' + sess.xp;
+}
+
+el('startBtn').onclick = startSession;
+el('revealBtn').onclick = reveal;
+document.querySelectorAll('.rate button').forEach(b => b.onclick = () => rate(parseInt(b.dataset.q)));
+document.addEventListener('keydown', e => {
+  if (el('review').classList.contains('hidden')) return;
+  if ((e.code === 'Space' || e.code === 'Enter') && !revealed){ e.preventDefault(); reveal(); return; }
+  if (revealed){ const map = { '1':1, '2':3, '3':4, '4':5 }; if (map[e.key]){ e.preventDefault(); rate(map[e.key]); } }
+});
+
+buildStart();
+</script>
+</body>
+</html>
