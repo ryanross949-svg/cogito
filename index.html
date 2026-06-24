@@ -93,6 +93,10 @@
   .shop-tile:hover { border-color: var(--cyan); }
   .shop-tile.locked { opacity: 0.4; cursor: not-allowed; }
   .shop-tile.equipped { border-color: var(--green); background: rgba(0,255,163,0.05); box-shadow: 0 0 10px rgba(0,255,163,0.1); }
+  .shop-tile.prestige { border-color: rgba(255,184,0,0.35); }
+  .shop-tile.prestige.unlocked { border-color: var(--amber); box-shadow: 0 0 12px rgba(255,184,0,0.25); }
+  .shop-tile.prestige.equipped { border-color: var(--amber); background: rgba(255,184,0,0.06); box-shadow: 0 0 14px rgba(255,184,0,0.3); }
+  .shop-tile.prestige .shop-name { color: var(--amber); }
   .shop-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
   .shop-name { font-size: 0.62rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
   .shop-status { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -494,16 +498,22 @@ renderAchievements();
 
 // ============== BACKGROUND SHOP ==============
 const BACKGROUNDS = [
-  { id: 'constellation', name: 'Constellation', level: 1,  icon: '🌌' },
-  { id: 'starfield',     name: 'Starfield',     level: 5,  icon: '✨' },
-  { id: 'nebula',        name: 'Nebula Drift',  level: 10, icon: '🌫️' },
-  { id: 'synthwave',     name: 'Synthwave',     level: 20, icon: '🌇' },
-  { id: 'matrix',        name: 'Matrix Rain',   level: 25, icon: '🟩' },
-  { id: 'orbital',       name: 'Orbital',       level: 30, icon: '🪐' },
-  { id: 'circuit',       name: 'Circuit',       level: 40, icon: '⚡' },
-  { id: 'aurora',        name: 'Aurora',        level: 50, icon: '🌈' },
-  { id: 'warp',          name: 'Warp',          level: 60, icon: '🌀' },
-  { id: 'quantum',       name: 'Quantum Foam',  level: 75, icon: '⚛️' }
+  { id: 'constellation', name: 'Constellation', level: 1,   icon: '🌌' },
+  { id: 'starfield',     name: 'Starfield',     level: 5,   icon: '✨' },
+  { id: 'nebula',        name: 'Nebula Drift',  level: 10,  icon: '🌫️' },
+  { id: 'drift',         name: 'Drift',         level: 15,  icon: '🍃' },
+  { id: 'synthwave',     name: 'Synthwave',     level: 20,  icon: '🌇' },
+  { id: 'matrix',        name: 'Matrix Rain',   level: 25,  icon: '🟩' },
+  { id: 'orbital',       name: 'Orbital',       level: 30,  icon: '🪐' },
+  { id: 'comet',         name: 'Comet',         level: 35,  icon: '☄️' },
+  { id: 'circuit',       name: 'Circuit',       level: 40,  icon: '⚡' },
+  { id: 'fireflies',     name: 'Fireflies',     level: 45,  icon: '💫' },
+  { id: 'aurora',        name: 'Aurora',        level: 50,  icon: '🌈' },
+  { id: 'warp',          name: 'Warp',          level: 60,  icon: '🌀' },
+  { id: 'snow',          name: 'Snow',          level: 65,  icon: '❄️' },
+  { id: 'quantum',       name: 'Quantum Foam',  level: 75,  icon: '⚛️' },
+  { id: 'sonar',         name: 'Sonar',         level: 85,  icon: '📡' },
+  { id: 'singularity',   name: 'Singularity',   level: 100, icon: '🕳️', special: true }
 ];
 function renderShop() {
   const grid = document.getElementById('shopGrid');
@@ -515,7 +525,7 @@ function renderShop() {
     const unlocked = lvl >= bg.level;
     const isEq = equipped === bg.id;
     const tile = document.createElement('div');
-    tile.className = 'shop-tile' + (unlocked ? '' : ' locked') + (isEq ? ' equipped' : '');
+    tile.className = 'shop-tile' + (unlocked ? '' : ' locked') + (isEq ? ' equipped' : '') + (bg.special ? ' prestige' : '');
     tile.innerHTML = `<span class="shop-icon">${unlocked ? bg.icon : '🔒'}</span><div class="shop-name">${bg.name}</div><div class="shop-status">${isEq ? 'Equipped' : (unlocked ? 'Equip' : 'Lvl ' + bg.level)}</div>`;
     if (unlocked && !isEq) tile.onclick = () => { localStorage.setItem('cogito-bg', bg.id); if (window.applyBackground) window.applyBackground(bg.id); renderShop(); };
     grid.appendChild(tile);
