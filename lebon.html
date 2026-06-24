@@ -281,7 +281,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(25
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Pandemic</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Pandemic</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Contagion Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -315,6 +315,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(25
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Contagion Lab</h1>
+      <p class="section-sub">Le Bon studied how an idea sweeps a crowd. This is social contagion: a person adopts once enough of their neighbours have. Set how persuasive the idea is and how much social proof a holdout needs, then release it from the centre and watch belief cascade — or fizzle.</p>
+      <canvas id="lbCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Transmissibility % <span id="lbTV" style="color:var(--cyan)"></span><input type="range" id="lbT" min="10" max="90" value="45" step="5" style="width:100%;"></label></div>
+      <button class="btn" id="lbGo">Release the idea</button> <button class="btn" id="lbReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset</button>
+      <div id="lbInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About LE BON</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1417,6 +1425,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("lbCanvas"); if(!cv)return; var ctx=cv.getContext("2d"); var COLS=44,ROWS=22,cell=12,grid,timer=null;
+  function size(){ var Wd=cv.width=cv.clientWidth||600; cell=Math.floor(Wd/COLS); cv.height=ROWS*cell; }
+  function reset(){ if(timer){clearInterval(timer);timer=null;} grid=[]; for(var r=0;r<ROWS;r++){var row=[];for(var c=0;c<COLS;c++)row.push(0);grid.push(row);} grid[ROWS>>1][COLS>>1]=1; draw(); document.getElementById("lbInfo").textContent="One believer at the centre. Release the idea to watch it spread."; }
+  function draw(){ size(); ctx.clearRect(0,0,cv.width,cv.height); for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++){ ctx.fillStyle=grid[r][c]?"#00D9FF":"rgba(255,255,255,0.05)"; ctx.fillRect(c*cell+1,r*cell+1,cell-2,cell-2);} }
+  function adopted(){ var n=0; for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)n+=grid[r][c]; return n; }
+  function step(){ var p=+document.getElementById("lbT").value/100, n=[]; var changed=false;
+    for(var r=0;r<ROWS;r++){ var row=[]; for(var c=0;c<COLS;c++){ if(grid[r][c]){row.push(1);continue;} var nb=0,tot=0;
+      for(var dr=-1;dr<=1;dr++)for(var dc=-1;dc<=1;dc++){ if(dr||dc){ var rr=r+dr,cc=c+dc; if(rr>=0&&cc>=0&&rr<ROWS&&cc<COLS){ tot++; nb+=grid[rr][cc]; } } }
+      var adopt = nb>0 && Math.random() < p*(nb/tot)*2.2; if(adopt)changed=true; row.push(adopt?1:0); } n.push(row); }
+    grid=n; draw(); var pct=Math.round(adopted()/(ROWS*COLS)*100); document.getElementById("lbInfo").innerHTML="Believers: <b style=\"color:#00D9FF\">"+pct+"%</b> of the crowd.";
+    if(!changed){ clearInterval(timer); timer=null; document.getElementById("lbInfo").innerHTML="Spread halted at <b style=\"color:#00D9FF\">"+pct+"%</b>. "+(pct>80?"A runaway cascade — the crowd is captured.":pct<25?"It fizzled: too little social proof to tip the holdouts.":"A partial cascade — pockets resist."); }
+  }
+  document.getElementById("lbGo").onclick=function(){ if(timer)return; timer=setInterval(step,160); };
+  document.getElementById("lbReset").onclick=reset; window.addEventListener("resize",draw); reset();
 })();
 </script>
 </body>

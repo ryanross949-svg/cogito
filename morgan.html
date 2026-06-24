@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(25
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Asymmetry</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Asymmetry</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Compounding Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(25
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Compounding Lab</h1>
+      <p class="section-sub">The financier&rsquo;s real engine is compounding — returns earning returns. Set your monthly contribution, the annual return and the horizon, then see how much of the final pile is money you put in versus money your money made. Patience, not income, does most of the work.</p>
+      <canvas id="mrCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Monthly contribution <span id="mrCV" style="color:var(--cyan)"></span><input type="range" id="mrC" min="0" max="2000" value="300" step="50" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Annual return % <span id="mrRV" style="color:var(--cyan)"></span><input type="range" id="mrR" min="0" max="15" value="7" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Years <span id="mrYV" style="color:var(--cyan)"></span><input type="range" id="mrY" min="5" max="45" value="30" step="1" style="width:100%;"></label></div>
+      <div id="mrInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MORGAN</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1423,6 +1430,27 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("mrCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function money(x){ if(x>=1e6)return "$"+(x/1e6).toFixed(2)+"M"; if(x>=1e3)return "$"+(x/1e3).toFixed(0)+"k"; return "$"+x.toFixed(0); }
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var c=+document.getElementById("mrC").value, r=+document.getElementById("mrR").value/100, y=+document.getElementById("mrY").value;
+    document.getElementById("mrCV").textContent="$"+c; document.getElementById("mrRV").textContent=r*100+"%"; document.getElementById("mrYV").textContent=y;
+    var bal=0,mr=r/12,months=y*12,contribH=[],balH=[];
+    for(var m=0;m<=months;m++){ contribH.push(c*m); balH.push(bal); bal=bal*(1+mr)+c; }
+    var mx=Math.max(balH[balH.length-1],1);
+    var ox=44,oy=H-22,pw=W-ox-12,ph=H-40;
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(ox,10); ctx.lineTo(ox,oy); ctx.lineTo(W-12,oy); ctx.stroke();
+    function plot(arr,col,fill){ ctx.beginPath(); for(var i=0;i<arr.length;i++){ var x=ox+pw*i/arr.length, yy=oy-ph*arr[i]/mx; i?ctx.lineTo(x,yy):ctx.moveTo(x,yy);} if(fill){ ctx.lineTo(ox+pw,oy); ctx.lineTo(ox,oy); ctx.closePath(); ctx.fillStyle=col; ctx.fill(); } else { ctx.strokeStyle=col; ctx.lineWidth=2; ctx.stroke(); } }
+    plot(balH,"rgba(0,217,255,0.18)",true); plot(contribH,"rgba(255,184,0,0.25)",true);
+    plot(balH,"#00D9FF",false); plot(contribH,"#FFB800",false);
+    var fin=balH[balH.length-1], put=c*months, grow=fin-put;
+    document.getElementById("mrInfo").innerHTML="After "+y+" years: <b style=\"color:#00D9FF\">"+money(fin)+"</b>. You contributed <b style=\"color:#FFB800\">"+money(put)+"</b>; compounding added <b style=\"color:#00FFA3\">"+money(grow)+"</b> — "+Math.round(grow/Math.max(fin,1)*100)+"% of the total is growth, not deposits.";
+  }
+  ["mrC","mrR","mrY"].forEach(function(id){document.getElementById(id).oninput=render;}); window.addEventListener("resize",render); render();
 })();
 </script>
 </body>

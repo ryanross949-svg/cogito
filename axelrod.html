@@ -358,7 +358,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project ECHO</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Tournament Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -503,6 +503,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Tournament Lab</h1>
+      <p class="section-sub">Axelrod ran a tournament: pit strategies against each other in the repeated Prisoner&rsquo;s Dilemma and tally the points. The shocking winner was the simplest — Tit-for-Tat: cooperate first, then mirror your opponent. Run the round-robin and watch nice, retaliatory strategies rise to the top.</p>
+      <div style="max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Rounds per match <span id="axNV" style="color:var(--cyan)"></span><input type="range" id="axN" min="10" max="200" value="80" step="10" style="width:100%;"></label></div>
+      <button class="btn" id="axRun">Run tournament</button>
+      <table id="axTable" style="border-collapse:collapse;font-family:var(--mono);font-size:0.85rem;margin-top:1.2rem;"></table>
+      <div id="axInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About AXELROD</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -1993,6 +2001,28 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  // payoff: T=5 (defect vs coop), R=3 (both coop), P=1 (both defect), S=0 (coop vs defect)
+  var STRATS=[
+    {n:"Tit-for-Tat", f:function(my,opp){ return opp.length? opp[opp.length-1] : "C"; }},
+    {n:"Always Cooperate", f:function(){ return "C"; }},
+    {n:"Always Defect", f:function(){ return "D"; }},
+    {n:"Grudger", f:function(my,opp){ return opp.indexOf("D")>-1? "D":"C"; }},
+    {n:"Random", f:function(){ return Math.random()<0.5?"C":"D"; }}];
+  function payoff(a,b){ if(a==="C"&&b==="C")return 3; if(a==="C"&&b==="D")return 0; if(a==="D"&&b==="C")return 5; return 1; }
+  function match(A,B,N){ var ha=[],hb=[],sa=0,sb=0; for(var i=0;i<N;i++){ var ma=A.f(ha,hb), mb=B.f(hb,ha); sa+=payoff(ma,mb); sb+=payoff(mb,ma); ha.push(ma); hb.push(mb);} return [sa,sb]; }
+  function run(){ var N=+document.getElementById("axN").value, totals=STRATS.map(function(){return 0;});
+    for(var i=0;i<STRATS.length;i++)for(var j=i;j<STRATS.length;j++){ var res=match(STRATS[i],STRATS[j],N); totals[i]+=res[0]; totals[j]+=res[1]; }
+    var rank=STRATS.map(function(s,i){return {n:s.n,pts:totals[i]};}).sort(function(a,b){return b.pts-a.pts;});
+    var html="<tr style=\"color:var(--text-faint)\"><td style=\"padding:0.3rem 1rem\">#</td><td style=\"padding:0.3rem 1rem\">Strategy</td><td style=\"padding:0.3rem 1rem\">Total points</td></tr>";
+    rank.forEach(function(r,i){ html+="<tr style=\"color:"+(i===0?"var(--green)":"var(--text-dim)")+"\"><td style=\"padding:0.3rem 1rem\">"+(i+1)+"</td><td style=\"padding:0.3rem 1rem\">"+r.n+"</td><td style=\"padding:0.3rem 1rem\">"+r.pts+"</td></tr>"; });
+    document.getElementById("axTable").innerHTML=html;
+    document.getElementById("axInfo").innerHTML="Winner: <b style=\"color:#00FFA3\">"+rank[0].n+"</b>. Notice Always Defect beats everyone head-to-head yet loses overall — it poisons its own well, while cooperative strategies rack up 3s together.";
+  }
+  document.getElementById("axRun").onclick=run; run();
 })();
 </script>
 </body>
