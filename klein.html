@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Eversion</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Eversion</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Topology Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Topology Lab</h1>
+      <p class="section-sub">A Mobius strip: a surface with only one side and one edge. Trace it and you return to the start having visited "both" faces. The Klein bottle is its closed cousin — a bottle whose inside is its outside.</p>
+      <canvas id="klCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <button class="btn" id="klSpin">Pause</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About KLEIN</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1405,6 +1411,22 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("klCanvas"); if(!cv) return; var ctx=cv.getContext("2d"); var H=300, ang=0, timer=null;
+  function render(){ var W=cv.width=cv.clientWidth||600; cv.height=H; ctx.clearRect(0,0,W,H);
+    var cxp=W/2, cyp=H/2, R=Math.min(W,H)*0.30, ca=Math.cos(ang), sa=Math.sin(ang), tilt=0.55;
+    for(var u=0;u<Math.PI*2;u+=0.025){ for(var s=-1;s<=1;s+=0.25){ var v=s*0.5;
+      var x=(1+v*Math.cos(u/2))*Math.cos(u), y=(1+v*Math.cos(u/2))*Math.sin(u), z=v*Math.sin(u/2);
+      var x2=x*ca - z*sa, z2=x*sa + z*ca, y2=y*Math.cos(tilt) - z2*Math.sin(tilt);
+      ctx.fillStyle="rgba(0,217,255,"+(0.2+0.5*((z2+1.5)/3))+")"; ctx.fillRect(cxp+x2*R, cyp+y2*R, 2.4, 2.4);
+    } }
+  }
+  function loop(){ ang+=0.012; render(); timer=requestAnimationFrame(loop); }
+  document.getElementById("klSpin").onclick=function(){ if(timer){ cancelAnimationFrame(timer); timer=null; this.textContent="Spin"; } else { this.textContent="Pause"; loop(); } };
+  window.addEventListener("resize",render); loop();
 })();
 </script>
 </body>

@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Tessellation</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Tessellation</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Geometry Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Geometry Lab</h1>
+      <p class="section-sub">Drag the three corners of the triangle. No matter how you reshape it, the interior angles always sum to exactly 180 degrees — a flat-space invariant Euclid proved 2,300 years ago.</p>
+      <canvas id="euCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="euInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About EUCLID</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1406,6 +1412,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("euCanvas"); if(!cv) return; var ctx=cv.getContext("2d"); var H=300;
+  var pts=[{x:140,y:70},{x:70,y:240},{x:360,y:220}], drag=-1;
+  function pos(e){ var r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+  cv.addEventListener("mousedown",function(e){ var p=pos(e); for(var i=0;i<3;i++) if(Math.hypot(pts[i].x-p.x,pts[i].y-p.y)<20) drag=i; });
+  cv.addEventListener("mousemove",function(e){ if(drag<0)return; var p=pos(e); pts[drag].x=Math.max(8,Math.min(cv.width-8,p.x)); pts[drag].y=Math.max(8,Math.min(H-8,p.y)); draw(); });
+  window.addEventListener("mouseup",function(){ drag=-1; });
+  function ang(a,b,c){ var x1=b.x-a.x,y1=b.y-a.y,x2=c.x-a.x,y2=c.y-a.y; var d=(x1*x2+y1*y2)/(Math.hypot(x1,y1)*Math.hypot(x2,y2)||1); return Math.acos(Math.max(-1,Math.min(1,d)))*180/Math.PI; }
+  function draw(){ var W=cv.width=cv.clientWidth||600; cv.height=H; ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle="#00D9FF"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); ctx.lineTo(pts[1].x,pts[1].y); ctx.lineTo(pts[2].x,pts[2].y); ctx.closePath(); ctx.stroke();
+    ctx.fillStyle="#FF2D9C"; for(var i=0;i<3;i++){ ctx.beginPath(); ctx.arc(pts[i].x,pts[i].y,7,0,7); ctx.fill(); }
+    var A=ang(pts[0],pts[1],pts[2]),B=ang(pts[1],pts[0],pts[2]),C=ang(pts[2],pts[0],pts[1]);
+    document.getElementById("euInfo").textContent=A.toFixed(1)+" + "+B.toFixed(1)+" + "+C.toFixed(1)+" = "+(A+B+C).toFixed(1)+" degrees";
+  }
+  window.addEventListener("resize",draw); draw();
 })();
 </script>
 </body>

@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Apex</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Apex</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Optimization Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,16 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Optimization Lab</h1>
+      <p class="section-sub">Linear programming in two variables. The shaded region is everything allowed by the constraints; the prize is the corner that maximizes your objective. Slide the weights and watch the optimum jump from vertex to vertex — never the interior.</p>
+      <canvas id="dzCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="dzInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <div style="display:grid;gap:0.7rem;max-width:420px;">
+        <label style="font-size:0.8rem;color:var(--text-dim);">Weight on x <input type="range" id="dzC1" min="0" max="10" value="3" style="width:100%;"></label>
+        <label style="font-size:0.8rem;color:var(--text-dim);">Weight on y <input type="range" id="dzC2" min="0" max="10" value="5" style="width:100%;"></label>
+      </div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About DANTZIG</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1404,6 +1414,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("dzCanvas"); if(!cv) return; var ctx=cv.getContext("2d"); var H=280;
+  var verts=[[0,0],[0,4],[2,5],[5,3.5],[6,0]];
+  function render(){ var W=cv.width=cv.clientWidth||600; cv.height=H; ctx.clearRect(0,0,W,H);
+    var sx=function(x){return 35+x/6*(W-70);}, sy=function(y){return H-25-y/5*(H-50);};
+    ctx.fillStyle="rgba(0,217,255,0.12)"; ctx.strokeStyle="#00D9FF"; ctx.lineWidth=1.5; ctx.beginPath();
+    verts.forEach(function(v,i){ var X=sx(v[0]),Y=sy(v[1]); if(i===0)ctx.moveTo(X,Y); else ctx.lineTo(X,Y); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+    var a=+document.getElementById("dzC1").value, b=+document.getElementById("dzC2").value, best=verts[0], bv=-1e9;
+    verts.forEach(function(v){ var val=a*v[0]+b*v[1]; if(val>bv){ bv=val; best=v; } });
+    verts.forEach(function(v){ ctx.fillStyle="rgba(255,255,255,0.4)"; ctx.beginPath(); ctx.arc(sx(v[0]),sy(v[1]),3,0,7); ctx.fill(); });
+    ctx.fillStyle="#FFB800"; ctx.beginPath(); ctx.arc(sx(best[0]),sy(best[1]),8,0,7); ctx.fill();
+    document.getElementById("dzInfo").textContent="max "+a+"x + "+b+"y  ->  corner ("+best[0]+", "+best[1]+") = "+bv.toFixed(1);
+  }
+  ["dzC1","dzC2"].forEach(function(id){ document.getElementById(id).oninput=render; });
+  window.addEventListener("resize",render); render();
 })();
 </script>
 </body>

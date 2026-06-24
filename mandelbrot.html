@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Black Swan</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Black Swan</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Fractal Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Fractal Lab</h1>
+      <p class="section-sub">The Mandelbrot set: one tiny equation, infinite detail. Click anywhere to zoom in — the same shapes reappear forever. Power laws and fat tails come from exactly this kind of self-similarity.</p>
+      <canvas id="mbCanvas" style="width:100%;height:260px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="mbInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <button class="btn" id="mbReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset View</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MANDELBROT</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1397,6 +1404,26 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("mbCanvas"); if(!cv) return; var ctx=cv.getContext("2d"); var H=260, W=500;
+  var cx=-0.6, cy=0, scale=3;
+  function render(){ W=cv.width=cv.clientWidth||500; cv.height=H; var img=ctx.createImageData(W,H), d=img.data, max=90;
+    for(var py=0;py<H;py++) for(var px=0;px<W;px++){
+      var x0=cx+(px/W-0.5)*scale, y0=cy+(py/H-0.5)*scale*(H/W), x=0,y=0,it=0;
+      while(x*x+y*y<4 && it<max){ var xt=x*x-y*y+x0; y=2*x*y+y0; x=xt; it++; }
+      var i=(py*W+px)*4, t=it/max;
+      if(it===max){ d[i]=d[i+1]=d[i+2]=8; } else { d[i]=Math.floor(60+180*t); d[i+1]=Math.floor(40+120*t*t); d[i+2]=Math.floor(120+120*(1-t)); }
+      d[i+3]=255;
+    }
+    ctx.putImageData(img,0,0);
+    document.getElementById("mbInfo").textContent="zoom "+(3/scale).toFixed(1)+"x  ·  center ("+cx.toFixed(4)+", "+cy.toFixed(4)+")  ·  click to dive in";
+  }
+  cv.addEventListener("click",function(e){ var r=cv.getBoundingClientRect(); cx+=((e.clientX-r.left)/r.width-0.5)*scale; cy+=((e.clientY-r.top)/r.height-0.5)*scale*(H/W); scale*=0.5; render(); });
+  document.getElementById("mbReset").onclick=function(){ cx=-0.6; cy=0; scale=3; render(); };
+  window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
