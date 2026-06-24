@@ -358,7 +358,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project PHOENIX</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Disruption Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -503,6 +503,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Disruption Lab</h1>
+      <p class="section-sub">Schumpeter called capitalism a gale of creative destruction. An incumbent technology matures and flattens; a disruptor starts small but climbs a steeper curve. Set when the challenger arrives and how fast it grows, and find the crossover — the moment the old order is overthrown.</p>
+      <canvas id="scCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Disruptor arrival (year) <span id="scStartV" style="color:var(--cyan)"></span><input type="range" id="scStart" min="0" max="60" value="25" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Disruptor growth rate <span id="scRateV" style="color:var(--cyan)"></span><input type="range" id="scRate" min="2" max="20" value="10" step="1" style="width:100%;"></label></div>
+      <div id="scInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About SCHUMPETER</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -1992,6 +1999,26 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("scCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function logistic(t,k,t0,r){ return k/(1+Math.exp(-r*(t-t0))); }
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var start=+document.getElementById("scStart").value, rate=+document.getElementById("scRate").value/100;
+    document.getElementById("scStartV").textContent=start; document.getElementById("scRateV").textContent=(rate*100).toFixed(0);
+    var years=100, ox=40,oy=H-22,pw=W-ox-12,ph=H-40, inc=[],dis=[],cross=-1;
+    for(var t=0;t<=years;t++){ var a=logistic(t,100,18,0.18), b=logistic(t,100,start+25,rate); inc.push(a); dis.push(b); if(cross<0&&b>a&&t>2)cross=t; }
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(ox,10); ctx.lineTo(ox,oy); ctx.lineTo(W-12,oy); ctx.stroke();
+    function plot(arr,col){ ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath(); for(var i=0;i<arr.length;i++){ var x=ox+pw*i/years, y=oy-ph*arr[i]/100; i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke(); }
+    plot(inc,"#FFB800"); plot(dis,"#00D9FF");
+    ctx.fillStyle="#FFB800"; ctx.font="11px monospace"; ctx.fillText("incumbent", ox+pw*0.05, oy-ph*0.9);
+    ctx.fillStyle="#00D9FF"; ctx.fillText("disruptor", ox+pw*0.6, 22);
+    if(cross>0){ var cx=ox+pw*cross/years, cy=oy-ph*dis[cross]/100; ctx.fillStyle="#00FFA3"; ctx.beginPath(); ctx.arc(cx,cy,5,0,7); ctx.fill(); }
+    document.getElementById("scInfo").innerHTML= cross>0 ? ("Crossover at year <b style=\"color:#00FFA3\">"+cross+"</b> — the disruptor overtakes and the incumbent&rsquo;s dominance ends. Arriving later or growing slower only delays the gale; the steeper S-curve still wins.") : "Within the window the incumbent still leads — but a disruptor with any real growth eventually crosses. Maturity is not safety.";
+  }
+  ["scStart","scRate"].forEach(function(id){document.getElementById(id).oninput=render;}); window.addEventListener("resize",render); render();
 })();
 </script>
 </body>

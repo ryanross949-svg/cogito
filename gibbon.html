@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Collapse</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Collapse</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Decline Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Decline Lab</h1>
+      <p class="section-sub">Gibbon charted how a mighty institution rots from within — corruption and complexity accreting faster than reform can clear them. Set the rate of internal decay against the strength of reform and watch the curve of vitality. Most empires do not fall to invaders; they hollow out.</p>
+      <canvas id="gbCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Decay / corruption rate <span id="gbDV" style="color:var(--cyan)"></span><input type="range" id="gbD" min="1" max="20" value="8" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Reform effort <span id="gbRV" style="color:var(--cyan)"></span><input type="range" id="gbR" min="0" max="20" value="5" step="1" style="width:100%;"></label></div>
+      <div id="gbInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About GIBBON</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1405,6 +1412,23 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("gbCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var d=+document.getElementById("gbD").value/100, r=+document.getElementById("gbR").value/100;
+    document.getElementById("gbD" + "V").textContent=(d*100).toFixed(0); document.getElementById("gbRV").textContent=(r*100).toFixed(0);
+    var ox=40,oy=H-22,pw=W-ox-12,ph=H-40, years=200, V=100, fall=-1, hist=[];
+    for(var t=0;t<=years;t++){ hist.push(V); var burden=d*(1+t/120); V=V + r*Math.max(0,100-V)*0.1 - burden*V*0.06; if(V<0)V=0; if(V<=0&&fall<0)fall=t; }
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(ox,10); ctx.lineTo(ox,oy); ctx.lineTo(W-12,oy); ctx.stroke();
+    ctx.strokeStyle="#FFB800"; ctx.lineWidth=2; ctx.beginPath();
+    for(var i=0;i<hist.length;i++){ var x=ox+pw*i/years, y=oy-ph*hist[i]/100; i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke();
+    if(fall>0){ var fx=ox+pw*fall/years; ctx.setLineDash([3,3]); ctx.strokeStyle="rgba(255,107,107,0.6)"; ctx.beginPath(); ctx.moveTo(fx,10); ctx.lineTo(fx,oy); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle="#FF6B6B"; ctx.font="11px monospace"; ctx.fillText("collapse", fx-20, 20); }
+    document.getElementById("gbInfo").innerHTML= fall>0 ? ("Vitality hits zero around year <b style=\"color:#FF6B6B\">"+fall+"</b>. Reform slowed the rot but the compounding burden won — decline is gradual, then sudden.") : "Reform outpaces decay: the institution holds. A rare balance — and one that itself demands constant effort to maintain.";
+  }
+  ["gbD","gbR"].forEach(function(id){document.getElementById(id).oninput=render;}); window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
