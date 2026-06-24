@@ -512,8 +512,8 @@ const BACKGROUNDS = [
   { id: 'warp',          name: 'Warp',          level: 60,  icon: '🌀' },
   { id: 'snow',          name: 'Snow',          level: 65,  icon: '❄️' },
   { id: 'quantum',       name: 'Quantum Foam',  level: 75,  icon: '⚛️' },
-  { id: 'sonar',         name: 'Sonar',         level: 85,  icon: '📡' },
-  { id: 'singularity',   name: 'Singularity',   level: 100, icon: '🕳️', special: true }
+  { id: 'sonar',         name: 'Sonar',         icon: '📡', check: () => currentStreak >= 30, req: '30-Day Streak' },
+  { id: 'singularity',   name: 'Singularity',   icon: '🕳️', special: true, check: () => disciplineStats().every(d => d.maturity >= 80), req: 'Master All 7' }
 ];
 function renderShop() {
   const grid = document.getElementById('shopGrid');
@@ -522,11 +522,11 @@ function renderShop() {
   const equipped = localStorage.getItem('cogito-bg') || 'constellation';
   grid.innerHTML = '';
   BACKGROUNDS.forEach(bg => {
-    const unlocked = lvl >= bg.level;
+    const unlocked = bg.check ? bg.check() : (lvl >= bg.level);
     const isEq = equipped === bg.id;
     const tile = document.createElement('div');
     tile.className = 'shop-tile' + (unlocked ? '' : ' locked') + (isEq ? ' equipped' : '') + (bg.special ? ' prestige' : '');
-    tile.innerHTML = `<span class="shop-icon">${unlocked ? bg.icon : '🔒'}</span><div class="shop-name">${bg.name}</div><div class="shop-status">${isEq ? 'Equipped' : (unlocked ? 'Equip' : 'Lvl ' + bg.level)}</div>`;
+    tile.innerHTML = `<span class="shop-icon">${unlocked ? bg.icon : '🔒'}</span><div class="shop-name">${bg.name}</div><div class="shop-status">${isEq ? 'Equipped' : (unlocked ? 'Equip' : (bg.req || ('Lvl ' + bg.level)))}</div>`;
     if (unlocked && !isEq) tile.onclick = () => { localStorage.setItem('cogito-bg', bg.id); if (window.applyBackground) window.applyBackground(bg.id); renderShop(); };
     grid.appendChild(tile);
   });
