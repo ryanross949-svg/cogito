@@ -86,7 +86,8 @@
   .fb-text { display:none; width:100%; margin-top:0.5rem; background:var(--void); border:1px solid var(--border); color:var(--text); padding:0.75rem; border-radius:4px; font-family:var(--mono); font-size:0.8rem; resize:vertical; }
   .submit-btn { width:100%; margin-top:1.5rem; background:var(--cyan); color:var(--void); border:none; padding:0.75rem; font-family:var(--mono); font-weight:700; text-transform:uppercase; cursor:pointer; border-radius:4px; letter-spacing:0.1em; }
   @media(max-width: 600px) { h1 { font-size: 2.2rem; } body { padding: 1rem; } }
-  #particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  header, .hub-grid, #disciplineSections { position: relative; z-index: 1; }
   .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
   .shop-tile { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.75rem 0.4rem; text-align: center; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
   .shop-tile:hover { border-color: var(--cyan); }
