@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(21
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Inner Citadel</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Inner Citadel</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Control Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(21
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Control Lab</h1>
+      <p class="section-sub">The heart of Stoicism is one dividing line: some things are up to us — our judgements, choices and effort — and the rest is not. Peace comes from investing only in the first column. Sort each concern, and Seneca will tell you where it truly belongs.</p>
+      <div id="snCard" style="font-family:var(--display);font-size:1.25rem;color:var(--text);background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:8px;padding:1.4rem;margin:1.2rem 0;text-align:center;min-height:1.4rem;"></div>
+      <div style="display:flex;gap:1rem;justify-content:center;"><button class="btn" id="snUp">Up to me</button> <button class="btn" id="snNot">Not up to me</button></div>
+      <div id="snInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About SENECA</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1426,6 +1433,27 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var ITEMS=[
+    {t:"Whether you give your full effort today",up:true,why:"Your effort is the textbook example of what is up to you."},
+    {t:"Whether it rains on your wedding",up:false,why:"The weather answers to no one. Wanting it otherwise only breeds frustration."},
+    {t:"The opinion a stranger forms of you",up:false,why:"Other people&rsquo;s judgements are theirs, not yours to command."},
+    {t:"How you respond to an insult",up:true,why:"The sting is optional — your judgement of the insult is fully yours."},
+    {t:"Whether you win the promotion",up:false,why:"You can prepare and apply, but the decision rests with others."},
+    {t:"Whether you keep your promise",up:true,why:"Your own integrity is squarely within your power."},
+    {t:"How long you will live",up:false,why:"The length of life is fixed by nature; only how you live it is yours."},
+    {t:"The goals you choose to pursue",up:true,why:"Choosing what to value is the freest act you have."}];
+  var i=0,score=0,done=0;
+  function show(){ if(i>=ITEMS.length){ document.getElementById("snCard").textContent="Walk complete."; document.getElementById("snInfo").innerHTML="You judged <b>"+score+" of "+done+"</b> correctly. The serene life spends its energy only on the first column."; return; }
+    document.getElementById("snCard").textContent=ITEMS[i].t; }
+  function answer(up){ if(i>=ITEMS.length)return; var it=ITEMS[i]; done++; var ok=(up===it.up); if(ok)score++;
+    document.getElementById("snInfo").innerHTML=(ok?"<b style=\"color:#00FFA3\">Yes.</b> ":"<b style=\"color:#FF6B6B\">Not quite.</b> ")+it.why; i++; setTimeout(show,0); }
+  document.getElementById("snUp").onclick=function(){answer(true);};
+  document.getElementById("snNot").onclick=function(){answer(false);};
+  show();
 })();
 </script>
 </body>

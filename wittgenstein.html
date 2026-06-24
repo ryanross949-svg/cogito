@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Silence</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Silence</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Meaning Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Meaning Lab</h1>
+      <p class="section-sub">What do all games share? Wittgenstein answered: nothing single. Board games, ball games, solitaire and ring-a-ring overlap like family faces — threads that crisscross without one running through them all. Pick any feature you think is the essence of &ldquo;game,&rdquo; and watch a counterexample appear.</p>
+      <p style="font-size:0.85rem;color:var(--text-dim);">Click a candidate essential feature:</p>
+      <div id="wtFeats" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin:0.8rem 0;"></div>
+      <div id="wtOut" style="font-size:0.95rem;color:var(--text-dim);line-height:1.7;min-height:2rem;"></div>
+      <div id="wtConc" style="font-family:var(--display);color:var(--cyan);margin-top:1rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About WITTGENSTEIN</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1416,6 +1424,28 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var FEATS=["competition","fun","skill","luck","more than one player","a winner"];
+  var GAMES=[
+    {n:"chess",f:["competition","skill","a winner","more than one player"]},
+    {n:"solitaire",f:["skill","luck","a winner"]},
+    {n:"ring-a-ring-o-roses",f:["fun","more than one player"]},
+    {n:"catch",f:["fun","skill","more than one player"]},
+    {n:"the lottery",f:["luck","a winner","competition"]},
+    {n:"a child throwing a ball at a wall",f:["fun","skill"]}];
+  var tested={};
+  var cont=document.getElementById("wtFeats");
+  FEATS.forEach(function(ft){ var b=document.createElement("button"); b.className="btn"; b.textContent=ft;
+    b.style.cssText="background:transparent;border:1px solid var(--border);color:var(--text-dim);";
+    b.onclick=function(){ tested[ft]=true; var miss=GAMES.filter(function(g){return g.f.indexOf(ft)<0;});
+      b.style.borderColor="#FF6B6B"; b.style.color="#FF6B6B";
+      document.getElementById("wtOut").innerHTML= miss.length? ("But <b style=\"color:var(--cyan)\">"+miss[0].n+"</b> is a game and has no "+ft+". So "+ft+" cannot be the essence.") : (ft+" happens to fit these, but widen the net and it fails too.");
+      if(Object.keys(tested).length===FEATS.length) document.getElementById("wtConc").innerHTML="Every candidate has a counterexample. There is no single thread — only a <b>family resemblance</b>. Meaning is use, not a hidden essence.";
+    }; cont.appendChild(b); });
+  document.getElementById("wtOut").textContent="Each feature you try will turn out to be missing from some game.";
 })();
 </script>
 </body>

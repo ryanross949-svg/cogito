@@ -358,7 +358,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project ORACLE</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Forecast Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -503,6 +503,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Forecast Lab</h1>
+      <p class="section-sub">Tetlock&rsquo;s superforecasters are not always right — they are well calibrated. When they say 70%, it happens about 70% of the time. Give each claim your probability, then reveal the truth and read your Brier score: the lower, the sharper. Confident-and-wrong is punished hardest.</p>
+      <div id="tkQs"></div>
+      <div style="margin-top:1rem;"><button class="btn" id="tkReveal">Reveal and score</button> <button class="btn" id="tkReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">New round</button></div>
+      <div id="tkInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About TETLOCK</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -1943,6 +1950,36 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var BANK=[
+    {q:"A standard year has 366 days.",a:false},
+    {q:"Water boils at a lower temperature at high altitude.",a:true},
+    {q:"Sharks are mammals.",a:false},
+    {q:"The Great Wall of China is visible to the naked eye from the Moon.",a:false},
+    {q:"Honey never spoils if sealed properly.",a:true},
+    {q:"Lightning never strikes the same place twice.",a:false},
+    {q:"An octopus has three hearts.",a:true},
+    {q:"The human body has 206 bones in adulthood.",a:true},
+    {q:"Goldfish have a memory of only a few seconds.",a:false},
+    {q:"Mount Everest is the tallest mountain measured from base to peak.",a:false}];
+  var cur=[];
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+  function build(){ cur=shuffle(BANK).slice(0,5); var h=""; cur.forEach(function(it,i){
+    h+="<div style=\"margin:0.9rem 0;\"><div style=\"font-size:0.95rem;color:var(--text);margin-bottom:0.3rem;\">"+(i+1)+". "+it.q+"</div>"+
+       "<label style=\"font-size:0.78rem;color:var(--text-dim);\">P(true) = <span id=\"tkv"+i+"\" style=\"color:var(--cyan)\">50</span>%<input type=\"range\" id=\"tk"+i+"\" min=\"0\" max=\"100\" value=\"50\" style=\"width:100%;max-width:420px;display:block;\"></label>"+
+       "<div id=\"tkr"+i+"\" style=\"font-size:0.82rem;margin-top:0.2rem;\"></div></div>"; });
+    document.getElementById("tkQs").innerHTML=h;
+    cur.forEach(function(it,i){ var s=document.getElementById("tk"+i); s.oninput=function(){document.getElementById("tkv"+i).textContent=this.value;}; });
+    document.getElementById("tkInfo").textContent="Set your probability for each, then reveal."; }
+  document.getElementById("tkReveal").onclick=function(){ var sum=0; cur.forEach(function(it,i){ var p=+document.getElementById("tk"+i).value/100, o=it.a?1:0; sum+=(p-o)*(p-o);
+    var r=document.getElementById("tkr"+i); r.innerHTML=(it.a?"<b style=\"color:#00FFA3\">True</b>":"<b style=\"color:#FF6B6B\">False</b>")+" — you said "+Math.round(p*100)+"%"; });
+    var brier=sum/cur.length;
+    var verdict= brier<0.1?"superb calibration":brier<0.2?"well calibrated":brier<0.35?"fair — some overconfidence":"poorly calibrated — try hedging toward 50% when unsure";
+    document.getElementById("tkInfo").innerHTML="Brier score = <b style=\"color:"+(brier<0.2?"#00FFA3":brier<0.35?"#FFB800":"#FF6B6B")+"\">"+brier.toFixed(3)+"</b> (0 = perfect, 0.25 = always guessing 50%). "+verdict+"."; };
+  document.getElementById("tkReset").onclick=build; build();
 })();
 </script>
 </body>
