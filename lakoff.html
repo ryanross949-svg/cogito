@@ -118,7 +118,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project METAPHOR</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Metaphor Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -213,6 +213,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Metaphor Lab</h1>
+      <p class="section-sub">Lakoff showed that abstract thought runs on metaphor: we understand one domain in terms of another, mostly without noticing. Pick a conceptual metaphor and see the hidden mapping that powers our everyday phrases — and how it quietly shapes what we can say.</p>
+      <div id="lkBtns" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin:1rem 0;"></div>
+      <div id="lkMap"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About LAKOFF</h1>
@@ -519,6 +525,39 @@ function bootSequence(){ const log = document.getElementById('bootLog'); const b
 window.LAKOFF = { show: showView, showModuleDetail, showLesson, markLessonRead, showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission, showProjectPhase, answerPhase, setTheme };
 function init(){ const savedTheme = localStorage.getItem('cogito-theme') || 'quantum'; document.body.dataset.theme = savedTheme; S = loadState(); checkDailyReset(); updateStreak(); try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const todayDate = new Date().toISOString().split('T')[0]; if(!act.includes(todayDate)) { act.push(todayDate); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {} saveState(); initBackground(); bootSequence(); }
 init();
+})();
+</script>
+<script>
+(function(){
+  var M=[
+    {name:"ARGUMENT IS WAR",src:"war",tgt:"argument",
+     map:[["attack","criticising a claim"],["defend","supporting your position"],["win / lose","being judged right or wrong"],["shoot down","refuting a point"]],
+     ex:["Your claims are indefensible.","He attacked every weak point.","I demolished his argument.","She shot down my idea."],
+     note:"Because we frame argument as war, we look for winners and losers — not for what both sides might build together."},
+    {name:"TIME IS MONEY",src:"money",tgt:"time",
+     map:[["spend","using time"],["save","being efficient"],["waste","using time poorly"],["invest","using time for return"]],
+     ex:["You are wasting my time.","This will save you hours.","I have invested a lot of time in this.","Is it worth your while?"],
+     note:"Treating time as a finite currency makes us budget and resent it — a very modern, industrial way to live."},
+    {name:"IDEAS ARE FOOD",src:"food",tgt:"ideas",
+     map:[["digest","understanding slowly"],["swallow","accepting"],["half-baked","underdeveloped"],["food for thought","something to ponder"]],
+     ex:["Let me digest that.","I cannot swallow that claim.","That is a half-baked theory.","A meaty argument."],
+     note:"The metaphor casts the mind as a gut: ideas are taken in, chewed over, and either nourish or disagree with us."},
+    {name:"LOVE IS A JOURNEY",src:"journey",tgt:"love",
+     map:[["crossroads","a decision point"],["dead end","no future"],["go separate ways","breaking up"],["long road","a sustained relationship"]],
+     ex:["We have come a long way.","The relationship hit a dead end.","We are at a crossroads.","Look how far we have come."],
+     note:"Seeing love as a shared journey makes us ask where it is going — and judge it by progress, not just by the present moment."}];
+  var cont=document.getElementById("lkBtns");
+  function showM(m){ var h="<div style=\"font-family:var(--display);font-size:1.15rem;color:var(--cyan);margin:0.5rem 0 0.8rem;\">"+m.name+"</div>";
+    h+="<table style=\"border-collapse:collapse;font-size:0.85rem;margin-bottom:1rem;\"><tr style=\"color:var(--text-faint)\"><td style=\"padding:0.3rem 1rem\">from "+m.src+"</td><td style=\"padding:0.3rem 1rem\">we map onto "+m.tgt+"</td></tr>";
+    m.map.forEach(function(r){ h+="<tr><td style=\"padding:0.3rem 1rem;color:var(--magenta)\">"+r[0]+"</td><td style=\"padding:0.3rem 1rem;color:var(--text-dim)\">"+r[1]+"</td></tr>"; });
+    h+="</table><div style=\"font-size:0.8rem;color:var(--text-dim);margin-bottom:0.6rem;\">Everyday expressions it licenses:</div><ul style=\"color:var(--cyan);font-size:0.9rem;line-height:1.8;margin:0 0 1rem 1.1rem;\">";
+    m.ex.forEach(function(e){ h+="<li>"+e+"</li>"; }); h+="</ul>";
+    h+="<div style=\"font-size:0.88rem;color:var(--text-dim);border-left:2px solid var(--border);padding-left:0.9rem;\">"+m.note+"</div>";
+    document.getElementById("lkMap").innerHTML=h; }
+  M.forEach(function(m){ var b=document.createElement("button"); b.className="btn"; b.textContent=m.name;
+    b.style.cssText="background:transparent;border:1px solid var(--border);color:var(--text-dim);font-size:0.78rem;";
+    b.onclick=function(){ cont.querySelectorAll("button").forEach(function(x){x.style.color="var(--text-dim)";x.style.borderColor="var(--border)";}); b.style.color="var(--cyan)"; b.style.borderColor="var(--cyan)"; showM(m); }; cont.appendChild(b); });
+  showM(M[0]);
 })();
 </script>
 </body>
