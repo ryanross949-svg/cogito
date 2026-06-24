@@ -17,6 +17,9 @@
   [data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --cyan:#FCEE09; --magenta:#FF003C; --amber:#00FFF0; --green:#FF003C; --red:#FF003C; --text:#F8F8F8; --text-dim:#A0A0A0; --text-faint:#606060; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
   [data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --cyan:#268BD2; --magenta:#D33682; --amber:#B58900; --green:#859900; --red:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#93A1A1; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
   [data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --cyan:#88C0D0; --magenta:#B48EAD; --amber:#EBCB8B; --green:#A3BE8C; --red:#BF616A; --text:#ECEFF4; --text-dim:#D8DEE9; --text-faint:#4C566A; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+  [data-theme="plain"] { --void:#15171c; --panel:rgba(38,42,50,0.7); --panel-solid:#1e2127; --cyan:#9fb3c8; --magenta:#b9a3c9; --green:#a3c9a8; --amber:#d8c79e; --red:#d39a9a; --text:#dfe4ea; --text-dim:#9aa3af; --text-faint:#5c6470; --border:rgba(159,179,200,0.18); --border-bright:rgba(159,179,200,0.4); }
+  [data-theme="crimson"] { --void:#140608; --panel:rgba(40,10,14,0.78); --panel-solid:#1a0509; --cyan:#FF4D6D; --magenta:#FF8FA3; --green:#FF4D6D; --amber:#FFB3C1; --red:#FF3355; --text:#FFE5E9; --text-dim:#C98A95; --text-faint:#7A4A52; --border:rgba(255,77,109,0.2); --border-bright:rgba(255,77,109,0.5); }
+  [data-theme="emerald"] { --void:#04140E; --panel:rgba(10,40,28,0.78); --panel-solid:#06150F; --cyan:#2EE6A6; --magenta:#5EEAD4; --green:#2EE6A6; --amber:#A7F3D0; --red:#FF6B6B; --text:#E6FFF5; --text-dim:#7FB8A0; --text-faint:#3F6657; --border:rgba(46,230,166,0.2); --border-bright:rgba(46,230,166,0.5); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: radial-gradient(ellipse at top, rgba(0,217,255,0.08), transparent 50%), radial-gradient(ellipse at bottom, rgba(157,78,221,0.08), transparent 50%), var(--void); color: var(--text); font-family: var(--mono); min-height: 100vh; padding: 2rem; transition: background 0.3s, color 0.3s; }
   header { text-align: center; margin-bottom: 2rem; }
@@ -29,6 +32,9 @@
   .theme-menu.active { display: flex; }
   .theme-option { padding: 0.5rem 1rem; font-size: 0.7rem; color: var(--text-dim); cursor: pointer; border: none; background: none; text-align: center; font-family: var(--mono); text-transform: uppercase; }
   .theme-option:hover { background: var(--panel); color: var(--cyan); }
+  .theme-option.locked { opacity: 0.4; cursor: not-allowed; }
+  .theme-option.locked:hover { background: none; color: var(--text-dim); }
+  .dev-btn { background: transparent; border: 1px dashed var(--red); color: var(--red); padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0.25rem; }
   .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; }
   @media(max-width: 800px) { .hub-grid { grid-template-columns: 1fr; } }
   .panel { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; position: relative; backdrop-filter: blur(8px); border-radius: 4px; }
@@ -87,12 +93,17 @@
   .submit-btn { width:100%; margin-top:1.5rem; background:var(--cyan); color:var(--void); border:none; padding:0.75rem; font-family:var(--mono); font-weight:700; text-transform:uppercase; cursor:pointer; border-radius:4px; letter-spacing:0.1em; }
   @media(max-width: 600px) { h1 { font-size: 2.2rem; } body { padding: 1rem; } }
   #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-  header, .hub-grid, #disciplineSections { position: relative; z-index: 1; }
+  header { position: relative; z-index: 60; }
+  .hub-grid, #disciplineSections { position: relative; z-index: 1; }
   .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
   .shop-tile { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.75rem 0.4rem; text-align: center; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
   .shop-tile:hover { border-color: var(--cyan); }
   .shop-tile.locked { opacity: 0.4; cursor: not-allowed; }
   .shop-tile.equipped { border-color: var(--green); background: rgba(0,255,163,0.05); box-shadow: 0 0 10px rgba(0,255,163,0.1); }
+  .shop-tile.prestige { border-color: rgba(255,184,0,0.35); }
+  .shop-tile.prestige.unlocked { border-color: var(--amber); box-shadow: 0 0 12px rgba(255,184,0,0.25); }
+  .shop-tile.prestige.equipped { border-color: var(--amber); background: rgba(255,184,0,0.06); box-shadow: 0 0 14px rgba(255,184,0,0.3); }
+  .shop-tile.prestige .shop-name { color: var(--amber); }
   .shop-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
   .shop-name { font-size: 0.62rem; font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
   .shop-status { font-size: 0.55rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -110,11 +121,7 @@
     <div class="theme-dropdown" style="margin-top: 1rem;">
       <button class="theme-btn" id="themeBtn">Theme</button>
       <div class="theme-menu" id="themeMenu">
-        <button class="theme-option" onclick="HUB.setTheme('quantum')">Quantum</button>
-        <button class="theme-option" onclick="HUB.setTheme('matrix')">Matrix</button>
-        <button class="theme-option" onclick="HUB.setTheme('cyberpunk')">Cyberpunk</button>
-        <button class="theme-option" onclick="HUB.setTheme('light')">Light</button>
-        <button class="theme-option" onclick="HUB.setTheme('nord')">Nord</button>
+        <!-- theme options are rendered by renderThemeMenu() -->
       </div>
     </div>
   </header>
@@ -176,7 +183,10 @@
 
   <!-- DEV TOOL: REMOVE BEFORE LAUNCH -->
   <div style="max-width:1000px;margin:0 auto 3rem;text-align:center;">
-    <button id="devLevel75" style="background:transparent;border:1px dashed var(--red);color:var(--red);padding:0.5rem 1rem;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">DEV: Set Global Lvl 75</button>
+    <button id="devLevel75" class="dev-btn">DEV: Set Global Lvl 75</button>
+    <button id="devMaster" class="dev-btn">DEV: Master All (80%)</button>
+    <button id="devStreak" class="dev-btn">DEV: 30-Day Streak</button>
+    <button id="devReset" class="dev-btn">DEV: Reset All</button>
   </div>
 
   <button id="feedback-fab">Feedback</button>
@@ -494,16 +504,22 @@ renderAchievements();
 
 // ============== BACKGROUND SHOP ==============
 const BACKGROUNDS = [
-  { id: 'constellation', name: 'Constellation', level: 1,  icon: '🌌' },
-  { id: 'starfield',     name: 'Starfield',     level: 5,  icon: '✨' },
-  { id: 'nebula',        name: 'Nebula Drift',  level: 10, icon: '🌫️' },
-  { id: 'synthwave',     name: 'Synthwave',     level: 20, icon: '🌇' },
-  { id: 'matrix',        name: 'Matrix Rain',   level: 25, icon: '🟩' },
-  { id: 'orbital',       name: 'Orbital',       level: 30, icon: '🪐' },
-  { id: 'circuit',       name: 'Circuit',       level: 40, icon: '⚡' },
-  { id: 'aurora',        name: 'Aurora',        level: 50, icon: '🌈' },
-  { id: 'warp',          name: 'Warp',          level: 60, icon: '🌀' },
-  { id: 'quantum',       name: 'Quantum Foam',  level: 75, icon: '⚛️' }
+  { id: 'constellation', name: 'Constellation', level: 1,   icon: '🌌' },
+  { id: 'starfield',     name: 'Starfield',     level: 5,   icon: '✨' },
+  { id: 'nebula',        name: 'Nebula Drift',  level: 10,  icon: '🌫️' },
+  { id: 'drift',         name: 'Drift',         level: 15,  icon: '🍃' },
+  { id: 'synthwave',     name: 'Synthwave',     level: 20,  icon: '🌇' },
+  { id: 'matrix',        name: 'Matrix Rain',   level: 25,  icon: '🟩' },
+  { id: 'orbital',       name: 'Orbital',       level: 30,  icon: '🪐' },
+  { id: 'comet',         name: 'Comet',         level: 35,  icon: '☄️' },
+  { id: 'circuit',       name: 'Circuit',       level: 40,  icon: '⚡' },
+  { id: 'fireflies',     name: 'Fireflies',     level: 45,  icon: '💫' },
+  { id: 'aurora',        name: 'Aurora',        level: 50,  icon: '🌈' },
+  { id: 'warp',          name: 'Warp',          level: 60,  icon: '🌀' },
+  { id: 'snow',          name: 'Snow',          level: 65,  icon: '❄️' },
+  { id: 'quantum',       name: 'Quantum Foam',  level: 75,  icon: '⚛️' },
+  { id: 'sonar',         name: 'Sonar',         icon: '📡', check: () => currentStreak >= 30, req: '30-Day Streak' },
+  { id: 'singularity',   name: 'Singularity',   icon: '🕳️', special: true, check: () => disciplineStats().every(d => d.maturity >= 80), req: 'Master All 7' }
 ];
 function renderShop() {
   const grid = document.getElementById('shopGrid');
@@ -512,11 +528,11 @@ function renderShop() {
   const equipped = localStorage.getItem('cogito-bg') || 'constellation';
   grid.innerHTML = '';
   BACKGROUNDS.forEach(bg => {
-    const unlocked = lvl >= bg.level;
+    const unlocked = bg.check ? bg.check() : (lvl >= bg.level);
     const isEq = equipped === bg.id;
     const tile = document.createElement('div');
-    tile.className = 'shop-tile' + (unlocked ? '' : ' locked') + (isEq ? ' equipped' : '');
-    tile.innerHTML = `<span class="shop-icon">${unlocked ? bg.icon : '🔒'}</span><div class="shop-name">${bg.name}</div><div class="shop-status">${isEq ? 'Equipped' : (unlocked ? 'Equip' : 'Lvl ' + bg.level)}</div>`;
+    tile.className = 'shop-tile' + (unlocked ? '' : ' locked') + (isEq ? ' equipped' : '') + (bg.special ? ' prestige' : '');
+    tile.innerHTML = `<span class="shop-icon">${unlocked ? bg.icon : '🔒'}</span><div class="shop-name">${bg.name}</div><div class="shop-status">${isEq ? 'Equipped' : (unlocked ? 'Equip' : (bg.req || ('Lvl ' + bg.level)))}</div>`;
     if (unlocked && !isEq) tile.onclick = () => { localStorage.setItem('cogito-bg', bg.id); if (window.applyBackground) window.applyBackground(bg.id); renderShop(); };
     grid.appendChild(tile);
   });
@@ -562,7 +578,38 @@ if (totalXP > 0) {
 document.getElementById('profTitle').textContent = profile.title;
 document.getElementById('profDesc').textContent = profile.desc;
 
-function setTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem('cogito-theme', theme); document.getElementById('themeMenu').classList.remove('active'); }
+const THEMES = [
+  { id: 'quantum',   name: 'Quantum',   level: 1 },
+  { id: 'plain',     name: 'Plain',     level: 1 },
+  { id: 'light',     name: 'Light',     level: 5 },
+  { id: 'nord',      name: 'Nord',      level: 15 },
+  { id: 'matrix',    name: 'Matrix',    level: 35 },
+  { id: 'cyberpunk', name: 'Cyberpunk', level: 55 },
+  { id: 'crimson',   name: 'Crimson',   level: 75 },
+  { id: 'emerald',   name: 'Emerald',   check: () => currentStreak >= 30, req: '30-day streak' }
+];
+function themeUnlocked(t) { return t.check ? t.check() : (getLevel(totalXP) >= t.level); }
+function renderThemeMenu() {
+  const menu = document.getElementById('themeMenu');
+  menu.innerHTML = '';
+  THEMES.forEach(t => {
+    const ok = themeUnlocked(t);
+    const b = document.createElement('button');
+    b.className = 'theme-option' + (ok ? '' : ' locked');
+    b.textContent = ok ? t.name : (t.name + ' \u00b7 ' + (t.req || ('Lv ' + t.level)));
+    if (ok) b.onclick = () => setTheme(t.id);
+    menu.appendChild(b);
+  });
+}
+function setTheme(theme) {
+  const t = THEMES.find(x => x.id === theme);
+  if (t && !themeUnlocked(t)) return;
+  document.body.dataset.theme = theme;
+  localStorage.setItem('cogito-theme', theme);
+  document.getElementById('themeMenu').classList.remove('active');
+}
+document.body.dataset.theme = localStorage.getItem('cogito-theme') || 'quantum';
+renderThemeMenu();
 document.getElementById('themeBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('themeMenu').classList.toggle('active'); };
 document.addEventListener('click', (e) => { if(!e.target.closest('.theme-dropdown')) document.getElementById('themeMenu').classList.remove('active'); });
 
@@ -605,6 +652,31 @@ document.getElementById('submitFeedback').onclick = () => {
     localStorage.setItem(app.storageKey, JSON.stringify(savedData));
     location.reload();
   };
+
+// DEV: master all disciplines (set every course to ~100% maturity)
+document.getElementById('devMaster').onclick = () => {
+  APPS.forEach(app => {
+    let d = {}; try { d = JSON.parse(localStorage.getItem(app.storageKey) || '{}'); } catch(e) {}
+    d.cards = {};
+    for (let i = 0; i < 12; i++) d.cards['dev' + i] = { ease: 2.5, interval: 45, repetitions: 6, due: Date.now() + 45 * 86400000, lastReviewed: Date.now(), correct: 6, wrong: 0 };
+    if (typeof d.xp !== 'number') d.xp = 5000;
+    localStorage.setItem(app.storageKey, JSON.stringify(d));
+  });
+  location.reload();
+};
+// DEV: grant a 30-day streak
+document.getElementById('devStreak').onclick = () => {
+  const days = [], base = new Date();
+  for (let i = 0; i < 30; i++) { const x = new Date(base); x.setDate(base.getDate() - i); days.push(x.toISOString().split('T')[0]); }
+  localStorage.setItem('cogito-activity', JSON.stringify(days));
+  location.reload();
+};
+// DEV: wipe everything (XP, cards, streaks, unlocks, theme, background)
+document.getElementById('devReset').onclick = () => {
+  if (!confirm('Reset ALL progress \u2014 XP, cards, streaks, unlocks, theme, and background \u2014 back to zero? This cannot be undone.')) return;
+  localStorage.clear();
+  location.reload();
+};
 
 window.HUB = { setTheme };
 </script>
