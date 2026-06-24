@@ -28,7 +28,7 @@ body{background:radial-gradient(ellipse at 20% 10%,rgba(0,217,255,0.08),transpar
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
 body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,217,255,0.02) 50%,transparent 50%);background-size:100% 4px;pointer-events:none;z-index:2;opacity:0.5;}
 #boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
-#boot.fade{opacity:0;pointer-events:none;transition:opacity 800ms ease;}
+#boot.fade{opacity:0;pointer-events:none;transition:opacity 400ms ease;}
 .boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--cyan);text-shadow:0 0 30px rgba(0,217,255,0.5);margin-bottom:1rem;position:relative;}
 .boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 2s ease-in-out infinite;}
 @keyframes scanLine{0%,100%{opacity:0.3;}50%{opacity:1;}}
@@ -1381,14 +1381,14 @@ function bootSequence(){
   const lines = ['Initializing cognitive architecture v1.0...', 'Loading behavioral kernel...', 'Calibrating SM-2 spaced repetition engine...', 'Mounting Pareto priority queue...', 'Indexing 10 axes / 120 cards / 40 arena scenarios...', 'Initializing Project Blind Spot...', 'KAHNEMAN online.'];
   let i = 0;
   function nextLine(){
-    if(i >= lines.length){ setTimeout(() => { document.getElementById('boot').classList.add('fade'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; showView('dashboard'); }, 800); }, 300); return; }
+    if(i >= lines.length){ showView('dashboard'); document.getElementById('app').classList.add('active'); setTimeout(() => { document.getElementById('boot').classList.add('fade'); setTimeout(() => { document.getElementById('boot').style.display = 'none'; }, 400); }, 120); return; }
     const line = document.createElement('div');
     line.className = 'boot-log-line';
     line.textContent = '> ' + lines[i];
     log.appendChild(line);
-    bar.style.width = ((i + 1) / lines.length * 100) + '%';
+    if(i===0 && bar){ bar.style.transition = 'width ' + (lines.length*55+200) + 'ms linear'; requestAnimationFrame(function(){ bar.style.width = '100%'; }); }
     i++;
-    setTimeout(nextLine, 220 + Math.random() * 180);
+    setTimeout(nextLine, 55);
   }
   nextLine();
 }
