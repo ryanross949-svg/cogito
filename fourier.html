@@ -378,7 +378,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project SIREN</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Wave Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -523,6 +523,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Wave Lab</h1>
+      <p class="section-sub">Any periodic signal is a sum of sine waves. Add more odd harmonics and watch pure sine curves stack into a sharp square wave — including the little overshoot at the edges (the Gibbs phenomenon).</p>
+      <canvas id="foCanvas" style="width:100%;height:240px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div id="foInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <label style="font-size:0.8rem;color:var(--text-dim);">Harmonics: <span id="foNV" style="color:var(--cyan);"></span></label>
+      <input type="range" id="foN" min="1" max="25" value="3" style="width:100%;max-width:420px;display:block;">
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About FOURIER</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -2013,6 +2021,22 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("foCanvas"); if(!cv) return; var ctx=cv.getContext("2d"); var H=240;
+  function render(){ var W=cv.width=cv.clientWidth||600; cv.height=H; ctx.clearRect(0,0,W,H);
+    var n=+document.getElementById("foN").value; document.getElementById("foNV").textContent=n;
+    var mid=H/2, amp=H*0.32, px, t;
+    ctx.strokeStyle="rgba(157,78,221,0.4)"; ctx.lineWidth=1; ctx.beginPath();
+    for(px=0;px<=W;px++){ t=px/W*Math.PI*2; ctx.lineTo(px, mid-(Math.sin(t)>=0?1:-1)*amp); } ctx.stroke();
+    ctx.strokeStyle="#00D9FF"; ctx.lineWidth=2; ctx.beginPath();
+    for(px=0;px<=W;px++){ t=px/W*Math.PI*2; var y=0; for(var k=1;k<=n;k++){ var h=2*k-1; y+=Math.sin(h*t)/h; } y*=4/Math.PI; if(px===0)ctx.moveTo(px,mid-y*amp); else ctx.lineTo(px,mid-y*amp); } ctx.stroke();
+    document.getElementById("foInfo").textContent=n+" harmonic"+(n>1?"s":"")+" -> approaching a square wave";
+  }
+  document.getElementById("foN").oninput=render;
+  window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
