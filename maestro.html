@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Panarchy</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Panarchy</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Systems Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Systems Lab</h1>
+      <p class="section-sub">Systems thinking starts with stocks and flows. Water fills a tank from a tap while draining through a hole sized to how full it already is. That outflow is a balancing feedback loop, and it always pulls the stock toward one level — inflow divided by the drain rate. Set both and watch it settle.</p>
+      <canvas id="msCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Inflow (tap) <span id="msInV" style="color:var(--cyan)"></span><input type="range" id="msIn" min="1" max="40" value="20" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Drain rate (% of stock) <span id="msDrV" style="color:var(--cyan)"></span><input type="range" id="msDr" min="2" max="40" value="16" step="1" style="width:100%;"></label></div>
+      <div id="msInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MAESTRO</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1385,6 +1392,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("msCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var inflow=+document.getElementById("msIn").value, drain=+document.getElementById("msDr").value/100;
+    document.getElementById("msInV").textContent=inflow; document.getElementById("msDrV").textContent=(drain*100).toFixed(0)+"%";
+    var eq=inflow/drain, S=0, steps=120, hist=[];
+    for(var t=0;t<=steps;t++){ hist.push(S); S=S+inflow-drain*S; if(S<0)S=0; }
+    var mx=Math.max(eq*1.2,1), ox=40,oy=H-22,pw=W-ox-12,ph=H-40;
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(ox,10); ctx.lineTo(ox,oy); ctx.lineTo(W-12,oy); ctx.stroke();
+    var ey=oy-ph*eq/mx; ctx.setLineDash([4,4]); ctx.strokeStyle="rgba(0,255,163,0.5)"; ctx.beginPath(); ctx.moveTo(ox,ey); ctx.lineTo(W-12,ey); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="rgba(0,255,163,0.8)"; ctx.font="11px monospace"; ctx.fillText("equilibrium", ox+6, ey-5);
+    ctx.strokeStyle="#00D9FF"; ctx.lineWidth=2; ctx.beginPath(); for(var i=0;i<hist.length;i++){ var x=ox+pw*i/steps, y=oy-ph*hist[i]/mx; i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke();
+    document.getElementById("msInfo").innerHTML="The stock climbs fast, then eases as the growing outflow cancels the inflow, settling at <b style=\"color:#00FFA3\">"+eq.toFixed(1)+"</b> (inflow / drain rate). Balancing loops do not overshoot — they home in.";
+  }
+  ["msIn","msDr"].forEach(function(id){document.getElementById(id).oninput=render;}); window.addEventListener("resize",render); render();
 })();
 </script>
 </body>

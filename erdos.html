@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Cascade</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Cascade</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Network Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Network Lab</h1>
+      <p class="section-sub">Erdos and Renyi asked what happens when you wire random nodes together one edge at a time. The answer is a phase transition: below a threshold the graph is dust, but cross it and a giant connected component snaps into being almost at once. Raise the edge probability and watch it ignite.</p>
+      <canvas id="erCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Edge probability (x1000) <span id="erPV" style="color:var(--cyan)"></span><input type="range" id="erP" min="0" max="160" value="40" step="1" style="width:100%;"></label></div>
+      <button class="btn" id="erShuf" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reshuffle nodes</button>
+      <div id="erInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About ERDOS</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1406,6 +1414,25 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("erCanvas"); if(!cv)return; var ctx=cv.getContext("2d"); var N=44, pos=[];
+  function place(){ pos=[]; for(var i=0;i<N;i++) pos.push([0.08+0.84*Math.random(),0.10+0.80*Math.random()]); }
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=300; ctx.clearRect(0,0,W,H);
+    var p=+document.getElementById("erP").value/1000; document.getElementById("erPV").textContent=p.toFixed(3);
+    var par=[]; for(var i=0;i<N;i++)par.push(i); function find(x){ while(par[x]!==x){ par[x]=par[par[x]]; x=par[x]; } return x; }
+    var edges=[]; for(var i=0;i<N;i++)for(var j=i+1;j<N;j++){ if(Math.random()<p){ edges.push([i,j]); var a=find(i),b=find(j); if(a!==b)par[a]=b; } }
+    var cnt={},best=-1,bestSz=0; for(var i=0;i<N;i++){ var r=find(i); cnt[r]=(cnt[r]||0)+1; if(cnt[r]>bestSz){bestSz=cnt[r];best=r;} }
+    function X(i){return pos[i][0]*W;} function Y(i){return pos[i][1]*H;}
+    edges.forEach(function(e){ var inG=(find(e[0])===best&&bestSz>1); ctx.strokeStyle=inG?"rgba(0,217,255,0.55)":"rgba(255,255,255,0.12)"; ctx.lineWidth=inG?1.6:1; ctx.beginPath(); ctx.moveTo(X(e[0]),Y(e[0])); ctx.lineTo(X(e[1]),Y(e[1])); ctx.stroke(); });
+    for(var i=0;i<N;i++){ var inG=(find(i)===best&&bestSz>1); ctx.fillStyle=inG?"#00D9FF":"#6b6e7a"; ctx.beginPath(); ctx.arc(X(i),Y(i),inG?5:3.5,0,7); ctx.fill(); }
+    var frac=Math.round(bestSz/N*100), thr=1/N;
+    document.getElementById("erInfo").innerHTML="Largest connected cluster: <b style=\"color:#00D9FF\">"+frac+"%</b> of nodes. "+(p<thr?"Below the threshold (~"+thr.toFixed(3)+") the graph is scattered fragments.":frac>55?"Past the threshold a giant component dominates — the network has ignited.":"Right around the threshold: clusters are merging into one.");
+  }
+  document.getElementById("erShuf").onclick=function(){ place(); render(); };
+  document.getElementById("erP").oninput=render; window.addEventListener("resize",render); place(); render();
 })();
 </script>
 </body>

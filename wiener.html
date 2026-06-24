@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Steersman</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Steersman</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Feedback Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Feedback Lab</h1>
+      <p class="section-sub">Cybernetics is the science of steering by feedback. A controller measures the gap between where the system is and where you want it, then corrects in proportion. Turn up the gain for a faster response — but push too hard and the loop overshoots and oscillates. Find the sweet spot.</p>
+      <canvas id="wnCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Feedback gain <span id="wnGV" style="color:var(--cyan)"></span><input type="range" id="wnG" min="2" max="100" value="25" step="1" style="width:100%;"></label></div>
+      <div id="wnInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About WIENER</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1216,6 +1223,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("wnCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var g=+document.getElementById("wnG").value/100; document.getElementById("wnGV").textContent=g.toFixed(2);
+    var set=1.0, v=0, vel=0, steps=140, hist=[], maxOver=0;
+    for(var t=0;t<steps;t++){ hist.push(v); var err=set-v; vel=vel*0.78 + g*err*0.5; v=v+vel; if(v-set>maxOver)maxOver=v-set; }
+    var ox=40,oy=H-22,pw=W-ox-12,ph=H-44, mx=Math.max(1.0+maxOver,1.1);
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(ox,10); ctx.lineTo(ox,oy); ctx.lineTo(W-12,oy); ctx.stroke();
+    var sy=oy-ph*set/mx; ctx.setLineDash([4,4]); ctx.strokeStyle="rgba(255,184,0,0.6)"; ctx.beginPath(); ctx.moveTo(ox,sy); ctx.lineTo(W-12,sy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="rgba(255,184,0,0.85)"; ctx.font="11px monospace"; ctx.fillText("setpoint", ox+6, sy-5);
+    ctx.strokeStyle="#00D9FF"; ctx.lineWidth=2; ctx.beginPath(); for(var i=0;i<hist.length;i++){ var x=ox+pw*i/steps, y=oy-ph*Math.max(0,hist[i])/mx; i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke();
+    var msg = g<0.25 ? "Low gain: stable but sluggish — it crawls to target." : (maxOver>0.35 ? "High gain: it overshoots by "+Math.round(maxOver*100)+"% and rings before settling. Too much correction destabilises." : "Well tuned: quick and settles cleanly with little overshoot.");
+    document.getElementById("wnInfo").textContent=msg;
+  }
+  document.getElementById("wnG").oninput=render; window.addEventListener("resize",render); render();
 })();
 </script>
 </body>

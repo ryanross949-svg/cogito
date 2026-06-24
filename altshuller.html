@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Invention</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Invention</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Invention Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Invention Lab</h1>
+      <p class="section-sub">Altshuller mined thousands of patents and found that invention is not luck — the same contradictions recur, solved by the same handful of principles. State what you want to improve and what gets worse, and TRIZ hands you the inventive principles that have cracked that exact tension before.</p>
+      <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:end;margin:1.2rem 0;"><label style="font-size:0.78rem;color:var(--text-dim);">Improve<br><select id="trImp" style="background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.5rem;border-radius:4px;margin-top:0.3rem;"></select></label><label style="font-size:0.78rem;color:var(--text-dim);">...without worsening<br><select id="trWor" style="background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.5rem;border-radius:4px;margin-top:0.3rem;"></select></label></div>
+      <div id="trOut"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About ALTSHULLER</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1406,6 +1412,39 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var PR={
+    1:["Segmentation","Divide the object into independent parts."],
+    2:["Taking out","Separate the troublesome part or property."],
+    3:["Local quality","Make each part fit its own ideal condition."],
+    4:["Asymmetry","Replace a symmetrical form with an asymmetrical one."],
+    5:["Merging","Bring identical or related operations together."],
+    7:["Nesting","Place one object inside another."],
+    10:["Prior action","Perform the required change before it is needed."],
+    13:["The other way round","Invert the action or fix what was moving."],
+    15:["Dynamics","Let the object or process adapt and change."],
+    17:["Another dimension","Move into 2D, 3D or stacking."],
+    19:["Periodic action","Replace continuous action with pulses."],
+    26:["Copying","Use a cheap copy instead of the real, fragile thing."],
+    28:["Mechanics substitution","Swap a mechanical means for fields or sensors."],
+    35:["Parameter change","Alter state, density, flexibility or temperature."]};
+  var PARAMS=["Speed","Weight","Strength","Reliability","Energy use","Ease of use","Accuracy","Durability"];
+  var M={ "Speed|Weight":[35,15,28],"Speed|Energy use":[19,35,10],"Weight|Strength":[1,35,28],"Weight|Durability":[3,35,17],
+    "Strength|Weight":[1,7,35],"Strength|Speed":[15,13,28],"Reliability|Speed":[10,28,35],"Reliability|Ease of use":[26,2,13],
+    "Energy use|Speed":[19,35,2],"Energy use|Strength":[35,10,28],"Ease of use|Reliability":[15,1,13],"Ease of use|Accuracy":[28,26,4],
+    "Accuracy|Speed":[28,10,3],"Accuracy|Ease of use":[26,28,3],"Durability|Weight":[35,3,17],"Durability|Speed":[19,10,35] };
+  function opts(sel,arr){ arr.forEach(function(p){ var o=document.createElement("option"); o.textContent=p; sel.appendChild(o); }); }
+  var imp=document.getElementById("trImp"), wor=document.getElementById("trWor"); opts(imp,PARAMS); opts(wor,PARAMS); wor.selectedIndex=1;
+  function render(){ var a=imp.value,b=wor.value; var key=a+"|"+b, ids=M[key];
+    if(a===b){ document.getElementById("trOut").innerHTML="<div style=\"color:var(--text-dim);font-size:0.9rem;\">Pick two different parameters to surface a real contradiction.</div>"; return; }
+    if(!ids) ids=[15,35,1];
+    var h="<div style=\"font-size:0.8rem;color:var(--text-dim);margin-bottom:0.7rem;\">To improve <b style=\"color:var(--cyan)\">"+a+"</b> without sacrificing <b style=\"color:var(--magenta)\">"+b+"</b>, TRIZ suggests:</div>";
+    ids.forEach(function(id){ var p=PR[id]; if(!p)return; h+="<div style=\"margin:0.5rem 0;padding:0.6rem 0.9rem;border:1px solid var(--border);border-radius:6px;\"><b style=\"color:var(--cyan)\">"+id+". "+p[0]+"</b><div style=\"font-size:0.85rem;color:var(--text-dim);margin-top:0.2rem;\">"+p[1]+"</div></div>"; });
+    document.getElementById("trOut").innerHTML=h; }
+  imp.onchange=render; wor.onchange=render; render();
 })();
 </script>
 </body>

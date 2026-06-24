@@ -379,7 +379,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project Prometheus</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">First-Principles Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -524,6 +524,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">First-Principles Lab</h1>
+      <p class="section-sub">First-principles reasoning refuses the quoted price and asks: what is this actually made of? Pick a product and break its price into the real cost drivers. The lesson is always the same — much of what you pay is convention, not physics, and that gap is where invention lives.</p>
+      <div id="prBtns" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin:1rem 0;"></div>
+      <div id="prBar" style="display:flex;height:38px;border-radius:6px;overflow:hidden;max-width:560px;font-family:var(--display);font-size:0.72rem;"></div>
+      <div id="prLegend" style="font-size:0.82rem;color:var(--text-dim);margin-top:0.8rem;line-height:1.9;"></div>
+      <div id="prNote" style="font-size:0.9rem;color:var(--cyan);margin-top:0.9rem;border-left:2px solid var(--border);padding-left:0.9rem;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About PRIMA</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -2089,6 +2097,28 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var COLORS=["#00D9FF","#00FFA3","#FFB800","#FF6B6B","#9D4EDD"];
+  var PRODUCTS=[
+    {n:"EV battery pack", parts:[["Raw materials (lithium, nickel, graphite)",38],["Cell + pack manufacturing",27],["R and D amortised",12],["Logistics and overhead",8],["Brand and margin",15]],
+     note:"Strip it to the metals and the floor is far below the sticker. Musk reasoned exactly this way to halve pack cost."},
+    {n:"Bottled water", parts:[["Water itself",1],["Bottle and cap (plastic)",16],["Transport and chilling",18],["Marketing",40],["Retail margin",25]],
+     note:"You are paying almost nothing for water and almost everything for the story around it."},
+    {n:"Smartphone", parts:[["Components (chips, screen, battery)",47],["Assembly",5],["R and D",16],["Distribution",9],["Brand and margin",23]],
+     note:"The physics is in the components; the rest is process and positioning you could in principle redesign."}];
+  var cont=document.getElementById("prBtns");
+  function show(p){ var bar="",leg="";
+    p.parts.forEach(function(part,i){ var col=COLORS[i%COLORS.length];
+      bar+="<div style=\"width:"+part[1]+"%;background:"+col+";display:flex;align-items:center;justify-content:center;color:#04121a;\">"+(part[1]>=10?part[1]+"%":"")+"</div>";
+      leg+="<div><span style=\"display:inline-block;width:11px;height:11px;background:"+col+";border-radius:2px;margin-right:6px;\"></span>"+part[0]+" — <b style=\"color:var(--text)\">"+part[1]+"%</b></div>"; });
+    document.getElementById("prBar").innerHTML=bar; document.getElementById("prLegend").innerHTML=leg; document.getElementById("prNote").textContent=p.note; }
+  PRODUCTS.forEach(function(p){ var b=document.createElement("button"); b.className="btn"; b.textContent=p.n;
+    b.style.cssText="background:transparent;border:1px solid var(--border);color:var(--text-dim);";
+    b.onclick=function(){ cont.querySelectorAll("button").forEach(function(x){x.style.color="var(--text-dim)";x.style.borderColor="var(--border)";}); b.style.color="var(--cyan)"; b.style.borderColor="var(--cyan)"; show(p); }; cont.appendChild(b); });
+  show(PRODUCTS[0]);
 })();
 </script>
 </body>

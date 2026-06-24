@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Negentropy</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Negentropy</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Emergence Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Emergence Lab</h1>
+      <p class="section-sub">Prigogine showed that systems driven far from equilibrium can spontaneously organise — order paid for by a flow of energy. These boids obey only three local rules: avoid crowding, match your neighbours, steer toward them. No leader, no plan, yet a flock emerges. Tune the cohesion and watch order condense from noise.</p>
+      <canvas id="pgCanvas" style="width:100%;height:320px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Cohesion / alignment <span id="pgCV" style="color:var(--cyan)"></span><input type="range" id="pgC" min="0" max="100" value="55" step="1" style="width:100%;"></label></div>
+      <button class="btn" id="pgToggle">Pause</button> <button class="btn" id="pgScatter" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Scatter</button>
+      <div id="pgInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About PRIGOGINE</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1417,6 +1425,31 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("pgCanvas"); if(!cv)return; var ctx=cv.getContext("2d"); var N=70, B=[], timer=null, W=600, Hh=320;
+  function size(){ W=cv.width=cv.clientWidth||600; Hh=cv.height=320; }
+  function init(){ size(); B=[]; for(var i=0;i<N;i++) B.push({x:Math.random()*W,y:Math.random()*Hh,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3}); }
+  function step(){ size(); var coh=+document.getElementById("pgC").value/100;
+    for(var i=0;i<N;i++){ var b=B[i],ax=0,ay=0,cx=0,cy=0,sx=0,sy=0,n=0;
+      for(var j=0;j<N;j++){ if(i===j)continue; var dx=B[j].x-b.x,dy=B[j].y-b.y,d2=dx*dx+dy*dy; if(d2<6400){ ax+=B[j].vx; ay+=B[j].vy; cx+=B[j].x; cy+=B[j].y; n++; if(d2<700){ sx-=dx; sy-=dy; } } }
+      if(n){ ax/=n; ay/=n; cx=cx/n-b.x; cy=cy/n-b.y; b.vx+=(ax-b.vx)*0.05*coh+cx*0.0008*coh+sx*0.02; b.vy+=(ay-b.vy)*0.05*coh+cy*0.0008*coh+sy*0.02; }
+      var sp=Math.sqrt(b.vx*b.vx+b.vy*b.vy)||1; var mxs=3.2; if(sp>mxs){ b.vx=b.vx/sp*mxs; b.vy=b.vy/sp*mxs; }
+      b.x+=b.vx; b.y+=b.vy; if(b.x<0)b.x+=W; if(b.x>W)b.x-=W; if(b.y<0)b.y+=Hh; if(b.y>Hh)b.y-=Hh; }
+    draw();
+  }
+  function draw(){ ctx.clearRect(0,0,W,Hh); for(var i=0;i<N;i++){ var b=B[i],a=Math.atan2(b.vy,b.vx); ctx.fillStyle="#00D9FF"; ctx.beginPath();
+    ctx.moveTo(b.x+Math.cos(a)*6,b.y+Math.sin(a)*6); ctx.lineTo(b.x+Math.cos(a+2.5)*4,b.y+Math.sin(a+2.5)*4); ctx.lineTo(b.x+Math.cos(a-2.5)*4,b.y+Math.sin(a-2.5)*4); ctx.closePath(); ctx.fill(); } }
+  function play(){ if(timer)return; timer=setInterval(step,33); document.getElementById("pgToggle").textContent="Pause"; }
+  function stop(){ if(timer){clearInterval(timer);timer=null;} document.getElementById("pgToggle").textContent="Resume"; }
+  document.getElementById("pgToggle").onclick=function(){ timer?stop():play(); };
+  document.getElementById("pgScatter").onclick=function(){ init(); draw(); };
+  document.getElementById("pgC").oninput=function(){ document.getElementById("pgCV").textContent=this.value; };
+  document.getElementById("pgCV").textContent=document.getElementById("pgC").value;
+  document.getElementById("pgInfo").textContent="Three local rules, one emergent flock. Drop cohesion to zero and order dissolves back into noise.";
+  init(); draw(); play();
 })();
 </script>
 </body>

@@ -287,7 +287,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project BIOSPHERE</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project BIOSPHERE</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Ecosystem Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Ecosystem Lab</h1>
+      <p class="section-sub">General Systems Theory looks for laws shared by all systems. Here is a closed one: a fixed total of matter cycling through nutrients, plants and herbivores, with nothing entering or leaving. Plants draw on nutrients, herbivores graze plants, death returns everything to the soil. Tune the rates — and notice the total never changes.</p>
+      <canvas id="vbCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Plant growth rate <span id="vbGV" style="color:var(--cyan)"></span><input type="range" id="vbG" min="5" max="60" value="30" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Grazing rate <span id="vbEV" style="color:var(--cyan)"></span><input type="range" id="vbE" min="5" max="60" value="28" step="1" style="width:100%;"></label></div>
+      <div id="vbInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about"><h1 class="section-title">About VON BERTALANFFY</h1><p class="section-sub">Methodology and design principles.</p><div class="about-content"><p>VON BERTALANFFY is a cognitive training simulator designed to install the thinking patterns of General Systems Theory. It trains you to see the exact same mathematical patterns in a biological cell, a corporation, and a galaxy.</p><h2>// The Ten Axes</h2><ul><li><strong>ISOMORPHISM</strong> — Why different systems obey the same math</li><li><strong>OPENNESS</strong> — Open vs. closed systems</li><li><strong>STEADY</strong> — Dynamic equilibrium and homeostasis</li><li><strong>EQUFINAL</strong> — Reaching the same state from different starts</li><li><strong>FEEDBACK</strong> — Positive and negative loops</li><li><strong>HIERARCHY</strong> — Holons and emergent properties</li><li><strong>BOUNDARY</strong> — System interfaces</li><li><strong>ENTROPY</strong> — Negentropy and importing order</li><li><strong>COUPLING</strong> — Tight vs. loose system coupling</li><li><strong>GESTALT</strong> — The whole is greater than the sum</li></ul></div></section>
   </main>
@@ -639,6 +646,28 @@ function bootSequence(){ const log = document.getElementById('bootLog'); const b
 window.BERT = { show: showView, showModuleDetail, showLesson, markLessonRead, showArenaProblem, answerProblem, revealDrill, rateDrill, completeRTMission, showProjectPhase, answerPhase, setTheme };
 function init(){ const savedTheme = localStorage.getItem('cogito-theme') || 'quantum'; document.body.dataset.theme = savedTheme; S = loadState(); checkDailyReset(); updateStreak(); try { let act = JSON.parse(localStorage.getItem('cogito-activity') || '[]'); const todayDate = new Date().toISOString().split('T')[0]; if(!act.includes(todayDate)) { act.push(todayDate); localStorage.setItem('cogito-activity', JSON.stringify(act)); } } catch(e) {} saveState(); initBackground(); bootSequence(); }
 init();
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("vbCanvas"); if(!cv)return; var ctx=cv.getContext("2d");
+  function render(){ var W=cv.width=cv.clientWidth||600,H=cv.height=280; ctx.clearRect(0,0,W,H);
+    var g=+document.getElementById("vbG").value/100, e=+document.getElementById("vbE").value/100, d1=0.06, d2=0.12;
+    document.getElementById("vbGV").textContent=(g*100).toFixed(0); document.getElementById("vbEV").textContent=(e*100).toFixed(0);
+    var Nn=70,P=20,Hh=10, total=Nn+P+Hh, steps=200, dt=0.5, nH=[],pH=[],hH=[];
+    for(var t=0;t<=steps;t++){ nH.push(Nn); pH.push(P); hH.push(Hh);
+      var uptake=g*Nn*P/total, graze=e*P*Hh/total, pdeath=d1*P, hdeath=d2*Hh;
+      Nn += (pdeath+hdeath-uptake)*dt; P += (uptake-graze-pdeath)*dt; Hh += (graze-hdeath)*dt;
+      if(Nn<0)Nn=0; if(P<0)P=0; if(Hh<0)Hh=0; }
+    var ox=40,oy=H-22,pw=W-ox-12,ph=H-40, mx=total;
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.moveTo(ox,10); ctx.lineTo(ox,oy); ctx.lineTo(W-12,oy); ctx.stroke();
+    function plot(arr,col){ ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath(); for(var i=0;i<arr.length;i++){ var x=ox+pw*i/steps, y=oy-ph*arr[i]/mx; i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke(); }
+    plot(nH,"#FFB800"); plot(pH,"#00FFA3"); plot(hH,"#00D9FF");
+    ctx.font="11px monospace"; ctx.fillStyle="#FFB800"; ctx.fillText("nutrients",ox+6,20); ctx.fillStyle="#00FFA3"; ctx.fillText("plants",ox+78,20); ctx.fillStyle="#00D9FF"; ctx.fillText("herbivores",ox+136,20);
+    var fin=nH[200]+pH[200]+hH[200];
+    document.getElementById("vbInfo").innerHTML="Matter cycles between the three pools; the total holds at <b style=\"color:var(--cyan)\">"+fin.toFixed(0)+"</b> throughout (conservation). Starve any link and the cycle crashes — a closed system must recycle everything.";
+  }
+  ["vbG","vbE"].forEach(function(id){document.getElementById(id).oninput=render;}); window.addEventListener("resize",render); render();
 })();
 </script>
 </body>
