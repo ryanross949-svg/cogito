@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Autopoiesis</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Autopoiesis</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Life Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Life Lab</h1>
+      <p class="section-sub">Conway&rsquo;s Game of Life: four trivial rules, endless emergent behaviour. A live cell with 2-3 neighbours survives; a dead cell with exactly 3 is born. Click to draw, then Run — a glider is already crawling for you.</p>
+      <canvas id="cwCanvas" style="width:100%;height:300px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
+      <button class="btn" id="cwRun">Run</button> <button class="btn" id="cwStep" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Step</button> <button class="btn" id="cwRand" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Random</button> <button class="btn" id="cwClear" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Clear</button>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About CONWAY</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1406,6 +1412,24 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById("cwCanvas"); if(!cv)return; var ctx=cv.getContext("2d"); var COLS=50,ROWS=26,cell=12,grid,timer=null;
+  function size(){ var W=cv.width=cv.clientWidth||600; cell=Math.floor(W/COLS); cv.height=ROWS*cell; }
+  function blank(){ grid=[]; for(var r=0;r<ROWS;r++){ var row=[]; for(var c=0;c<COLS;c++)row.push(0); grid.push(row);} }
+  function draw(){ size(); ctx.clearRect(0,0,cv.width,cv.height); for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++) if(grid[r][c]){ ctx.fillStyle="#00D9FF"; ctx.fillRect(c*cell+1,r*cell+1,cell-2,cell-2);} }
+  function step(){ var n=[]; for(var r=0;r<ROWS;r++){ var row=[]; for(var c=0;c<COLS;c++){ var cnt=0;
+    for(var dr=-1;dr<=1;dr++)for(var dc=-1;dc<=1;dc++){ if(dr||dc){ cnt+=grid[(r+dr+ROWS)%ROWS][(c+dc+COLS)%COLS]; } }
+    row.push((grid[r][c]&&(cnt===2||cnt===3))||(!grid[r][c]&&cnt===3)?1:0); } n.push(row);} grid=n; draw(); }
+  cv.addEventListener("click",function(e){ var b=cv.getBoundingClientRect(); var c=Math.floor((e.clientX-b.left)/b.width*COLS),r=Math.floor((e.clientY-b.top)/b.height*ROWS); if(grid[r]&&grid[r][c]!=null){ grid[r][c]=grid[r][c]?0:1; draw(); } });
+  document.getElementById("cwStep").onclick=step;
+  document.getElementById("cwRun").onclick=function(){ if(timer){clearInterval(timer);timer=null;this.textContent="Run";}else{timer=setInterval(step,120);this.textContent="Pause";} };
+  document.getElementById("cwClear").onclick=function(){ blank(); draw(); };
+  document.getElementById("cwRand").onclick=function(){ for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)grid[r][c]=Math.random()<0.28?1:0; draw(); };
+  window.addEventListener("resize",draw); blank();
+  [[0,1],[1,2],[2,0],[2,1],[2,2]].forEach(function(p){ grid[p[0]+2][p[1]+2]=1; }); draw();
 })();
 </script>
 </body>

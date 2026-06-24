@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project OMEGA</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project OMEGA</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Logic Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,12 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Logic Lab</h1>
+      <p class="section-sub">Everything a computer does reduces to logic gates. Flip the two input bits, pick a gate, and watch the output — the highlighted row of the truth table is exactly your current input.</p>
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin:1.2rem 0;"><button class="btn" id="tgA">A = 0</button> <button class="btn" id="tgB">B = 0</button> <select id="tgGate" style="background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.5rem;border-radius:4px;font-family:var(--mono);"><option>AND</option><option>OR</option><option>XOR</option><option>NAND</option><option>NOR</option><option>XNOR</option></select> <span style="color:var(--text-dim);font-size:0.8rem;">Output</span> <span id="tgOut" style="font-family:var(--display);font-size:2rem;font-weight:700;">0</span></div>
+      <table id="tgTable" style="border-collapse:collapse;font-family:var(--mono);font-size:0.85rem;"></table>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About TURING</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1405,6 +1411,23 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var G={AND:function(a,b){return a&&b;},OR:function(a,b){return a||b;},XOR:function(a,b){return a!==b;},NAND:function(a,b){return !(a&&b);},NOR:function(a,b){return !(a||b);},XNOR:function(a,b){return a===b;}};
+  var A=false,B=false;
+  function render(){ var g=document.getElementById("tgGate").value||"AND";
+    document.getElementById("tgA").textContent="A = "+(A?1:0); document.getElementById("tgB").textContent="B = "+(B?1:0);
+    var out=G[g](A,B)?1:0; var o=document.getElementById("tgOut"); o.textContent=out; o.style.color=out?"#00FFA3":"#7A6E94";
+    var html="<tr style=\"color:var(--text-faint)\"><td style=\"padding:0.2rem 0.9rem\">A</td><td style=\"padding:0.2rem 0.9rem\">B</td><td style=\"padding:0.2rem 0.9rem\">"+g+"</td></tr>";
+    [[0,0],[0,1],[1,0],[1,1]].forEach(function(r){ var v=G[g](!!r[0],!!r[1])?1:0; var cur=(r[0]===(A?1:0)&&r[1]===(B?1:0));
+      html+="<tr style=\""+(cur?"color:var(--cyan)":"color:var(--text-dim)")+"\"><td style=\"padding:0.2rem 0.9rem\">"+r[0]+"</td><td style=\"padding:0.2rem 0.9rem\">"+r[1]+"</td><td style=\"padding:0.2rem 0.9rem\">"+v+"</td></tr>"; });
+    document.getElementById("tgTable").innerHTML=html;
+  }
+  document.getElementById("tgA").onclick=function(){A=!A;render();};
+  document.getElementById("tgB").onclick=function(){B=!B;render();};
+  document.getElementById("tgGate").onchange=render; render();
 })();
 </script>
 </body>
