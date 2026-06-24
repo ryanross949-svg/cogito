@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Open Society</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Open Society</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Falsification Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,13 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Falsification Lab</h1>
+      <p class="section-sub">Popper argued you never confirm a theory — you can only try to falsify it. Here is Wason&rsquo;s classic test. Rule: if a card shows a vowel on one side, it has an even number on the other. Each card shows one face. Pick exactly the cards you must turn over to catch a rule-breaker.</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin:1.4rem 0;"><div class="wcard" data-c="A" style="cursor:pointer;width:64px;height:88px;border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.8rem;color:var(--text);user-select:none;">A</div><div class="wcard" data-c="K" style="cursor:pointer;width:64px;height:88px;border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.8rem;color:var(--text);user-select:none;">K</div><div class="wcard" data-c="4" style="cursor:pointer;width:64px;height:88px;border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.8rem;color:var(--text);user-select:none;">4</div><div class="wcard" data-c="7" style="cursor:pointer;width:64px;height:88px;border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.8rem;color:var(--text);user-select:none;">7</div></div>
+      <button class="btn" id="wpCheck">Check my picks</button>
+      <div id="wpOut" style="font-size:0.9rem;color:var(--text-dim);line-height:1.7;margin-top:1rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About POPPER</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1413,6 +1420,22 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var sel={}; var cards=document.querySelectorAll(".wcard");
+  cards.forEach(function(el){ el.onclick=function(){ var c=el.getAttribute("data-c"); sel[c]=!sel[c];
+    el.style.borderColor=sel[c]?"var(--cyan)":"var(--border)"; el.style.color=sel[c]?"var(--cyan)":"var(--text)"; el.style.background=sel[c]?"rgba(0,217,255,0.08)":"none"; }; });
+  document.getElementById("wpCheck").onclick=function(){
+    var need={A:true,"7":true}, ok=true, why=[];
+    ["A","K","4","7"].forEach(function(c){ if(!!sel[c]!==!!need[c]) ok=false; });
+    why.push("<b>A</b> (vowel): must check — its hidden side could be odd, breaking the rule.");
+    why.push("<b>7</b> (odd): must check — a vowel hiding behind it would break the rule. This is the card most people miss.");
+    why.push("<b>K</b> (consonant): irrelevant — the rule says nothing about consonants.");
+    why.push("<b>4</b> (even): a tempting trap — turning it can only <i>confirm</i>, never falsify. Confirmation is worthless here.");
+    document.getElementById("wpOut").innerHTML=(ok?"<b style=\"color:#00FFA3\">Correct — A and 7.</b> ":"<b style=\"color:#FF6B6B\">Not quite.</b> The answer is A and 7. ")+"<br>"+why.join("<br>");
+  };
 })();
 </script>
 </body>

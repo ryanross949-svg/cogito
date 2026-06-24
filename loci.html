@@ -280,7 +280,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Mnemonic Vault</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Mnemonic Vault</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Memory Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -314,6 +314,14 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Memory Lab</h1>
+      <p class="section-sub">The method of loci turns memory into a walk. Each item is placed at a familiar spot along a route; to recall, you stroll the route and collect them. Study the five placements, then take the walk and see how many you pin to the right spot.</p>
+      <div id="lcStudy"></div>
+      <div id="lcQuiz" style="display:none;"></div>
+      <div style="margin-top:1rem;"><button class="btn" id="lcStart">New journey</button> <button class="btn" id="lcWalk" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Take the walk</button></div>
+      <div id="lcInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About LOCI</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1408,6 +1416,34 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var LOCI=["the front door","the kitchen table","the staircase","the bedroom window","the back garden"];
+  var ITEMS=["a violin","a goldfish","an umbrella","a candle","a telescope","a pineapple","a typewriter","a kite","a lantern","a chess set","a compass","a teapot"];
+  var current=[],answered=0,correct=0;
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+  function start(){ current=shuffle(ITEMS).slice(0,5); answered=0; correct=0;
+    var h="<div style=\"font-size:0.7rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--text-dim);margin-bottom:0.6rem;\">Study these placements</div>";
+    current.forEach(function(it,i){ h+="<div style=\"padding:0.4rem 0;border-bottom:1px solid var(--border);\"><b style=\"color:var(--magenta)\">"+LOCI[i]+"</b> &rarr; <span style=\"color:var(--cyan)\">"+it+"</span></div>"; });
+    document.getElementById("lcStudy").innerHTML=h; document.getElementById("lcStudy").style.display="block";
+    document.getElementById("lcQuiz").style.display="none";
+    document.getElementById("lcInfo").textContent="When ready, hide the list and take the walk."; }
+  function walk(){ if(!current.length){ document.getElementById("lcInfo").textContent="Start a journey first."; return; }
+    document.getElementById("lcStudy").style.display="none"; answered=0; correct=0;
+    var pool=shuffle(ITEMS); var q=document.getElementById("lcQuiz"); q.style.display="block"; q.innerHTML="";
+    current.forEach(function(it,i){ var opts=[it]; for(var k=0;k<pool.length&&opts.length<4;k++) if(pool[k]!==it&&opts.indexOf(pool[k])<0) opts.push(pool[k]); opts=shuffle(opts);
+      var row=document.createElement("div"); row.style.margin="0.6rem 0";
+      var lab=document.createElement("div"); lab.innerHTML="At <b style=\"color:var(--magenta)\">"+LOCI[i]+"</b> you placed..."; lab.style.cssText="font-size:0.85rem;color:var(--text-dim);margin-bottom:0.3rem;"; row.appendChild(lab);
+      opts.forEach(function(o){ var b=document.createElement("button"); b.className="btn"; b.textContent=o; b.style.cssText="margin:0.2rem;background:transparent;border:1px solid var(--border);color:var(--text-dim);";
+        b.onclick=function(){ if(b.disabled)return; var rowBtns=row.querySelectorAll("button"); rowBtns.forEach(function(x){x.disabled=true;});
+          if(o===it){ b.style.borderColor="#00FFA3"; b.style.color="#00FFA3"; correct++; } else { b.style.borderColor="#FF6B6B"; b.style.color="#FF6B6B";
+            rowBtns.forEach(function(x){ if(x.textContent===it){x.style.borderColor="#00FFA3";x.style.color="#00FFA3";} }); }
+          answered++; if(answered===5) document.getElementById("lcInfo").innerHTML="You recalled <b>"+correct+" of 5</b> by walking the route. "+(correct>=4?"The palace works.":"Try again — vivid, surprising images stick best."); };
+        row.appendChild(b); }); q.appendChild(row); });
+    document.getElementById("lcInfo").textContent="Pick the item you placed at each spot."; }
+  document.getElementById("lcStart").onclick=start; document.getElementById("lcWalk").onclick=walk; start();
 })();
 </script>
 </body>
