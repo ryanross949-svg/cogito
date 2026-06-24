@@ -279,7 +279,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     </div>
   </header>
   <nav class="nav">
-    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Biosphere</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
+    <div class="nav-item active" data-view="dashboard">Dashboard</div><div class="nav-item" data-view="modules">Modules</div><div class="nav-item" data-view="project">Project Biosphere</div><div class="nav-item" data-view="drills">Drills</div><div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Selection Lab</div><div class="nav-item" data-view="stats">Stats</div><div class="nav-item" data-view="about">About</div>
   </nav>
   <main>
     <section class="view active" id="view-dashboard">
@@ -313,6 +313,22 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       <div class="panel mt-2"><div class="panel-label">// Card Maturity Distribution</div><div id="maturityChart" style="display:grid;gap:0.5rem;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Session Log</div><div id="sessionLog" style="max-height:300px;overflow-y:auto;margin-top:0.5rem"></div></div>
       <div class="panel mt-2"><div class="panel-label">// Reset</div><p class="text-sm text-dim" style="margin-bottom:1rem">Wipe all progress and restart training. This cannot be undone.</p><button class="btn danger" id="resetBtn">Reset All Progress</button></div>
+    </section>
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Selection Lab</h1>
+      <p class="section-sub">Watch natural selection in action. Each organism has a trait from 0 to 100; those closest to the environmental optimum survive and reproduce with small mutations. Move the optimum and watch the population adapt over generations.</p>
+      <canvas id="darwinCanvas" style="width:100%;height:220px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.2);margin:1rem 0;"></canvas>
+      <div id="darwinInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;"></div>
+      <div style="display:grid;gap:0.75rem;max-width:420px;">
+        <label style="font-size:0.8rem;color:var(--text-dim);">Environment optimum <input type="range" id="darwinOpt" min="0" max="100" value="75" style="width:100%;"></label>
+        <label style="font-size:0.8rem;color:var(--text-dim);">Selection pressure <input type="range" id="darwinSel" min="1" max="10" value="5" style="width:100%;"></label>
+        <label style="font-size:0.8rem;color:var(--text-dim);">Mutation <input type="range" id="darwinMut" min="0" max="12" value="4" style="width:100%;"></label>
+      </div>
+      <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;">
+        <button class="btn" id="darwinStep">Step Generation</button>
+        <button class="btn" id="darwinRun">Run</button>
+        <button class="btn" id="darwinReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset</button>
+      </div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About DARWIN</h1><p class="section-sub">Methodology and design principles.</p>
@@ -1415,6 +1431,47 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var cv=document.getElementById('darwinCanvas'); if(!cv) return;
+  var ctx=cv.getContext('2d'), H=220, pop=[], gen=0, timer=null;
+  function opt(){ return +document.getElementById('darwinOpt').value; }
+  function init(){ pop=[]; for(var i=0;i<200;i++) pop.push(Math.random()*100); gen=0; render(); }
+  function step(){
+    var o=opt(), sel=+document.getElementById('darwinSel').value, mut=+document.getElementById('darwinMut').value;
+    var sigma=42-sel*3.5;
+    var fit=pop.map(function(t){ var d=t-o; return Math.exp(-(d*d)/(2*sigma*sigma)); });
+    var sum=0; fit.forEach(function(x){ sum+=x; }); if(sum<=0) sum=1;
+    var next=[];
+    for(var i=0;i<pop.length;i++){
+      var r=Math.random()*sum, acc=0, idx=pop.length-1;
+      for(var j=0;j<pop.length;j++){ acc+=fit[j]; if(acc>=r){ idx=j; break; } }
+      var child=pop[idx]+(Math.random()*2-1)*mut;
+      next.push(child<0?0:(child>100?100:child));
+    }
+    pop=next; gen++; render();
+  }
+  function render(){
+    var W=cv.width=cv.clientWidth||600; cv.height=H;
+    ctx.clearRect(0,0,W,H);
+    var bins=[]; for(var b=0;b<25;b++) bins.push(0);
+    pop.forEach(function(t){ var k=Math.floor(t/4); if(k>24)k=24; bins[k]++; });
+    var max=0; bins.forEach(function(x){ if(x>max)max=x; }); if(max<1)max=1;
+    var bw=W/25;
+    for(var i=0;i<25;i++){ var h=bins[i]/max*(H-30); ctx.fillStyle='rgba(0,217,255,0.6)'; ctx.fillRect(i*bw+1,H-h-18,bw-2,h); }
+    var ox=opt()/100*W; ctx.strokeStyle='#FF2D9C'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H-16); ctx.stroke();
+    ctx.fillStyle='#FF2D9C'; ctx.font='10px monospace'; ctx.fillText('optimum', Math.min(W-52,ox+4), 12);
+    var mean=0; pop.forEach(function(t){ mean+=t; }); mean/=pop.length;
+    document.getElementById('darwinInfo').textContent='Generation '+gen+'   ·   Mean trait '+mean.toFixed(1)+'   ·   Optimum '+opt();
+  }
+  document.getElementById('darwinStep').onclick=step;
+  document.getElementById('darwinRun').onclick=function(){ if(timer){ clearInterval(timer); timer=null; this.textContent='Run'; } else { timer=setInterval(step,350); this.textContent='Pause'; } };
+  document.getElementById('darwinReset').onclick=function(){ if(timer){ clearInterval(timer); timer=null; document.getElementById('darwinRun').textContent='Run'; } init(); };
+  document.getElementById('darwinOpt').oninput=render;
+  window.addEventListener('resize',render);
+  init();
 })();
 </script>
 </body>

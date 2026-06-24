@@ -379,7 +379,7 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
     <div class="nav-item" data-view="modules">Modules</div>
     <div class="nav-item" data-view="project">Project Spectrum</div>
     <div class="nav-item" data-view="drills">Drills</div>
-    <div class="nav-item" data-view="arena">Arena</div>
+    <div class="nav-item" data-view="arena">Arena</div><div class="nav-item" data-view="lab">Game Lab</div>
     <div class="nav-item" data-view="stats">Stats</div>
     <div class="nav-item" data-view="about">About</div>
   </nav>
@@ -524,6 +524,31 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,
       </div>
     </section>
     
+        <section class="view" id="view-lab">
+      <h1 class="section-title">Game Lab</h1>
+      <p class="section-sub">The Prisoner's Dilemma. Mutual cooperation pays more, yet the Nash equilibrium is mutual defection (highlighted) — neither player can do better by switching alone. Play rounds against a strategy and feel the trap.</p>
+      <div style="overflow-x:auto;">
+      <table style="border-collapse:collapse;margin:1.5rem 0;font-family:var(--mono);font-size:0.85rem;">
+        <tr><td></td><td style="padding:0.5rem;color:var(--text-dim);">Opp: Cooperate</td><td style="padding:0.5rem;color:var(--text-dim);">Opp: Defect</td></tr>
+        <tr><td style="padding:0.5rem;color:var(--text-dim);">You: Cooperate</td><td style="padding:1rem;border:1px solid var(--border);text-align:center;">3 / 3</td><td style="padding:1rem;border:1px solid var(--border);text-align:center;">0 / 5</td></tr>
+        <tr><td style="padding:0.5rem;color:var(--text-dim);">You: Defect</td><td style="padding:1rem;border:1px solid var(--border);text-align:center;">5 / 0</td><td style="padding:1rem;border:2px solid var(--cyan);text-align:center;color:var(--cyan);box-shadow:0 0 10px rgba(0,217,255,0.3);">1 / 1<br><span style="font-size:0.6rem;letter-spacing:0.1em;">NASH EQ</span></td></tr>
+      </table>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin:1rem 0;">
+        <label style="color:var(--text-dim);font-size:0.8rem;">Opponent:</label>
+        <select id="nashStrat" style="background:var(--panel-solid);color:var(--text);border:1px solid var(--border);padding:0.4rem;border-radius:4px;font-family:var(--mono);">
+          <option value="tft">Tit-for-Tat</option>
+          <option value="allc">Always Cooperate</option>
+          <option value="alld">Always Defect</option>
+          <option value="rand">Random</option>
+        </select>
+        <button class="btn" id="nashC">Cooperate</button>
+        <button class="btn" id="nashD">Defect</button>
+        <button class="btn" id="nashReset" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);">Reset</button>
+      </div>
+      <div id="nashScore" style="font-family:var(--display);font-size:1.1rem;color:var(--cyan);margin:0.5rem 0;"></div>
+      <div id="nashHist" style="font-size:0.8rem;color:var(--text-dim);line-height:1.6;"></div>
+    </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About NASH</h1>
       <p class="section-sub">Methodology and design principles.</p>
@@ -2069,6 +2094,37 @@ function init(){
 
 init();
 
+})();
+</script>
+<script>
+(function(){
+  var view=document.getElementById('view-lab'); if(!view) return;
+  var PAY={CC:[3,3],CD:[0,5],DC:[5,0],DD:[1,1]};
+  var st;
+  function reset(){ st={you:0,opp:0,round:0,lastYou:null,hist:[]}; render(); }
+  function oppMove(strat){
+    if(strat==='allc') return 'C';
+    if(strat==='alld') return 'D';
+    if(strat==='rand') return Math.random()<0.5?'C':'D';
+    return st.lastYou===null?'C':st.lastYou;
+  }
+  function play(my){
+    var om=oppMove(document.getElementById('nashStrat').value);
+    var p=PAY[my+om];
+    st.you+=p[0]; st.opp+=p[1]; st.round++; st.lastYou=my;
+    st.hist.unshift('R'+st.round+': you '+(my==='C'?'Cooperate':'Defect')+' / opp '+(om==='C'?'Cooperate':'Defect')+'  ->  +'+p[0]+' / +'+p[1]);
+    if(st.hist.length>6) st.hist.pop();
+    render();
+  }
+  function render(){
+    document.getElementById('nashScore').textContent='You '+st.you+'   ·   Opponent '+st.opp+'   ·   Round '+st.round;
+    var h=document.getElementById('nashHist');
+    h.innerHTML = st.hist.length ? st.hist.map(function(x){return '<div>'+x+'</div>';}).join('') : '<div style="color:var(--text-faint)">No rounds yet — pick Cooperate or Defect.</div>';
+  }
+  document.getElementById('nashC').onclick=function(){play('C');};
+  document.getElementById('nashD').onclick=function(){play('D');};
+  document.getElementById('nashReset').onclick=reset;
+  reset();
 })();
 </script>
 </body>
