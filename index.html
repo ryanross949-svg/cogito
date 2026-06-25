@@ -124,6 +124,13 @@
   .quiz-opt:hover { border-color:var(--cyan); color:var(--text); }
   .quiz-opt.sel { border-color:var(--cyan); color:var(--cyan); background:rgba(0,217,255,0.08); }
   .quiz-submit { width:100%; margin-top:0.5rem; }
+  .path-quizline { font-size:0.8rem; color:var(--text-faint); margin-bottom:0.3rem; }
+  .path-quizline strong { color:var(--cyan); font-weight:normal; }
+  .path-retake { color:var(--text-faint); text-decoration:underline; border:none; padding:0; background:none; display:inline; overflow:visible; font-size:0.72rem; margin-left:0.35rem; cursor:pointer; }
+  .path-retake:hover { color:var(--cyan); transform:none; box-shadow:none; }
+  .path-also { font-size:0.82rem; color:var(--text-faint); margin-top:0.35rem; }
+  .path-also a { display:inline; border:none; padding:0; background:none; color:var(--cyan); overflow:visible; }
+  .path-also a:hover { transform:none; box-shadow:none; text-decoration:underline; }
   #feedback-fab { position:fixed; bottom:2rem; right:2rem; z-index:90; background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
   #feedback-fab:hover { border-color:var(--cyan); color:var(--cyan); }
   #feedback-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
@@ -905,16 +912,26 @@ function getQuiz(){ try { return JSON.parse(localStorage.getItem('cogito-quiz'))
 function parseSave(key){ try { return JSON.parse(localStorage.getItem(key)); } catch(e){ return null; } }
 
 // ---- module-level next step for one course ----
-function courseNextStep(cid){
+function courseDue(cid){
+  const st = (window.COURSE_STRUCTURE || {})[cid];
+  if (!st) return 0;
+  const save = parseSave(st.key);
+  if (!save || !(save.xp > 0)) return 0;
+  const cards = save.cards || {}; const now = Date.now(); let d = 0;
+  Object.keys(cards).forEach(id => { const c = cards[id]; if (c && c.lastReviewed != null && typeof c.due === 'number' && c.due <= now) d++; });
+  return d;
+}
+function courseNextStep(cid, skipReview){
   const st = (window.COURSE_STRUCTURE || {})[cid];
   if (!st) return null;
   const save = parseSave(st.key);
   if (!save || !(save.xp > 0)) return null; // not started -> handled as a "start" suggestion
   const cards = save.cards || {}, arena = save.arena || {}, project = save.project || {};
   const now = Date.now();
-  let due = 0;
-  Object.keys(cards).forEach(id => { const c = cards[id]; if (c && c.lastReviewed != null && typeof c.due === 'number' && c.due <= now) due++; });
-  if (due > 0) return { kind:'review', cid, href:st.href, count:due, label:'Review ' + due + ' due card' + (due>1?'s':'') + ' in ' + st.name };
+  if (!skipReview){
+    const due = courseDue(cid);
+    if (due > 0) return { kind:'review', cid, href:st.href, count:due, label:'Review ' + due + ' due card' + (due>1?'s':'') + ' in ' + st.name };
+  }
   for (const mo of st.modules){
     const newC = mo.cards.filter(id => !cards[id] || cards[id].lastReviewed == null);
     if (newC.length) return { kind:'learn', cid, href:st.href, label:'Learn the ' + mo.codename + ' module in ' + st.name + ' — ' + newC.length + ' new card' + (newC.length>1?'s':'') };
@@ -931,12 +948,17 @@ function courseNextStep(cid){
 
 function buildTasks(){
   const ids = Object.keys(window.COURSE_STRUCTURE || {});
+  // when 2+ courses have cards due, fold them into one cross-course review task
+  let totalDue = 0, coursesDue = 0;
+  ids.forEach(cid => { const d = courseDue(cid); if (d > 0){ totalDue += d; coursesDue++; } });
+  const useGlobal = coursesDue >= 2;
   const steps = [];
-  ids.forEach(cid => { const s = courseNextStep(cid); if (s){ s.maturity = appById[cid] ? appById[cid].maturity : 0; steps.push(s); } });
+  ids.forEach(cid => { const s = courseNextStep(cid, useGlobal); if (s){ s.maturity = appById[cid] ? appById[cid].maturity : 0; steps.push(s); } });
   const W = { review:4000, learn:3000, arena:2500, project:2000 };
   steps.sort((a,b) => (W[b.kind] + (b.kind==='review'?Math.min(b.count,99):b.maturity)) - (W[a.kind] + (a.kind==='review'?Math.min(a.count,99):a.maturity)));
   const out = []; let rev = 0;
-  for (const s of steps){ if (s.kind==='review'){ if (rev>=3) continue; rev++; } out.push(s); if (out.length>=6) break; }
+  if (useGlobal && totalDue > 0) out.push({ kind:'review', href:'review.html', label:'Review ' + totalDue + ' cards due across your courses' });
+  for (const s of steps){ if (s.kind==='review'){ if (rev>=2) continue; rev++; } out.push(s); if (out.length>=6) break; }
   // top up with a "start" suggestion if the list is thin
   if (out.length < 6){
     const rec = recommendedCourse();
@@ -945,22 +967,29 @@ function buildTasks(){
   return out;
 }
 
-function recommendedCourse(){
+function recommendedCourses(){
+  const out = [], seen = {};
+  const push = (app, reason) => { if (app && !seen[app.id]){ seen[app.id] = 1; out.push({ app, reason }); } };
   const inProg = appData.filter(a => a.xp > 0 && a.maturity < 100).sort((x,y) => y.maturity - x.maturity);
-  if (inProg.length) return { app: inProg[0], reason:'closest to mastery' };
+  inProg.forEach((a, i) => push(a, i === 0 ? 'closest to mastery' : 'in progress'));
   const q = getQuiz();
-  if (q && q.top){ const app = appById[FLAGSHIP[q.top]]; if (app && !(app.xp > 0)) return { app, reason:'from your quiz' }; }
-  const fresh = appData.filter(a => a.xp === 0);
-  if (fresh.length) return { app: fresh[0], reason:'a strong starting point' };
-  return null;
+  if (q && q.top){ const app = appById[FLAGSHIP[q.top]]; if (app && !(app.xp > 0)) push(app, 'from your quiz'); }
+  appData.filter(a => a.xp === 0).forEach(a => push(a, 'a strong starting point'));
+  return out.slice(0, 3);
 }
+function recommendedCourse(){ return recommendedCourses()[0] || null; }
 
 function renderGuidance(){
   const body = document.getElementById('guidanceBody'); if (!body) return;
   let html = '';
-  const rec = recommendedCourse();
-  if (rec){ html += '<div class="path-rec">' + (rec.reason==='from your quiz' ? 'Your quiz suggests starting with' : 'Recommended focus') + ': <a href="' + rec.app.href + '">' + rec.app.name + '</a><span class="path-reason">' + rec.reason + '</span></div>'; }
-  else { html += '<div class="path-rec">You have mastered everything in view. Remarkable.</div>'; }
+  const q = getQuiz();
+  if (q && q.top){ html += '<div class="path-quizline">Your strongest pull: <strong>' + (DISC_NAMES_Q[q.top] || q.top) + '</strong><button class="path-retake" id="pathRetake">retake</button></div>'; }
+  const recs = recommendedCourses();
+  if (recs.length){
+    const primary = recs[0];
+    html += '<div class="path-rec">' + (primary.reason==='from your quiz' ? 'Your quiz suggests starting with' : 'Recommended focus') + ': <a href="' + primary.app.href + '">' + primary.app.name + '</a><span class="path-reason">' + primary.reason + '</span></div>';
+    if (recs.length > 1){ html += '<div class="path-also">Also worth your time: ' + recs.slice(1).map(r => '<a href="' + r.app.href + '">' + r.app.name + '</a>').join(' · ') + '</div>'; }
+  } else { html += '<div class="path-rec">You have mastered everything in view. Remarkable.</div>'; }
   const tasks = buildTasks();
   if (tasks.length){
     html += '<div class="path-tasks-label">Recommended next tasks</div><ol class="path-tasks">';
@@ -969,8 +998,9 @@ function renderGuidance(){
   } else {
     html += '<div class="path-empty">Pick any course (or take the quiz) and a personalised to-do list will appear here.</div>';
   }
-  if (!getQuiz()){ html += '<div class="path-hint">Not sure where to begin? Tap “Find My Starting Point.”</div>'; }
+  if (!q){ html += '<div class="path-hint">Not sure where to begin? Tap “Find My Starting Point.”</div>'; }
   body.innerHTML = html;
+  const rt = document.getElementById('pathRetake'); if (rt) rt.onclick = (e) => { e.preventDefault(); openQuiz(); };
 }
 
 // ---- quiz UI ----
