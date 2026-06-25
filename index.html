@@ -216,6 +216,7 @@
         </div>
       </div>
       <button class="submit-btn" id="submitFeedback">Submit to GitHub</button>
+      <p style="margin-top:1.1rem;font-size:0.68rem;color:var(--text-faint);text-align:center;letter-spacing:0.04em;line-height:1.7;">Thanks for helping shape Cogito. A whisper for the curious: not every course sits on the map. One waits in the dead center of the web &mdash; where the seven spokes meet. Knock three times.</p>
     </div>
   </div>
 
@@ -522,11 +523,6 @@ const ACHIEVEMENT_TRACKS = [
   ]}
 ];
 
-if (localStorage.getItem('cogito-secret-found') === '1') {
-  ACHIEVEMENT_TRACKS.push({ label: 'Forbidden', tiers: [
-    { name: 'The Hidden Hand', desc: 'You found what lies off the map', icon: '\u269C', check: () => true }
-  ]});
-}
 
 // Per-discipline mastery, shown as 7 individual tiles (mastered at 80% avg maturity).
 const DISCIPLINE_MASTERY = [
