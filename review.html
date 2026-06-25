@@ -194,13 +194,25 @@ function buildStart(){
   const mk = (key, txt) => { const d = document.createElement('div'); d.className='chip'+(activeDisc===key?' active':''); d.textContent = txt; d.onclick = () => { activeDisc = key; buildStart(); }; chips.appendChild(d); };
   mk('all', 'All (' + due.length + ')');
   Object.keys(DISC_NAMES).forEach(k => { if (counts[k]) mk(k, DISC_NAMES[k] + ' (' + counts[k] + ')'); });
+  { const ord = localStorage.getItem('cogito-drill-order') || 'module';
+    const ob = document.createElement('div'); ob.className = 'chip'; ob.style.marginLeft = 'auto'; ob.title = 'Toggle card order';
+    ob.textContent = ord === 'random' ? '🔀 Shuffled' : '↕ Module order';
+    ob.onclick = () => { const c = localStorage.getItem('cogito-drill-order') || 'module'; localStorage.setItem('cogito-drill-order', c === 'random' ? 'module' : 'random'); buildStart(); };
+    chips.appendChild(ob); }
   el('startBtn').disabled = filtered().length === 0;
   el('startBtn').textContent = filtered().length ? 'Start Review (' + filtered().length + ')' : 'Nothing due';
 }
 
 let queue = [], pos = 0, revealed = false, sess = { reviewed:0, correct:0, xp:0 };
+function orderQueue(arr){
+  arr = arr.slice();
+  const ord = localStorage.getItem('cogito-drill-order') || 'module';
+  if (ord === 'random'){ for (let i = arr.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp; } }
+  else { const RC = window.REVIEW_CARDS || []; arr.sort((a, b) => RC.indexOf(a) - RC.indexOf(b)); }
+  return arr;
+}
 function startSession(){
-  queue = filtered(); pos = 0; sess = { reviewed:0, correct:0, xp:0 };
+  queue = orderQueue(filtered()); pos = 0; sess = { reviewed:0, correct:0, xp:0 };
   if (!queue.length) return;
   el('start').classList.add('hidden'); el('review').classList.remove('hidden');
   showCard();
