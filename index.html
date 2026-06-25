@@ -85,6 +85,45 @@
   .app-tag { font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; display: flex; justify-content: space-between; }
   .maturity-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
   .maturity-fill { height: 100%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); transition: width 0.8s; }
+  .fav-star { position:absolute; top:0.55rem; right:0.7rem; font-size:1.05rem; line-height:1; color:var(--text-faint); cursor:pointer; z-index:3; transition:color 0.2s, transform 0.2s; }
+  .fav-star:hover { transform:scale(1.25); color:var(--amber); }
+  .fav-star.active { color:#FFD24A; text-shadow:0 0 8px rgba(255,210,74,0.7); }
+  .domain-title { cursor:pointer; user-select:none; }
+  .domain-title .chev { margin-left:auto; font-size:0.75rem; transition:transform 0.3s; color:var(--text-faint); }
+  .domain-section.collapsed .chev { transform:rotate(-90deg); }
+  .domain-section.collapsed .grid { display:none; }
+  .continue-section { max-width:1000px; margin:0 auto 2.5rem; }
+  .continue-head { font-family:var(--display); font-size:1.2rem; color:var(--amber); border-bottom:1px solid rgba(255,184,0,0.3); padding-bottom:0.5rem; margin-bottom:1.5rem; letter-spacing:0.1em; text-transform:uppercase; display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
+  .rec-next { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.06em; color:var(--text-dim); text-transform:none; margin-left:auto; }
+  .rec-next a { display:inline; border:none; padding:0; background:none; color:var(--cyan); overflow:visible; }
+  .rec-next a:hover { transform:none; box-shadow:none; text-decoration:underline; }
+  .guidance-wrap { max-width:1000px; margin:0 auto 2.5rem; }
+  .path-quiz-btn { font-family:var(--mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--void); background:var(--cyan); border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; transition:0.2s; }
+  .path-quiz-btn:hover { box-shadow:0 0 14px rgba(0,217,255,0.5); }
+  .path-rec { font-size:0.95rem; color:var(--text-dim); margin:0.7rem 0 0.2rem; }
+  .path-rec a { display:inline; border:none; padding:0; background:none; color:var(--cyan); font-family:var(--display); letter-spacing:0.05em; overflow:visible; }
+  .path-rec a:hover { transform:none; box-shadow:none; text-decoration:underline; }
+  .path-reason { color:var(--text-faint); font-size:0.7rem; font-style:italic; margin-left:0.3rem; }
+  .path-tasks-label { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--text-faint); margin:1.1rem 0 0.6rem; }
+  .path-tasks { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.5rem; counter-reset:task; }
+  .path-tasks li { position:relative; padding:0.6rem 0.8rem 0.6rem 2.4rem; border:1px solid var(--border); border-radius:5px; background:rgba(255,255,255,0.02); counter-increment:task; }
+  .path-tasks li::before { content:counter(task); position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); font-family:var(--display); color:var(--cyan); font-size:0.85rem; }
+  .path-tasks li a { display:block; border:none; padding:0; margin:0; background:none; color:var(--text); font-size:0.88rem; overflow:visible; gap:0; }
+  .path-tasks li a:hover { transform:none; box-shadow:none; color:var(--cyan); }
+  .path-tasks li.task-review { border-left:2px solid var(--cyan); }
+  .path-tasks li.task-learn { border-left:2px solid var(--green); }
+  .path-tasks li.task-arena { border-left:2px solid var(--amber); }
+  .path-tasks li.task-project { border-left:2px solid var(--magenta); }
+  .path-tasks li.task-start { border-left:2px solid var(--text-faint); }
+  .path-empty, .path-hint { font-size:0.85rem; color:var(--text-faint); margin-top:0.7rem; }
+  #quiz-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
+  .quiz-q { margin-bottom:1.2rem; }
+  .quiz-q-text { font-size:0.95rem; color:var(--text); margin-bottom:0.6rem; }
+  .quiz-opts { display:grid; gap:0.5rem; }
+  .quiz-opt { text-align:left; font-size:0.85rem; color:var(--text-dim); background:transparent; border:1px solid var(--border); padding:0.55rem 0.8rem; border-radius:5px; cursor:pointer; transition:0.15s; font-family:inherit; width:100%; }
+  .quiz-opt:hover { border-color:var(--cyan); color:var(--text); }
+  .quiz-opt.sel { border-color:var(--cyan); color:var(--cyan); background:rgba(0,217,255,0.08); }
+  .quiz-submit { width:100%; margin-top:0.5rem; }
   #feedback-fab { position:fixed; bottom:2rem; right:2rem; z-index:90; background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
   #feedback-fab:hover { border-color:var(--cyan); color:var(--cyan); }
   #feedback-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
@@ -122,6 +161,7 @@
   <canvas id="particles"></canvas>
   <script src="cogito-bg.js?v=2"></script>
   <script src="review-index.js"></script>
+  <script src="course-structure.js?v=1"></script>
   <header>
     <h1>Cogito</h1>
     <div class="sub">Interactive Training Simulators</div>
@@ -156,6 +196,15 @@
       <div class="profile-desc" id="profDesc">Begin training in any discipline to determine your cognitive profile.</div>
     </div>
   </div>
+
+  <div class="guidance-wrap" id="guidanceWrap">
+    <div class="panel">
+      <div class="panel-label" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;"><span>// Your Path</span><button id="quizBtn" class="path-quiz-btn">🧭 Find My Starting Point</button></div>
+      <div id="guidanceBody"></div>
+    </div>
+  </div>
+
+  <div id="continueSection" class="continue-section"></div>
 
   <div class="hub-grid">
     <div class="panel">
@@ -194,6 +243,14 @@
     <button id="devMaster" class="dev-btn">DEV: Master All (80%)</button>
     <button id="devStreak" class="dev-btn">DEV: 30-Day Streak</button>
     <button id="devReset" class="dev-btn">DEV: Reset All</button>
+  </div>
+
+  <div id="quiz-modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeQuiz">&times;</button>
+      <h3 class="modal-title">// Find Your Starting Point</h3>
+      <div id="quizBody"></div>
+    </div>
   </div>
 
   <button id="feedback-fab">Feedback</button>
@@ -318,7 +375,7 @@ let currentStreak = calculateStreak(activity);
 
 APPS.forEach(app => {
   const savedData = localStorage.getItem(app.storageKey);
-  let xp = 0, level = 1, maturity = 0, matureCount = 0;
+  let xp = 0, level = 1, maturity = 0, matureCount = 0, lastActivity = 0;
   if (savedData) {
     try {
       const parsed = JSON.parse(savedData);
@@ -326,7 +383,7 @@ APPS.forEach(app => {
       if (parsed.cards) {
         let totalMat = 0, count = 0;
         Object.values(parsed.cards).forEach(c => {
-          const m = getMaturity(c.interval); totalMat += m;
+          const m = getMaturity(c.interval); totalMat += m; if (c.lastReviewed && c.lastReviewed > lastActivity) lastActivity = c.lastReviewed;
           if(c.interval >= 21) { matureCount++; totalMature++; }
           count++;
         });
@@ -334,7 +391,7 @@ APPS.forEach(app => {
       }
     } catch(e) {}
   }
-  appData.push({ ...app, xp, level, maturity, matureCount });
+  appData.push({ ...app, xp, level, maturity, matureCount, lastActivity });
 });
 
 // The hidden course stays off the discipline map (not in APPS), but still counts
@@ -348,15 +405,49 @@ try {
   }
 } catch (e) {}
 
-// Build one section per discipline, then drop each course card into its section.
+// ---- Favorites + a reusable course card with a pin (star) ----
+function getFavs(){ try { return JSON.parse(localStorage.getItem('cogito-favorites') || '[]'); } catch(e){ return []; } }
+function setFavs(a){ localStorage.setItem('cogito-favorites', JSON.stringify(a)); }
+function toggleFav(id){ const f = getFavs(); const i = f.indexOf(id); if(i===-1) f.push(id); else f.splice(i,1); setFavs(f); }
+const appById = {}; appData.forEach(a => appById[a.id] = a);
+
+function makeCard(app){
+  const card = document.createElement('a');
+  card.href = app.href;
+  card.dataset.appId = app.id;
+  card.innerHTML = `
+    <div class="app-header"><div class="app-title">${app.name}</div><div class="app-level">LVL ${app.level}</div></div>
+    <div class="app-desc">${app.desc}</div>
+    <div class="app-tag"><span>${app.tag}</span><span>${app.xp} XP</span></div>
+    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>`;
+  const star = document.createElement('span');
+  star.className = 'fav-star' + (getFavs().indexOf(app.id) !== -1 ? ' active' : '');
+  star.textContent = '\u2605';
+  star.title = 'Pin to Your Courses';
+  star.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFav(app.id); renderContinue(); refreshStars(); });
+  card.appendChild(star);
+  return card;
+}
+function refreshStars(){
+  const favs = getFavs();
+  document.querySelectorAll('.fav-star').forEach(s => { s.classList.toggle('active', favs.indexOf(s.parentElement.dataset.appId) !== -1); });
+}
+
+// ---- Build collapsible discipline sections ----
 const sectionsRoot = document.getElementById('disciplineSections');
 const gridByKey = {};
+function getCollapsed(){ try { return JSON.parse(localStorage.getItem('cogito-disc-collapsed') || '{}'); } catch(e){ return {}; } }
 DISCIPLINES.forEach(d => {
   const section = document.createElement('div');
-  section.className = 'domain-section';
+  section.className = 'domain-section' + (getCollapsed()[d.key] ? ' collapsed' : '');
   const title = document.createElement('div');
   title.className = 'domain-title';
-  title.textContent = d.emoji + ' ' + d.title;
+  title.innerHTML = `<span>${d.emoji} ${d.title}</span><span class="chev">\u25BC</span>`;
+  title.addEventListener('click', () => {
+    section.classList.toggle('collapsed');
+    const c = getCollapsed(); c[d.key] = section.classList.contains('collapsed');
+    localStorage.setItem('cogito-disc-collapsed', JSON.stringify(c));
+  });
   const grid = document.createElement('div');
   grid.className = 'grid';
   grid.id = d.key + '-grid';
@@ -369,18 +460,40 @@ DISCIPLINES.forEach(d => {
 appData.forEach(app => {
   const target = gridByKey[app.domain];
   if (!target) return; // defensive: an unknown/typo'd domain is skipped, never crashes the hub
-  const card = document.createElement('a');
-  card.href = app.href;
-  card.innerHTML = `
-    <div class="app-header"><div class="app-title">${app.name}</div><div class="app-level">LVL ${app.level}</div></div>
-    <div class="app-desc">${app.desc}</div>
-    <div class="app-tag"><span>${app.tag}</span><span>${app.xp} XP</span></div>
-    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>`;
-  target.grid.appendChild(card);
+  target.grid.appendChild(makeCard(app));
 });
 
 // Hide any discipline that has no courses yet so the page stays clean.
 Object.values(gridByKey).forEach(t => { if (t.grid.children.length === 0) t.section.style.display = 'none'; });
+
+// ---- "Your Courses": pinned favorites first, then recently worked-on ----
+function recommendedNext(){
+  const inProgress = appData.filter(a => a.xp > 0 && a.maturity < 100).sort((x,y) => y.maturity - x.maturity);
+  if (inProgress.length) return inProgress[0];
+  const fresh = appData.filter(a => a.xp === 0);
+  return fresh.length ? fresh[0] : null;
+}
+function renderContinue(){
+  const host = document.getElementById('continueSection');
+  if (!host) return;
+  host.innerHTML = '';
+  const favs = getFavs();
+  const favCards = favs.map(id => appById[id]).filter(Boolean);
+  const recents = appData.filter(a => a.xp > 0 && favs.indexOf(a.id) === -1)
+                         .sort((x,y) => (y.lastActivity||0) - (x.lastActivity||0)).slice(0, 6);
+  const list = favCards.concat(recents);
+  if (!list.length) return; // nothing to resume yet -> strip stays hidden
+  const head = document.createElement('div');
+  head.className = 'continue-head';
+  head.innerHTML = '<span>\u2605 Your Courses</span>';
+  const rec = recommendedNext();
+  if (rec){ const r = document.createElement('span'); r.className = 'rec-next'; r.innerHTML = 'Recommended next: <a href="' + rec.href + '">' + rec.name + ' \u2192</a>'; head.appendChild(r); }
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  list.forEach(app => grid.appendChild(makeCard(app)));
+  host.appendChild(head); host.appendChild(grid);
+}
+renderContinue();
 
 document.getElementById('globalLevel').textContent = getLevel(totalXP);
 document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
@@ -630,16 +743,25 @@ function renderReview() {
 renderReview();
 if (window.initBackground) window.initBackground();
 
-let maturities = disciplineStats().map(d => d.maturity);
-let minMat = Math.min(...maturities), maxMat = Math.max(...maturities), avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length, diff = maxMat - minMat;
+const maturities = disciplineStats().map(d => d.maturity);
+const nDisc = maturities.length;
+const avgMat = maturities.reduce((a,b) => a+b, 0) / nDisc;
+const mastered = maturities.filter(m => m >= 75).length;   // deep
+const strong   = maturities.filter(m => m >= 50).length;   // solid
+const weak      = maturities.filter(m => m < 20).length;   // neglected
+const started  = appData.filter(a => a.xp > 0).length;
+// Count how many disciplines are mastered/strong/weak rather than keying off a
+// single high or low outlier (which mislabeled "6 mastered, 1 gap" as a specialist).
 let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
 if (totalXP > 0) {
-  if (avgMat < 15) profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape.' };
-  else if (maxMat > 75 && minMat < 20) profile = { title: 'ULTRA-SPECIALIST', desc: 'Deep mastery in one domain, neglecting others. Diversify your training.' };
-  else if (avgMat > 75 && diff < 20) profile = { title: 'RENAISSANCE OPERATOR', desc: 'Highly balanced and deeply mastered across all disciplines.' };
-  else if (avgMat > 40 && diff < 30) profile = { title: 'POLYMATH', desc: 'Robust latticework. Balanced and growing across multiple domains.' };
-  else if (diff > 40) profile = { title: 'FRAGMENTED THINKER', desc: 'Highly imbalanced. Spikes of brilliance but deep valleys.' };
-  else profile = { title: 'OPERATOR', desc: 'Progressing steadily across all axes.' };
+  if (started <= 1 || avgMat < 8) profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape.' };
+  else if (mastered === nDisc) profile = { title: 'RENAISSANCE OPERATOR', desc: 'Total mastery across every discipline. The lattice is complete.' };
+  else if (mastered >= nDisc - 1) profile = { title: 'GRAND OPERATOR', desc: 'Near-total mastery \u2014 one discipline left to conquer.' };
+  else if (mastered >= Math.ceil(nDisc * 0.6)) profile = { title: 'POLYMATH', desc: 'Deep command across most disciplines, with room left to round out.' };
+  else if (mastered >= 1 && weak >= nDisc - 2) profile = { title: 'SPECIALIST', desc: 'Sharp focus in a domain or two; the rest of the lattice awaits.' };
+  else if (strong >= Math.ceil(nDisc * 0.6)) profile = { title: 'PRACTITIONER', desc: 'A solid, broadening foundation across the disciplines.' };
+  else if (avgMat >= 20) profile = { title: 'OPERATOR', desc: 'Progressing steadily across the axes.' };
+  else profile = { title: 'APPRENTICE', desc: 'Building momentum. Keep widening and deepening your training.' };
 }
 document.getElementById('profTitle').textContent = profile.title;
 document.getElementById('profDesc').textContent = profile.desc;
@@ -745,6 +867,164 @@ document.getElementById('devReset').onclick = () => {
 };
 
 window.HUB = { setTheme };
+
+// ============================== GUIDANCE SYSTEM ==============================
+// Diagnostic quiz + recommended course + module-level task list. Reads the
+// generated COURSE_STRUCTURE map plus each course save.
+const FLAGSHIP = { physics:'fermi', math:'bayes', compute:'turing', life:'darwin', mind:'kahneman', strategy:'nash', systems:'prima' };
+const DISC_NAMES_Q = { physics:'Physics', math:'Mathematics', compute:'Computation', life:'Life Sciences', mind:'Mind', strategy:'Strategy', systems:'Systems' };
+const QUIZ = [
+  { q:'Which would you most love to be able to do?', opts:[
+    { t:'Estimate almost anything in seconds, like a physicist', d:'physics' },
+    { t:'Reason fluently about code, computation, and AI', d:'compute' },
+    { t:'Win negotiations and games of strategy', d:'strategy' },
+    { t:'Understand people, persuasion, and bias', d:'mind' } ] },
+  { q:'Pick the puzzle that grabs you most:', opts:[
+    { t:'Why complex systems thrive or collapse', d:'systems' },
+    { t:'How life evolves and adapts', d:'life' },
+    { t:'The hidden patterns in numbers and shapes', d:'math' },
+    { t:'Making the right call under deep uncertainty', d:'mind' } ] },
+  { q:'Your dream superpower would be to:', opts:[
+    { t:'See the feedback loops inside any system', d:'systems' },
+    { t:'Predict what your rival does next', d:'strategy' },
+    { t:'Reason up from first principles', d:'physics' },
+    { t:'Spot manipulation and never be fooled', d:'mind' } ] },
+  { q:'What would sharpen your edge most right now?', opts:[
+    { t:'Sharper logic, algorithms, and proof', d:'compute' },
+    { t:'Deeper intuition for mathematics', d:'math' },
+    { t:'Understanding biology and evolution', d:'life' },
+    { t:'Strategic and economic thinking', d:'strategy' } ] },
+  { q:'Which mind would you most want to learn from?', opts:[
+    { t:'A game theorist mapping every incentive', d:'strategy' },
+    { t:'A naturalist decoding the designs of life', d:'life' },
+    { t:'A physicist estimating the impossible', d:'physics' },
+    { t:'A logician building thinking machines', d:'compute' } ] }
+];
+
+function getQuiz(){ try { return JSON.parse(localStorage.getItem('cogito-quiz')); } catch(e){ return null; } }
+function parseSave(key){ try { return JSON.parse(localStorage.getItem(key)); } catch(e){ return null; } }
+
+// ---- module-level next step for one course ----
+function courseNextStep(cid){
+  const st = (window.COURSE_STRUCTURE || {})[cid];
+  if (!st) return null;
+  const save = parseSave(st.key);
+  if (!save || !(save.xp > 0)) return null; // not started -> handled as a "start" suggestion
+  const cards = save.cards || {}, arena = save.arena || {}, project = save.project || {};
+  const now = Date.now();
+  let due = 0;
+  Object.keys(cards).forEach(id => { const c = cards[id]; if (c && c.lastReviewed != null && typeof c.due === 'number' && c.due <= now) due++; });
+  if (due > 0) return { kind:'review', cid, href:st.href, count:due, label:'Review ' + due + ' due card' + (due>1?'s':'') + ' in ' + st.name };
+  for (const mo of st.modules){
+    const newC = mo.cards.filter(id => !cards[id] || cards[id].lastReviewed == null);
+    if (newC.length) return { kind:'learn', cid, href:st.href, label:'Learn the ' + mo.codename + ' module in ' + st.name + ' — ' + newC.length + ' new card' + (newC.length>1?'s':'') };
+  }
+  for (const mo of st.modules){
+    const un = mo.arena.filter(id => arena[id] !== true);
+    if (un.length) return { kind:'arena', cid, href:st.href, label:'Solve the ' + mo.codename + ' Arena in ' + st.name + ' — ' + un.length + ' left' };
+  }
+  const phases = st.modules.map(mo => mo.phase).filter(Boolean);
+  const unsolved = phases.filter(pid => !(project[pid] && project[pid].solved));
+  if (unsolved.length) return { kind:'project', cid, href:st.href, label:'Continue the Project in ' + st.name + ' — ' + unsolved.length + ' phase' + (unsolved.length>1?'s':'') + ' left' };
+  return null; // complete
+}
+
+function buildTasks(){
+  const ids = Object.keys(window.COURSE_STRUCTURE || {});
+  const steps = [];
+  ids.forEach(cid => { const s = courseNextStep(cid); if (s){ s.maturity = appById[cid] ? appById[cid].maturity : 0; steps.push(s); } });
+  const W = { review:4000, learn:3000, arena:2500, project:2000 };
+  steps.sort((a,b) => (W[b.kind] + (b.kind==='review'?Math.min(b.count,99):b.maturity)) - (W[a.kind] + (a.kind==='review'?Math.min(a.count,99):a.maturity)));
+  const out = []; let rev = 0;
+  for (const s of steps){ if (s.kind==='review'){ if (rev>=3) continue; rev++; } out.push(s); if (out.length>=6) break; }
+  // top up with a "start" suggestion if the list is thin
+  if (out.length < 6){
+    const rec = recommendedCourse();
+    if (rec && rec.app && !(rec.app.xp > 0)) out.push({ kind:'start', href:rec.app.href, label:'Start ' + rec.app.name + (rec.reason==='from your quiz' ? ' — your quiz pick' : ' — a strong next course') });
+  }
+  return out;
+}
+
+function recommendedCourse(){
+  const inProg = appData.filter(a => a.xp > 0 && a.maturity < 100).sort((x,y) => y.maturity - x.maturity);
+  if (inProg.length) return { app: inProg[0], reason:'closest to mastery' };
+  const q = getQuiz();
+  if (q && q.top){ const app = appById[FLAGSHIP[q.top]]; if (app && !(app.xp > 0)) return { app, reason:'from your quiz' }; }
+  const fresh = appData.filter(a => a.xp === 0);
+  if (fresh.length) return { app: fresh[0], reason:'a strong starting point' };
+  return null;
+}
+
+function renderGuidance(){
+  const body = document.getElementById('guidanceBody'); if (!body) return;
+  let html = '';
+  const rec = recommendedCourse();
+  if (rec){ html += '<div class="path-rec">' + (rec.reason==='from your quiz' ? 'Your quiz suggests starting with' : 'Recommended focus') + ': <a href="' + rec.app.href + '">' + rec.app.name + '</a><span class="path-reason">' + rec.reason + '</span></div>'; }
+  else { html += '<div class="path-rec">You have mastered everything in view. Remarkable.</div>'; }
+  const tasks = buildTasks();
+  if (tasks.length){
+    html += '<div class="path-tasks-label">Recommended next tasks</div><ol class="path-tasks">';
+    tasks.forEach(tk => { html += '<li class="task-' + tk.kind + '"><a href="' + tk.href + '">' + tk.label + '</a></li>'; });
+    html += '</ol>';
+  } else {
+    html += '<div class="path-empty">Pick any course (or take the quiz) and a personalised to-do list will appear here.</div>';
+  }
+  if (!getQuiz()){ html += '<div class="path-hint">Not sure where to begin? Tap “Find My Starting Point.”</div>'; }
+  body.innerHTML = html;
+}
+
+// ---- quiz UI ----
+let quizAnswers = {};
+function openQuiz(){ quizAnswers = {}; renderQuiz(); document.getElementById('quiz-modal').style.display = 'flex'; }
+function closeQuiz(){ document.getElementById('quiz-modal').style.display = 'none'; }
+function renderQuiz(){
+  let h = '';
+  QUIZ.forEach((item, qi) => {
+    h += '<div class="quiz-q"><div class="quiz-q-text">' + (qi+1) + '. ' + item.q + '</div><div class="quiz-opts">';
+    item.opts.forEach(o => { h += '<button class="quiz-opt' + (quizAnswers[qi]===o.d?' sel':'') + '" data-q="' + qi + '" data-d="' + o.d + '">' + o.t + '</button>'; });
+    h += '</div></div>';
+  });
+  h += '<button class="submit-btn quiz-submit" id="quizSubmit" disabled>Answer all to see your path</button>';
+  document.getElementById('quizBody').innerHTML = h;
+  document.querySelectorAll('#quizBody .quiz-opt').forEach(b => { b.onclick = () => {
+    const qi = b.getAttribute('data-q'); quizAnswers[qi] = b.getAttribute('data-d');
+    document.querySelectorAll('#quizBody .quiz-opt[data-q="' + qi + '"]').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    const sub = document.getElementById('quizSubmit');
+    if (Object.keys(quizAnswers).length >= QUIZ.length){ sub.disabled = false; sub.textContent = 'See my path →'; }
+  }; });
+  document.getElementById('quizSubmit').onclick = () => { if (Object.keys(quizAnswers).length >= QUIZ.length) submitQuiz(); };
+}
+function submitQuiz(){
+  const scores = {};
+  Object.keys(quizAnswers).forEach(k => { const d = quizAnswers[k]; scores[d] = (scores[d]||0) + 1; });
+  const ranked = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
+  const data = { scores, top: ranked[0] || null, second: ranked[1] || null, date: new Date().toISOString().slice(0,10) };
+  localStorage.setItem('cogito-quiz', JSON.stringify(data));
+  showQuizResult(data);
+  renderGuidance();
+}
+function showQuizResult(data){
+  const app = appById[FLAGSHIP[data.top]];
+  let h = '<div style="text-align:center; padding:1rem 0;">';
+  h += '<div style="font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-faint);">Your strongest pull</div>';
+  h += '<div style="font-family:var(--display); font-size:1.6rem; color:var(--cyan); margin:0.3rem 0 1rem;">' + (DISC_NAMES_Q[data.top] || data.top) + '</div>';
+  if (app){
+    h += '<div style="color:var(--text-dim); font-size:0.9rem;">Start here:</div>';
+    h += '<a href="' + app.href + '" style="display:inline-block; margin-top:0.6rem; font-family:var(--display); font-size:1.3rem; color:var(--void); background:var(--cyan); padding:0.5rem 1.2rem; border-radius:5px; letter-spacing:0.08em;">' + app.name + ' →</a>';
+  }
+  if (data.second){ h += '<div style="margin-top:1.2rem; font-size:0.8rem; color:var(--text-faint);">Runner-up: ' + (DISC_NAMES_Q[data.second] || data.second) + '</div>'; }
+  h += '<div style="margin-top:1.4rem;"><button class="quiz-opt" id="quizRetake" style="width:auto;">Retake quiz</button></div>';
+  h += '</div>';
+  document.getElementById('quizBody').innerHTML = h;
+  const rt = document.getElementById('quizRetake'); if (rt) rt.onclick = () => { quizAnswers = {}; renderQuiz(); };
+}
+
+document.getElementById('quizBtn').addEventListener('click', openQuiz);
+document.getElementById('closeQuiz').addEventListener('click', closeQuiz);
+document.getElementById('quiz-modal').addEventListener('click', (e) => { if (e.target.id === 'quiz-modal') closeQuiz(); });
+renderGuidance();
+
 </script>
 </body>
 </html>
