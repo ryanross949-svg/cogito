@@ -934,9 +934,18 @@ function loadState(){
     if(saved){
       const parsed = JSON.parse(saved);
       const def = defaultState();
-      return Object.assign(def, parsed);
+      // Base on fresh defaults so every CURRENT id is always present, then layer
+      // saved progress on top. A shallow assign would let an old save (missing
+      // newer card ids) replace the maps and crash the page on boot.
+      const merged = Object.assign({}, def, parsed);
+      merged.modules = Object.assign({}, def.modules, parsed.modules || {});
+      merged.cards = Object.assign({}, def.cards, parsed.cards || {});
+      merged.project = Object.assign({}, def.project, parsed.project || {});
+      merged.arena = Object.assign({}, def.arena, parsed.arena || {});
+      merged.daily = Object.assign({}, def.daily, parsed.daily || {});
+      return merged;
     }
-  }catch(e){}
+  }catch(e){ console.error("Failed to load save, resetting.", e); localStorage.removeItem(STORAGE_KEY); }
   return defaultState();
 }
 
