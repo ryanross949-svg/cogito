@@ -933,9 +933,23 @@ function loadState(){
   try{
     const saved = localStorage.getItem(STORAGE_KEY);
     if(saved){
-      const parsed = JSON.parse(saved);
+      const ps = JSON.parse(saved) || {};
       const def = defaultState();
-      return Object.assign(def, parsed);
+      // Carry over scalar progress.
+      if(typeof ps.xp === 'number') def.xp = ps.xp;
+      if(typeof ps.streak === 'number') def.streak = ps.streak;
+      if(typeof ps.longestStreak === 'number') def.longestStreak = ps.longestStreak;
+      if(ps.lastVisit) def.lastVisit = ps.lastVisit;
+      if(Array.isArray(ps.history)) def.history = ps.history;
+      if(Array.isArray(ps.sessionLog)) def.sessionLog = ps.sessionLog;
+      if(ps.daily) def.daily = Object.assign(def.daily, ps.daily);
+      // Reconcile keyed maps so every CURRENT id is always present, even if an
+      // older save used a different schema (fixes the broken prima-v7 saves).
+      if(ps.modules) MODULES.forEach(m=>{ if(ps.modules[m.id]) def.modules[m.id] = Object.assign(def.modules[m.id], ps.modules[m.id]); });
+      if(ps.cards) CARDS.forEach(c=>{ if(ps.cards[c.id]) def.cards[c.id] = Object.assign(def.cards[c.id], ps.cards[c.id]); });
+      if(ps.project) PROJECT_PHASES.forEach(p=>{ if(ps.project[p.id]) def.project[p.id] = Object.assign(def.project[p.id], ps.project[p.id]); });
+      if(ps.arena) ARENA.forEach(p=>{ if(ps.arena[p.id] !== undefined) def.arena[p.id] = ps.arena[p.id]; });
+      return def;
     }
   }catch(e){}
   return defaultState();
