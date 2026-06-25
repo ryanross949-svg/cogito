@@ -28,6 +28,7 @@ window.REVIEW_INDEX = [
 {"course":"loci","key":"loci-v1","disc":"mind","name":"LOCI","count":120},
 {"course":"lorenz","key":"lorenz-v1","disc":"physics","name":"LORENZ","count":120},
 {"course":"mach","key":"mach-v1","disc":"physics","name":"MACH","count":120},
+{"course":"machiavelli","key":"machiavelli-v1","disc":"unknown","name":"MACHIAVELLI","count":120},
 {"course":"maestro","key":"maestro-v1","disc":"systems","name":"MAESTRO","count":120},
 {"course":"malthus","key":"malthus-v1-clean","disc":"life","name":"MALTHUS","count":120},
 {"course":"mandelbrot","key":"mandelbrot-v1","disc":"math","name":"MANDELBROT","count":120},

@@ -7,7 +7,9 @@ const re = /id: '([a-z]+)', name: '([^']*)', domain: '([a-z]+)'/g;
 let m;
 while ((m = re.exec(hub)) !== null) disc[m[1]] = { name: m[2], domain: m[3] };
 
-const files = fs.readdirSync('.').filter(f => f.endsWith('.html') && f !== 'index.html').sort();
+// Scan course pages only. index.html is the hub; review.html is the review UI itself.
+const NON_COURSE = new Set(['index.html', 'review.html']);
+const files = fs.readdirSync('.').filter(f => f.endsWith('.html') && !NON_COURSE.has(f)).sort();
 const cards = [];
 const index = [];
 const problems = [];

@@ -54,6 +54,13 @@
   .radar-poly { fill: rgba(0,217,255,0.15); stroke: var(--cyan); stroke-width: 2; filter: drop-shadow(0 0 8px var(--cyan)); transition: all 0.8s ease; }
   .radar-label { font-family: var(--display); font-size: 10px; fill: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
   .radar-label.active { fill: var(--cyan); }
+  .secret-halo { fill:none; stroke:#FFD24A; stroke-width:1.4; filter:drop-shadow(0 0 6px #FFD24A); animation:secretPulse 2.4s ease-in-out infinite; }
+  .secret-dot { fill:#FFD24A; filter:drop-shadow(0 0 5px #FFD24A); }
+  .secret-label { font-family: var(--display); font-size:7px; fill:#FFD24A; letter-spacing:0.18em; filter:drop-shadow(0 0 4px rgba(255,210,74,0.7)); }
+  .secret-hint { fill:rgba(255,210,74,0.16); animation:secretShimmer 3.6s ease-in-out infinite; }
+  .secret-mark { cursor:pointer; }
+  @keyframes secretPulse { 0%,100%{opacity:0.9;} 50%{opacity:0.35;} }
+  @keyframes secretShimmer { 0%,100%{opacity:0.06;} 50%{opacity:0.28;} }
   .heatmap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10px, 1fr)); gap: 2px; margin-top: 0.5rem; }
   .heat-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.05); border-radius: 1px; }
   .heat-active-4 { background: var(--cyan); box-shadow: 0 0 4px var(--cyan); }
@@ -329,6 +336,17 @@ APPS.forEach(app => {
   appData.push({ ...app, xp, level, maturity, matureCount });
 });
 
+// The hidden course stays off the discipline map (not in APPS), but still counts
+// toward global progression so every other feature treats it as a real course.
+try {
+  const _secRaw = localStorage.getItem('machiavelli-v1');
+  if (_secRaw) {
+    const _sec = JSON.parse(_secRaw);
+    if (typeof _sec.xp === 'number') totalXP += _sec.xp;
+    if (_sec.cards) Object.values(_sec.cards).forEach(c => { if (c.interval >= 21) totalMature++; });
+  }
+} catch (e) {}
+
 // Build one section per discipline, then drop each course card into its section.
 const sectionsRoot = document.getElementById('disciplineSections');
 const gridByKey = {};
@@ -400,6 +418,52 @@ function drawHubRadar() {
     if(stats[i].maturity > 50) text.classList.add('active');
     svg.appendChild(text);
   }
+  addRadarSecret(svg);
+}
+
+// --- Hidden course discovery: click the blank center of the web three times. ---
+let _secretClicks = 0, _secretTimer = null;
+function revealSecretToast(){
+  const note = document.createElement('div');
+  note.textContent = '\u269C  A hidden course surfaces from the dark \u2014 MACHIAVELLI';
+  note.style.cssText = 'position:fixed;left:50%;top:24px;transform:translateX(-50%);background:#190f02;border:1px solid #FFD24A;color:#FFD24A;padding:0.75rem 1.3rem;border-radius:6px;font-family:var(--display);font-size:0.8rem;letter-spacing:0.14em;z-index:9999;box-shadow:0 0 24px rgba(255,210,74,0.55);';
+  document.body.appendChild(note);
+  setTimeout(() => { note.style.transition='opacity 0.7s'; note.style.opacity='0'; setTimeout(() => note.remove(), 700); }, 3800);
+}
+function addRadarSecret(svg){
+  const NS = 'http://www.w3.org/2000/svg';
+  const found = localStorage.getItem('cogito-secret-found') === '1';
+  if (found){
+    const g = document.createElementNS(NS,'g'); g.setAttribute('class','secret-mark');
+    g.addEventListener('click', () => { window.location.href = 'machiavelli.html'; });
+    const halo = document.createElementNS(NS,'circle');
+    halo.setAttribute('cx',0); halo.setAttribute('cy',0); halo.setAttribute('r',8); halo.setAttribute('class','secret-halo');
+    const dot = document.createElementNS(NS,'circle');
+    dot.setAttribute('cx',0); dot.setAttribute('cy',0); dot.setAttribute('r',3.2); dot.setAttribute('class','secret-dot');
+    const txt = document.createElementNS(NS,'text');
+    txt.setAttribute('x',0); txt.setAttribute('y',20); txt.setAttribute('text-anchor','middle'); txt.setAttribute('dominant-baseline','middle');
+    txt.setAttribute('class','secret-label'); txt.textContent = 'MACHIAVELLI';
+    g.appendChild(halo); g.appendChild(dot); g.appendChild(txt); svg.appendChild(g);
+  } else {
+    const hint = document.createElementNS(NS,'circle');
+    hint.setAttribute('cx',0); hint.setAttribute('cy',0); hint.setAttribute('r',1.5); hint.setAttribute('class','secret-hint');
+    svg.appendChild(hint);
+    const hit = document.createElementNS(NS,'circle');
+    hit.setAttribute('cx',0); hit.setAttribute('cy',0); hit.setAttribute('r',13); hit.setAttribute('fill','transparent');
+    hit.style.cursor = 'pointer';
+    hit.addEventListener('click', () => {
+      _secretClicks++;
+      if (_secretTimer) clearTimeout(_secretTimer);
+      _secretTimer = setTimeout(() => { _secretClicks = 0; }, 2000);
+      if (_secretClicks >= 3){
+        _secretClicks = 0;
+        localStorage.setItem('cogito-secret-found','1');
+        drawHubRadar();
+        revealSecretToast();
+      }
+    });
+    svg.appendChild(hit);
+  }
 }
 drawHubRadar();
 
@@ -457,6 +521,12 @@ const ACHIEVEMENT_TRACKS = [
     { name: 'Grand Synthesis', desc: '60%+ maturity in all 7', icon: '💠', check: () => { const s = disciplineStats().filter(d => d.count > 0); return s.length === DISCIPLINES.length && s.every(d => d.maturity >= 60); } }
   ]}
 ];
+
+if (localStorage.getItem('cogito-secret-found') === '1') {
+  ACHIEVEMENT_TRACKS.push({ label: 'Forbidden', tiers: [
+    { name: 'The Hidden Hand', desc: 'You found what lies off the map', icon: '\u269C', check: () => true }
+  ]});
+}
 
 // Per-discipline mastery, shown as 7 individual tiles (mastered at 80% avg maturity).
 const DISCIPLINE_MASTERY = [
