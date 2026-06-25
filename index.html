@@ -85,6 +85,18 @@
   .app-tag { font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; display: flex; justify-content: space-between; }
   .maturity-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
   .maturity-fill { height: 100%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); transition: width 0.8s; }
+  .fav-star { position:absolute; top:0.55rem; right:0.7rem; font-size:1.05rem; line-height:1; color:var(--text-faint); cursor:pointer; z-index:3; transition:color 0.2s, transform 0.2s; }
+  .fav-star:hover { transform:scale(1.25); color:var(--amber); }
+  .fav-star.active { color:#FFD24A; text-shadow:0 0 8px rgba(255,210,74,0.7); }
+  .domain-title { cursor:pointer; user-select:none; }
+  .domain-title .chev { margin-left:auto; font-size:0.75rem; transition:transform 0.3s; color:var(--text-faint); }
+  .domain-section.collapsed .chev { transform:rotate(-90deg); }
+  .domain-section.collapsed .grid { display:none; }
+  .continue-section { max-width:1000px; margin:0 auto 2.5rem; }
+  .continue-head { font-family:var(--display); font-size:1.2rem; color:var(--amber); border-bottom:1px solid rgba(255,184,0,0.3); padding-bottom:0.5rem; margin-bottom:1.5rem; letter-spacing:0.1em; text-transform:uppercase; display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
+  .rec-next { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.06em; color:var(--text-dim); text-transform:none; margin-left:auto; }
+  .rec-next a { display:inline; border:none; padding:0; background:none; color:var(--cyan); overflow:visible; }
+  .rec-next a:hover { transform:none; box-shadow:none; text-decoration:underline; }
   #feedback-fab { position:fixed; bottom:2rem; right:2rem; z-index:90; background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
   #feedback-fab:hover { border-color:var(--cyan); color:var(--cyan); }
   #feedback-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
@@ -156,6 +168,8 @@
       <div class="profile-desc" id="profDesc">Begin training in any discipline to determine your cognitive profile.</div>
     </div>
   </div>
+
+  <div id="continueSection" class="continue-section"></div>
 
   <div class="hub-grid">
     <div class="panel">
@@ -318,7 +332,7 @@ let currentStreak = calculateStreak(activity);
 
 APPS.forEach(app => {
   const savedData = localStorage.getItem(app.storageKey);
-  let xp = 0, level = 1, maturity = 0, matureCount = 0;
+  let xp = 0, level = 1, maturity = 0, matureCount = 0, lastActivity = 0;
   if (savedData) {
     try {
       const parsed = JSON.parse(savedData);
@@ -326,7 +340,7 @@ APPS.forEach(app => {
       if (parsed.cards) {
         let totalMat = 0, count = 0;
         Object.values(parsed.cards).forEach(c => {
-          const m = getMaturity(c.interval); totalMat += m;
+          const m = getMaturity(c.interval); totalMat += m; if (c.lastReviewed && c.lastReviewed > lastActivity) lastActivity = c.lastReviewed;
           if(c.interval >= 21) { matureCount++; totalMature++; }
           count++;
         });
@@ -334,7 +348,7 @@ APPS.forEach(app => {
       }
     } catch(e) {}
   }
-  appData.push({ ...app, xp, level, maturity, matureCount });
+  appData.push({ ...app, xp, level, maturity, matureCount, lastActivity });
 });
 
 // The hidden course stays off the discipline map (not in APPS), but still counts
@@ -348,15 +362,49 @@ try {
   }
 } catch (e) {}
 
-// Build one section per discipline, then drop each course card into its section.
+// ---- Favorites + a reusable course card with a pin (star) ----
+function getFavs(){ try { return JSON.parse(localStorage.getItem('cogito-favorites') || '[]'); } catch(e){ return []; } }
+function setFavs(a){ localStorage.setItem('cogito-favorites', JSON.stringify(a)); }
+function toggleFav(id){ const f = getFavs(); const i = f.indexOf(id); if(i===-1) f.push(id); else f.splice(i,1); setFavs(f); }
+const appById = {}; appData.forEach(a => appById[a.id] = a);
+
+function makeCard(app){
+  const card = document.createElement('a');
+  card.href = app.href;
+  card.dataset.appId = app.id;
+  card.innerHTML = `
+    <div class="app-header"><div class="app-title">${app.name}</div><div class="app-level">LVL ${app.level}</div></div>
+    <div class="app-desc">${app.desc}</div>
+    <div class="app-tag"><span>${app.tag}</span><span>${app.xp} XP</span></div>
+    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>`;
+  const star = document.createElement('span');
+  star.className = 'fav-star' + (getFavs().indexOf(app.id) !== -1 ? ' active' : '');
+  star.textContent = '\u2605';
+  star.title = 'Pin to Your Courses';
+  star.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFav(app.id); renderContinue(); refreshStars(); });
+  card.appendChild(star);
+  return card;
+}
+function refreshStars(){
+  const favs = getFavs();
+  document.querySelectorAll('.fav-star').forEach(s => { s.classList.toggle('active', favs.indexOf(s.parentElement.dataset.appId) !== -1); });
+}
+
+// ---- Build collapsible discipline sections ----
 const sectionsRoot = document.getElementById('disciplineSections');
 const gridByKey = {};
+function getCollapsed(){ try { return JSON.parse(localStorage.getItem('cogito-disc-collapsed') || '{}'); } catch(e){ return {}; } }
 DISCIPLINES.forEach(d => {
   const section = document.createElement('div');
-  section.className = 'domain-section';
+  section.className = 'domain-section' + (getCollapsed()[d.key] ? ' collapsed' : '');
   const title = document.createElement('div');
   title.className = 'domain-title';
-  title.textContent = d.emoji + ' ' + d.title;
+  title.innerHTML = `<span>${d.emoji} ${d.title}</span><span class="chev">\u25BC</span>`;
+  title.addEventListener('click', () => {
+    section.classList.toggle('collapsed');
+    const c = getCollapsed(); c[d.key] = section.classList.contains('collapsed');
+    localStorage.setItem('cogito-disc-collapsed', JSON.stringify(c));
+  });
   const grid = document.createElement('div');
   grid.className = 'grid';
   grid.id = d.key + '-grid';
@@ -369,18 +417,40 @@ DISCIPLINES.forEach(d => {
 appData.forEach(app => {
   const target = gridByKey[app.domain];
   if (!target) return; // defensive: an unknown/typo'd domain is skipped, never crashes the hub
-  const card = document.createElement('a');
-  card.href = app.href;
-  card.innerHTML = `
-    <div class="app-header"><div class="app-title">${app.name}</div><div class="app-level">LVL ${app.level}</div></div>
-    <div class="app-desc">${app.desc}</div>
-    <div class="app-tag"><span>${app.tag}</span><span>${app.xp} XP</span></div>
-    <div class="maturity-bar"><div class="maturity-fill" style="width:${app.maturity}%"></div></div>`;
-  target.grid.appendChild(card);
+  target.grid.appendChild(makeCard(app));
 });
 
 // Hide any discipline that has no courses yet so the page stays clean.
 Object.values(gridByKey).forEach(t => { if (t.grid.children.length === 0) t.section.style.display = 'none'; });
+
+// ---- "Your Courses": pinned favorites first, then recently worked-on ----
+function recommendedNext(){
+  const inProgress = appData.filter(a => a.xp > 0 && a.maturity < 100).sort((x,y) => y.maturity - x.maturity);
+  if (inProgress.length) return inProgress[0];
+  const fresh = appData.filter(a => a.xp === 0);
+  return fresh.length ? fresh[0] : null;
+}
+function renderContinue(){
+  const host = document.getElementById('continueSection');
+  if (!host) return;
+  host.innerHTML = '';
+  const favs = getFavs();
+  const favCards = favs.map(id => appById[id]).filter(Boolean);
+  const recents = appData.filter(a => a.xp > 0 && favs.indexOf(a.id) === -1)
+                         .sort((x,y) => (y.lastActivity||0) - (x.lastActivity||0)).slice(0, 6);
+  const list = favCards.concat(recents);
+  if (!list.length) return; // nothing to resume yet -> strip stays hidden
+  const head = document.createElement('div');
+  head.className = 'continue-head';
+  head.innerHTML = '<span>\u2605 Your Courses</span>';
+  const rec = recommendedNext();
+  if (rec){ const r = document.createElement('span'); r.className = 'rec-next'; r.innerHTML = 'Recommended next: <a href="' + rec.href + '">' + rec.name + ' \u2192</a>'; head.appendChild(r); }
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  list.forEach(app => grid.appendChild(makeCard(app)));
+  host.appendChild(head); host.appendChild(grid);
+}
+renderContinue();
 
 document.getElementById('globalLevel').textContent = getLevel(totalXP);
 document.getElementById('globalXp').textContent = totalXP.toLocaleString() + ' Total XP';
@@ -630,16 +700,25 @@ function renderReview() {
 renderReview();
 if (window.initBackground) window.initBackground();
 
-let maturities = disciplineStats().map(d => d.maturity);
-let minMat = Math.min(...maturities), maxMat = Math.max(...maturities), avgMat = maturities.reduce((a,b) => a+b, 0) / maturities.length, diff = maxMat - minMat;
+const maturities = disciplineStats().map(d => d.maturity);
+const nDisc = maturities.length;
+const avgMat = maturities.reduce((a,b) => a+b, 0) / nDisc;
+const mastered = maturities.filter(m => m >= 75).length;   // deep
+const strong   = maturities.filter(m => m >= 50).length;   // solid
+const weak      = maturities.filter(m => m < 20).length;   // neglected
+const started  = appData.filter(a => a.xp > 0).length;
+// Count how many disciplines are mastered/strong/weak rather than keying off a
+// single high or low outlier (which mislabeled "6 mastered, 1 gap" as a specialist).
 let profile = { title: 'UNRANKED', desc: 'Begin training in any discipline to determine your cognitive profile.' };
 if (totalXP > 0) {
-  if (avgMat < 15) profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape.' };
-  else if (maxMat > 75 && minMat < 20) profile = { title: 'ULTRA-SPECIALIST', desc: 'Deep mastery in one domain, neglecting others. Diversify your training.' };
-  else if (avgMat > 75 && diff < 20) profile = { title: 'RENAISSANCE OPERATOR', desc: 'Highly balanced and deeply mastered across all disciplines.' };
-  else if (avgMat > 40 && diff < 30) profile = { title: 'POLYMATH', desc: 'Robust latticework. Balanced and growing across multiple domains.' };
-  else if (diff > 40) profile = { title: 'FRAGMENTED THINKER', desc: 'Highly imbalanced. Spikes of brilliance but deep valleys.' };
-  else profile = { title: 'OPERATOR', desc: 'Progressing steadily across all axes.' };
+  if (started <= 1 || avgMat < 8) profile = { title: 'INITIATE', desc: 'You have entered the training grounds. Your cognitive architecture is taking shape.' };
+  else if (mastered === nDisc) profile = { title: 'RENAISSANCE OPERATOR', desc: 'Total mastery across every discipline. The lattice is complete.' };
+  else if (mastered >= nDisc - 1) profile = { title: 'GRAND OPERATOR', desc: 'Near-total mastery \u2014 one discipline left to conquer.' };
+  else if (mastered >= Math.ceil(nDisc * 0.6)) profile = { title: 'POLYMATH', desc: 'Deep command across most disciplines, with room left to round out.' };
+  else if (mastered >= 1 && weak >= nDisc - 2) profile = { title: 'SPECIALIST', desc: 'Sharp focus in a domain or two; the rest of the lattice awaits.' };
+  else if (strong >= Math.ceil(nDisc * 0.6)) profile = { title: 'PRACTITIONER', desc: 'A solid, broadening foundation across the disciplines.' };
+  else if (avgMat >= 20) profile = { title: 'OPERATOR', desc: 'Progressing steadily across the axes.' };
+  else profile = { title: 'APPRENTICE', desc: 'Building momentum. Keep widening and deepening your training.' };
 }
 document.getElementById('profTitle').textContent = profile.title;
 document.getElementById('profDesc').textContent = profile.desc;
