@@ -930,19 +930,19 @@ function courseNextStep(cid, skipReview){
   const now = Date.now();
   if (!skipReview){
     const due = courseDue(cid);
-    if (due > 0) return { kind:'review', cid, href:st.href, count:due, label:'Review ' + due + ' due card' + (due>1?'s':'') + ' in ' + st.name };
+    if (due > 0) return { kind:'review', cid, href:st.href + '#view=drills', count:due, label:'Review ' + due + ' due card' + (due>1?'s':'') + ' in ' + st.name };
   }
   for (const mo of st.modules){
     const newC = mo.cards.filter(id => !cards[id] || cards[id].lastReviewed == null);
-    if (newC.length) return { kind:'learn', cid, href:st.href, label:'Learn the ' + mo.codename + ' module in ' + st.name + ' — ' + newC.length + ' new card' + (newC.length>1?'s':'') };
+    if (newC.length) return { kind:'learn', cid, href:st.href + '#module=' + mo.id, label:'Learn the ' + mo.codename + ' module in ' + st.name + ' — ' + newC.length + ' new card' + (newC.length>1?'s':'') };
   }
   for (const mo of st.modules){
     const un = mo.arena.filter(id => arena[id] !== true);
-    if (un.length) return { kind:'arena', cid, href:st.href, label:'Solve the ' + mo.codename + ' Arena in ' + st.name + ' — ' + un.length + ' left' };
+    if (un.length) return { kind:'arena', cid, href:st.href + '#view=arena', label:'Solve the ' + mo.codename + ' Arena in ' + st.name + ' — ' + un.length + ' left' };
   }
   const phases = st.modules.map(mo => mo.phase).filter(Boolean);
   const unsolved = phases.filter(pid => !(project[pid] && project[pid].solved));
-  if (unsolved.length) return { kind:'project', cid, href:st.href, label:'Continue the Project in ' + st.name + ' — ' + unsolved.length + ' phase' + (unsolved.length>1?'s':'') + ' left' };
+  if (unsolved.length) return { kind:'project', cid, href:st.href + '#view=project', label:'Continue the Project in ' + st.name + ' — ' + unsolved.length + ' phase' + (unsolved.length>1?'s':'') + ' left' };
   return null; // complete
 }
 
@@ -962,7 +962,7 @@ function buildTasks(){
   // top up with a "start" suggestion if the list is thin
   if (out.length < 6){
     const rec = recommendedCourse();
-    if (rec && rec.app && !(rec.app.xp > 0)) out.push({ kind:'start', href:rec.app.href, label:'Start ' + rec.app.name + (rec.reason==='from your quiz' ? ' — your quiz pick' : ' — a strong next course') });
+    if (rec && rec.app && !(rec.app.xp > 0)) out.push({ kind:'start', href:rec.app.href + '#view=modules', label:'Start ' + rec.app.name + (rec.reason==='from your quiz' ? ' — your quiz pick' : ' — a strong next course') });
   }
   return out;
 }
