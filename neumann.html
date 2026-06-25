@@ -1058,6 +1058,7 @@ function parseLesson(text){
 
 // ============== VIEWS ==============
 function showView(name){
+  if(!window.__dlDone && name === 'dashboard'){ window.__dlDone = true; try{ var __h = location.hash || ''; var __mm = __h.match(/module=([a-zA-Z0-9]+)/); var __vm = __h.match(/view=([a-zA-Z]+)/); var __ok = {modules:1,project:1,drills:1,arena:1,lab:1,stats:1,about:1,dashboard:1}; if(__mm && typeof MODULES !== 'undefined' && typeof S !== 'undefined' && S){ var __mod = MODULES.find(function(x){ return x.id === __mm[1]; }); if(__mod && S.modules && S.modules[__mod.id] && S.modules[__mod.id].unlocked){ return showModuleDetail(__mm[1]); } name = 'modules'; } else if(__vm && __ok[__vm[1]]){ name = __vm[1]; } }catch(e){} }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const view = document.getElementById('view-' + name);
