@@ -1166,6 +1166,15 @@ function renderDrills(){
   const due = getDueCards(activeFilter);
   if(due.length === 0){ container.innerHTML = '<div class="drill-empty"><h3>Queue Clear</h3><p>No cards due for review in this category. Come back tomorrow, or solve an Arena problem.</p><button class="btn" onclick="DARWIN.show(\'arena\')">Arena →</button></div>'; return; }
   drillQueue = due.slice();
+  { var __ord = localStorage.getItem('cogito-drill-order') || 'module';
+    if(__ord === 'random'){ for(var __i=drillQueue.length-1;__i>0;__i--){ var __j=Math.floor(Math.random()*(__i+1)), __t=drillQueue[__i]; drillQueue[__i]=drillQueue[__j]; drillQueue[__j]=__t; } }
+    else { drillQueue.sort(function(a,b){ return CARDS.indexOf(a)-CARDS.indexOf(b); }); }
+    var __ref = document.querySelector('.filter-btn');
+    if(__ref){ var __btn = document.getElementById('drillOrderToggle');
+      if(!__btn){ __btn = document.createElement('button'); __btn.id='drillOrderToggle'; __btn.className=__ref.className.replace('active','').trim(); __btn.style.marginLeft='auto'; __btn.title='Toggle card order'; __btn.onclick=function(){ var c=localStorage.getItem('cogito-drill-order')||'module'; localStorage.setItem('cogito-drill-order', c==='random'?'module':'random'); renderDrills(); }; __ref.parentNode.appendChild(__btn); }
+      __btn.textContent = (__ord==='random' ? '🔀 Shuffled' : '↕ Module order');
+    }
+  }
   showNextDrill();
 }
 
