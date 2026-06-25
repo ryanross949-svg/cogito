@@ -93,6 +93,7 @@
   .domain-section.collapsed .chev { transform:rotate(-90deg); }
   .domain-section.collapsed .grid { display:none; }
   .continue-section { max-width:1000px; margin:0 auto 2.5rem; }
+  .continue-empty { font-size:0.85rem; color:var(--text-faint); padding:0.5rem 0 0.2rem; }
   .continue-head { font-family:var(--display); font-size:1.2rem; color:var(--amber); border-bottom:1px solid rgba(255,184,0,0.3); padding-bottom:0.5rem; margin-bottom:1.5rem; letter-spacing:0.1em; text-transform:uppercase; display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
   .rec-next { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.06em; color:var(--text-dim); text-transform:none; margin-left:auto; }
   .rec-next a { display:inline; border:none; padding:0; background:none; color:var(--cyan); overflow:visible; }
@@ -473,7 +474,7 @@ appData.forEach(app => {
 // Hide any discipline that has no courses yet so the page stays clean.
 Object.values(gridByKey).forEach(t => { if (t.grid.children.length === 0) t.section.style.display = 'none'; });
 
-// ---- "Your Courses": pinned favorites first, then recently worked-on ----
+// ---- "Your Courses": only courses you pin with the star (no auto-add) ----
 function recommendedNext(){
   const inProgress = appData.filter(a => a.xp > 0 && a.maturity < 100).sort((x,y) => y.maturity - x.maturity);
   if (inProgress.length) return inProgress[0];
@@ -486,19 +487,23 @@ function renderContinue(){
   host.innerHTML = '';
   const favs = getFavs();
   const favCards = favs.map(id => appById[id]).filter(Boolean);
-  const recents = appData.filter(a => a.xp > 0 && favs.indexOf(a.id) === -1)
-                         .sort((x,y) => (y.lastActivity||0) - (x.lastActivity||0)).slice(0, 6);
-  const list = favCards.concat(recents);
-  if (!list.length) return; // nothing to resume yet -> strip stays hidden
   const head = document.createElement('div');
   head.className = 'continue-head';
   head.innerHTML = '<span>\u2605 Your Courses</span>';
   const rec = recommendedNext();
   if (rec){ const r = document.createElement('span'); r.className = 'rec-next'; r.innerHTML = 'Recommended next: <a href="' + rec.href + '">' + rec.name + ' \u2192</a>'; head.appendChild(r); }
+  host.appendChild(head);
+  if (!favCards.length){
+    const empty = document.createElement('div');
+    empty.className = 'continue-empty';
+    empty.textContent = 'No courses yet \u2014 tap the \u2605 on any course below to add it to Your Courses.';
+    host.appendChild(empty);
+    return;
+  }
   const grid = document.createElement('div');
   grid.className = 'grid';
-  list.forEach(app => grid.appendChild(makeCard(app)));
-  host.appendChild(head); host.appendChild(grid);
+  favCards.forEach(app => grid.appendChild(makeCard(app)));
+  host.appendChild(grid);
 }
 renderContinue();
 
