@@ -5,6 +5,7 @@ window.REVIEW_INDEX = [
 {"course":"bayes","key":"bayes-v1","disc":"math","name":"BAYES","count":120},
 {"course":"boltzmann","key":"boltzmann-v1","disc":"physics","name":"BOLTZMANN","count":120},
 {"course":"chomsky","key":"chomsky-v1","disc":"mind","name":"CHOMSKY","count":120},
+{"course":"cobra","key":"cobra-v1","disc":"unknown","name":"COBRA","count":60},
 {"course":"conway","key":"conway-v1","disc":"compute","name":"CONWAY","count":120},
 {"course":"dantzig","key":"dantzig-v1","disc":"math","name":"DANTZIG","count":120},
 {"course":"darwin","key":"darwin-v1","disc":"life","name":"DARWIN","count":120},
