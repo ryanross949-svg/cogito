@@ -47,6 +47,13 @@
   .rate button[data-q="3"]:hover{border-color:var(--amber);color:var(--amber);}
   .rate button[data-q="4"]:hover{border-color:var(--cyan);color:var(--cyan);}
   .rate button[data-q="5"]:hover{border-color:var(--green);color:var(--green);}
+  @media (max-width:600px){
+    body{padding:1rem;}
+    .panel{padding:1.25rem;}
+    .card-front{font-size:1.25rem;}
+    .rate{gap:0.4rem;}
+    .rate button{padding:0.7rem 0.2rem;font-size:0.7rem;}
+  }
   .hidden{display:none;}
   .hint{font-size:0.65rem;color:var(--text-faint);margin-top:1.5rem;text-align:center;letter-spacing:0.05em;}
   .stat-row{display:flex;justify-content:space-around;margin:1.5rem 0;}
@@ -77,7 +84,7 @@
       <div class="card-back hidden" id="cBack"></div>
       <button class="btn" id="revealBtn" style="width:100%">Show Answer</button>
       <div class="rate hidden" id="rateRow">
-        <button data-q="1">Again<small>&lt;1d</small></button>
+        <button data-q="1">Again<small>&lt;1m</small></button>
         <button data-q="3">Hard<small id="iHard"></small></button>
         <button data-q="4">Good<small id="iGood"></small></button>
         <button data-q="5">Easy<small id="iEasy"></small></button>
