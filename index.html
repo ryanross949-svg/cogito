@@ -140,7 +140,6 @@
   #hub-corner { position:fixed; bottom:2rem; left:2rem; z-index:90; display:flex; gap:0.5rem; }
   #hub-corner button { background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
   #hub-corner #aboutBtn:hover { border-color:var(--cyan); color:var(--cyan); }
-  #hub-corner #resetAllBtn:hover { border-color:var(--red); color:var(--red); }
   #about-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
   #about-modal .modal-content { max-width:680px; max-height:85vh; overflow-y:auto; }
   .about-sec { margin-bottom:1.3rem; }
@@ -151,6 +150,8 @@
   .about-sec li::before { content:'\203A'; position:absolute; left:0; color:var(--cyan); }
   .about-sec b { color:var(--text); font-weight:normal; }
   .about-key { font-family:var(--mono); font-size:0.72rem; color:var(--amber); border:1px solid var(--border); padding:0.02rem 0.35rem; border-radius:3px; }
+  .about-reset { margin-top:0.5rem; background:transparent; border:1px solid var(--red); color:var(--red); padding:0.55rem 1.1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
+  .about-reset:hover { background:var(--red); color:var(--void); }
   .fb-row { display:grid; gap:1.5rem; }
   .fb-q { display:flex; justify-content:space-between; align-items:center; }
   .fb-label { font-size:0.85rem; }
@@ -268,7 +269,6 @@
 
   <div id="hub-corner">
     <button id="aboutBtn">About</button>
-    <button id="resetAllBtn">Reset All</button>
   </div>
   <div id="about-modal">
     <div class="modal-content">
@@ -326,6 +326,11 @@
           <li><b>Desktop (Chrome / Edge):</b> click the <b>install</b> icon in the address bar, or the menu &rarr; <b>Install</b>.</li>
         </ul>
         <p>Then launch Cogito from its new icon, just like any other app.</p>
+      </div>
+      <div class="about-sec">
+        <h4>Reset</h4>
+        <p>This wipes <b>everything</b> on this device &mdash; XP, cards, streaks, unlocks, themes, and pinned courses. It cannot be undone.</p>
+        <button id="resetAllBtn" class="about-reset">Reset All Progress</button>
       </div>
     </div>
   </div>
