@@ -34,7 +34,6 @@
   .theme-option:hover { background: var(--panel); color: var(--cyan); }
   .theme-option.locked { opacity: 0.4; cursor: not-allowed; }
   .theme-option.locked:hover { background: none; color: var(--text-dim); }
-  .dev-btn { background: transparent; border: 1px dashed var(--red); color: var(--red); padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0.25rem; }
   .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; }
   @media(max-width: 800px) { .hub-grid { grid-template-columns: 1fr; } }
   .panel { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; position: relative; backdrop-filter: blur(8px); border-radius: 4px; }
@@ -138,6 +137,20 @@
   .modal-content { background:var(--panel-solid); border:1px solid var(--cyan); padding:2rem; max-width:500px; width:90%; border-radius:8px; position:relative; }
   .close-btn { position:absolute; top:1rem; right:1rem; cursor:pointer; color:var(--text-dim); font-size:1.2rem; background:none; border:none; }
   .modal-title { font-family:var(--display); color:var(--cyan); margin-bottom:1.5rem; letter-spacing:0.1em; }
+  #hub-corner { position:fixed; bottom:2rem; left:2rem; z-index:90; display:flex; gap:0.5rem; }
+  #hub-corner button { background:transparent; border:1px solid var(--border-bright); color:var(--text-dim); padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; transition:all 0.2s; }
+  #hub-corner #aboutBtn:hover { border-color:var(--cyan); color:var(--cyan); }
+  #hub-corner #resetAllBtn:hover { border-color:var(--red); color:var(--red); }
+  #about-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:100; justify-content:center; align-items:center; backdrop-filter:blur(5px); }
+  #about-modal .modal-content { max-width:680px; max-height:85vh; overflow-y:auto; }
+  .about-sec { margin-bottom:1.3rem; }
+  .about-sec h4 { font-family:var(--mono); color:var(--cyan); font-size:0.76rem; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:0.5rem; }
+  .about-sec p { font-size:0.85rem; line-height:1.6; color:var(--text-dim); margin-bottom:0.4rem; }
+  .about-sec ul { list-style:none; padding:0; margin:0; }
+  .about-sec li { font-size:0.85rem; line-height:1.55; color:var(--text-dim); padding:0.18rem 0 0.18rem 1rem; position:relative; }
+  .about-sec li::before { content:'\203A'; position:absolute; left:0; color:var(--cyan); }
+  .about-sec b { color:var(--text); font-weight:normal; }
+  .about-key { font-family:var(--mono); font-size:0.72rem; color:var(--amber); border:1px solid var(--border); padding:0.02rem 0.35rem; border-radius:3px; }
   .fb-row { display:grid; gap:1.5rem; }
   .fb-q { display:flex; justify-content:space-between; align-items:center; }
   .fb-label { font-size:0.85rem; }
@@ -245,14 +258,6 @@
     <!-- Discipline sections are generated from the DISCIPLINES array in the script below -->
   <div id="disciplineSections"></div>
 
-  <!-- DEV TOOL: REMOVE BEFORE LAUNCH -->
-  <div style="max-width:1000px;margin:0 auto 3rem;text-align:center;">
-    <button id="devLevel75" class="dev-btn">DEV: Set Global Lvl 75</button>
-    <button id="devMaster" class="dev-btn">DEV: Master All (80%)</button>
-    <button id="devStreak" class="dev-btn">DEV: 30-Day Streak</button>
-    <button id="devReset" class="dev-btn">DEV: Reset All</button>
-  </div>
-
   <div id="quiz-modal">
     <div class="modal-content">
       <button class="close-btn" id="closeQuiz">&times;</button>
@@ -261,6 +266,59 @@
     </div>
   </div>
 
+  <div id="hub-corner">
+    <button id="aboutBtn">About</button>
+    <button id="resetAllBtn">Reset All</button>
+  </div>
+  <div id="about-modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeAbout">&times;</button>
+      <h3 class="modal-title">// How Cogito Works</h3>
+      <div class="about-sec">
+        <h4>What this is</h4>
+        <p>Cogito is a gamified learning platform built on <b>spaced repetition</b>. Each course distills a field into 10 modules of flashcards, applied problems, and a capstone project &mdash; across 7 disciplines: Physics, Mathematics, Computation, Life, Mind, Strategy, and Systems.</p>
+      </div>
+      <div class="about-sec">
+        <h4>The Hub (this page)</h4>
+        <ul>
+          <li><b>Courses</b> are grouped by discipline &mdash; click a discipline header to collapse it.</li>
+          <li><b>Your Courses</b>: tap the <b>&#9733;</b> star on any course to pin it to the top strip. Nothing is added automatically.</li>
+          <li><b>Your Path</b>: take the <b>Find My Starting Point</b> quiz for a recommendation, then work the auto-generated to-do list &mdash; each task deep-links to the exact module, Arena, or Drills.</li>
+          <li><b>Daily Review</b> banner: once you finish a course&rsquo;s first full pass, its due cards join a single cross-course review queue.</li>
+          <li><b>Global Mastery Matrix</b> &amp; radar: your mastery across every discipline at a glance.</li>
+          <li><b>Themes</b>: 8 color themes. <b>Achievements</b> &amp; <b>Shop</b>: earn and spend as you progress.</li>
+        </ul>
+      </div>
+      <div class="about-sec">
+        <h4>Inside a course</h4>
+        <ul>
+          <li><b>Dashboard</b> &mdash; overview and your daily mission.</li>
+          <li><b>Modules</b> &mdash; read each lesson, then unlock the next by studying its cards.</li>
+          <li><b>Drills</b> &mdash; the spaced-repetition flashcards (see below).</li>
+          <li><b>Arena</b> &mdash; applied multiple-choice problems for bonus XP.</li>
+          <li><b>Project</b> &mdash; a multi-phase capstone that ties the course together.</li>
+          <li><b>Stats</b> &mdash; retention, streaks, and progress.</li>
+        </ul>
+      </div>
+      <div class="about-sec">
+        <h4>How spaced repetition works</h4>
+        <p>In Drills, read the prompt, reveal the answer, then rate yourself honestly:</p>
+        <ul>
+          <li><b>Again</b> &mdash; forgot it; the card returns this session.</li>
+          <li><b>Hard / Good / Easy</b> &mdash; the gap until you see it again grows each time (Good runs roughly 3d &rarr; 7d &rarr; 18d &rarr; 45d&hellip;), so you review each fact right before you&rsquo;d forget it.</li>
+          <li>Use the <b>order toggle</b> by the filters to run cards in <b>Module order</b> or <b>Shuffle</b>.</li>
+        </ul>
+      </div>
+      <div class="about-sec">
+        <h4>Shortcuts &amp; tips</h4>
+        <ul>
+          <li>In Drills: <span class="about-key">space</span> reveals, <span class="about-key">1</span>&ndash;<span class="about-key">4</span> rate Again / Hard / Good / Easy.</li>
+          <li>Pin your active courses with the <b>&#9733;</b> so they&rsquo;re always one tap away.</li>
+          <li>Follow the <b>Recommended tasks</b> for the highest-leverage next action at any moment.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
   <button id="feedback-fab">Feedback</button>
   <div id="feedback-modal">
     <div class="modal-content">
@@ -833,42 +891,16 @@ document.getElementById('submitFeedback').onclick = () => {
     modal.style.display = 'none';
 };
 
-  // DEV TOOL: Inject XP to test Hub UI at Level 75
-  document.getElementById('devLevel75').onclick = () => {
-    const app = APPS[0]; // Targets PRIMA
-    let savedData = JSON.parse(localStorage.getItem(app.storageKey) || '{}');
-    savedData.xp = 547600; // Enough XP for Level 75
-    // Ensure the data structure exists so the Hub doesn't crash reading it
-    if(!savedData.modules) savedData.modules = {};
-    if(!savedData.cards) savedData.cards = {}; 
-    localStorage.setItem(app.storageKey, JSON.stringify(savedData));
-    location.reload();
-  };
-
-// DEV: master all disciplines (set every course to ~100% maturity)
-document.getElementById('devMaster').onclick = () => {
-  APPS.forEach(app => {
-    let d = {}; try { d = JSON.parse(localStorage.getItem(app.storageKey) || '{}'); } catch(e) {}
-    d.cards = {};
-    for (let i = 0; i < 12; i++) d.cards['dev' + i] = { ease: 2.5, interval: 45, repetitions: 6, due: Date.now() + 45 * 86400000, lastReviewed: Date.now(), correct: 6, wrong: 0 };
-    if (typeof d.xp !== 'number') d.xp = 5000;
-    localStorage.setItem(app.storageKey, JSON.stringify(d));
-  });
-  location.reload();
-};
-// DEV: grant a 30-day streak
-document.getElementById('devStreak').onclick = () => {
-  const days = [], base = new Date();
-  for (let i = 0; i < 30; i++) { const x = new Date(base); x.setDate(base.getDate() - i); days.push(x.toISOString().split('T')[0]); }
-  localStorage.setItem('cogito-activity', JSON.stringify(days));
-  location.reload();
-};
-// DEV: wipe everything (XP, cards, streaks, unlocks, theme, background)
-document.getElementById('devReset').onclick = () => {
-  if (!confirm('Reset ALL progress \u2014 XP, cards, streaks, unlocks, theme, and background \u2014 back to zero? This cannot be undone.')) return;
+// Reset all progress (full wipe, with confirmation)
+document.getElementById('resetAllBtn').onclick = () => {
+  if (!confirm('Reset ALL progress \u2014 XP, cards, streaks, unlocks, themes, and pinned courses \u2014 back to zero? This cannot be undone.')) return;
   localStorage.clear();
   location.reload();
 };
+// About modal
+document.getElementById('aboutBtn').onclick = () => { document.getElementById('about-modal').style.display = 'flex'; };
+document.getElementById('closeAbout').onclick = () => { document.getElementById('about-modal').style.display = 'none'; };
+document.getElementById('about-modal').addEventListener('click', (e) => { if (e.target.id === 'about-modal') document.getElementById('about-modal').style.display = 'none'; });
 
 window.HUB = { setTheme };
 
