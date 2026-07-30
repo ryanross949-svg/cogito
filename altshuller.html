@@ -7,9 +7,9 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cogito.css">
-  <style>:root{ --void:#050810; --void-2:#0A0E1A; --panel:rgba(10,18,30,0.7); --panel-solid:#0A1220; --accent:#00D9FF; --accent-dim:#008FB3; --accent-2:#FF2D9C; --warn:#FFB800; --success:#00FFA3; --danger:#FF3355; --text:#E0F4FF; --text-dim:#6B7C8F; --text-faint:#727B8A; --border:rgba(0,217,255,0.15); --border-bright:rgba(0,217,255,0.4); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
+  <style>:root{ --accent:#00D9FF; --accent-dim:#008FB3; }</style>
 </head>
 <body>
 <canvas id="particles"></canvas>
@@ -35,7 +35,7 @@
         <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
       </div>
       <div class="dash-grid">
-        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--warn)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="ALTSHULLER.completeRTMission()">Mark Complete · +25 XP</button></div>
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--text)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="ALTSHULLER.completeRTMission()">Mark Complete · +25 XP</button></div>
         <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
       </div>
       <div id="secretUnlockContainer"></div>
