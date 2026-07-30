@@ -15,7 +15,13 @@ Update the ARENA array (100 problems, 10 per module, 4 difficulty tiers).
 Update the PROJECT_PHASES array (10 cumulative project phases).
 Update the REAL_WORLD_MISSIONS array (30 daily missions).
 Add the new app to the APPS array in index.html so it tracks on the Global Dashboard. Its `domain` MUST be one of the 7 master discipline keys in the DISCIPLINES array: physics, math, compute, life, mind, strategy, systems. The Global Mastery Matrix (radar) and Discipline Breakdown aggregate every course up to these 7 axes (average maturity per discipline; XP summed). An unknown domain is now skipped gracefully instead of crashing the hub, but the course won't appear until its domain matches a discipline.
-Ensure the Theme Switcher CSS, HTML, and JS are included (copy from ORACLE v7.6).
+Link the shared stylesheet instead of copying CSS: <link rel="stylesheet" href="cogito.css"> in <head>, then one <style>:root{...}</style> after it holding only that course's palette. Copy the Theme Switcher HTML and JS from ORACLE v7.6; its CSS already lives in cogito.css.
+Styling
+cogito.css is the single stylesheet for all 52 course pages. It holds every shared rule plus all 8 theme definitions. Do NOT paste CSS into a course page. Before this file existed there were 32 divergent copies of the same stylesheet, and three themes (plain, crimson, emerald) had been added to index.html only, so selecting them did nothing on any course page.
+A course page overrides exactly one thing: its own :root palette. Everything else is inherited.
+Colour tokens are named for their ROLE, never their appearance: --accent / --accent-dim (the course's primary colour), --accent-2 (secondary), --success (correct, completed, read), --warn (caution, mid mastery, difficulty 2), --danger (wrong, low mastery). Structural tokens are --void / --void-2 / --panel / --panel-solid / --text / --text-dim / --text-faint / --border / --border-bright / --display / --mono.
+Never reintroduce appearance-based names. The tokens were once called --cyan, --magenta, --green and so on, which broke down immediately: --cyan held green on lakoff and --magenta held purple on godel, so the CSS could no longer be read and trusted. A name must survive a re-theme.
+index.html and review.html still carry their own inline CSS; they are different surfaces and were deliberately left out of the extraction.
 Key Mechanics
 Spaced Repetition (SM-2): Flashcards schedule based on quality (1-5). Maturity is 21+ days.
 Progression: A module is marked "complete" when the Lesson is read AND 1 Arena problem is solved. This unlocks the next module.

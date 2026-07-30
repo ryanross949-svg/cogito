@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cogito.css">
-  <style>:root{ --void:#08050F; --void-2:#0F0A1A; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24; --cyan:#00F5D4; --cyan-dim:#008F7A; --magenta:#9D4EDD; --amber:#FFB300; --green:#00D9FF; --red:#FF3366; --text:#E6E6FA; --text-dim:#81759A; --text-faint:#807992; --border:rgba(157,78,221,0.2); --border-bright:rgba(157,78,221,0.5); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
+  <style>:root{ --void:#08050F; --void-2:#0F0A1A; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24; --accent:#00F5D4; --accent-dim:#008F7A; --accent-2:#9D4EDD; --warn:#FFB300; --success:#00D9FF; --danger:#FF3366; --text:#E6E6FA; --text-dim:#81759A; --text-faint:#807992; --border:rgba(157,78,221,0.2); --border-bright:rgba(157,78,221,0.5); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
 </head>
 <body>
 <canvas id="particles"></canvas>
@@ -92,7 +92,7 @@
       <div class="dash-grid">
         <div class="panel">
           <div class="panel-label">// Daily Real-World Mission</div>
-          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--warn)" id="rtTitle">Generating Mission...</h2>
           <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
           <button class="btn secondary" id="rtBtn" onclick="ORACLE.completeRTMission()">Mark Complete · +25 XP</button>
         </div>
@@ -262,7 +262,7 @@
           <div class="panel-label">// 2. Generated Prompt</div>
           <div id="sb-preview" style="background:var(--void);border:1px solid var(--border);padding:1rem;border-radius:4px;height:200px;overflow-y:auto;font-size:0.85rem;color:var(--text);line-height:1.6;white-space:pre-wrap;"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;">
-            <div style="font-size:0.7rem;color:var(--text-dim)">Tokens: <span id="sb-tokens" style="color:var(--cyan)">0</span> (~4 chars = 1 token)</div>
+            <div style="font-size:0.7rem;color:var(--text-dim)">Tokens: <span id="sb-tokens" style="color:var(--accent)">0</span> (~4 chars = 1 token)</div>
             <button class="btn" id="sb-copy">Copy to Clipboard</button>
           </div>
         </div>
@@ -726,7 +726,7 @@ function checkSecretUnlock(){
       html += '<h2>// SINGULARITY ACHIEVED</h2>';
       html += '<p>You have completed all 10 axes and successfully automated Project Singularity. You now possess the complete architecture of cognitive symbiosis.</p>';
       html += '<p><strong>The Secret:</strong> The AI is not an oracle; it is a prediction engine. It does not think; it computes probabilities. Your competitive advantage is not in memorizing prompts, but in understanding the mechanics of attention, context, and temperature. The human provides the taste and the strategy; the AI provides the velocity. You are now a Centaur.</p>';
-      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '<p style="color:var(--warn);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
       html += '</div>';
       container.innerHTML = html;
       flashCombo('UNLOCKED');
@@ -1080,7 +1080,7 @@ function showModuleDetail(moduleId){
   html += '</div>';
   
   if(prog.completed){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
     const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
     if(nextM && S.modules[nextM.id].unlocked){
       html += '<button class="btn success mt-1" onclick="ORACLE.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>';
@@ -1154,7 +1154,7 @@ function renderProject(){
   
   let html = '<div class="project-hud">';
   html += '<div class="hud-stat"><span class="label">Automations:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
-  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'SYNTHESIZED' : 'EXECUTING') + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--accent-2)">' + (solvedCount === totalPhases ? 'SYNTHESIZED' : 'EXECUTING') + '</span></div>';
   html += '</div>';
   
   html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each cognitive axis to automate a startup workflow. Phases unlock sequentially as you complete the corresponding training modules AND solve the previous project phase.</p>';
@@ -1220,7 +1220,7 @@ function showProjectPhase(phaseId){
   html += '<div class="outcome" id="outcome"></div>';
   
   if(solved){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Previously Solved</div><p class="text-sm">You have completed this phase. Review it any time.</p></div>';
   }
   
   container.innerHTML = html;
@@ -1249,7 +1249,7 @@ function answerPhase(idx){
       S.project[p.id].solved = true;
       S.project[p.id].choice = idx;
       addXP(150, 'singularity: ' + p.id);
-      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+150 XP. Phase complete.</div>';
       flashCombo('+150 XP');
     }else{
       html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
@@ -1459,7 +1459,7 @@ function showArenaProblem(problemId){
   html += '<div class="outcome" id="outcome"></div>';
   
   if(solved){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Previously Solved</div><p class="text-sm">You have solved this problem. Review it any time.</p></div>';
   }
   
   container.innerHTML = html;
@@ -1507,12 +1507,12 @@ function answerProblem(idx){
         S.modules[p.moduleId].problemSolved = true;
         if(moduleProgress(p.moduleId).completed){
           unlockNextModule(p.moduleId);
-          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--success);font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
         }else{
-          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP</div>';
         }
       }else{
-        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP</div>';
       }
       flashCombo('+' + p.reward + ' XP');
     }else{
@@ -1570,9 +1570,9 @@ function renderStats(){
   const chart = document.getElementById('maturityChart');
   const cats = [
     { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
-    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
-    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
-    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--warn)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--accent)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--success)' }
   ];
   chart.innerHTML = '';
   cats.forEach(cat => {
@@ -1590,7 +1590,7 @@ function renderStats(){
     log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
       const d = new Date(entry.t);
       const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--accent);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
     }).join('');
   }
 }

@@ -8,45 +8,45 @@
 <style>
   :root {
     --void:#050810; --panel:rgba(15,10,26,0.7); --panel-solid:#140E24;
-    --cyan:#00D9FF; --magenta:#FF2D9C; --green:#00FFA3; --amber:#FFB800; --red:#FF3355;
+    --accent:#00D9FF; --accent-2:#FF2D9C; --success:#00FFA3; --warn:#FFB800; --danger:#FF3355;
     --text:#E6E6FA; --text-dim:#81759A; --text-faint:#807992;
     --border:rgba(157,78,221,0.2); --border-bright:rgba(157,78,221,0.5);
     --display:'Segoe UI',Helvetica,sans-serif; --mono:'JetBrains Mono',monospace;
   }
-  [data-theme="matrix"]{--void:#000;--panel:rgba(0,20,0,0.8);--panel-solid:#050505;--cyan:#00FF41;--magenta:#00FF41;--amber:#39FF14;--green:#00FF41;--red:#FF3366;--text:#00FF41;--text-dim:#008F11;--text-faint:#009119;--border:rgba(0,255,65,0.2);--border-bright:rgba(0,255,65,0.5);}
-  [data-theme="cyberpunk"]{--void:#1A0A1A;--panel:rgba(40,10,40,0.8);--panel-solid:#1A051A;--cyan:#FCEE09;--magenta:#FF003C;--amber:#00FFF0;--green:#FF003C;--red:#FF003C;--text:#F8F8F8;--text-dim:#A0A0A0;--text-faint:#818181;--border:rgba(255,0,60,0.3);--border-bright:rgba(255,0,60,0.6);}
-  [data-theme="light"]{--void:#FDF6E3;--panel:rgba(253,246,227,0.9);--panel-solid:#FFFFFF;--cyan:#268BD2;--magenta:#D33682;--amber:#B58900;--green:#859900;--red:#DC322F;--text:#073642;--text-dim:#586E75;--text-faint:#587479;--border:rgba(7,54,66,0.15);--border-bright:rgba(7,54,66,0.3);}
-  [data-theme="nord"]{--void:#2E3440;--panel:rgba(46,52,64,0.8);--panel-solid:#2E3440;--cyan:#88C0D0;--magenta:#B48EAD;--amber:#EBCB8B;--green:#A3BE8C;--red:#BF616A;--text:#ECEFF4;--text-dim:#D8DEE9;--text-faint:#999FAC;--border:rgba(216,222,233,0.15);--border-bright:rgba(216,222,233,0.3);}
+  [data-theme="matrix"]{--void:#000;--panel:rgba(0,20,0,0.8);--panel-solid:#050505;--accent:#00FF41;--accent-2:#00FF41;--warn:#39FF14;--success:#00FF41;--danger:#FF3366;--text:#00FF41;--text-dim:#008F11;--text-faint:#009119;--border:rgba(0,255,65,0.2);--border-bright:rgba(0,255,65,0.5);}
+  [data-theme="cyberpunk"]{--void:#1A0A1A;--panel:rgba(40,10,40,0.8);--panel-solid:#1A051A;--accent:#FCEE09;--accent-2:#FF003C;--warn:#00FFF0;--success:#FF003C;--danger:#FF003C;--text:#F8F8F8;--text-dim:#A0A0A0;--text-faint:#818181;--border:rgba(255,0,60,0.3);--border-bright:rgba(255,0,60,0.6);}
+  [data-theme="light"]{--void:#FDF6E3;--panel:rgba(253,246,227,0.9);--panel-solid:#FFFFFF;--accent:#268BD2;--accent-2:#D33682;--warn:#B58900;--success:#859900;--danger:#DC322F;--text:#073642;--text-dim:#586E75;--text-faint:#587479;--border:rgba(7,54,66,0.15);--border-bright:rgba(7,54,66,0.3);}
+  [data-theme="nord"]{--void:#2E3440;--panel:rgba(46,52,64,0.8);--panel-solid:#2E3440;--accent:#88C0D0;--accent-2:#B48EAD;--warn:#EBCB8B;--success:#A3BE8C;--danger:#BF616A;--text:#ECEFF4;--text-dim:#D8DEE9;--text-faint:#999FAC;--border:rgba(216,222,233,0.15);--border-bright:rgba(216,222,233,0.3);}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:radial-gradient(ellipse at top,rgba(0,217,255,0.08),transparent 50%),radial-gradient(ellipse at bottom,rgba(157,78,221,0.08),transparent 50%),var(--void);color:var(--text);font-family:var(--mono);min-height:100vh;padding:2rem;}
   #particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
   .wrap{position:relative;z-index:5;max-width:760px;margin:0 auto;}
   .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;}
   .back{font-size:0.75rem;color:var(--text-dim);text-decoration:none;border:1px solid var(--border);padding:0.4rem 0.8rem;border-radius:4px;text-transform:uppercase;letter-spacing:0.1em;}
-  .back:hover{border-color:var(--cyan);color:var(--cyan);}
-  h1{font-family:var(--display);font-size:1.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);text-shadow:0 0 20px rgba(0,217,255,0.4);}
+  .back:hover{border-color:var(--accent);color:var(--accent);}
+  h1{font-family:var(--display);font-size:1.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);text-shadow:0 0 20px rgba(0,217,255,0.4);}
   .panel{background:var(--panel);border:1px solid var(--border);padding:2rem;border-radius:6px;backdrop-filter:blur(8px);position:relative;}
-  .panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);}
-  .big{font-family:var(--display);font-size:3rem;font-weight:700;color:var(--cyan);text-shadow:0 0 15px rgba(0,217,255,0.5);line-height:1;}
+  .panel::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:1px solid var(--accent);border-left:1px solid var(--accent);}
+  .big{font-family:var(--display);font-size:3rem;font-weight:700;color:var(--accent);text-shadow:0 0 15px rgba(0,217,255,0.5);line-height:1;}
   .label{font-size:0.6rem;letter-spacing:0.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.75rem;}
   .chips{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1.5rem 0;}
   .chip{font-size:0.7rem;color:var(--text-dim);border:1px solid var(--border);padding:0.35rem 0.7rem;border-radius:20px;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;}
-  .chip.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,0.08);}
-  .btn{background:var(--cyan);color:var(--void);border:none;padding:0.85rem 2rem;font-family:var(--mono);font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px;letter-spacing:0.1em;font-size:0.85rem;}
+  .chip.active{border-color:var(--accent);color:var(--accent);background:rgba(0,217,255,0.08);}
+  .btn{background:var(--accent);color:var(--void);border:none;padding:0.85rem 2rem;font-family:var(--mono);font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px;letter-spacing:0.1em;font-size:0.85rem;}
   .btn:disabled{opacity:0.4;cursor:not-allowed;}
   .progress{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;margin-bottom:1.5rem;}
-  .progress-fill{height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);transition:width 0.3s;}
+  .progress-fill{height:100%;background:var(--accent);box-shadow:0 0 6px var(--accent);transition:width 0.3s;}
   .meta{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.1em;}
-  .tag{color:var(--magenta);}
+  .tag{color:var(--accent-2);}
   .card-front{font-family:var(--display);font-size:1.5rem;line-height:1.5;color:var(--text);margin:1.5rem 0;min-height:4rem;}
   .card-back{font-size:1rem;line-height:1.7;color:var(--text-dim);border-top:1px solid var(--border);padding-top:1.5rem;margin-top:1.5rem;white-space:pre-wrap;}
   .rate{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-top:1.5rem;}
   .rate button{padding:0.8rem 0.4rem;border:1px solid var(--border);background:transparent;color:var(--text);font-family:var(--mono);border-radius:4px;cursor:pointer;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;transition:all 0.15s;}
   .rate button small{display:block;font-size:0.6rem;color:var(--text-faint);font-weight:400;margin-top:0.25rem;letter-spacing:0;}
-  .rate button[data-q="1"]:hover{border-color:var(--red);color:var(--red);}
-  .rate button[data-q="3"]:hover{border-color:var(--amber);color:var(--amber);}
-  .rate button[data-q="4"]:hover{border-color:var(--cyan);color:var(--cyan);}
-  .rate button[data-q="5"]:hover{border-color:var(--green);color:var(--green);}
+  .rate button[data-q="1"]:hover{border-color:var(--danger);color:var(--danger);}
+  .rate button[data-q="3"]:hover{border-color:var(--warn);color:var(--warn);}
+  .rate button[data-q="4"]:hover{border-color:var(--accent);color:var(--accent);}
+  .rate button[data-q="5"]:hover{border-color:var(--success);color:var(--success);}
   @media (max-width:600px){
     body{padding:1rem;}
     .panel{padding:1.25rem;}
@@ -95,8 +95,8 @@
       <div class="label">// Session Complete</div>
       <div class="stat-row">
         <div><div class="big" id="sReviewed">0</div><div class="label" style="margin-top:0.5rem">Reviewed</div></div>
-        <div><div class="big" id="sCorrect" style="color:var(--green)">0</div><div class="label" style="margin-top:0.5rem">Recalled</div></div>
-        <div><div class="big" id="sXp" style="color:var(--amber)">0</div><div class="label" style="margin-top:0.5rem">XP</div></div>
+        <div><div class="big" id="sCorrect" style="color:var(--success)">0</div><div class="label" style="margin-top:0.5rem">Recalled</div></div>
+        <div><div class="big" id="sXp" style="color:var(--warn)">0</div><div class="label" style="margin-top:0.5rem">XP</div></div>
       </div>
       <button class="btn" onclick="location.href='index.html'">Back to Hub</button>
     </div>

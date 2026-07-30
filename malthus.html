@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cogito.css">
-  <style>:root{ --void:#050A08; --void-2:#0A1210; --panel:rgba(10,18,14,0.7); --panel-solid:#0A1410; --cyan:#39FF14; --cyan-dim:#008F11; --magenta:#FF2D9C; --amber:#FFB800; --green:#00D9FF; --red:#FF3355; --text:#E0FFEC; --text-dim:#6B8F7C; --text-faint:#6B8177; --border:rgba(57,255,20,0.15); --border-bright:rgba(57,255,20,0.4); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
+  <style>:root{ --void:#050A08; --void-2:#0A1210; --panel:rgba(10,18,14,0.7); --panel-solid:#0A1410; --accent:#39FF14; --accent-dim:#008F11; --accent-2:#FF2D9C; --warn:#FFB800; --success:#00D9FF; --danger:#FF3355; --text:#E0FFEC; --text-dim:#6B8F7C; --text-faint:#6B8177; --border:rgba(57,255,20,0.15); --border-bright:rgba(57,255,20,0.4); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
 </head>
 <body>
 <canvas id="particles"></canvas>
@@ -91,7 +91,7 @@
       <div class="dash-grid">
         <div class="panel">
           <div class="panel-label">// Daily Real-World Mission</div>
-          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2>
+          <h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--warn)" id="rtTitle">Generating Mission...</h2>
           <p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p>
           <button class="btn secondary" id="rtBtn" onclick="MALTHUS.completeRTMission()">Mark Complete · +25 XP</button>
         </div>
@@ -204,8 +204,8 @@
       <h1 class="section-title">Growth Lab</h1>
       <p class="section-sub">Malthus warned that populations grow geometrically while resources do not. The logistic curve tells the fuller story: fast exponential lift-off, then a slow bend as the population presses against its carrying capacity. Drag the rate and ceiling and watch the shape change.</p>
       <canvas id="mlCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
-      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Growth rate r <span id="mlRV" style="color:var(--cyan)"></span><input type="range" id="mlR" min="1" max="80" value="30" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Carrying capacity K <span id="mlKV" style="color:var(--cyan)"></span><input type="range" id="mlK" min="20" max="100" value="80" step="1" style="width:100%;"></label></div>
-      <div id="mlInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Growth rate r <span id="mlRV" style="color:var(--accent)"></span><input type="range" id="mlR" min="1" max="80" value="30" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Carrying capacity K <span id="mlKV" style="color:var(--accent)"></span><input type="range" id="mlK" min="20" max="100" value="80" step="1" style="width:100%;"></label></div>
+      <div id="mlInfo" style="font-family:var(--display);color:var(--accent);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MALTHUS</h1>
@@ -645,7 +645,7 @@ function checkSecretUnlock(){
       html += '<h2>// GAIA UNLOCKED</h2>';
       html += '<p>You have completed all 10 axes and successfully managed Project GAIA. You now possess the complete ecological architecture.</p>';
       html += '<p><strong>The Secret:</strong> Growth is not the goal; sustainability is. Every system has limits. The Malthusian trap is not a prediction; it is a mathematical certainty if growth is exponential and resources are finite. The only sustainable state is a Steady State. You are now a Malthusian.</p>';
-      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '<p style="color:var(--warn);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
       html += '</div>';
       container.innerHTML = html;
       flashCombo('UNLOCKED');
@@ -999,7 +999,7 @@ function showModuleDetail(moduleId){
   html += '</div>';
   
   if(prog.completed){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational. Drill these cards daily to deepen mastery.</p>';
     const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
     if(nextM && S.modules[nextM.id].unlocked){
       html += '<button class="btn success mt-1" onclick="MALTHUS.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>';
@@ -1074,7 +1074,7 @@ function renderProject(){
   let html = '<div class="project-hud">';
   html += '<div class="hud-stat"><span class="label">Population:</span><span class="val">8B</span></div>';
   html += '<div class="hud-stat"><span class="label">Phases:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div>';
-  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'STABLE' : 'OVERSHOOT') + '</span></div>';
+  html += '<div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--accent-2)">' + (solvedCount === totalPhases ? 'STABLE' : 'OVERSHOOT') + '</span></div>';
   html += '</div>';
   
   html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each ecological axis to manage Earth\'s carrying capacity. Phases unlock sequentially.</p>';
@@ -1140,7 +1140,7 @@ function showProjectPhase(phaseId){
   html += '<div class="outcome" id="outcome"></div>';
   
   if(solved){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>';
   }
   
   container.innerHTML = html;
@@ -1169,7 +1169,7 @@ function answerPhase(idx){
       S.project[p.id].solved = true;
       S.project[p.id].choice = idx;
       addXP(150, 'gaia: ' + p.id);
-      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+150 XP. Phase complete.</div>';
       flashCombo('+150 XP');
     }else{
       html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>';
@@ -1379,7 +1379,7 @@ function showArenaProblem(problemId){
   html += '<div class="outcome" id="outcome"></div>';
   
   if(solved){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>';
   }
   
   container.innerHTML = html;
@@ -1427,12 +1427,12 @@ function answerProblem(idx){
         S.modules[p.moduleId].problemSolved = true;
         if(moduleProgress(p.moduleId).completed){
           unlockNextModule(p.moduleId);
-          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
+          html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.1);border:1px solid var(--success);font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>';
         }else{
-          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+          html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP</div>';
         }
       }else{
-        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>';
+        html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP</div>';
       }
       flashCombo('+' + p.reward + ' XP');
     }else{
@@ -1490,9 +1490,9 @@ function renderStats(){
   const chart = document.getElementById('maturityChart');
   const cats = [
     { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
-    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
-    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
-    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--warn)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--accent)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--success)' }
   ];
   chart.innerHTML = '';
   cats.forEach(cat => {
@@ -1510,7 +1510,7 @@ function renderStats(){
     log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
       const d = new Date(entry.t);
       const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--accent);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
     }).join('');
   }
 }

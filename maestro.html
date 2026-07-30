@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cogito.css">
-  <style>:root{ --void:#0A0F0A; --void-2:#0F1A0F; --panel:rgba(10,20,10,0.7); --panel-solid:#0A140A; --cyan:#00FF88; --cyan-dim:#008F44; --magenta:#FF6B35; --amber:#FFD700; --green:#00D9FF; --red:#FF3355; --text:#E0FFE0; --text-dim:#6B8F6B; --text-faint:#6B826E; --border:rgba(0,255,136,0.15); --border-bright:rgba(0,255,136,0.4); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
+  <style>:root{ --void:#0A0F0A; --void-2:#0F1A0F; --panel:rgba(10,20,10,0.7); --panel-solid:#0A140A; --accent:#00FF88; --accent-dim:#008F44; --accent-2:#FF6B35; --warn:#FFD700; --success:#00D9FF; --danger:#FF3355; --text:#E0FFE0; --text-dim:#6B8F6B; --text-faint:#6B826E; --border:rgba(0,255,136,0.15); --border-bright:rgba(0,255,136,0.4); --display:'Chakra Petch',sans-serif; --mono:'JetBrains Mono',monospace; }</style>
 </head>
 <body>
 <canvas id="particles"></canvas>
@@ -35,7 +35,7 @@
         <div class="panel"><div class="panel-label">// Daily Output</div><div class="big-stat-value" id="dailyStudied" style="font-size:2rem">0</div><div class="big-stat-sub">cards reviewed today</div><div class="mt-2" style="display:grid;gap:0.4rem"><div class="text-sm text-dim">Accuracy: <span id="dailyAccuracy" class="text-cyan">--</span></div><div class="text-sm text-dim">Problems solved: <span id="dailySolved" class="text-cyan">0</span></div><div class="text-sm text-dim">XP gained: <span id="dailyXp" class="text-cyan">0</span></div></div></div>
       </div>
       <div class="dash-grid">
-        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--amber)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="MAESTRO.completeRTMission()">Mark Complete &middot; +25 XP</button></div>
+        <div class="panel"><div class="panel-label">// Daily Real-World Mission</div><h2 style="font-family:var(--display);font-size:1.1rem;margin-bottom:0.5rem;color:var(--warn)" id="rtTitle">Generating Mission...</h2><p id="rtBody" style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;line-height:1.7"></p><button class="btn secondary" id="rtBtn" onclick="MAESTRO.completeRTMission()">Mark Complete &middot; +25 XP</button></div>
         <div class="profile-card"><div class="panel-label">// Operator Profile</div><div class="profile-title" id="profTitle">UNRANKED</div><div class="profile-desc" id="profDesc">Complete drills to determine your psychometric profile.</div></div>
       </div>
       <div id="secretUnlockContainer"></div>
@@ -64,8 +64,8 @@
       <h1 class="section-title">Systems Lab</h1>
       <p class="section-sub">Systems thinking starts with stocks and flows. Water fills a tank from a tap while draining through a hole sized to how full it already is. That outflow is a balancing feedback loop, and it always pulls the stock toward one level — inflow divided by the drain rate. Set both and watch it settle.</p>
       <canvas id="msCanvas" style="width:100%;height:280px;border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,0.25);margin:1rem 0;"></canvas>
-      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Inflow (tap) <span id="msInV" style="color:var(--cyan)"></span><input type="range" id="msIn" min="1" max="40" value="20" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Drain rate (% of stock) <span id="msDrV" style="color:var(--cyan)"></span><input type="range" id="msDr" min="2" max="40" value="16" step="1" style="width:100%;"></label></div>
-      <div id="msInfo" style="font-family:var(--display);color:var(--cyan);margin-bottom:1rem;font-size:0.95rem;"></div>
+      <div style="display:grid;gap:0.6rem;max-width:420px;margin:0.5rem 0 1rem;"><label style="font-size:0.8rem;color:var(--text-dim);">Inflow (tap) <span id="msInV" style="color:var(--accent)"></span><input type="range" id="msIn" min="1" max="40" value="20" step="1" style="width:100%;"></label><label style="font-size:0.8rem;color:var(--text-dim);">Drain rate (% of stock) <span id="msDrV" style="color:var(--accent)"></span><input type="range" id="msDr" min="2" max="40" value="16" step="1" style="width:100%;"></label></div>
+      <div id="msInfo" style="font-family:var(--display);color:var(--accent);margin-bottom:1rem;font-size:0.95rem;"></div>
     </section>
     <section class="view" id="view-about">
       <h1 class="section-title">About MAESTRO</h1><p class="section-sub">Methodology and design principles.</p>
@@ -446,7 +446,7 @@ function checkSecretUnlock(){
       html += '<h2>// PANARCHY ACHIEVED</h2>';
       html += '<p>You have completed all 10 axes and successfully navigated Project Panarchy. You now possess the complete systems architecture.</p>';
       html += '<p><strong>The Secret:</strong> The world is not a collection of parts; it is a web of interactions. By mapping boundaries, feedback loops, and bottlenecks, you see the system instead of the symptoms. You design for emergence, resilience, and adaptation. You are now a Maestro.</p>';
-      html += '<p style="color:var(--amber);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
+      html += '<p style="color:var(--warn);font-family:var(--display);letter-spacing:0.1em">// END OF TRANSMISSION</p>';
       html += '</div>';
       container.innerHTML = html;
       flashCombo('UNLOCKED');
@@ -729,7 +729,7 @@ function showModuleDetail(moduleId){
   }
   html += '</div>';
   if(prog.completed){
-    html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational.</p>';
+    html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Module Complete</div><p class="text-sm">Axis ' + m.codename + ' operational.</p>';
     const nextM = MODULES[MODULES.findIndex(x=>x.id===moduleId)+1];
     if(nextM && S.modules[nextM.id].unlocked){ html += '<button class="btn success mt-1" onclick="MAESTRO.showModuleDetail(\''+nextM.id+'\')">Next: ' + nextM.codename + ' -></button>'; }
     html += '<button class="btn secondary mt-1" onclick="MAESTRO.show(\'project\')">Go to Project -></button>';
@@ -781,7 +781,7 @@ function renderProject(){
   const container = document.getElementById('projectContainer');
   const solvedCount = PROJECT_PHASES.filter(p => S.project[p.id].solved).length;
   const totalPhases = PROJECT_PHASES.length;
-  let html = '<div class="project-hud"><div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div><div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--magenta)">' + (solvedCount === totalPhases ? 'PANARCHY' : 'EXECUTING') + '</span></div></div>';
+  let html = '<div class="project-hud"><div class="hud-stat"><span class="label">Phases Solved:</span><span class="val">' + solvedCount + '/' + totalPhases + '</span></div><div class="hud-stat"><span class="label">Status:</span><span class="val" style="color:var(--accent-2)">' + (solvedCount === totalPhases ? 'PANARCHY' : 'EXECUTING') + '</span></div></div>';
   html += '<p class="text-sm text-dim" style="margin-bottom:1.5rem">Apply each systems axis to the platform scenario. Phases unlock sequentially.</p>';
   html += '<div class="phase-list">';
   PROJECT_PHASES.forEach((p, i) => {
@@ -816,7 +816,7 @@ function showProjectPhase(phaseId){
   p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MAESTRO.answerPhase(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
   html += '</div>';
   html += '<div class="outcome" id="outcome"></div>';
-  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>'; }
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Previously Solved</div><p class="text-sm">You have completed this phase.</p></div>'; }
   container.innerHTML = html;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -836,7 +836,7 @@ function answerPhase(idx){
       S.project[p.id].solved = true;
       S.project[p.id].choice = idx;
       addXP(150, 'panarchy: ' + p.id);
-      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+150 XP. Phase complete.</div>';
+      html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+150 XP. Phase complete.</div>';
       flashCombo('+150 XP');
     }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved.</div>'; }
   }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-evaluate and try again.</div>'; }
@@ -986,7 +986,7 @@ function showArenaProblem(problemId){
   p.options.forEach((opt, i) => { const letter = String.fromCharCode(65 + i); html += '<div class="option" onclick="MAESTRO.answerProblem(' + i + ')"><div class="option-letter">' + letter + '</div><div class="option-text">' + opt + '</div></div>'; });
   html += '</div>';
   html += '<div class="outcome" id="outcome"></div>';
-  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--green)"><div class="panel-label" style="color:var(--green)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>'; }
+  if(solved){ html += '<div class="panel mt-2" style="border-color:var(--success)"><div class="panel-label" style="color:var(--success)">// Previously Solved</div><p class="text-sm">You have solved this problem.</p></div>'; }
   container.innerHTML = html;
   window.scrollTo({ top: 0, behavior: 'smooth' });
   let timeLeft = p.timeLimit;
@@ -1018,9 +1018,9 @@ function answerProblem(idx){
       addXP(p.reward, 'arena: ' + p.id);
       if(!S.modules[p.moduleId].problemSolved){
         S.modules[p.moduleId].problemSolved = true;
-        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.08);border:1px solid var(--green);font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
-        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
-      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--green)">+' + p.reward + ' XP</div>'; }
+        if(moduleProgress(p.moduleId).completed){ unlockNextModule(p.moduleId); html += '<div style="margin-top:1rem;padding:0.75rem;background:rgba(0,217,255,0.08);border:1px solid var(--success);font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP - Module ' + MODULES.find(x=>x.id===p.moduleId).codename + ' complete - Next axis unlocked.</div>'; }
+        else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP</div>'; }
+      }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--success)">+' + p.reward + ' XP</div>'; }
       flashCombo('+' + p.reward + ' XP');
     }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved.</div>'; }
   }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson.</div>'; }
@@ -1054,9 +1054,9 @@ function renderStats(){
   const chart = document.getElementById('maturityChart');
   const cats = [
     { name: 'New (0d)', count: newCards, color: 'var(--text-dim)' },
-    { name: 'Learning (1-6d)', count: learning, color: 'var(--amber)' },
-    { name: 'Young (7-20d)', count: young, color: 'var(--cyan)' },
-    { name: 'Mature (21d+)', count: mature, color: 'var(--green)' }
+    { name: 'Learning (1-6d)', count: learning, color: 'var(--warn)' },
+    { name: 'Young (7-20d)', count: young, color: 'var(--accent)' },
+    { name: 'Mature (21d+)', count: mature, color: 'var(--success)' }
   ];
   chart.innerHTML = '';
   cats.forEach(cat => {
@@ -1072,7 +1072,7 @@ function renderStats(){
     log.innerHTML = S.sessionLog.slice(0, 20).map(entry => {
       const d = new Date(entry.t);
       const time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--cyan);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
+      return '<div style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.75rem"><span style="color:var(--text-dim)">' + time + '</span><span style="color:var(--text-dim)">' + entry.reason + '</span><span style="color:var(--accent);font-family:var(--display)">+' + entry.amount + ' XP</span></div>';
     }).join('');
   }
 }
