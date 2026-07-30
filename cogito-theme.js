@@ -39,9 +39,9 @@
     var s = document.createElement('style');
     s.id = 'cogito-theme-css';
     s.textContent =
-      '[data-theme="plain"]{--void:#15171c;--panel:rgba(38,42,50,0.7);--panel-solid:#1e2127;--cyan:#9fb3c8;--magenta:#b9a3c9;--green:#a3c9a8;--amber:#d8c79e;--red:#d39a9a;--text:#dfe4ea;--text-dim:#9aa3af;--text-faint:#5c6470;--border:rgba(159,179,200,0.18);--border-bright:rgba(159,179,200,0.4);}' +
-      '[data-theme="crimson"]{--void:#140608;--panel:rgba(40,10,14,0.78);--panel-solid:#1a0509;--cyan:#FF4D6D;--magenta:#FF8FA3;--green:#FF4D6D;--amber:#FFB3C1;--red:#FF3355;--text:#FFE5E9;--text-dim:#C98A95;--text-faint:#7A4A52;--border:rgba(255,77,109,0.2);--border-bright:rgba(255,77,109,0.5);}' +
-      '[data-theme="emerald"]{--void:#04140E;--panel:rgba(10,40,28,0.78);--panel-solid:#06150F;--cyan:#2EE6A6;--magenta:#5EEAD4;--green:#2EE6A6;--amber:#A7F3D0;--red:#FF6B6B;--text:#E6FFF5;--text-dim:#7FB8A0;--text-faint:#3F6657;--border:rgba(46,230,166,0.2);--border-bright:rgba(46,230,166,0.5);}' +
+      '[data-theme="plain"]{--void:#15171c;--panel:rgba(38,42,50,0.7);--panel-solid:#1e2127;--accent:#9fb3c8;--accent-2:#b9a3c9;--success:#a3c9a8;--warn:#d8c79e;--danger:#d39a9a;--text:#dfe4ea;--text-dim:#9aa3af;--text-faint:#5c6470;--border:rgba(159,179,200,0.18);--border-bright:rgba(159,179,200,0.4);}' +
+      '[data-theme="crimson"]{--void:#140608;--panel:rgba(40,10,14,0.78);--panel-solid:#1a0509;--accent:#FF4D6D;--accent-2:#FF8FA3;--success:#FF4D6D;--warn:#FFB3C1;--danger:#FF3355;--text:#FFE5E9;--text-dim:#C98A95;--text-faint:#7A4A52;--border:rgba(255,77,109,0.2);--border-bright:rgba(255,77,109,0.5);}' +
+      '[data-theme="emerald"]{--void:#04140E;--panel:rgba(10,40,28,0.78);--panel-solid:#06150F;--accent:#2EE6A6;--accent-2:#5EEAD4;--success:#2EE6A6;--warn:#A7F3D0;--danger:#FF6B6B;--text:#E6FFF5;--text-dim:#7FB8A0;--text-faint:#3F6657;--border:rgba(46,230,166,0.2);--border-bright:rgba(46,230,166,0.5);}' +
       '.theme-option.locked{opacity:0.4;cursor:not-allowed;}.theme-option.locked:hover{background:none;color:var(--text-dim);}';
     document.head.appendChild(s);
   }
