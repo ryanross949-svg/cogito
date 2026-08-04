@@ -26,6 +26,7 @@ const path = require('path');
 const args = process.argv.slice(2);
 const only = args.includes('--course') ? args[args.indexOf('--course') + 1] : null;
 const simulate = args.includes('--simulate');
+const fixPlan = args.includes('--fix-plan');
 
 const dir = path.join(__dirname, '..');
 const files = fs.readdirSync(dir).filter(f => f.endsWith('.html') &&
@@ -122,6 +123,60 @@ if (simulate) {
   console.log('backlog: ' + pc(100 * simFar / total) + ' of questions have no distractor within 90% of');
   console.log('the correct option, so those need new text rather than editing.');
   console.log('');
+}
+
+/* --fix-plan: turn the score into a per-question work order.
+ *
+ * Written after four courses were fixed by hand, each of which took the same three
+ * rounds: author, measure, find the number overshot, adjust. The overshoot is not a
+ * judgment call, it is arithmetic the script can do. It picks which quarter of the
+ * questions KEEP the answer as the longest option, because 25% is the target rather
+ * than zero, and then says exactly how many characters each remaining question is off
+ * by. Authoring against this is filling in blanks instead of aiming at a moving number.
+ *
+ * The choice of which questions keep it is deliberate: the ones where the answer is
+ * already longest by the smallest margin, so the least text has to change overall.
+ */
+if (fixPlan) {
+  if (!only) { console.log('\n--fix-plan needs --course <file>'); process.exit(2); }
+  const arena = load(only) || [];
+  const rowsOut = [];
+  for (const q of arena) {
+    if (!Array.isArray(q.options) || typeof q.correct !== 'number') continue;
+    const opts = q.options.map(String);
+    if (opts[q.correct] === undefined) continue;
+    const lens = opts.map(o => o.length), me = lens[q.correct];
+    const longestOther = Math.max.apply(null, lens.filter((l, i) => i !== q.correct));
+    const cut = opts[q.correct].search(JUSTIFY);
+    rowsOut.push({ id: q.id, me, longestOther, margin: me - longestOther,
+      isTell: isTell(lens, q.correct), cut: cut > 0 ? cut : null,
+      longestDistractor: opts.filter((o, i) => i !== q.correct).sort((a, b) => b.length - a.length)[0] });
+  }
+  const tellRows = rowsOut.filter(r => r.isTell);
+  const keep = Math.round(rowsOut.length * 0.25);
+  /* smallest margin first: these stay as they are and become the intended 25% */
+  const keepIds = new Set(tellRows.slice().sort((a, b) => a.margin - b.margin).slice(0, keep).map(r => r.id));
+
+  console.log('');
+  console.log('work order for ' + only + ': ' + rowsOut.length + ' questions, ' +
+    tellRows.length + ' currently give the answer away');
+  console.log('keep ' + Math.min(keep, tellRows.length) + ' of them as the intended 25%; fix the rest below.');
+  console.log('');
+  const todo = tellRows.filter(r => !keepIds.has(r.id));
+  todo.forEach(r => {
+    const opt = r.cut !== null
+      ? 'cut the answer at char ' + r.cut + ' (moves its reason to the explanation), or '
+      : '';
+    console.log('  ' + r.id.padEnd(6) + 'answer ' + String(r.me).padStart(3) +
+      ', longest distractor ' + String(r.longestOther).padStart(3) + '   ' +
+      opt + 'add ' + (r.margin + 1) + '+ chars to a distractor');
+    console.log('         longest distractor now: ' + r.longestDistractor);
+  });
+  console.log('');
+  console.log(todo.length + ' questions to change. ' +
+    todo.filter(r => r.cut !== null).length + ' of them can be fixed by cutting the answer alone.');
+  console.log('Re-run without --fix-plan after applying, and expect 25%, not 0%.');
+  process.exit(0);
 }
 
 if (!only) {
