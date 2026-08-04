@@ -62,7 +62,14 @@ before saving. Run it with no patch file to fix a slot tell on its own.
 
 - `check-arena-tell.js --course x.html` reports near 25%, and the correct and distractor
   mean lengths are close.
-- `check-course-spec.js --course x.html` says `to spec`.
+- The answer is not reliably the **shortest** either. Check the length-rank spread the
+  tool prints; it should sit near a quarter in each of the four ranks. Erdos hit 25.0%
+  on the headline number with rank 4 at 20 of 40, meaning the answer was the shortest
+  option half the time, and a guesser who avoids the shortest option beats chance on
+  that. It is the same tell one level down. The three hand-fixed courses still carry it:
+  the answer is the shortest 11% of the time in cobra, 15% in oracle, 19% in prima.
+- `check-course-spec.js --course x.html` says `to spec`, or reports only `arena 40/100`
+  if the pass was de-tell without expansion.
 - `node scripts/test-arena-nav.js` passes.
 - If the course's `CARDS` changed, `node scripts/gen-review.js` has been re-run.
 
@@ -90,6 +97,53 @@ Every one of these cost real time on the first four courses.
   statistic. Three such questions were deliberately skipped.
 - **Preserve ids.** Saved SM-2 scheduling and solved flags are keyed on them. Add new
   questions with new ids rather than renumbering.
+- **A distractor that is defensibly true is worse than one that is hard.** It punishes
+  the students who know the most, which is the opposite of what the Arena is for.
+  Boltzmann p19 offered "surface tension pulls the top layer into regular hexagonal
+  cells" as a wrong answer about convection, but Pearson showed in 1958 that surface
+  tension is what drives the hexagonal cells in Benard's own experiment. Before writing
+  any distractor, ask whether a well-read student could defend it. In philosophy, stay
+  off live scholarly disputes and build from misreadings no interpreter defends. In
+  mathematics, watch for the true theorem that answers a different question.
+- **Lengthening a stub can manufacture that defect.** Schumpeter p36 had the throwaway
+  option "Deregulate everything.", dismissible on sight. Padded to carry a real claim it
+  became a principled position a thoughtful student would defend, on a stem that asks
+  what you *should* do. When you give a stub a real claim, make it a claim that is
+  false, not one that is merely unfashionable.
+- **A string can appear twice in the file.** Wittgenstein p23's question text was also
+  flashcard c64's front, so a raw replace would have silently edited a card as well.
+  Assert the match count before writing, and match on the surrounding field
+  (`body:'...'`) rather than the bare sentence. `apply-arena-patch.js` avoids this
+  entirely, but it only writes options, the correct index, and the explanation; a
+  question body still needs a hand edit.
+
+## Delegating a course
+
+Four courses have been run this way and all four landed on 25.0% first time, so the
+overshoot round trip that cost the hand-fixed courses is gone. Three can run in
+parallel without interfering. The recipe:
+
+- One agent, one course, one patch file named after the course. Tell it that a dirty
+  `git status` from the other agents is expected and not its problem.
+- Tell it to **skip `test-arena-nav.js`**. It reads all 52 courses and will race an
+  agent mid-write. Run it once in the main session after the batch lands.
+- Tell it not to commit, stage, or checkout anything.
+- Give it the domain and the misconceptions worth building distractors from. Expect it
+  to correct you: erdos was dispatched as combinatorics and is actually applied network
+  science, and the agent authored against the real content and said so.
+- Require a report section listing **every distractor it is not fully confident is
+  false**, and say that an empty section is a claim. This is the highest-value thing it
+  produces. In each course that had a genuine defect, the agent's own top-ranked flag
+  was that defect. Ask for id lists rather than counts; two reports miscounted their
+  own lists.
+- Forbid pasting question text, options, drafts, or `--fix-plan` output into the report.
+  Keeping that in the agent's context is the entire point.
+
+Then review in the main session: re-run the checks yourself rather than trusting the
+report, and read the flagged questions plus a sample of six to eight it was confident
+about. The checker measures length and cannot measure believability, so that read is
+the only thing standing between a green scoreboard and a course that punishes the
+students who know the most.
 
 ## Adding questions to reach 100
 
