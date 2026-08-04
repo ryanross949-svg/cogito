@@ -78,15 +78,19 @@
     row.style.gap = '1rem';
     row.style.flexWrap = 'wrap';
 
-    var btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.type = 'button';
-    btn.textContent = next ? 'Next Problem ->' : 'Back to Arena';
-    btn.onclick = function () {
-      if (next) ctx.goProblem(next.id);
-      else ctx.goArena();
-    };
-    row.appendChild(btn);
+    /* No button at the end of a module. The problem view already carries a "<- Arena"
+       link at the top, so offering "Back to Arena" here put the same control on screen
+       twice and only on the last problem, which reads as a mistake rather than a
+       choice. The note below still says the module is finished; getting back is the
+       link that was always there. */
+    if (next) {
+      var btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.type = 'button';
+      btn.textContent = 'Next Problem ->';
+      btn.onclick = function () { ctx.goProblem(next.id); };
+      row.appendChild(btn);
+    }
 
     var note = document.createElement('span');
     note.className = 'text-sm text-dim';

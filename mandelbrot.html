@@ -16,6 +16,7 @@
 <script src="cogito-bg.js?v=2"></script>
 <script src="cogito-a11y.js"></script>
 <script src="cogito-theme.js?v=1"></script>
+<script src="cogito-arena-nav.js?v=1"></script>
 <div id="boot"><div class="boot-logo">MANDELBROT</div><div class="boot-sub">Cogito // Fat Tails & Fractals v1.0</div><div class="boot-log" id="bootLog"></div><div class="boot-bar"><div class="boot-bar-fill" id="bootBar"></div></div></div>
 <div id="app">
   <header class="topbar">
@@ -1037,7 +1038,7 @@ function answerProblem(idx){
     }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">Already solved. No XP awarded.</div>'; }
   }else{ html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>'; }
   outcome.innerHTML = html;
-  outcome.classList.add('active');
+  outcome.classList.add('active'); if(window.CogitoArenaNav){ CogitoArenaNav.renderNext({ arena: ARENA, currentId: p.id, moduleId: p.moduleId, solved: S.arena, goProblem: function(id){ showArenaProblem(id); } }); }
   saveState();
   renderTopbar();
   const container = document.getElementById('arenaContainer');

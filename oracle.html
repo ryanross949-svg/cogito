@@ -1528,20 +1528,7 @@ function answerProblem(idx){
   outcome.classList.add('active');
   saveState();
 
-  // Next-problem control. Lives in cogito-arena-nav.js rather than here, because this
-  // function exists inline in all 52 course pages and those copies have already drifted;
-  // a feature added in 52 places becomes the next thing to diverge. Guarded, so a page
-  // that has not loaded the shared file yet behaves exactly as it does today.
-  if(window.CogitoArenaNav){
-    CogitoArenaNav.renderNext({
-      arena: ARENA,
-      currentId: p.id,
-      moduleId: p.moduleId,
-      solved: S.arena,
-      goProblem: function(id){ showArenaProblem(id); },
-      goArena: function(){ ORACLE.show('arena'); }
-    });
-  }
+ if(window.CogitoArenaNav){ CogitoArenaNav.renderNext({ arena: ARENA, currentId: p.id, moduleId: p.moduleId, solved: S.arena, goProblem: function(id){ showArenaProblem(id); } }); }
   renderTopbar();
   
   const container = document.getElementById('arenaContainer');

@@ -16,6 +16,7 @@
 <script src="cogito-bg.js?v=2"></script>
 <script src="cogito-a11y.js"></script>
 <script src="cogito-theme.js?v=1"></script>
+<script src="cogito-arena-nav.js?v=1"></script>
 
 <div id="boot">
   <div class="boot-logo">AXELROD</div>
@@ -1435,7 +1436,7 @@ function answerProblem(idx){
   }
   
   outcome.innerHTML = html;
-  outcome.classList.add('active');
+  outcome.classList.add('active'); if(window.CogitoArenaNav){ CogitoArenaNav.renderNext({ arena: ARENA, currentId: p.id, moduleId: p.moduleId, solved: S.arena, goProblem: function(id){ showArenaProblem(id); } }); }
   saveState();
   renderTopbar();
   
