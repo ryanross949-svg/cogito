@@ -3,24 +3,46 @@
    .redesign/README.md). Each course sets its own accent in a small :root override
    after this file loads; everything below is common to every course. */
 
-/* Default palette. Individual courses override these in their own page. */
+/* Default palette. Individual courses override these in their own page.
+
+   Contrast is checked, not eyeballed: node scripts/check-contrast.js prints every
+   text-on-background pair for all eight themes and exits non-zero if any falls under
+   4.5:1. Run it after touching any colour here.
+
+   Two things that pass came out of that check and should not be "corrected" back.
+
+   First, --text is deliberately NOT near-white. Quantum was #E8EDF4 on #0A0C10, which
+   is 16.6:1. That passes AA and AAA and is painful to read: at that ratio on a dark
+   background the glyphs bleed into the paper, which is why long sessions hurt. Body
+   text now sits between 10.8:1 and 12.9:1 across every theme, still comfortably above
+   the 7:1 AAA floor. Raising the void and lowering the text both contribute; neither
+   alone was enough.
+
+   Second, --text-faint was failing AA in seven of the eight themes (light 2.71:1,
+   nord 3.30, matrix 3.33, crimson 3.51, cyberpunk 3.74, plain 3.71, emerald 3.84)
+   despite a commit that claimed AA contrast. It is the token most likely to be
+   "toned down" for looking loud. It cannot go below 4.5:1.
+
+   Matrix green and cyberpunk yellow stay at 15:1 as accents on purpose. They are the
+   signature of two opt-in, unlock-gated themes, and the checker reports that as a
+   comfort note rather than a failure. */
 :root{
-  --void:#0A0C10; --void-2:#10131A; --panel:rgba(18,22,30,0.72); --panel-solid:#12161E;
+  --void:#141821; --void-2:#10131A; --panel:rgba(18,22,30,0.72); --panel-solid:#12161E;
   --accent:#00F5D4; --accent-dim:#0B7F6E; --accent-2:#55607A;
   --warn:#FFB000; --success:#4ADE80; --danger:#FF4D5E;
-  --text:#E8EDF4; --text-dim:#94A0B0; --text-faint:#777F8F;
+  --text:#CFD6E0; --text-dim:#94A0B0; --text-faint:#8A92A2;
   --border:rgba(148,160,176,0.16); --border-bright:rgba(148,160,176,0.34);
   --display:'IBM Plex Sans Condensed',sans-serif; --mono:'IBM Plex Mono',monospace;
 }
 
 /* Themes. Selected via data-theme on <body>; see THEMES in index.html. */
-[data-theme="plain"] { --void:#15171c; --panel:rgba(38,42,50,0.7); --panel-solid:#1e2127; --accent:#9fb3c8; --accent-2:#b9a3c9; --success:#a3c9a8; --warn:#d8c79e; --danger:#d39a9a; --text:#dfe4ea; --text-dim:#9AA3AF; --text-faint:#6B7280; --border:rgba(159,179,200,0.18); --border-bright:rgba(159,179,200,0.4); }
-[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --accent:#268BD2; --accent-dim:#1A5A8A; --accent-2:#D33682; --warn:#B58900; --success:#859900; --danger:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#8A9A9E; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
-[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --accent:#88C0D0; --accent-dim:#5E81AC; --accent-2:#B48EAD; --warn:#EBCB8B; --success:#A3BE8C; --danger:#BF616A; --text:#ECEFF4; --text-dim:#C3CBD9; --text-faint:#7A8494; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
-[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --accent:#00FF41; --accent-dim:#008F11; --accent-2:#00FF41; --warn:#39FF14; --success:#00FF41; --danger:#FF3355; --text:#00FF41; --text-dim:#00B82F; --text-faint:#00701C; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
-[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --accent:#FCEE09; --accent-dim:#FCEE09; --accent-2:#FF003C; --warn:#00FFF0; --success:#FF003C; --danger:#FF003C; --text:#F8F8F8; --text-dim:#B8B8B8; --text-faint:#6E6E6E; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
-[data-theme="crimson"] { --void:#140608; --panel:rgba(40,10,14,0.78); --panel-solid:#1a0509; --accent:#FF4D6D; --accent-2:#FF8FA3; --success:#FF4D6D; --warn:#FFB3C1; --danger:#FF3355; --text:#FFE5E9; --text-dim:#D49AA4; --text-faint:#8A5A62; --border:rgba(255,77,109,0.2); --border-bright:rgba(255,77,109,0.5); }
-[data-theme="emerald"] { --void:#04140E; --panel:rgba(10,40,28,0.78); --panel-solid:#06150F; --accent:#2EE6A6; --accent-2:#5EEAD4; --success:#2EE6A6; --warn:#A7F3D0; --danger:#FF6B6B; --text:#E6FFF5; --text-dim:#8FCCB4; --text-faint:#54786A; --border:rgba(46,230,166,0.2); --border-bright:rgba(46,230,166,0.5); }
+[data-theme="plain"] { --void:#1a1d23; --panel:rgba(38,42,50,0.7); --panel-solid:#1e2127; --accent:#9fb3c8; --accent-2:#b9a3c9; --success:#a3c9a8; --warn:#d8c79e; --danger:#d39a9a; --text:#ccd2da; --text-dim:#9AA3AF; --text-faint:#868E9A; --border:rgba(159,179,200,0.18); --border-bright:rgba(159,179,200,0.4); }
+[data-theme="light"] { --void:#FDF6E3; --panel:rgba(253,246,227,0.9); --panel-solid:#FFFFFF; --accent:#1A6FA8; --accent-dim:#1A5A8A; --accent-2:#D33682; --warn:#B58900; --success:#859900; --danger:#DC322F; --text:#073642; --text-dim:#586E75; --text-faint:#5F6E71; --border:rgba(7,54,66,0.15); --border-bright:rgba(7,54,66,0.3); }
+[data-theme="nord"] { --void:#2E3440; --panel:rgba(46,52,64,0.8); --panel-solid:#2E3440; --accent:#88C0D0; --accent-dim:#5E81AC; --accent-2:#B48EAD; --warn:#EBCB8B; --success:#A3BE8C; --danger:#BF616A; --text:#ECEFF4; --text-dim:#C3CBD9; --text-faint:#959EAD; --border:rgba(216,222,233,0.15); --border-bright:rgba(216,222,233,0.3); }
+[data-theme="matrix"] { --void:#000; --panel:rgba(0,20,0,0.8); --panel-solid:#050505; --accent:#00FF41; --accent-dim:#008F11; --accent-2:#00FF41; --warn:#39FF14; --success:#00FF41; --danger:#FF3355; --text:#00E03A; --text-dim:#00B82F; --text-faint:#009127; --border:rgba(0,255,65,0.2); --border-bright:rgba(0,255,65,0.5); }
+[data-theme="cyberpunk"] { --void:#1A0A1A; --panel:rgba(40,10,40,0.8); --panel-solid:#1A051A; --accent:#FCEE09; --accent-dim:#FCEE09; --accent-2:#FF003C; --warn:#00FFF0; --success:#FF003C; --danger:#FF003C; --text:#CECECE; --text-dim:#B8B8B8; --text-faint:#8B8B8B; --border:rgba(255,0,60,0.3); --border-bright:rgba(255,0,60,0.6); }
+[data-theme="crimson"] { --void:#140608; --panel:rgba(40,10,14,0.78); --panel-solid:#1a0509; --accent:#FF4D6D; --accent-2:#FF8FA3; --success:#FF4D6D; --warn:#FFB3C1; --danger:#FF3355; --text:#DBC2C7; --text-dim:#D49AA4; --text-faint:#A97A84; --border:rgba(255,77,109,0.2); --border-bright:rgba(255,77,109,0.5); }
+[data-theme="emerald"] { --void:#04140E; --panel:rgba(10,40,28,0.78); --panel-solid:#06150F; --accent:#2EE6A6; --accent-2:#5EEAD4; --success:#2EE6A6; --warn:#A7F3D0; --danger:#FF6B6B; --text:#BEDCCF; --text-dim:#8FCCB4; --text-faint:#6F9787; --border:rgba(46,230,166,0.2); --border-bright:rgba(46,230,166,0.5); }
 
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--void);color:var(--text);font-family:var(--mono);overflow-x:hidden;}
