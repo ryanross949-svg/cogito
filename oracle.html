@@ -16,6 +16,7 @@
 <script src="cogito-bg.js?v=2"></script>
 <script src="cogito-a11y.js"></script>
 <script src="cogito-theme.js?v=1"></script>
+<script src="cogito-arena-nav.js?v=1"></script>
 
 <div id="boot">
   <div class="boot-logo">ORACLE</div>
@@ -1522,10 +1523,25 @@ function answerProblem(idx){
   }else{
     html += '<div style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim)">No XP. Re-read the lesson, then try again.</div>';
   }
-  
+
   outcome.innerHTML = html;
   outcome.classList.add('active');
   saveState();
+
+  // Next-problem control. Lives in cogito-arena-nav.js rather than here, because this
+  // function exists inline in all 52 course pages and those copies have already drifted;
+  // a feature added in 52 places becomes the next thing to diverge. Guarded, so a page
+  // that has not loaded the shared file yet behaves exactly as it does today.
+  if(window.CogitoArenaNav){
+    CogitoArenaNav.renderNext({
+      arena: ARENA,
+      currentId: p.id,
+      moduleId: p.moduleId,
+      solved: S.arena,
+      goProblem: function(id){ showArenaProblem(id); },
+      goArena: function(){ ORACLE.show('arena'); }
+    });
+  }
   renderTopbar();
   
   const container = document.getElementById('arenaContainer');
