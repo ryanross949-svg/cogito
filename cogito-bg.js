@@ -239,4 +239,49 @@
 
   window.applyBackground = apply;
   window.initBackground = function () { apply(localStorage.getItem('cogito-bg') || 'constellation'); };
+
+  // ---------- status-bar colour (Ryan, 2026-09-21) ----------
+  //
+  // "There's a white horizontal band across the very top where the time and my
+  // battery are." On iOS Safari the area behind the status bar is painted from
+  // <meta name="theme-color">, and with no such tag it defaults to white -
+  // against every Cogito theme but one, which are all dark.
+  //
+  // It cannot be a static tag in the 54 pages, because --void changes with the
+  // theme: #141821 on quantum, #FDF6E3 on light, #04140E on emerald. So the tag
+  // is created here and kept in step with whatever --void currently resolves to.
+  //
+  // This file rather than cogito-theme.js because all 54 pages load this one and
+  // only 52 load that one; the two that do not are exactly the pages that would
+  // otherwise keep the white band.
+  //
+  // The companion half is `viewport-fit=cover` on every page's viewport meta,
+  // without which the page never extends under the status bar at all.
+  function syncStatusBarColour() {
+    var d = document, tag = d.querySelector('meta[name="theme-color"]');
+    if (!tag) {
+      tag = d.createElement('meta');
+      tag.setAttribute('name', 'theme-color');
+      d.head.appendChild(tag);
+    }
+    var void_ = getComputedStyle(d.documentElement).getPropertyValue('--void').trim();
+    if (void_) tag.setAttribute('content', void_);
+  }
+
+  function watchTheme() {
+    syncStatusBarColour();
+    if (!window.MutationObserver || !document.body) return;
+    // setTheme() writes body.dataset.theme; the colour has to follow it.
+    new MutationObserver(syncStatusBarColour).observe(document.body, {
+      attributes: true, attributeFilter: ['data-theme'],
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', watchTheme);
+  } else {
+    watchTheme();
+  }
+
+  window.syncStatusBarColour = syncStatusBarColour;
 })();

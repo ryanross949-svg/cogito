@@ -53,7 +53,11 @@ body{
 #particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(color-mix(in srgb, var(--accent-2) 3%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--accent-2) 3%, transparent) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
 
-#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;}
+/* viewport-fit=cover (2026-09-21) lets the page run under the status bar, which
+   is what kills the white band. Everything pinned to the top then has to add the
+   inset back, or it sits under the clock. env() falls back to 0px on anything
+   without a notch, so desktop is untouched. */
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:calc(2rem + env(safe-area-inset-top,0px)) 2rem calc(2rem + env(safe-area-inset-bottom,0px));}
 #boot.fade{opacity:0;pointer-events:none;transition:opacity 400ms ease;}
 .boot-logo{font-family:var(--display);font-size:clamp(3rem,10vw,7rem);font-weight:700;letter-spacing:0.3em;color:var(--accent);margin-bottom:1rem;position:relative;}
 .boot-logo::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanLine 2s ease-in-out infinite;}
@@ -68,7 +72,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 #app{position:relative;z-index:5;min-height:100vh;display:none;flex-direction:column;}
 #app.active{display:flex;}
 
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--void) 85%, transparent);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:calc(1rem + env(safe-area-inset-top,0px)) 2rem 1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--void) 85%, transparent);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
 .topbar-left{display:flex;align-items:center;gap:1rem;}
 .brand{font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:0.2em;color:var(--accent);}
 .brand-tag{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.3em;display:block;margin-top:2px;}
@@ -322,7 +326,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .diff-4{background:color-mix(in srgb, var(--danger) 15%, transparent); color:var(--danger); border:1px solid color-mix(in srgb, var(--danger) 55%, transparent);}
 
 @media(max-width:700px){
-  .topbar{padding:0.75rem 1rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
+  .topbar{padding:calc(0.75rem + env(safe-area-inset-top,0px)) 1rem 0.75rem;flex-direction:column;gap:0.5rem;align-items:flex-start;}
   .stats-strip{flex-wrap:wrap;gap:0.85rem;}
   .nav{padding:0 1rem;}
   .nav-item{padding:0.75rem 0.65rem;font-size:0.65rem;}
