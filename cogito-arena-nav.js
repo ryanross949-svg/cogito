@@ -102,7 +102,62 @@
     outcome.parentNode.insertBefore(row, outcome.nextSibling);
   }
 
-  global.CogitoArenaNav = { pickNext: pickNext, moduleProgress: moduleProgress, renderNext: renderNext };
+  // ---------- auto-scroll to the verdict (Ryan, 2026-09-21) ----------
+  //
+  // "Whenever I answer a question I have to physically scroll down to get to
+  // the reasoning and then press Continue Training. Can you make it so it
+  // automatically scrolls for me?"
+  //
+  // Both answer paths - answerProblem in the Arena and answerPhase in the
+  // project - finish by appending a `.lesson-actions` div holding the next
+  // button. That append is the signal, and it fires AFTER the button exists,
+  // which is exactly the moment worth scrolling to.
+  //
+  // Done here, in the one file all 52 course pages already load, rather than by
+  // editing 52 copies of answerProblem. COGITO_CONTEXT is explicit that shared
+  // behaviour belongs in a shared file: before cogito.css existed there were 32
+  // divergent copies of the same stylesheet and three themes that silently did
+  // nothing on every course page.
+  //
+  // Scrolls to the outcome, not to the button: the reasoning is what he reads
+  // first, and the button follows it down the page.
+  function scrollToVerdict(actions) {
+    var target = document.getElementById('outcome');
+    if (!target || !target.classList.contains('active')) target = actions;
+    if (!target || !target.scrollIntoView) return;
+    var still = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try {
+      target.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    } catch (e) {
+      target.scrollIntoView();   // older WebKit takes no options object
+    }
+  }
+
+  function watchForVerdict() {
+    if (!global.MutationObserver || !global.document || !document.body) return;
+    new MutationObserver(function (records) {
+      for (var i = 0; i < records.length; i++) {
+        var added = records[i].addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          var el = added[j];
+          if (el.nodeType === 1 && el.classList && el.classList.contains('lesson-actions')) {
+            scrollToVerdict(el);
+            return;
+          }
+        }
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (global.document) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', watchForVerdict);
+    } else {
+      watchForVerdict();
+    }
+  }
+
+  global.CogitoArenaNav = { pickNext: pickNext, moduleProgress: moduleProgress, renderNext: renderNext, scrollToVerdict: scrollToVerdict };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = global.CogitoArenaNav; // so the pure half can be tested in node
